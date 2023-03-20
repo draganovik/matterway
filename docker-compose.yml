@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  catalog.api:
+    container_name: catalog_api
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
+
+  customers.api:
+    container_name: customers_api
+    image: ${DOCKER_REGISTRY-}customersapi
+    build:
+      context: .
+      dockerfile: src/Services/Customers/Customers.API/Dockerfile
+
+
+  identity.api:
+    container_name: identity_api
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: src/Services/Identity/Identity.API/Dockerfile
+
+
+  inventory.api:
+    container_name: inventory_api
+    image: ${DOCKER_REGISTRY-}inventoryapi
+    build:
+      context: .
+      dockerfile: src/Services/Inventory/Inventory.API/Dockerfile
+
+
+  ordering.api:
+    container_name: ordering_api
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
+
+
+  payment.api:
+    container_name: payment_api
+    image: ${DOCKER_REGISTRY-}paymentapi
+    build:
+      context: .
+      dockerfile: src/Services/Payment/Payment.API/Dockerfile
+

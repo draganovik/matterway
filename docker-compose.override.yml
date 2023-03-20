@@ -1,0 +1,118 @@
+version: '3.4'
+
+services:
+  catalog.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1001:80"
+      - "2001:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  customers.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1002:80"
+      - "2002:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  identity.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1003:80"
+      - "2003:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  inventory.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1004:80"
+      - "2004:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  ordering.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1005:80"
+      - "2005:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  payment.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "1006:80"
+      - "2006:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  catalog.db:
+    container_name: catalog_db
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1401:8011"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M55QL_4UTH
+      - MSSQL_PID=Express
+
+  customers.db:
+    container_name: customers_db
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1402:8011"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M55QL_4UTH
+      - MSSQL_PID=Express
+
+  identity.db:
+    container_name: identity_db
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1403:8011"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M55QL_4UTH
+      - MSSQL_PID=Express
+
+  ordering.db:
+    container_name: ordering_db
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1404:8011"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M55QL_4UTH
+      - MSSQL_PID=Express
+
+  payment.db:
+    container_name: payment_db
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1405:8011"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M55QL_4UTH
+      - MSSQL_PID=Express
