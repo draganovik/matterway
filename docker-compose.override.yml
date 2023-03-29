@@ -27,12 +27,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - Jwt__Issuer=http://localhost:2003
+      - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
+      - Jwt__Audience=http://localhost:2003
+      - ConnectionStrings__IdentityDbContext=Server=identity_db;Database=identity;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
     ports:
       - "1003:80"
       - "2003:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+     
 
   inventory.api:
     environment:
@@ -91,7 +96,7 @@ services:
     container_name: identity_db
     image: mcr.microsoft.com/mssql/server
     ports:
-      - "1403:8011"
+      - "1403:1433"
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=M55QL_4UTH
