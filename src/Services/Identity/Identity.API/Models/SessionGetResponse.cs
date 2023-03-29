@@ -1,6 +1,6 @@
 ﻿namespace Identity.API.Models;
 
-public class SystemUserLoginResponse
+public class SessionPostResponse
 {
     public string Token { get; set; }
     public string RefreshToken { get; set; }

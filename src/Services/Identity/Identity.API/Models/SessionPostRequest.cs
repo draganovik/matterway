@@ -2,7 +2,7 @@
 
 namespace Identity.API.Models;
 
-public class SystemUserLoginRequest
+public class SessionPostRequest
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Email is not valid")]

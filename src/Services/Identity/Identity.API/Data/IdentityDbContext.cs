@@ -4,53 +4,53 @@ using Identity.API.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.API.Data
+namespace Identity.API.Data;
+
+public class IdentityDbContext : DbContext
 {
-    public class IdentityDbContext : DbContext
+    readonly IConfiguration configuration;
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options, IConfiguration config)
+        : base(options)
     {
-        IConfiguration configuration;
-        public IdentityDbContext(DbContextOptions<IdentityDbContext> options, IConfiguration config)
-            : base(options)
+        configuration = config;
+    }
+
+    public DbSet<SystemUser> SystemUser { get; set; } = default!;
+
+    public DbSet<Session> Session { get; set; } = default!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Session>()
+            .HasOne(su => su.SystemUser)
+            .WithMany(se => se.Sessions)
+            .HasForeignKey(s => s.SystemUserId)
+            .IsRequired();
+
+        var initUser = new SystemUser
         {
-            configuration = config;
-        }
+            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
+            Email = "user@example.com",
+            Role = SystemUserRole.Customer
+        };
 
-        public DbSet<SystemUser> SystemUser { get; set; } = default!;
+        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "password1");
 
-        public DbSet<Session> Session { get; set; } = default!;
+        modelBuilder.Entity<SystemUser>().HasData(initUser);
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        var (token1, desc) = JwtOperations.Generate(initUser, configuration);
+        var (token2, _) = JwtOperations.Generate(initUser, configuration, true);
+
+        modelBuilder.Entity<Session>().HasData(new Session
         {
-            modelBuilder.Entity<SystemUser>()
-                .HasOne(s => s.Session)
-                .WithOne(u => u.SystemUser)
-                .HasForeignKey<Session>(s => s.SystemUserId)
-                .IsRequired();
+            Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
+            SystemUserId = initUser.Id,
+            Token = token1,
+            RefreshToken = token2,
+            Created = desc.IssuedAt.GetValueOrDefault(),
+            Expires = desc.Expires.GetValueOrDefault()
+        });
 
-            var initUser = new SystemUser
-            {
-                Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                Email = "user@example.com",
-                PasswordHash = new PasswordHasher<SystemUser>().HashPassword(null, "password1"),
-                Role = SystemUserRole.Customer
-            };
-
-            modelBuilder.Entity<SystemUser>().HasData(initUser);
-
-            var (token1, desc) = JwtOperations.Generate(initUser, configuration);
-            var (token2, _) = JwtOperations.Generate(initUser, configuration, true);
-
-            modelBuilder.Entity<Session>().HasData(new Session
-            {
-                Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                SystemUserId = initUser.Id,
-                Token = token1,
-                RefreshToken = token2,
-                Created = desc.IssuedAt.GetValueOrDefault(),
-                Expires = desc.Expires.GetValueOrDefault()
-            });
-
-            base.OnModelCreating(modelBuilder);
-        }
+        base.OnModelCreating(modelBuilder);
     }
 }

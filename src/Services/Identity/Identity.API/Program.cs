@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,6 +65,37 @@ builder.Services.AddAuthentication(options =>
         //ValidIssuer = builder.Configuration["Jwt:Issuer"],
         //ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            // Get the system user ID from the token
+            if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+            {
+                context.Fail("Unauthorized");
+            }
+
+            // Get the token from the context
+            var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
+
+            if (token == null) context.Fail("Unauthorized");
+
+            // Get the session from the database based on the user ID and token
+            var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDbContext>();
+            var session = await dbContext.Session.FirstOrDefaultAsync(s => s.SystemUserId == systemUserId && s.Token == token);
+
+            if (session == null)
+            {
+                context.Fail("Unauthorized");
+            }
+        }
     };
 });
 

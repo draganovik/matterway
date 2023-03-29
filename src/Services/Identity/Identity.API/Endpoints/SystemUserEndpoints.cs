@@ -1,5 +1,7 @@
-﻿using Identity.API.Data;
+﻿using AutoMapper;
+using Identity.API.Data;
 using Identity.API.Entities;
+using Identity.API.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 namespace Identity.API.Endpoints;
@@ -10,9 +12,13 @@ public static class SystemUserEndpoints
     {
         var group = routes.MapGroup("/api/SystemUser").WithTags(nameof(SystemUser));
 
-        group.MapGet("/", async (IdentityDbContext db) =>
+        group.MapGet("/", async Task<Results<Ok<IEnumerable<SystemUserGetResponse>>, NotFound>> (IdentityDbContext db, IMapper mapper) =>
         {
-            return await db.SystemUser.ToListAsync();
+            return await db.SystemUser.AsNoTracking()
+                .ToListAsync()
+                is IEnumerable<SystemUser> value && value.Any()
+                    ? TypedResults.Ok(mapper.Map<IEnumerable<SystemUserGetResponse>>(value))
+                    : TypedResults.NotFound();
         })
         .WithName("GetAllSystemUsers")
         .WithOpenApi();

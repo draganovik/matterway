@@ -3,6 +3,7 @@ using Identity.API.Data;
 using Identity.API.Entities;
 using Identity.API.Helpers;
 using Identity.API.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -19,8 +20,8 @@ public static class SessionEndpoints
 
         var group = routes.MapGroup("/api/Session").WithTags(nameof(Session));
 
-        group.MapPost("/create", async Task<Results<Ok<SystemUserLoginResponse>, BadRequest<string>>>
-            (SystemUserLoginRequest request, IdentityDbContext db, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper) =>
+        group.MapPost("/create", async Task<Results<Ok<SessionPostResponse>, BadRequest<string>>>
+            (SessionPostRequest request, IdentityDbContext db, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper) =>
         {
             var existingUser = await db.SystemUser
                 .SingleOrDefaultAsync(u => u.Email == request.Email);
@@ -47,15 +48,15 @@ public static class SessionEndpoints
             await db.Session.AddAsync(session);
             await db.SaveChangesAsync();
 
-            return TypedResults.Ok(mapper.Map<SystemUserLoginResponse>(session));
+            return TypedResults.Ok(mapper.Map<SessionPostResponse>(session));
         }).WithName("CreateSession")
         .WithOpenApi();
 
-        group.MapGet("/", async Task<Results<Ok<IEnumerable<SystemUserLoginResponse>>, NoContent>> (IdentityDbContext db, IMapper mapper) =>
+        group.MapGet("/", async Task<Results<Ok<IEnumerable<SessionPostResponse>>, NoContent>> (IdentityDbContext db, IMapper mapper) =>
         {
             var ss = await db.Session.Include(s => s.SystemUser).ToListAsync();
             return ss is IEnumerable<Session> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<SystemUserLoginResponse>>(value))
+                ? TypedResults.Ok(mapper.Map<IEnumerable<SessionPostResponse>>(value))
                 : TypedResults.NoContent();
         })
         .WithName("GetAllSessions")
@@ -90,20 +91,26 @@ public static class SessionEndpoints
         .WithName("UpdateSession")
         .WithOpenApi();
 
-        group.MapDelete("/revoke", [Authorize] async Task<Results<NoContent, NotFound, BadRequest>> (HttpContext context, IdentityDbContext db) =>
+        group.MapDelete("/revoke", [Authorize] async Task<Results<Ok, NotFound, UnauthorizedHttpResult>> (HttpContext context, IdentityDbContext db) =>
         {
             var user = context.User;
+
             var identity = user.Identity as ClaimsIdentity;
             if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
             {
-                return TypedResults.BadRequest();
+                return TypedResults.Unauthorized();
             }
 
+            // Get the token from the context
+            var token = context.GetTokenAsync("access_token").Result;
+
+            if (token == null) return TypedResults.Unauthorized();
+
             var affected = await db.Session
-                .Where(model => model.SystemUserId == systemUserId)
+                .Where(model => model.SystemUserId == systemUserId && model.Token == token)
                 .ExecuteDeleteAsync();
 
-            return affected == 1 ? TypedResults.NoContent() : TypedResults.NotFound();
+            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
         })
         .WithName("RevokeSession")
         .WithOpenApi();

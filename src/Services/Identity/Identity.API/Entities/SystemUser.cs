@@ -1,5 +1,6 @@
 ﻿using Identity.API.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Identity.API.Entities;
 
@@ -14,10 +15,11 @@ public class SystemUser : IValidatableObject
     [Required(ErrorMessage = "Password is required.")]
     public string PasswordHash { get; set; } = string.Empty;
 
-    public Session? Session { get; set; }
+    public IEnumerable<Session>? Sessions { get; set; }
 
     public DateTime Created { get; set; } = DateTime.UtcNow;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SystemUserRole Role { get; set; } = SystemUserRole.Customer;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

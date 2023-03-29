@@ -1,9 +1,13 @@
-﻿namespace Identity.API.Enums
+﻿using System.Runtime.Serialization;
+
+namespace Identity.API.Enums;
+
+public enum SystemUserRole
 {
-    public enum SystemUserRole
-    {
-        Admin = 0,
-        Manager = 1,
-        Customer = 2
-    }
+    [EnumMember(Value = "Admin")]
+    Admin = 0,
+    [EnumMember(Value = "Manager")]
+    Manager = 1,
+    [EnumMember(Value = "Customer")]
+    Customer = 2
 }
