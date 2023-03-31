@@ -39,7 +39,7 @@ public class IdentityDbContext : DbContext
         modelBuilder.Entity<SystemUser>().HasData(initUser);
 
         var (token1, desc) = JwtOperations.Generate(initUser, configuration);
-        var (token2, _) = JwtOperations.Generate(initUser, configuration, true);
+        var (token2, rdesc) = JwtOperations.Generate(initUser, configuration, true);
 
         modelBuilder.Entity<Session>().HasData(new Session
         {
@@ -48,7 +48,8 @@ public class IdentityDbContext : DbContext
             Token = token1,
             RefreshToken = token2,
             Created = desc.IssuedAt.GetValueOrDefault(),
-            Expires = desc.Expires.GetValueOrDefault()
+            Expires = desc.Expires.GetValueOrDefault(),
+            RefreshExpires = rdesc.Expires.GetValueOrDefault()
         });
 
         base.OnModelCreating(modelBuilder);

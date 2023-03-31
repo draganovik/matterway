@@ -10,7 +10,7 @@ public static class SystemUserEndpoints
 {
     public static void MapSystemUserEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/SystemUser").WithTags(nameof(SystemUser));
+        var group = routes.MapGroup("/api/Account").WithTags(nameof(SystemUser));
 
         group.MapGet("/", async Task<Results<Ok<IEnumerable<SystemUserGetResponse>>, NotFound>> (IdentityDbContext db, IMapper mapper) =>
         {
@@ -34,7 +34,7 @@ public static class SystemUserEndpoints
         .WithName("GetSystemUserById")
         .WithOpenApi();
 
-        group.MapPut("/{id}", async Task<Results<Ok, NotFound>> (Guid id, SystemUser systemUser, IdentityDbContext db) =>
+        group.MapPut("update/{id}", async Task<Results<Ok, NotFound>> (Guid id, SystemUser systemUser, IdentityDbContext db) =>
         {
             var affected = await db.SystemUser
                 .Where(model => model.Id == id)
@@ -51,7 +51,7 @@ public static class SystemUserEndpoints
         .WithName("UpdateSystemUser")
         .WithOpenApi();
 
-        group.MapPost("/", async (SystemUser systemUser, IdentityDbContext db) =>
+        group.MapPost("/register", async (SystemUser systemUser, IdentityDbContext db) =>
         {
             db.SystemUser.Add(systemUser);
             await db.SaveChangesAsync();
@@ -60,7 +60,7 @@ public static class SystemUserEndpoints
         .WithName("CreateSystemUser")
         .WithOpenApi();
 
-        group.MapDelete("/{id}", async Task<Results<Ok, NotFound>> (Guid id, IdentityDbContext db) =>
+        /*group.MapDelete("/{id}", async Task<Results<Ok, NotFound>> (Guid id, IdentityDbContext db) =>
         {
             var affected = await db.SystemUser
                 .Where(model => model.Id == id)
@@ -69,6 +69,6 @@ public static class SystemUserEndpoints
             return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
         })
         .WithName("DeleteSystemUser")
-        .WithOpenApi();
+        .WithOpenApi();*/
     }
 }

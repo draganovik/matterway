@@ -22,7 +22,15 @@ public class Session : IValidatableObject
     [Required(ErrorMessage = "Expires is required.")]
     public DateTime? Expires { get; set; }
 
+    [Required(ErrorMessage = "Refresh expires is required.")]
+    public DateTime? RefreshExpires { get; set; }
+
     public bool IsExpired()
+    {
+        return DateTime.UtcNow >= Expires;
+    }
+
+    public bool IsExpiredRefresh()
     {
         return DateTime.UtcNow >= Expires;
     }
@@ -44,11 +52,6 @@ public class Session : IValidatableObject
         if (string.IsNullOrEmpty(RefreshToken))
         {
             results.Add(new ValidationResult("RefreshToken is required."));
-        }
-
-        if (Expires == null)
-        {
-            results.Add(new ValidationResult("Expires is required."));
         }
 
         return results;

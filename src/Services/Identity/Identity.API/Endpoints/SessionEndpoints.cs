@@ -20,6 +20,16 @@ public static class SessionEndpoints
 
         var group = routes.MapGroup("/api/Session").WithTags(nameof(Session));
 
+        group.MapGet("/", async Task<Results<Ok<IEnumerable<SessionPostResponse>>, NoContent>> (IdentityDbContext db, IMapper mapper) =>
+        {
+            var ss = await db.Session.Include(s => s.SystemUser).ToListAsync();
+            return ss is IEnumerable<Session> value && value.Any()
+                ? TypedResults.Ok(mapper.Map<IEnumerable<SessionPostResponse>>(value))
+                : TypedResults.NoContent();
+        })
+       .WithName("GetAllSessions")
+       .WithOpenApi();
+
         group.MapPost("/create", async Task<Results<Ok<SessionPostResponse>, BadRequest<string>>>
             (SessionPostRequest request, IdentityDbContext db, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper) =>
         {
@@ -34,7 +44,7 @@ public static class SessionEndpoints
 
             // Generate a JWT for the user session
             var (token, tdescriptor) = JwtOperations.Generate(existingUser, configuration);
-            var (refresh, _) = JwtOperations.Generate(existingUser, configuration, true);
+            var (refresh, rdescriptor) = JwtOperations.Generate(existingUser, configuration, true);
 
             // Create a new session for the user
             var session = new Session
@@ -44,6 +54,7 @@ public static class SessionEndpoints
                 RefreshToken = refresh,
                 Created = tdescriptor.IssuedAt ?? DateTime.UtcNow,
                 Expires = tdescriptor.Expires ?? DateTime.UtcNow,
+                RefreshExpires = rdescriptor.Expires ?? DateTime.UtcNow
             };
             await db.Session.AddAsync(session);
             await db.SaveChangesAsync();
@@ -52,44 +63,48 @@ public static class SessionEndpoints
         }).WithName("CreateSession")
         .WithOpenApi();
 
-        group.MapGet("/", async Task<Results<Ok<IEnumerable<SessionPostResponse>>, NoContent>> (IdentityDbContext db, IMapper mapper) =>
+        group.MapPost("/refresh", async Task<Results<Ok<SessionPostResponse>, BadRequest<object>, UnauthorizedHttpResult>>
+            (SessionRefreshPostRequest request, HttpContext context, IdentityDbContext db, IConfiguration configuration, IMapper mapper) =>
         {
-            var ss = await db.Session.Include(s => s.SystemUser).ToListAsync();
-            return ss is IEnumerable<Session> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<SessionPostResponse>>(value))
-                : TypedResults.NoContent();
-        })
-        .WithName("GetAllSessions")
+
+            var identity = context.User.Identity as ClaimsIdentity;
+
+            if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            var session = await db.Session
+                .Include(s => s.SystemUser)
+                .SingleOrDefaultAsync(s => s.SystemUserId == systemUserId && s.RefreshToken == request.RefreshToken && s.Expires > DateTime.UtcNow);
+
+            if (session == null)
+            {
+                return TypedResults.BadRequest<object>(new { message = "Token did not expire or refresh token was invalid." });
+            }
+
+            if (session.IsExpiredRefresh())
+            {
+                return TypedResults.BadRequest<object>(new { message = "Refresh token has expired." });
+            }
+
+            // Generate a new JWT for the user session
+            var (token, tdescriptor) = JwtOperations.Generate(session.SystemUser, configuration);
+            var (refresh, rdescriptor) = JwtOperations.Generate(session.SystemUser, configuration, true);
+
+            // Update the session with the new tokens
+            session.Token = token;
+            session.RefreshToken = refresh;
+            session.Created = tdescriptor.IssuedAt ?? DateTime.UtcNow;
+            session.Expires = tdescriptor.Expires ?? DateTime.UtcNow;
+            session.RefreshExpires = rdescriptor.Expires ?? DateTime.UtcNow;
+            db.Session.Update(session);
+            await db.SaveChangesAsync();
+
+            return TypedResults.Ok(mapper.Map<SessionPostResponse>(session));
+        }).WithName("RefreshSession")
         .WithOpenApi();
 
-        group.MapGet("/{id}", async Task<Results<Ok<Session>, NotFound>> (Guid id, IdentityDbContext db) =>
-        {
-            return await db.Session.AsNoTracking()
-                .FirstOrDefaultAsync(model => model.Id == id)
-                is Session model
-                    ? TypedResults.Ok(model)
-                    : TypedResults.NotFound();
-        })
-        .WithName("GetSessionById")
-        .WithOpenApi();
-
-        group.MapPut("/{id}", async Task<Results<Ok, NotFound>> (Guid id, Session session, IdentityDbContext db) =>
-        {
-            var affected = await db.Session
-                .Where(model => model.Id == id)
-                .ExecuteUpdateAsync(setters => setters
-                  .SetProperty(m => m.Id, session.Id)
-                  .SetProperty(m => m.SystemUserId, session.SystemUserId)
-                  .SetProperty(m => m.Token, session.Token)
-                  .SetProperty(m => m.RefreshToken, session.RefreshToken)
-                  .SetProperty(m => m.Created, session.Created)
-                  .SetProperty(m => m.Expires, session.Expires)
-                );
-
-            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
-        })
-        .WithName("UpdateSession")
-        .WithOpenApi();
 
         group.MapDelete("/revoke", [Authorize] async Task<Results<Ok, NotFound, UnauthorizedHttpResult>> (HttpContext context, IdentityDbContext db) =>
         {
