@@ -51,12 +51,12 @@ namespace Identity.API.Migrations
             migrationBuilder.InsertData(
                 table: "SystemUser",
                 columns: new[] { "Id", "Created", "Email", "PasswordHash", "Role" },
-                values: new object[] { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 3, 31, 13, 18, 16, 39, DateTimeKind.Utc).AddTicks(1151), "user@example.com", "AQAAAAIAAYagAAAAEPJ7tY6J1UfLmM4vRQ3zg2wrKHnmhiJ5BoDogxS63HI7Nx916b+lp6m/setlZrTSYA==", 2 });
+                values: new object[] { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 4, 6, 14, 15, 51, 718, DateTimeKind.Utc).AddTicks(417), "user@example.com", "AQAAAAIAAYagAAAAEA1kLvCNFQ0vjv+Cu2Xjn8U8cmdpaPcVZme1NbBwi+BqsPHknc8eZqgNKR1gwsPXWQ==", 2 });
 
             migrationBuilder.InsertData(
                 table: "Session",
                 columns: new[] { "Id", "Created", "Expires", "RefreshExpires", "RefreshToken", "SystemUserId", "Token" },
-                values: new object[] { new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"), new DateTime(2023, 3, 31, 13, 18, 16, 104, DateTimeKind.Utc).AddTicks(781), new DateTime(2023, 3, 31, 13, 33, 16, 104, DateTimeKind.Utc).AddTicks(788), new DateTime(2023, 4, 12, 13, 18, 16, 104, DateTimeKind.Utc).AddTicks(2241), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODAyNjg2OTYsImV4cCI6MTY4MTMwNTQ5NiwiaWF0IjoxNjgwMjY4Njk2fQ.gIqBOvqHYkW9AQ6Hfrob6GhhSQbnI4AP_udGVcb977o", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODAyNjg2OTYsImV4cCI6MTY4MDI2OTU5NiwiaWF0IjoxNjgwMjY4Njk2fQ.lzK7qD6vKVIUXe9Ut1Lb4grHN_UqqfuBqtdlWzGQCVM" });
+                values: new object[] { new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"), new DateTime(2023, 4, 6, 14, 15, 51, 779, DateTimeKind.Utc).AddTicks(3595), new DateTime(2023, 4, 6, 14, 30, 51, 779, DateTimeKind.Utc).AddTicks(3601), new DateTime(2023, 4, 18, 14, 15, 51, 779, DateTimeKind.Utc).AddTicks(4976), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODA3OTA1NTEsImV4cCI6MTY4MTgyNzM1MSwiaWF0IjoxNjgwNzkwNTUxfQ.qFUI_kKexjjryYGolpX-nTB0P7OIJCsUXZyUPRg4HkU", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODA3OTA1NTEsImV4cCI6MTY4MDc5MTQ1MSwiaWF0IjoxNjgwNzkwNTUxfQ.QTZO_JjZ_Eo6mMeMAanWGCOh-eIIGmhISXAN9f7H4wo" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Session_SystemUserId",

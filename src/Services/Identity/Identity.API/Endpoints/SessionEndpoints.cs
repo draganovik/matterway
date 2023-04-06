@@ -30,6 +30,29 @@ public static class SessionEndpoints
        .WithName("GetAllSessions")
        .WithOpenApi();
 
+        group.MapGet("/introspect", [Authorize] async Task<Results<Ok<SessionPostResponse>, UnauthorizedHttpResult>> (HttpContext context, IdentityDbContext db, IMapper mapper) =>
+        {
+            var user = context.User;
+
+            var identity = user.Identity as ClaimsIdentity;
+            if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            // Get the token from the context
+            var token = context.GetTokenAsync("access_token").Result;
+
+            if (token == null) return TypedResults.Unauthorized();
+
+            var currentSession = await db.Session
+                .Where(model => model.SystemUserId == systemUserId && model.Token == token).FirstOrDefaultAsync();
+
+            return TypedResults.Ok(mapper.Map<SessionPostResponse>(currentSession));
+        })
+       .WithName("IntrospectSession")
+       .WithOpenApi();
+
         group.MapPost("/create", async Task<Results<Ok<SessionPostResponse>, BadRequest<string>>>
             (SessionPostRequest request, IdentityDbContext db, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper) =>
         {
