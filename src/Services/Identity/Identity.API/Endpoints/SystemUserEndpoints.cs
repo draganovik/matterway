@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using Identity.API.Data;
 using Identity.API.Entities;
 using Identity.API.Enums;
 using Identity.API.Models.SystemUserModels;
+using Identity.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Identity.API.Endpoints;
 
@@ -34,65 +33,47 @@ public static class SystemUserEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<SystemUserBaseResponseModel>>, NotFound>> QuerySystemUsers(IdentityDbContext db, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<SystemUserBaseResponseModel>>, NoContent>> QuerySystemUsers(ISystemUserRepository systemUserRepository, IMapper mapper)
     {
-        return await db.SystemUser.AsNoTracking()
-            .ToListAsync()
+        return await systemUserRepository.Query()
             is IEnumerable<SystemUser> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<SystemUserBaseResponseModel>>(value))
-                : TypedResults.NotFound();
+                : TypedResults.NoContent();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> GetSystemUserById(Guid id, IdentityDbContext db, IMapper mapper)
+    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> GetSystemUserById(Guid id, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
-        return await db.SystemUser.AsNoTracking()
-            .FirstOrDefaultAsync(model => model.Id == id)
+        return await systemUserRepository.GetById(id)
             is SystemUser value
                 ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(value))
                 : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, IdentityDbContext db, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
+    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
     {
-        var currentUserModel = await db.SystemUser.FindAsync(id);
-        if (currentUserModel is null)
-        {
-            return TypedResults.NotFound();
-        }
-        var affected = await db.SystemUser
-            .Where(model => model.Id == id)
-            .ExecuteUpdateAsync(setters => setters
-                  .SetProperty(m => m.Email, requestModel.Email)
-                  .SetProperty(m => m.Created, DateTime.UtcNow)
-                  .SetProperty(m => m.Role, requestModel.Role)
-                  .SetProperty(m => m.PasswordHash, passwordHasher.HashPassword(currentUserModel, requestModel.Password!))
-                );
-        var updatedUser = await db.SystemUser.FindAsync(id);
-        return affected == 1 ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
+        var updatedUser = await systemUserRepository.Update(id, requestModel);
+        return updatedUser is not null ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest>> CreateSystemUser(SystemUserBaseRequestModel requestModel, IdentityDbContext db, IMapper mapper)
+    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest>> CreateSystemUser(SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var systemUserModel = mapper.Map<SystemUser>(requestModel);
-        db.SystemUser.Add(systemUserModel);
-        var states = await db.SaveChangesAsync();
-        if (states == 0)
+        var createdSystemUser = await systemUserRepository.Create(systemUserModel);
+        if (createdSystemUser is null)
         {
             return TypedResults.BadRequest();
         }
-        return TypedResults.Created($"/api/SystemUserModels/{systemUserModel.Id}", mapper.Map<SystemUserBaseResponseModel>(systemUserModel));
+        return TypedResults.Created($"/api/SystemUserModels/{createdSystemUser.Id}", mapper.Map<SystemUserBaseResponseModel>(createdSystemUser));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<NoContent, NotFound>> DeleteSystemUser(Guid id, IdentityDbContext db, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound>> DeleteSystemUser(Guid id, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
-        var affected = await db.SystemUser
-            .Where(model => model.Id == id)
-            .ExecuteDeleteAsync();
+        var isDeleted = await systemUserRepository.Delete(id);
 
-        return affected == 1 ? TypedResults.NoContent() : TypedResults.NotFound();
+        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }

@@ -1,6 +1,7 @@
 using Identity.API.Data;
 using Identity.API.Endpoints;
 using Identity.API.Entities;
+using Identity.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext") ?? throw new InvalidOperationException("Connection string 'IdentityDbContext' not found.")));
 
+builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
 builder.Services
