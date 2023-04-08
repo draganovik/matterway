@@ -1,22 +1,21 @@
 ﻿using Identity.API.Entities;
 using Identity.API.Models.SystemUserModels;
 
-namespace Identity.API.Repository
+namespace Identity.API.Repository;
+
+public interface ISystemUserRepository
 {
-    public interface ISystemUserRepository
-    {
-        Task<ICollection<SystemUser>> Query();
+    Task<ICollection<SystemUser>> Query();
 
-        Task<SystemUser?> GetById(Guid id);
+    Task<SystemUser?> GetById(Guid id);
 
-        Task<SystemUser?> GetByEmail(string email);
+    Task<SystemUser?> GetByEmail(string email);
 
-        Task<SystemUser?> GetByCredentials(string email, string password);
+    Task<SystemUser?> GetByCredentials(string email, string password);
 
-        Task<SystemUser?> Create(SystemUser user);
+    Task<SystemUser?> Create(SystemUser user);
 
-        Task<SystemUser?> Update(Guid id, SystemUserBaseRequestModel user);
+    Task<SystemUser?> Update(Guid id, SystemUserBaseRequestModel user);
 
-        Task<bool> Delete(Guid id);
-    }
+    Task<bool> Delete(Guid id);
 }
