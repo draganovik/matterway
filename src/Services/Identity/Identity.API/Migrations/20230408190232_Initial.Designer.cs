@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.API.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20230406141551_Initial")]
+    [Migration("20230408190232_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -64,12 +64,12 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                            Created = new DateTime(2023, 4, 6, 14, 15, 51, 779, DateTimeKind.Utc).AddTicks(3595),
-                            Expires = new DateTime(2023, 4, 6, 14, 30, 51, 779, DateTimeKind.Utc).AddTicks(3601),
-                            RefreshExpires = new DateTime(2023, 4, 18, 14, 15, 51, 779, DateTimeKind.Utc).AddTicks(4976),
-                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODA3OTA1NTEsImV4cCI6MTY4MTgyNzM1MSwiaWF0IjoxNjgwNzkwNTUxfQ.qFUI_kKexjjryYGolpX-nTB0P7OIJCsUXZyUPRg4HkU",
+                            Created = new DateTime(2023, 4, 8, 19, 2, 32, 226, DateTimeKind.Utc).AddTicks(7517),
+                            Expires = new DateTime(2023, 4, 8, 19, 17, 32, 226, DateTimeKind.Utc).AddTicks(7523),
+                            RefreshExpires = new DateTime(2023, 4, 20, 19, 2, 32, 226, DateTimeKind.Utc).AddTicks(8846),
+                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODA5ODA1NTIsImV4cCI6MTY4MjAxNzM1MiwiaWF0IjoxNjgwOTgwNTUyfQ.l3cPaj15KMvgvTGElKEW_HSdb5k5N8GyoGBpiko9t5I",
                             SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODA3OTA1NTEsImV4cCI6MTY4MDc5MTQ1MSwiaWF0IjoxNjgwNzkwNTUxfQ.QTZO_JjZ_Eo6mMeMAanWGCOh-eIIGmhISXAN9f7H4wo"
+                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODA5ODA1NTIsImV4cCI6MTY4MDk4MTQ1MiwiaWF0IjoxNjgwOTgwNTUyfQ.9DxUqJwm5d2neR4HrM6-yCZqVy-CMbCaBWoYSAi8s60"
                         });
                 });
 
@@ -101,10 +101,10 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 4, 6, 14, 15, 51, 718, DateTimeKind.Utc).AddTicks(417),
+                            Created = new DateTime(2023, 4, 8, 19, 2, 32, 158, DateTimeKind.Utc).AddTicks(3142),
                             Email = "user@example.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEA1kLvCNFQ0vjv+Cu2Xjn8U8cmdpaPcVZme1NbBwi+BqsPHknc8eZqgNKR1gwsPXWQ==",
-                            Role = 2
+                            PasswordHash = "AQAAAAIAAYagAAAAEMNz6I63KS4CYSVYa1LazIX0a9yGItSdpmpWj5Z52ziTW3QEbcHLxCshFIA+8rtiVw==",
+                            Role = 0
                         });
                 });
 

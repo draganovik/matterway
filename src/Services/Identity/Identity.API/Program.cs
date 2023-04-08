@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdentityDbContext>(options =>
@@ -16,6 +17,9 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
+builder.Services
+    .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,7 +68,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         //ValidIssuer = builder.Configuration["Jwt:Issuer"],
         //ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 
     options.Events = new JwtBearerEvents

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Models;
+namespace Identity.API.Models.SessionModels;
 
-public class SessionPostRequest
+public class SessionBaseRequestModel
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Email is not valid")]

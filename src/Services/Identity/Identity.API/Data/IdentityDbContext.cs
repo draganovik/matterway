@@ -31,10 +31,10 @@ public class IdentityDbContext : DbContext
         {
             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
             Email = "user@example.com",
-            Role = SystemUserRole.Customer
+            Role = SystemUserRole.Admin
         };
 
-        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "password1");
+        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "string");
 
         modelBuilder.Entity<SystemUser>().HasData(initUser);
 

@@ -1,6 +1,6 @@
-﻿namespace Identity.API.Models;
+﻿namespace Identity.API.Models.SessionModels;
 
-public class SessionRefreshPostRequest
+public class SessionRefreshBaseRequestModel
 {
     public string RefreshToken { get; set; }
     public string TokenType { get; set; } = "Bearer";
