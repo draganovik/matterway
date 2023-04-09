@@ -5,8 +5,19 @@ using Shared.ServiceBrokers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Catalog.API.Data;
+using Catalog.API.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext") ?? throw new InvalidOperationException("Connection string 'CatalogDbContext' not found.")));
+
+builder.Services
+    .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -102,5 +113,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapProductDetailEndpoints();
 
 app.Run();

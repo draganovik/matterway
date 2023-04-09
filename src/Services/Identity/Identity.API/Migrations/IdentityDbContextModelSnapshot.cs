@@ -61,12 +61,12 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                            Created = new DateTime(2023, 4, 9, 2, 48, 11, 328, DateTimeKind.Utc).AddTicks(5286),
-                            Expires = new DateTime(2023, 4, 9, 3, 3, 11, 328, DateTimeKind.Utc).AddTicks(5290),
-                            RefreshExpires = new DateTime(2023, 4, 21, 2, 48, 11, 328, DateTimeKind.Utc).AddTicks(6502),
-                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDg0OTEsImV4cCI6MTY4MjA0NTI5MSwiaWF0IjoxNjgxMDA4NDkxfQ.aFmfTCgqzuirTUDNNLLH_LfI4gAhATPRrenF9zQtAaY",
+                            Created = new DateTime(2023, 4, 9, 5, 11, 27, 6, DateTimeKind.Utc).AddTicks(7415),
+                            Expires = new DateTime(2023, 4, 9, 5, 26, 27, 6, DateTimeKind.Utc).AddTicks(7423),
+                            RefreshExpires = new DateTime(2023, 4, 21, 5, 11, 27, 6, DateTimeKind.Utc).AddTicks(8484),
+                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMTcwODcsImV4cCI6MTY4MjA1Mzg4NywiaWF0IjoxNjgxMDE3MDg3fQ.H0f9xFiXcbkU4vT1lEmpMurQ5TzBbNr-0v9o5RzN78A",
                             SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDg0OTEsImV4cCI6MTY4MTAwOTM5MSwiaWF0IjoxNjgxMDA4NDkxfQ.a3T2WSCmFRzEZ4-WZ7yWo1s6kOjdvUQbpGa0dYU0VLM"
+                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMTcwODcsImV4cCI6MTY4MTAxNzk4NywiaWF0IjoxNjgxMDE3MDg3fQ.b5gPuP6-Xsfd8XTJ91agFjP6LKPgDx5iBC0abWzIpcU"
                         });
                 });
 
@@ -98,9 +98,9 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 4, 9, 2, 48, 11, 272, DateTimeKind.Utc).AddTicks(7341),
+                            Created = new DateTime(2023, 4, 9, 5, 11, 26, 950, DateTimeKind.Utc).AddTicks(3524),
                             Email = "user@example.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAENpALCvs+2eF8D3WNtiCky5pLNgQaonBmUxiNKbuqOudWb3VS8wQVbXpcBvs5cTS2w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDVImPQgm5pkjVhU5APZgNN4+opiXDMrORy9hgbN9IQKxAy6xV2GqYrgdQjNwUr2Ww==",
                             Role = 0
                         });
                 });
