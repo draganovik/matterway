@@ -14,13 +14,13 @@ public class CustomerRepository : ICustomerRepository
         this.context = context;
     }
 
-    public async Task<Customer?> Create(Customer customer)
+    public async Task<Customer?> Create(Customer requestModel)
     {
-        context.Customer.Add(customer);
+        context.Customer.Add(requestModel);
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
         {
-            return await context.Customer.FindAsync(customer.Id);
+            return await context.Customer.FindAsync(requestModel.Id);
         }
         return null;
     }
@@ -44,23 +44,23 @@ public class CustomerRepository : ICustomerRepository
         .ToListAsync();
     }
 
-    public async Task<Customer?> Update(Guid id, CustomerUpdateRequestModel customer)
+    public async Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel)
     {
-        var currentUserModel = await context.Customer.FindAsync(id);
-        if (currentUserModel is null)
+        var currentCustomerModel = await context.Customer.FindAsync(id);
+        if (currentCustomerModel is null)
         {
             return null;
         }
         var affected = await context.Customer
         .Where(model => model.Id == id)
         .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.SystemUserId, customer.SystemUserId)
-              .SetProperty(m => m.FirstName, customer.FirstName)
-              .SetProperty(m => m.LastName, customer.LastName)
-              .SetProperty(m => m.BirthDate, customer.BirthDate)
-              .SetProperty(m => m.DefaultAddressId, customer.DefaultAddressId)
+              .SetProperty(m => m.SystemUserId, requestModel.SystemUserId)
+              .SetProperty(m => m.FirstName, requestModel.FirstName)
+              .SetProperty(m => m.LastName, requestModel.LastName)
+              .SetProperty(m => m.BirthDate, requestModel.BirthDate)
+              .SetProperty(m => m.DefaultAddressId, requestModel.DefaultAddressId)
             );
-        await context.Entry(currentUserModel).ReloadAsync();
-        return affected == 1 ? currentUserModel : null;
+        await context.Entry(currentCustomerModel).ReloadAsync();
+        return affected == 1 ? currentCustomerModel : null;
     }
 }

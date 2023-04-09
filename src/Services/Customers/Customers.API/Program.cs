@@ -1,4 +1,4 @@
-using Customers.API.Data;
+﻿using Customers.API.Data;
 using Customers.API.Endpoints;
 using Customers.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,8 +16,8 @@ builder.Services.AddDbContext<CustomersDbContext>(options =>
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
-
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -117,5 +117,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapCustomerEndpoints();
+
+app.MapCartItemEndpoints();
 
 app.Run();

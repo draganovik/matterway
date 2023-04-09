@@ -9,9 +9,9 @@ public interface ICustomerRepository
 
     Task<Customer?> GetById(Guid id);
 
-    Task<Customer?> Create(Customer customer);
+    Task<Customer?> Create(Customer requestModel);
 
-    Task<Customer?> Update(Guid id, CustomerUpdateRequestModel customer);
+    Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
 }

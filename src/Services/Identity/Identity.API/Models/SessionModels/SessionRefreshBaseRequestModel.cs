@@ -2,6 +2,6 @@
 
 public class SessionRefreshBaseRequestModel
 {
-    public string RefreshToken { get; set; }
-    public string TokenType { get; set; } = "Bearer";
+    public string? RefreshToken { get; set; }
+    public string? TokenType { get; set; } = "Bearer";
 }
