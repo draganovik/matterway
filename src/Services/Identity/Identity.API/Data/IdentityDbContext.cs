@@ -1,8 +1,8 @@
 ﻿using Identity.API.Entities;
-using Identity.API.Enums;
 using Identity.API.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Enums;
 
 namespace Identity.API.Data;
 

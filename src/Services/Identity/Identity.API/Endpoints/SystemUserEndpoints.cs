@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Identity.API.Entities;
-using Identity.API.Enums;
 using Identity.API.Models.SystemUserModels;
 using Identity.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Shared.Enums;
 
 namespace Identity.API.Endpoints;
 
@@ -66,7 +66,7 @@ public static class SystemUserEndpoints
         {
             return TypedResults.BadRequest();
         }
-        return TypedResults.Created($"/api/SystemUserModels/{createdSystemUser.Id}", mapper.Map<SystemUserBaseResponseModel>(createdSystemUser));
+        return TypedResults.Created($"/api/SystemUsers/{createdSystemUser.Id}", mapper.Map<SystemUserBaseResponseModel>(createdSystemUser));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]

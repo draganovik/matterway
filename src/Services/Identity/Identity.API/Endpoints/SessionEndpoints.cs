@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Identity.API.Entities;
-using Identity.API.Enums;
 using Identity.API.Helpers;
 using Identity.API.Models.SessionModels;
 using Identity.API.Repository;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Shared.Enums;
 using System.Security.Claims;
 
 namespace Identity.API.Endpoints;

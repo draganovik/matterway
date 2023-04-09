@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Identity.API.Enums;
+namespace Shared.Enums;
 
 public enum SystemUserRole
 {
