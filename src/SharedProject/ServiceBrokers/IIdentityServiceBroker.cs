@@ -1,9 +1,8 @@
 ﻿using System.Security.Claims;
 
-namespace Shared.ServiceBrokers
+namespace Shared.ServiceBrokers;
+
+public interface IIdentityServiceBroker
 {
-    public interface IIdentityServiceBroker
-    {
-        Task<ClaimsPrincipal?> ValidateTokenAsync(string token);
-    }
+    Task<ClaimsPrincipal?> ValidateTokenAsync(string token);
 }

@@ -1,15 +1,14 @@
 ﻿using Customers.API.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Data
-{
-    public class CustomersDbContext : DbContext
-    {
-        public CustomersDbContext(DbContextOptions<CustomersDbContext> options)
-            : base(options)
-        {
-        }
+namespace Customers.API.Data;
 
-        public DbSet<Customer> Customer { get; set; } = default!;
+public class CustomersDbContext : DbContext
+{
+    public CustomersDbContext(DbContextOptions<CustomersDbContext> options)
+        : base(options)
+    {
     }
+
+    public DbSet<Customer> Customer { get; set; } = default!;
 }

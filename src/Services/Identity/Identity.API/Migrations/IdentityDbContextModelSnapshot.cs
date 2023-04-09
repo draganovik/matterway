@@ -8,119 +8,118 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Identity.API.Migrations
+namespace Identity.API.Migrations;
+
+[DbContext(typeof(IdentityDbContext))]
+partial class IdentityDbContextModelSnapshot : ModelSnapshot
 {
-    [DbContext(typeof(IdentityDbContext))]
-    partial class IdentityDbContextModelSnapshot : ModelSnapshot
+    protected override void BuildModel(ModelBuilder modelBuilder)
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+        modelBuilder
+            .HasAnnotation("ProductVersion", "7.0.4")
+            .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+        SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Identity.API.Entities.Session", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+        modelBuilder.Entity("Identity.API.Entities.Session", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("Created")
+                    .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Expires")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("Expires")
+                    .IsRequired()
+                    .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RefreshExpires")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("RefreshExpires")
+                    .IsRequired()
+                    .HasColumnType("datetime2");
 
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RefreshToken")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SystemUserId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("SystemUserId")
+                    .IsRequired()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Token")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("SystemUserId");
+                b.HasIndex("SystemUserId");
 
-                    b.ToTable("Session");
+                b.ToTable("Session");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                            Created = new DateTime(2023, 4, 9, 0, 44, 6, 73, DateTimeKind.Utc).AddTicks(3737),
-                            Expires = new DateTime(2023, 4, 9, 0, 59, 6, 73, DateTimeKind.Utc).AddTicks(3741),
-                            RefreshExpires = new DateTime(2023, 4, 21, 0, 44, 6, 73, DateTimeKind.Utc).AddTicks(4909),
-                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDEwNDYsImV4cCI6MTY4MjAzNzg0NiwiaWF0IjoxNjgxMDAxMDQ2fQ.sj2ij6VUd7vQtnG6v6E6dDyEmBNpMce0W-mnPTk6QrE",
-                            SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDEwNDYsImV4cCI6MTY4MTAwMTk0NiwiaWF0IjoxNjgxMDAxMDQ2fQ.gsboHa4CdJ_z_e8B-FFuy0uWXaPbuAg_Y8oihs8Gs5Q"
-                        });
-                });
+                b.HasData(
+                    new
+                    {
+                        Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
+                        Created = new DateTime(2023, 4, 9, 0, 44, 6, 73, DateTimeKind.Utc).AddTicks(3737),
+                        Expires = new DateTime(2023, 4, 9, 0, 59, 6, 73, DateTimeKind.Utc).AddTicks(3741),
+                        RefreshExpires = new DateTime(2023, 4, 21, 0, 44, 6, 73, DateTimeKind.Utc).AddTicks(4909),
+                        RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDEwNDYsImV4cCI6MTY4MjAzNzg0NiwiaWF0IjoxNjgxMDAxMDQ2fQ.sj2ij6VUd7vQtnG6v6E6dDyEmBNpMce0W-mnPTk6QrE",
+                        SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
+                        Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEwMDEwNDYsImV4cCI6MTY4MTAwMTk0NiwiaWF0IjoxNjgxMDAxMDQ2fQ.gsboHa4CdJ_z_e8B-FFuy0uWXaPbuAg_Y8oihs8Gs5Q"
+                    });
+            });
 
-            modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+        modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("Created")
+                    .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PasswordHash")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                b.Property<int>("Role")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("SystemUser");
+                b.ToTable("SystemUser");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 4, 9, 0, 44, 6, 17, DateTimeKind.Utc).AddTicks(4950),
-                            Email = "user@example.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAVgTGCN7tL6L8P2EdfHshGrb2B3yVVvEYc6cF/bYAXOwZrTOl01EIpvNbTw3ihz2A==",
-                            Role = 0
-                        });
-                });
+                b.HasData(
+                    new
+                    {
+                        Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
+                        Created = new DateTime(2023, 4, 9, 0, 44, 6, 17, DateTimeKind.Utc).AddTicks(4950),
+                        Email = "user@example.com",
+                        PasswordHash = "AQAAAAIAAYagAAAAEAVgTGCN7tL6L8P2EdfHshGrb2B3yVVvEYc6cF/bYAXOwZrTOl01EIpvNbTw3ihz2A==",
+                        Role = 0
+                    });
+            });
 
-            modelBuilder.Entity("Identity.API.Entities.Session", b =>
-                {
-                    b.HasOne("Identity.API.Entities.SystemUser", "SystemUser")
-                        .WithMany("Sessions")
-                        .HasForeignKey("SystemUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+        modelBuilder.Entity("Identity.API.Entities.Session", b =>
+            {
+                b.HasOne("Identity.API.Entities.SystemUser", "SystemUser")
+                    .WithMany("Sessions")
+                    .HasForeignKey("SystemUserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("SystemUser");
-                });
+                b.Navigation("SystemUser");
+            });
 
-            modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
-                {
-                    b.Navigation("Sessions");
-                });
+        modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
+            {
+                b.Navigation("Sessions");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }
