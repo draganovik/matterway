@@ -6,6 +6,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__CatalogDbContext=Server=catalog_db;Database=catalog;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - Jwt__Issuer=http://localhost:2003
+      - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
+      - Jwt__Audience=http://localhost:2003
+      - Services__Identity__Url=http://identity_api:80
     ports:
       - "2001:443"
     volumes:
@@ -46,6 +50,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__InventoryDbContext=Server=inventory_db;Database=inventory;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - Jwt__Issuer=http://localhost:2003
+      - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
+      - Jwt__Audience=http://localhost:2003
+      - Services__Identity__Url=http://identity_api:80
     ports:
       - "2004:443"
     volumes:
@@ -57,6 +65,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__OrderingDbContext=Server=ordering_db;Database=ordering;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - Jwt__Issuer=http://localhost:2003
+      - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
+      - Jwt__Audience=http://localhost:2003
+      - Services__Identity__Url=http://identity_api:80
     ports:
       - "2005:443"
     volumes:
@@ -68,6 +80,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ConnectionStrings__PaymentDbContext=Server=payment_db;Database=payment;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - Jwt__Issuer=http://localhost:2003
+      - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
+      - Jwt__Audience=http://localhost:2003
+      - Services__Identity__Url=http://identity_api:80
     ports:
       - "2006:443"
     volumes:

@@ -16,14 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext") ?? throw new InvalidOperationException("Connection string 'IdentityDbContext' not found.")));
 
-builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
-builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
 builder.Services
     .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -118,26 +118,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-
 app.MapSystemUserEndpoints();
 
 app.MapSessionEndpoints();
-
-app.Use(async (ctx, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        ctx.Response.StatusCode = ex.StatusCode;
-        await ctx.Response.WriteAsync(ex.Message);
-    }
-});
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();
