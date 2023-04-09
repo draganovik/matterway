@@ -1,70 +1,93 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Catalog.API.Data;
+﻿using AutoMapper;
 using Catalog.API.Entities;
+using Catalog.API.Models.ProductDetailModels;
+using Catalog.API.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.OpenApi;
+using Shared.Enums;
+
 namespace Catalog.API.Endpoints;
 
 public static class ProductDetailEndpoints
 {
-    public static void MapProductDetailEndpoints (this IEndpointRouteBuilder routes)
+    public static void MapProductDetailEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/ProductDetail").WithTags(nameof(ProductDetail));
+        var group = routes.MapGroup("/api/ProductDetails").WithTags(nameof(ProductDetail));
 
-        group.MapGet("/", async (CatalogDbContext db) =>
+        group.MapGet("/", QueryProductDetails)
+            .WithName("QueryProductDetails").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query ProductDetails. "
+            });
+
+        group.MapGet("/{id}", GetProductDetailById)
+            .WithName("GetProductDetailById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get a ProductDetail by id. "
+            });
+
+        group.MapPut("/{id}", UpdateProductDetailById)
+            .WithName("UpdateProductDetailById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update a ProductDetail by id. "
+            });
+
+        group.MapPost("/", CreateProductDetail)
+            .WithName("CreateProductDetail").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create a new ProductDetail. "
+            });
+
+        group.MapDelete("/{id}", DeleteProductDetail)
+            .WithName("DeleteProductDetail").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete a ProductDetail by id. "
+            });
+    }
+
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Ok<IEnumerable<ProductDetailBaseResponseModel>>, NoContent>> QueryProductDetails(IProductDetailRepository productDetailRepository, IMapper mapper)
+    {
+        return await productDetailRepository.Query()
+            is IEnumerable<ProductDetail> value && value.Any()
+                ? TypedResults.Ok(mapper.Map<IEnumerable<ProductDetailBaseResponseModel>>(value))
+                : TypedResults.NoContent();
+    }
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound>> GetProductDetailById(Guid id, IProductDetailRepository productDetailRepository, IMapper mapper)
+    {
+        return await productDetailRepository.GetById(id)
+            is ProductDetail value
+                ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponseModel>(value))
+                : TypedResults.NotFound();
+    }
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound>> UpdateProductDetailById(Guid id, ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
+    {
+        var updatedUser = await productDetailRepository.Update(id, requestModel);
+        return updatedUser is not null ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
+    }
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Created<ProductDetailBaseResponseModel>, BadRequest>> CreateProductDetail(ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
+    {
+        var productDetailModel = mapper.Map<ProductDetail>(requestModel);
+        var createdProductDetail = await productDetailRepository.Create(productDetailModel);
+        if (createdProductDetail is null)
         {
-            return await db.ProductDetail.ToListAsync();
-        })
-        .WithName("GetAllProductDetails")
-        .WithOpenApi();
+            return TypedResults.BadRequest();
+        }
+        return TypedResults.Created($"/api/ProductDetails/{createdProductDetail.Id}", mapper.Map<ProductDetailBaseResponseModel>(createdProductDetail));
+    }
 
-        group.MapGet("/{id}", async Task<Results<Ok<ProductDetail>, NotFound>> (Guid id, CatalogDbContext db) =>
-        {
-            return await db.ProductDetail.AsNoTracking()
-                .FirstOrDefaultAsync(model => model.Id == id)
-                is ProductDetail model
-                    ? TypedResults.Ok(model)
-                    : TypedResults.NotFound();
-        })
-        .WithName("GetProductDetailById")
-        .WithOpenApi();
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<NoContent, NotFound>> DeleteProductDetail(Guid id, IProductDetailRepository productDetailRepository, IMapper mapper)
+    {
+        var isDeleted = await productDetailRepository.Delete(id);
 
-        group.MapPut("/{id}", async Task<Results<Ok, NotFound>> (Guid id, ProductDetail productDetail, CatalogDbContext db) =>
-        {
-            var affected = await db.ProductDetail
-                .Where(model => model.Id == id)
-                .ExecuteUpdateAsync(setters => setters
-                  .SetProperty(m => m.Id, productDetail.Id)
-                  .SetProperty(m => m.ProductId, productDetail.ProductId)
-                  .SetProperty(m => m.Type, productDetail.Type)
-                  .SetProperty(m => m.Title, productDetail.Title)
-                  .SetProperty(m => m.Value, productDetail.Value)
-                  .SetProperty(m => m.Unit, productDetail.Unit)
-                );
-
-            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
-        })
-        .WithName("UpdateProductDetail")
-        .WithOpenApi();
-
-        group.MapPost("/", async (ProductDetail productDetail, CatalogDbContext db) =>
-        {
-            db.ProductDetail.Add(productDetail);
-            await db.SaveChangesAsync();
-            return TypedResults.Created($"/api/ProductDetail/{productDetail.Id}",productDetail);
-        })
-        .WithName("CreateProductDetail")
-        .WithOpenApi();
-
-        group.MapDelete("/{id}", async Task<Results<Ok, NotFound>> (Guid id, CatalogDbContext db) =>
-        {
-            var affected = await db.ProductDetail
-                .Where(model => model.Id == id)
-                .ExecuteDeleteAsync();
-
-            return affected == 1 ? TypedResults.Ok() : TypedResults.NotFound();
-        })
-        .WithName("DeleteProductDetail")
-        .WithOpenApi();
+        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }

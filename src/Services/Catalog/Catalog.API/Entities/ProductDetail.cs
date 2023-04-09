@@ -18,6 +18,7 @@ public class ProductDetail
     public DetailType Type { get; set; }
     [Required]
     public string? Title { get; set; }
+    [Required]
     public string? Value { get; set; }
     public string? Unit { get; set; }
 }

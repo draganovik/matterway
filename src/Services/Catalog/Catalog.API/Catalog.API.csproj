@@ -24,12 +24,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Repository\" />
-    <Folder Include="Profiles\" />
-  </ItemGroup>
-
   <Import Project="..\..\..\SharedProject\SharedProject.projitems" Label="Shared" />
 
 </Project>

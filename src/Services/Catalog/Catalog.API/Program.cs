@@ -1,4 +1,8 @@
+using Catalog.API.Data;
+using Catalog.API.Endpoints;
+using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.ServiceBrokers;
@@ -6,10 +10,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Catalog.API.Data;
-using Catalog.API.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CatalogDbContext>(options =>
@@ -18,6 +18,8 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 builder.Services
     .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
