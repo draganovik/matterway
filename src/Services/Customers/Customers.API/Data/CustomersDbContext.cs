@@ -12,5 +12,5 @@ public class CustomersDbContext : DbContext
 
     public DbSet<Customer> Customer { get; set; } = default!;
 
-    public DbSet<Customers.API.Entities.CartItem> CartItem { get; set; } = default!;
+    public DbSet<CartItem> CartItem { get; set; } = default!;
 }

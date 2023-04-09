@@ -20,7 +20,7 @@ public class ProductDetailRepository : IProductDetailRepository
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
         {
-            return await context.ProductDetail.FindAsync(requestModel.Id);
+            return await context.ProductDetail.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == requestModel.Id);
         }
         return null;
     }
@@ -35,18 +35,18 @@ public class ProductDetailRepository : IProductDetailRepository
 
     public async Task<ProductDetail?> GetById(Guid id)
     {
-        return await context.ProductDetail.FindAsync(id);
+        return await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
     }
 
     public async Task<ICollection<ProductDetail>> Query()
     {
-        return await context.ProductDetail.AsNoTracking()
+        return await context.ProductDetail.Include(pd => pd.Product).AsNoTracking()
         .ToListAsync();
     }
 
     public async Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel)
     {
-        var currentProductDetailModel = await context.ProductDetail.FindAsync(id);
+        var currentProductDetailModel = await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
         if (currentProductDetailModel is null)
         {
             return null;

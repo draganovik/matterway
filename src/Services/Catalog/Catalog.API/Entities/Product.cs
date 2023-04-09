@@ -11,8 +11,12 @@ public class Product
     [Required]
     public string? Title { get; set; }
     [Required]
+    [Range(0.01, double.MaxValue)]
+    public double? Price { get; set; }
+    [Required]
     public string? Description { get; set; }
     public ICollection<ProductDetail>? ProductDetails { get; set; }
+    public ICollection<ProductImage>? ProductImages { get; set; }
     [Required]
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     [Required]

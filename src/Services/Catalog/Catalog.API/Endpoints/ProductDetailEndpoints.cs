@@ -17,31 +17,31 @@ public static class ProductDetailEndpoints
         group.MapGet("/", QueryProductDetails)
             .WithName("QueryProductDetails").WithOpenApi(operation => new(operation)
             {
-                Summary = "Query ProductDetails. "
+                Summary = "Query ProductDetails."
             });
 
         group.MapGet("/{id}", GetProductDetailById)
             .WithName("GetProductDetailById").WithOpenApi(operation => new(operation)
             {
-                Summary = "Get a ProductDetail by id. "
+                Summary = "Get a ProductDetail by id."
             });
 
         group.MapPut("/{id}", UpdateProductDetailById)
             .WithName("UpdateProductDetailById").WithOpenApi(operation => new(operation)
             {
-                Summary = "Update a ProductDetail by id. "
+                Summary = "Update a ProductDetail by id."
             });
 
         group.MapPost("/", CreateProductDetail)
             .WithName("CreateProductDetail").WithOpenApi(operation => new(operation)
             {
-                Summary = "Create a new ProductDetail. "
+                Summary = "Create a new ProductDetail."
             });
 
         group.MapDelete("/{id}", DeleteProductDetail)
             .WithName("DeleteProductDetail").WithOpenApi(operation => new(operation)
             {
-                Summary = "Delete a ProductDetail by id. "
+                Summary = "Delete a ProductDetail by id."
             });
     }
 

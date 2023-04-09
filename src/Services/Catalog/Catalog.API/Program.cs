@@ -1,4 +1,4 @@
-using Catalog.API.Data;
+﻿using Catalog.API.Data;
 using Catalog.API.Endpoints;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,11 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext") ?? throw new InvalidOperationException("Connection string 'CatalogDbContext' not found.")));
 
+builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
+
 builder.Services
     .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
+builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -117,5 +121,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapProductDetailEndpoints();
+
+app.MapProductImageEndpoints();
+
+app.MapProductEndpoints();
 
 app.Run();
