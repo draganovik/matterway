@@ -13,21 +13,18 @@ public static class OrderItemEndpoints
 {
     public static void MapOrderItemEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/OrderItems").WithTags(nameof(OrderItem));
+        var group = routes.MapGroup("/api/Orders").WithTags(nameof(Order));
 
-        group.MapGet("/", QueryOrderItems)
+        group.MapGet("/Items", QueryOrderItems)
             .WithName("QueryOrderItems").WithOpenApi();
 
-        group.MapGet("/{id}", GetOrderItemById)
+        group.MapGet("/{id}/Items/{itemId}", GetOrderItemById)
             .WithName("GetOrderItemById").WithOpenApi();
 
-        group.MapPut("/{id}", UpdateOrderItemById)
+        group.MapPut("/{id}/Items/{itemId}", UpdateOrderItemById)
             .WithName("UpdateOrderItemById").WithOpenApi();
 
-        group.MapPost("/", CreateOrderItem)
-            .WithName("CreateOrderItem").WithOpenApi();
-
-        group.MapDelete("/{id}", DeleteOrderItem)
+        group.MapDelete("/{id}/Items/{itemId}", DeleteOrderItem)
             .WithName("DeleteOrderItem").WithOpenApi();
     }
 
@@ -42,20 +39,24 @@ public static class OrderItemEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound>> GetOrderItemById(Guid id, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound>> GetOrderItemById(Guid id, Guid itemId, IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
-        return await OrderItemRepository.GetById(id)
+        return await OrderItemRepository.GetById(id, itemId)
             is OrderItem entity
                 ? TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(entity))
                 : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderItemById(Guid id, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
+        var updatedEntity = mapper.Map<OrderItem>(requestModel);
+        updatedEntity.OrderId = id;
+        updatedEntity.ProductId = itemId;
+
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(updatedEntity);
+        var isValid = Validator.TryValidateObject(updatedEntity, context, results, true);
 
         if (!isValid)
         {
@@ -63,9 +64,7 @@ public static class OrderItemEndpoints
             return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
         }
 
-        var updatedEntity = mapper.Map<OrderItem>(requestModel);
-
-        var updateEntity = await OrderItemRepository.Update(id, updatedEntity);
+        var updateEntity = await OrderItemRepository.Update(updatedEntity);
         if (updateEntity is null)
         {
             return TypedResults.NotFound<object>(new { message = "Entity not found" });
@@ -74,31 +73,9 @@ public static class OrderItemEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<OrderItemBaseResponseModel>, BadRequest<object>>> CreateOrderItem(OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound>> DeleteOrderItem(Guid id, Guid itemId, IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
-        var newEntity = mapper.Map<OrderItem>(requestModel);
-        var results = new List<ValidationResult>();
-        var context = new ValidationContext(newEntity);
-        var isValid = Validator.TryValidateObject(newEntity, context, results, true);
-
-        if (!isValid)
-        {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
-        }
-
-        newEntity = await OrderItemRepository.Create(newEntity);
-        if (newEntity is null)
-        {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create object" });
-        }
-        return TypedResults.Created($"/api/OrderItems/{newEntity.Id}", mapper.Map<OrderItemBaseResponseModel>(newEntity));
-    }
-
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<NoContent, NotFound>> DeleteOrderItem(Guid id, IOrderItemRepository OrderItemRepository, IMapper mapper)
-    {
-        var isDeleted = await OrderItemRepository.Delete(id);
+        var isDeleted = await OrderItemRepository.Delete(id, itemId);
 
         return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }

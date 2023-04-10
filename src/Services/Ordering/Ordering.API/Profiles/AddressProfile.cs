@@ -9,6 +9,7 @@ public class AddressProfile : Profile
     public AddressProfile()
     {
         CreateMap<Address, AddressBaseResponseModel>();
+        CreateMap<Address, AddressOrderResponseModel>();
 
         CreateMap<AddressBaseRequestModel, Address>();
     }

@@ -2,10 +2,8 @@
 
 namespace Ordering.API.Models.OrderItemModels;
 
-public class OrderItemBaseResponseModel
+public class OrderItemOrderResponseModel
 {
-    public Guid Id { get; set; }
-    public Guid OrderId { get; set; }
     public Guid ProductId { get; set; }
     public string? ProductName { get; set; }
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than 0")]

@@ -19,22 +19,23 @@ public class OrderItemRepository : IOrderItemRepository
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
         {
-            return await context.OrderItem.FindAsync(requestModel.Id);
+            return await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.OrderId == requestModel.OrderId);
         }
         return null;
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<bool> Delete(Guid orderId, Guid productId)
     {
         var affected = await context.OrderItem
-            .Where(model => model.Id == id)
+            .Where(model => model.ProductId == productId)
+            .Where(model => model.OrderId == orderId)
             .ExecuteDeleteAsync();
         return affected == 1;
     }
 
-    public async Task<OrderItem?> GetById(Guid id)
+    public async Task<OrderItem?> GetById(Guid orderId, Guid productId)
     {
-        return await context.OrderItem.FindAsync(id);
+        return await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == productId && x.OrderId == orderId);
     }
 
     public async Task<ICollection<OrderItem>> Query()
@@ -43,17 +44,17 @@ public class OrderItemRepository : IOrderItemRepository
         .ToListAsync();
     }
 
-    public async Task<OrderItem?> Update(Guid id, OrderItem requestModel)
+    public async Task<OrderItem?> Update(OrderItem requestModel)
     {
-        var currentOrderItemModel = await context.OrderItem.FindAsync(id);
+        var currentOrderItemModel = await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.OrderId == requestModel.OrderId);
         if (currentOrderItemModel is null)
         {
             return null;
         }
         var affected = await context.OrderItem
-        .Where(model => model.Id == id)
+            .Where(model => model.ProductId == requestModel.ProductId)
+            .Where(model => model.OrderId == requestModel.OrderId)
         .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.Id, requestModel.Id)
                   .SetProperty(m => m.OrderId, requestModel.OrderId)
                   .SetProperty(m => m.ProductId, requestModel.ProductId)
                   .SetProperty(m => m.ProductName, requestModel.ProductName)

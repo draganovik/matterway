@@ -9,6 +9,7 @@ public class OrderItemProfile : Profile
     public OrderItemProfile()
     {
         CreateMap<OrderItem, OrderItemBaseResponseModel>();
+        CreateMap<OrderItem, OrderItemOrderResponseModel>();
 
         CreateMap<OrderItemBaseRequestModel, OrderItem>();
     }

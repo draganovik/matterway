@@ -7,11 +7,11 @@ public interface IOrderItemRepository
 {
     Task<ICollection<OrderItem>> Query();
 
-    Task<OrderItem?> GetById(Guid id);
+    Task<OrderItem?> GetById(Guid orderId, Guid productId);
 
     Task<OrderItem?> Create(OrderItem requestModel);
 
-    Task<OrderItem?> Update(Guid id, OrderItem requestModel);
+    Task<OrderItem?> Update(OrderItem requestModel);
 
-    Task<bool> Delete(Guid id);
+    Task<bool> Delete(Guid orderId, Guid productId);
 }
