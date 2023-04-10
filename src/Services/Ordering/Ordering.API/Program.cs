@@ -20,6 +20,7 @@ builder.Services
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 builder.Services.AddScoped<ICatalogServiceBroker, CatalogServiceBroker>();
+builder.Services.AddScoped<ICustomersServiceBroker, CustomersServiceBroker>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

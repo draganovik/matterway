@@ -5,7 +5,9 @@ using Ordering.API.Entities;
 using Ordering.API.Models.OrderModels;
 using Ordering.API.Repository;
 using Shared.Enums;
+using Shared.ServiceBrokers;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Ordering.API.Endpoints;
 
@@ -50,9 +52,33 @@ public static class OrderEndpoints
                 : TypedResults.NotFound();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, IOrderRepository OrderRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound<object>, BadRequest<object>, UnauthorizedHttpResult>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        if (requestModel.CustomerId != null && userRole == SystemUserRole.Customer)
+        {
+            var customerId = await customerServiceBroker.VerifyBySystemUserId(systemUserId);
+            if (customerId == null || customerId != requestModel.CustomerId.Value)
+            {
+                return TypedResults.BadRequest<object>(new { message = "Customer Id is not valid Id from Customers API" });
+            }
+        }
+        else if (requestModel.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(requestModel.CustomerId.Value))
+        {
+            return TypedResults.BadRequest<object>(new { message = "Customer Id is not registrated in Customers API" });
+        }
+
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
         var isValid = Validator.TryValidateObject(requestModel, context, results, true);
@@ -71,10 +97,35 @@ public static class OrderEndpoints
         return TypedResults.Ok(mapper.Map<OrderBaseResponseModel>(updateEntity));
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<object>>> CreateOrder(OrderCreateRequestModel requestModel, IOrderRepository OrderRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Unauthorized();
+        }
+
         var newEntity = mapper.Map<Order>(requestModel);
+
+        if (newEntity.CustomerId != null && userRole == SystemUserRole.Customer)
+        {
+            var customerId = await customerServiceBroker.VerifyBySystemUserId(systemUserId);
+            if (customerId == null || customerId != newEntity.CustomerId.Value)
+            {
+                return TypedResults.BadRequest<object>(new { message = "Customer Id is not valid Id from Customers API" });
+            }
+        }
+        else if (newEntity.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(newEntity.CustomerId.Value))
+        {
+            return TypedResults.BadRequest<object>(new { message = "Customer Id is not registrated in Customers API" });
+        }
+
         var results = new List<ValidationResult>();
         var context = new ValidationContext(newEntity);
         var isValid = Validator.TryValidateObject(newEntity, context, results, true);
@@ -90,6 +141,7 @@ public static class OrderEndpoints
         {
             return TypedResults.BadRequest<object>(new { message = "Cannot create object" });
         }
+
         return TypedResults.Created($"/api/Orders/{newEntity.Id}", mapper.Map<OrderBaseResponseModel>(newEntity));
     }
 

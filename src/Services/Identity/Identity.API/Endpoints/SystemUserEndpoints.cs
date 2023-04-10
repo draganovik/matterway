@@ -51,7 +51,7 @@ public static class SystemUserEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
+    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var updatedUser = await systemUserRepository.Update(id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
@@ -61,6 +61,7 @@ public static class SystemUserEndpoints
     public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest>> CreateSystemUser(SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var systemUserModel = mapper.Map<SystemUser>(requestModel);
+        systemUserModel.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(systemUserModel, requestModel.Password);
         var createdSystemUser = await systemUserRepository.Create(systemUserModel);
         if (createdSystemUser is null)
         {

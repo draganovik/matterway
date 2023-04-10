@@ -9,6 +9,8 @@ public interface ICustomerRepository
 
     Task<Customer?> GetById(Guid id);
 
+    Task<Customer?> GetBySystemUserId(Guid id);
+
     Task<Customer?> Create(Customer requestModel);
 
     Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel);

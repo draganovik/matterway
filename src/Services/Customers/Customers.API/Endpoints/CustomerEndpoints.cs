@@ -4,6 +4,7 @@ using Customers.API.Models.CustomerModels;
 using Customers.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 
 namespace Customers.API.Endpoints;
@@ -16,6 +17,9 @@ public static class CustomerEndpoints
 
         group.MapGet("/", QueryCustomers)
             .WithName("QueryCustomers").WithOpenApi();
+
+        group.MapGet("/VerifyBy", VerifyCustomer)
+            .WithName("VerifyCustomer").WithOpenApi();
 
         group.MapGet("/{id}", GetCustomerById)
             .WithName("GetCustomerById").WithOpenApi();
@@ -47,6 +51,26 @@ public static class CustomerEndpoints
             is Customer value
                 ? TypedResults.Ok(mapper.Map<CustomerBaseResponseModel>(value))
                 : TypedResults.NotFound();
+    }
+
+    public static async Task<Results<Ok<CustomerBaseResponseModel>, NotFound, BadRequest>> VerifyCustomer([FromQuery] Guid? customerId, [FromQuery] Guid? systemUserId, ICustomerRepository customerRepository, IMapper mapper)
+    {
+        if (customerId.HasValue)
+        {
+            var customer = await customerRepository.GetById(customerId.Value);
+            return customer != null
+                ? TypedResults.Ok(mapper.Map<CustomerBaseResponseModel>(customer))
+                : TypedResults.NotFound();
+        }
+        if (systemUserId.HasValue)
+        {
+            var customer = await customerRepository.GetBySystemUserId(systemUserId.Value);
+            return customer != null
+                ? TypedResults.Ok(mapper.Map<CustomerBaseResponseModel>(customer))
+                : TypedResults.NotFound();
+        }
+        return TypedResults.BadRequest();
+
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]

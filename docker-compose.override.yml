@@ -70,6 +70,7 @@ services:
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
       - Services__Catalog__Url=http://catalog_api:80
+      - Services__Customers__Url=http://customers_api:80
     ports:
       - "2005:443"
     volumes:

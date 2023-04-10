@@ -38,6 +38,11 @@ public class CustomerRepository : ICustomerRepository
         return await context.Customer.FindAsync(id);
     }
 
+    public async Task<Customer?> GetBySystemUserId(Guid id)
+    {
+        return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == id);
+    }
+
     public async Task<ICollection<Customer>> Query()
     {
         return await context.Customer.AsNoTracking()
