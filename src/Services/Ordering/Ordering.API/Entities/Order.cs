@@ -15,7 +15,7 @@ public class Order
     [Required]
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     [Required]
-    public ICollection<OrderHistory> OrderHistories { get; set; } = new List<OrderHistory>();
+    public ICollection<OrderHistory> OrderHistory { get; set; } = new List<OrderHistory>();
 
     [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$", ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000-0000")]
     public string ReferenceNumber { get; set; } = GenerateReferenceNumber();

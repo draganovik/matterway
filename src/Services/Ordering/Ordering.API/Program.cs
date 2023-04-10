@@ -23,6 +23,8 @@ builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IOrderHistoryRepository, OrderHistoryRepository>();
 
 // Add services to the container.
@@ -121,5 +123,9 @@ if (app.Environment.IsDevelopment())
 app.MapAddressEndpoints();
 
 app.MapOrderHistoryEndpoints();
+
+app.MapOrderEndpoints();
+
+app.MapOrderItemEndpoints();
 
 app.Run();
