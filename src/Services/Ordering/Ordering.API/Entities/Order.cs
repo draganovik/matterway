@@ -17,8 +17,7 @@ public class Order
     [Required]
     public ICollection<OrderHistory> OrderHistories { get; set; } = new List<OrderHistory>();
 
-    // Validate reference number to be in format of paycheck referene number 
-    [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$")]
+    [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$", ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000-0000")]
     public string ReferenceNumber { get; set; } = GenerateReferenceNumber();
 
     public static string GenerateReferenceNumber()

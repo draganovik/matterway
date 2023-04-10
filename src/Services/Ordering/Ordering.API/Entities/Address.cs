@@ -17,7 +17,7 @@ public class Address
     [Required]
     public string Country { get; set; } = "Serbia";
     [Required]
-    [RegularExpression(@"^[0-9]{5}$")]
+    [RegularExpression(@"^[0-9]{5}$", ErrorMessage = "Invalid zip code. Zip code must be 5 digits")]
     public string? ZipCode { get; set; }
     public string? Note { get; set; }
 }

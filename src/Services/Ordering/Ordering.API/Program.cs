@@ -1,14 +1,24 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Ordering.API.Data;
+using Ordering.API.Endpoints;
+using Ordering.API.Repository;
 using Shared.ServiceBrokers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<OrderingDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OrderingDbContext") ?? throw new InvalidOperationException("Connection string 'OrderingDbContext' not found.")));
+
+builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -102,5 +112,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapAddressEndpoints();
 
 app.Run();
