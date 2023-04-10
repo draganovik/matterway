@@ -9,16 +9,21 @@ using Shared.ServiceBrokers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<OrderingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OrderingDbContext") ?? throw new InvalidOperationException("Connection string 'OrderingDbContext' not found.")));
+builder.Services
+    .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IOrderHistoryRepository, OrderHistoryRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -114,5 +119,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapAddressEndpoints();
+
+app.MapOrderHistoryEndpoints();
 
 app.Run();

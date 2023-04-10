@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Ordering.API.Entities;
 
 namespace Ordering.API.Data
 {
@@ -9,6 +10,8 @@ namespace Ordering.API.Data
         {
         }
 
-        public DbSet<Ordering.API.Entities.Address> Address { get; set; } = default!;
+        public DbSet<Address> Address { get; set; } = default!;
+
+        public DbSet<OrderHistory> OrderHistory { get; set; } = default!;
     }
 }
