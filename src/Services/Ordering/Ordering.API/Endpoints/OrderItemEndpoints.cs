@@ -5,6 +5,8 @@ using Ordering.API.Entities;
 using Ordering.API.Models.OrderItemModels;
 using Ordering.API.Repository;
 using Shared.Enums;
+using Shared.Models;
+using Shared.ServiceBrokers;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.API.Endpoints;
@@ -48,11 +50,20 @@ public static class OrderItemEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var updatedEntity = mapper.Map<OrderItem>(requestModel);
         updatedEntity.OrderId = id;
         updatedEntity.ProductId = itemId;
+
+        Product? product = await catalogServiceBroker.GetProductById(updatedEntity.ProductId);
+        if (product is null)
+        {
+            return TypedResults.NotFound<object>(new { message = "Product not found" });
+        }
+
+        updatedEntity.ProductName = product.Title;
+        updatedEntity.UnitPrice = product.Price ?? 0;
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(updatedEntity);
@@ -64,10 +75,10 @@ public static class OrderItemEndpoints
             return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
         }
 
-        var updateEntity = await OrderItemRepository.Update(updatedEntity);
+        var updateEntity = await OrderItemRepository.Put(updatedEntity);
         if (updateEntity is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Entity not found" });
+            return TypedResults.NotFound<object>(new { message = "Can't save entity" });
         }
         return TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(updateEntity));
     }

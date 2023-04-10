@@ -1,4 +1,4 @@
-﻿namespace SharedProject.Enums;
+﻿namespace Shared.Enums;
 
 public enum OrderStatus
 {

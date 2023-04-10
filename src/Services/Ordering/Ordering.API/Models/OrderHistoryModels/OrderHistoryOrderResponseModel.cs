@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using SharedProject.Enums;
+﻿using Shared.Enums;
+using System.Text.Json.Serialization;
 
 namespace Ordering.API.Models.OrderHistoryModels;
 

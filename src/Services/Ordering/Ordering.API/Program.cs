@@ -19,6 +19,7 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
+builder.Services.AddScoped<ICatalogServiceBroker, CatalogServiceBroker>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -45,8 +45,6 @@ public static class ProductEndpoints
             });
     }
 
-
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
     public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts(IProductRepository productRepository, IMapper mapper)
     {
         return await productRepository.Query()
@@ -55,7 +53,6 @@ public static class ProductEndpoints
                 : TypedResults.NoContent();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
     public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound>> GetProductById(Guid id, IProductRepository productRepository, IMapper mapper)
     {
         return await productRepository.GetById(id)

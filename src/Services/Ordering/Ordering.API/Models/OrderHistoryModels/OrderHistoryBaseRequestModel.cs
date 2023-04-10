@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using SharedProject.Enums;
+﻿using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Ordering.API.Models.OrderHistoryModels;

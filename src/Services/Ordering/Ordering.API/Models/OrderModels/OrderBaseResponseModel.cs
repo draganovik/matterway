@@ -1,5 +1,4 @@
-﻿using Ordering.API.Entities;
-using Ordering.API.Models.AddressModels;
+﻿using Ordering.API.Models.AddressModels;
 using Ordering.API.Models.OrderHistoryModels;
 using Ordering.API.Models.OrderItemModels;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +9,9 @@ public class OrderBaseResponseModel
 {
     public Guid Id { get; set; }
     public Guid? CustomerId { get; set; }
+    // Total should be have 2 decimal places
+    [Range(0.01, double.MaxValue, ErrorMessage = "Total must be greater than 0")]
+    public double Total { get; set; }
     public AddressOrderResponseModel? Address { get; set; }
     public ICollection<OrderItemOrderResponseModel> OrderItems { get; set; } = new List<OrderItemOrderResponseModel>();
     public ICollection<OrderHistoryOrderResponseModel> OrderHistory { get; set; } = new List<OrderHistoryOrderResponseModel>();

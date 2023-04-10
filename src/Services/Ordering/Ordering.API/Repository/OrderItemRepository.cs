@@ -44,14 +44,21 @@ public class OrderItemRepository : IOrderItemRepository
         .ToListAsync();
     }
 
-    public async Task<OrderItem?> Update(OrderItem requestModel)
+    public async Task<OrderItem?> Put(OrderItem requestModel)
     {
         var currentOrderItemModel = await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.OrderId == requestModel.OrderId);
+        var affected = 0;
         if (currentOrderItemModel is null)
         {
+            context.OrderItem.Add(requestModel);
+            affected = await context.SaveChangesAsync();
+            if (affected == 1)
+            {
+                return await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.OrderId == requestModel.OrderId);
+            }
             return null;
         }
-        var affected = await context.OrderItem
+        affected = await context.OrderItem
             .Where(model => model.ProductId == requestModel.ProductId)
             .Where(model => model.OrderId == requestModel.OrderId)
         .ExecuteUpdateAsync(setters => setters

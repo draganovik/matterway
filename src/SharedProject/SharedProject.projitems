@@ -12,6 +12,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enums\DetailType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\CatalogServiceBroker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\ICatalogServiceBroker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IdentityServiceBroker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IIdentityServiceBroker.cs" />
   </ItemGroup>
