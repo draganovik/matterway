@@ -73,7 +73,6 @@ public partial class Initialize : Migration
             name: "OrderItem",
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -82,7 +81,7 @@ public partial class Initialize : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_OrderItem", x => x.Id);
+                table.PrimaryKey("PK_OrderItem", x => new { x.OrderId, x.ProductId });
                 table.ForeignKey(
                     name: "FK_OrderItem_Order_OrderId",
                     column: x => x.OrderId,
@@ -99,11 +98,6 @@ public partial class Initialize : Migration
         migrationBuilder.CreateIndex(
             name: "IX_OrderHistory_OrderId",
             table: "OrderHistory",
-            column: "OrderId");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_OrderItem_OrderId",
-            table: "OrderItem",
             column: "OrderId");
     }
 

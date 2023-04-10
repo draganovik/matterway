@@ -110,10 +110,6 @@ partial class OrderingDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("Ordering.API.Entities.OrderItem", b =>
             {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
-
                 b.Property<Guid>("OrderId")
                     .HasColumnType("uniqueidentifier");
 
@@ -130,9 +126,7 @@ partial class OrderingDbContextModelSnapshot : ModelSnapshot
                 b.Property<int>("Units")
                     .HasColumnType("int");
 
-                b.HasKey("Id");
-
-                b.HasIndex("OrderId");
+                b.HasKey("OrderId", "ProductId");
 
                 b.ToTable("OrderItem");
             });
@@ -151,7 +145,7 @@ partial class OrderingDbContextModelSnapshot : ModelSnapshot
         modelBuilder.Entity("Ordering.API.Entities.OrderHistory", b =>
             {
                 b.HasOne("Ordering.API.Entities.Order", "Order")
-                    .WithMany("OrderHistories")
+                    .WithMany("OrderHistory")
                     .HasForeignKey("OrderId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
@@ -172,7 +166,7 @@ partial class OrderingDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("Ordering.API.Entities.Order", b =>
             {
-                b.Navigation("OrderHistories");
+                b.Navigation("OrderHistory");
 
                 b.Navigation("OrderItems");
             });

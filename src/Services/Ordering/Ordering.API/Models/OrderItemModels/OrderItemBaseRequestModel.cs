@@ -5,7 +5,6 @@ namespace Ordering.API.Models.OrderItemModels;
 public class OrderItemBaseRequestModel
 {
     [Required]
-    public Guid OrderId { get; set; }
-    [Required]
-    public Guid ProductId { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "Units must be greater than 0")]
+    public int Units { get; set; }
 }

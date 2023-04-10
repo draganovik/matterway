@@ -2,9 +2,8 @@
 
 namespace Ordering.API.Models.AddressModels;
 
-public class AddressBaseResponseModel
+public class AddressOrderResponseModel
 {
-    public Guid Id { get; set; }
     public string? ReceiverName { get; set; }
     public string? Residence { get; set; }
     public string? Street { get; set; }

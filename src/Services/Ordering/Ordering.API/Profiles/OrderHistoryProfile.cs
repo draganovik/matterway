@@ -9,6 +9,7 @@ public class OrderHistoryProfile : Profile
     public OrderHistoryProfile()
     {
         CreateMap<OrderHistory, OrderHistoryBaseResponseModel>();
+        CreateMap<OrderHistory, OrderHistoryOrderResponseModel>();
 
         CreateMap<OrderHistoryBaseRequestModel, OrderHistory>();
     }
