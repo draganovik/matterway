@@ -36,9 +36,9 @@ public static class CustomerEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<CustomerBaseResponseModel>>, NoContent>> QueryCustomers(ICustomerRepository customerRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<CustomerBaseResponseModel>>, NoContent>> QueryCustomers([FromQuery] int pageIndex, [FromQuery] int pageSize, ICustomerRepository customerRepository, IMapper mapper)
     {
-        return await customerRepository.Query()
+        return await customerRepository.Query(pageIndex, pageSize)
             is IEnumerable<Customer> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<CustomerBaseResponseModel>>(value))
                 : TypedResults.NoContent();

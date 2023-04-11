@@ -38,10 +38,12 @@ public class AddressRepository : IAddressRepository
         return await context.Address.FindAsync(id);
     }
 
-    public async Task<ICollection<Address>> Query()
+    public async Task<ICollection<Address>> Query(int pageIndex, int pageSize)
     {
         return await context.Address.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Address?> Update(Guid id, AddressBaseRequestModel requestModel)

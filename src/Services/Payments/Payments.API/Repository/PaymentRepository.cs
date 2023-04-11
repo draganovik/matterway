@@ -38,10 +38,12 @@ public class PaymentRepository : IPaymentRepository
         return await context.Payment.FindAsync(id);
     }
 
-    public async Task<ICollection<Payment>> Query()
+    public async Task<ICollection<Payment>> Query(int pageIndex, int pageSize)
     {
         return await context.Payment.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Payment?> Update(Guid id, PaymentBaseRequestModel requestModel)

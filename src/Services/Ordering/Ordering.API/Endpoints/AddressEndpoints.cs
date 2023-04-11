@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Entities;
 using Ordering.API.Models.AddressModels;
 using Ordering.API.Repository;
@@ -33,9 +34,9 @@ public static class AddressEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<AddressBaseResponseModel>>, NoContent>> QueryAddresses(IAddressRepository addressRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<AddressBaseResponseModel>>, NoContent>> QueryAddresses([FromQuery] int pageIndex, [FromQuery] int pageSize, IAddressRepository addressRepository, IMapper mapper)
     {
-        return await addressRepository.Query()
+        return await addressRepository.Query(pageIndex, pageSize)
             is IEnumerable<Address> entityCollection && entityCollection.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<AddressBaseResponseModel>>(entityCollection))
                 : TypedResults.NoContent();

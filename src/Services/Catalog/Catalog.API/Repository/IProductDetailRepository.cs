@@ -1,17 +1,17 @@
 ﻿using Catalog.API.Entities;
-using Catalog.API.Models.ProductModels;
+using Catalog.API.Models.ProductDetailModels;
 
 namespace Catalog.API.Repository;
 
-public interface IProductRepository
+public interface IProductDetailRepository
 {
-    Task<ICollection<Product>> Query();
+    Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize);
 
-    Task<Product?> GetById(Guid id);
+    Task<ProductDetail?> GetById(Guid id);
 
-    Task<Product?> Create(Product requestModel);
+    Task<ProductDetail?> Create(ProductDetail requestModel);
 
-    Task<Product?> Update(Guid id, ProductBaseRequestModel requestModel);
+    Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
 }

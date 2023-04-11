@@ -5,7 +5,7 @@ namespace Identity.API.Repository;
 
 public interface ISystemUserRepository
 {
-    Task<ICollection<SystemUser>> Query();
+    Task<ICollection<SystemUser>> Query(int pageIndex, int pageSize);
 
     Task<SystemUser?> GetById(Guid id);
 

@@ -12,7 +12,7 @@ using Ordering.API.Data;
 namespace Ordering.API.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
-    [Migration("20230411182220_Initialize")]
+    [Migration("20230411210749_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -152,26 +152,18 @@ namespace Ordering.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            CreatedDate = new DateTime(2023, 4, 11, 17, 22, 20, 662, DateTimeKind.Local).AddTicks(8899),
+                            CreatedDate = new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1045),
                             Description = "Order Created",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                             OrderStatus = 1
                         },
                         new
                         {
-                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"),
-                            CreatedDate = new DateTime(2023, 4, 11, 18, 22, 20, 662, DateTimeKind.Local).AddTicks(8907),
-                            Description = "Order Created",
-                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
-                            OrderStatus = 0
-                        },
-                        new
-                        {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
-                            CreatedDate = new DateTime(2023, 4, 11, 20, 22, 20, 662, DateTimeKind.Local).AddTicks(8910),
+                            CreatedDate = new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1051),
                             Description = "Order Created",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            OrderStatus = 0
+                            OrderStatus = 5
                         });
                 });
 

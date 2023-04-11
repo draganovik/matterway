@@ -4,6 +4,7 @@ using Catalog.API.Models.ProductImageModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -48,9 +49,9 @@ public static class ProductImageEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<ProductImageBaseResponseModel>>, NoContent>> QueryProductImages(IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<ProductImageBaseResponseModel>>, NoContent>> QueryProductImages([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductImageRepository productImageRepository, IMapper mapper)
     {
-        return await productImageRepository.Query()
+        return await productImageRepository.Query(pageIndex, pageSize)
             is IEnumerable<ProductImage> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<ProductImageBaseResponseModel>>(value))
                 : TypedResults.NoContent();

@@ -81,23 +81,15 @@ public class OrderingDbContext : DbContext
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                 OrderStatus = OrderStatus.Ready,
-                Description = "Order Created",
-                CreatedDate = DateTime.Now.Subtract(TimeSpan.FromHours(3))
-            },
-            new OrderHistory
-            {
-                Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"),
-                OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
-                OrderStatus = OrderStatus.Pending,
-                Description = "Order Created",
-                CreatedDate = DateTime.Now.Subtract(TimeSpan.FromHours(2))
+                Description = "Order Ready",
+                CreatedDate = DateTime.Now
             },
             new OrderHistory
             {
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                OrderStatus = OrderStatus.Pending,
-                Description = "Order Created",
+                OrderStatus = OrderStatus.Canceled,
+                Description = "Order Canceled",
                 CreatedDate = DateTime.Now
             }
         );

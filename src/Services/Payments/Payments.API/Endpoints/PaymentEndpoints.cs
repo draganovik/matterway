@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Payments.API.Entities;
 using Payments.API.Models.PaymentModels;
 using Payments.API.Repository;
@@ -33,9 +34,9 @@ public static class PaymentEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<PaymentBaseResponseModel>>, NoContent>> QueryPayments(IPaymentRepository addressRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<PaymentBaseResponseModel>>, NoContent>> QueryPayments([FromQuery] int pageIndex, [FromQuery] int pageSize, IPaymentRepository addressRepository, IMapper mapper)
     {
-        return await addressRepository.Query()
+        return await addressRepository.Query(pageIndex, pageSize)
             is IEnumerable<Payment> entityCollection && entityCollection.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<PaymentBaseResponseModel>>(entityCollection))
                 : TypedResults.NoContent();

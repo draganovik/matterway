@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Entities;
 using Ordering.API.Models.OrderItemModels;
 using Ordering.API.Repository;
@@ -32,9 +33,9 @@ public static class OrderItemEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<OrderItemBaseResponseModel>>, NoContent>> QueryOrderItems(IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<OrderItemBaseResponseModel>>, NoContent>> QueryOrderItems([FromQuery] int pageIndex, [FromQuery] int pageSize, IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
-        return await OrderItemRepository.Query()
+        return await OrderItemRepository.Query(pageIndex, pageSize)
             is IEnumerable<OrderItem> entityCollection && entityCollection.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<OrderItemBaseResponseModel>>(entityCollection))
                 : TypedResults.NoContent();

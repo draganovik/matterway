@@ -57,10 +57,12 @@ public class SystemUserRepository : ISystemUserRepository
         return await context.SystemUser.FindAsync(id);
     }
 
-    public async Task<ICollection<SystemUser>> Query()
+    public async Task<ICollection<SystemUser>> Query(int pageIndex, int pageSize)
     {
         return await context.SystemUser.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<SystemUser?> Update(Guid id, SystemUserBaseRequestModel user)

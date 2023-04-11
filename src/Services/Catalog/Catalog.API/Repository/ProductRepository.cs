@@ -1,5 +1,6 @@
 ﻿using Catalog.API.Data;
 using Catalog.API.Entities;
+using Catalog.API.Filters;
 using Catalog.API.Models.ProductModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,10 +39,13 @@ public class ProductRepository : IProductRepository
         return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<ICollection<Product>> Query()
+    public async Task<ICollection<Product>> Query(int pageIndex, int pageSize, ProductFilter productFilter)
     {
-        return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).AsNoTracking()
-        .ToListAsync();
+        var productQuery = productFilter.GenerateQuery(context.Product.AsQueryable());
+        return await productQuery.Include(x => x.ProductDetails).Include(x => x.ProductImages).AsNoTracking()
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Product?> Update(Guid id, ProductBaseRequestModel requestModel)

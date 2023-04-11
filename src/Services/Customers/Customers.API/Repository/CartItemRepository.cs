@@ -38,10 +38,12 @@ public class CartItemRepository : ICartItemRepository
         return await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == id && x.ProductId == productId);
     }
 
-    public async Task<ICollection<CartItem>> Query()
+    public async Task<ICollection<CartItem>> Query(int pageIndex, int pageSize)
     {
         return await context.CartItem.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<CartItem?> Put(CartItem requestModel)
