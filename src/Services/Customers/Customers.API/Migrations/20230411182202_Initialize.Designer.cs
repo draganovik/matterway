@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Customers.API.Migrations
 {
     [DbContext(typeof(CustomersDbContext))]
-    [Migration("20230411162049_Initialize")]
+    [Migration("20230411182202_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -46,6 +46,24 @@ namespace Customers.API.Migrations
                     b.HasKey("CustomerId", "ProductId");
 
                     b.ToTable("CartItem");
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ProductName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
+                            Quantity = 3,
+                            UnitPrice = 4999.0
+                        },
+                        new
+                        {
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ProductName = "Ring Spotlight Cam",
+                            Quantity = 1,
+                            UnitPrice = 19999.0
+                        });
                 });
 
             modelBuilder.Entity("Customers.API.Entities.Customer", b =>
@@ -77,6 +95,24 @@ namespace Customers.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Customer");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            BirthDate = new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FirstName = "Stefan",
+                            LastName = "Stefanov",
+                            SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3")
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            BirthDate = new DateTime(2000, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FirstName = "Mara",
+                            LastName = "Jakov",
+                            SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4")
+                        });
                 });
 
             modelBuilder.Entity("Customers.API.Entities.CartItem", b =>
