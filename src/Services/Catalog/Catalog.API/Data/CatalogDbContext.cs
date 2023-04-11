@@ -17,9 +17,6 @@ public class CatalogDbContext : DbContext
 
     public DbSet<Product> Product { get; set; } = default!;
 
-    // Add initial data to the database (products should be IoT devices: Smart Lights, Locks, Speakers, Apliences,...)
-    // Make the data look real and descriptive (long descriptions, images, etc.)
-    // parste static guids (ids)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>().HasData(
