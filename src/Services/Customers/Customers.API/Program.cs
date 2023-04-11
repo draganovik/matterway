@@ -91,7 +91,10 @@ builder.Services.AddAuthentication(options =>
             // Get the token from the context
             var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
 
-            if (token == null) context.Fail("Unauthorized");
+            if (token == null)
+            {
+                context.Fail("Unauthorized");
+            }
 
             // Get the session from the database based on the user ID and token
             // TODO: make a call to the Identity API to validate the token

@@ -19,19 +19,34 @@ public static class OrderEndpoints
         var group = routes.MapGroup("/api/Orders").WithTags(nameof(Order));
 
         group.MapGet("/", QueryOrders)
-            .WithName("QueryOrders").WithOpenApi();
+            .WithName("QueryOrders").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Orders",
+            });
 
         group.MapGet("/{id}", GetOrderById)
-            .WithName("GetOrderById").WithOpenApi();
+            .WithName("GetOrderById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get Order By Id",
+            });
 
-        group.MapPut("/{id}", UpdateOrderById)
-            .WithName("UpdateOrderById").WithOpenApi();
+        group.MapPatch("/{id}", UpdateOrderById)
+            .WithName("UpdateOrderById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update Order By Id",
+            });
 
         group.MapPost("/", CreateOrder)
-            .WithName("CreateOrder").WithOpenApi();
+            .WithName("CreateOrder").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Order",
+            });
 
         group.MapDelete("/{id}", DeleteOrder)
-            .WithName("DeleteOrder").WithOpenApi();
+            .WithName("DeleteOrder").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete Order",
+            });
     }
 
 

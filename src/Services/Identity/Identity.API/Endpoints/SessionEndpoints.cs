@@ -21,19 +21,34 @@ public static class SessionEndpoints
         var group = routes.MapGroup("/api/Sessions").WithTags(nameof(Session));
 
         group.MapGet("/", QuerySessions)
-            .WithName("GetAllSessions").WithOpenApi();
+            .WithName("QuerySessions").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Sessions",
+            });
 
         group.MapGet("/introspect", IntrospectSession)
-            .WithName("IntrospectSession").WithOpenApi();
+            .WithName("IntrospectSession").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Introspect Session",
+            });
 
         group.MapPost("/create", CreateSession)
-            .WithName("CreateSession").WithOpenApi();
+            .WithName("CreateSession").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Session",
+            });
 
         group.MapPost("/refresh", RefreshSession)
-            .WithName("RefreshSession").WithOpenApi();
+            .WithName("RefreshSession").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Refresh Session",
+            });
 
         group.MapDelete("/revoke", RevokeSession)
-            .WithName("RevokeSession").WithOpenApi();
+            .WithName("RevokeSession").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Revoke Session",
+            });
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
@@ -56,7 +71,11 @@ public static class SessionEndpoints
         }
         // Get the token from the context
         var token = context.GetTokenAsync("access_token").Result;
-        if (token == null) return TypedResults.Unauthorized();
+        if (token == null)
+        {
+            return TypedResults.Unauthorized();
+        }
+
         var currentSession = await sessionRepository.GetByToken(token);
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(currentSession));
     }
@@ -73,8 +92,8 @@ public static class SessionEndpoints
             return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
         }
 
-        var existingUser = await systemUserRepository.GetByEmail(requestModel.Email);
-        if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password) != PasswordVerificationResult.Success)
+        var existingUser = await systemUserRepository.GetByEmail(requestModel.Email!);
+        if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password!) != PasswordVerificationResult.Success)
         {
             return TypedResults.BadRequest<object>(new { message = "Invalid email or password." });
         }

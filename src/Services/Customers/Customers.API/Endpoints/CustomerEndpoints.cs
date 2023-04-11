@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Customers.API.Endpoints;
 
@@ -16,22 +18,40 @@ public static class CustomerEndpoints
         var group = routes.MapGroup("/api/Customers").WithTags(nameof(Customer));
 
         group.MapGet("/", QueryCustomers)
-            .WithName("QueryCustomers").WithOpenApi();
+            .WithName("QueryCustomers").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Customers",
+            });
 
         group.MapGet("/VerifyBy", VerifyCustomer)
-            .WithName("VerifyCustomer").WithOpenApi();
+            .WithName("VerifyCustomer").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Verify Customer",
+            });
 
         group.MapGet("/{id}", GetCustomerById)
-            .WithName("GetCustomerById").WithOpenApi();
+            .WithName("GetCustomerById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get Customer by Id",
+            });
 
-        group.MapPut("/{id}", UpdateCustomerById)
-            .WithName("UpdateCustomerById").WithOpenApi();
+        group.MapPatch("/{id}", UpdateCustomerById)
+            .WithName("UpdateCustomerById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update Customer by Id",
+            });
 
         group.MapPost("/", CreateCustomer)
-            .WithName("CreateCustomer").WithOpenApi();
+            .WithName("CreateCustomer").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Customer",
+            });
 
         group.MapDelete("/{id}", DeleteCustomer)
-            .WithName("DeleteCustomer").WithOpenApi();
+            .WithName("DeleteCustomer").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete Customer",
+            });
     }
 
 
@@ -73,21 +93,82 @@ public static class CustomerEndpoints
 
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<CustomerBaseResponseModel>, NotFound>> UpdateCustomerById(Guid id, CustomerUpdateRequestModel requestModel, ICustomerRepository customerRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Ok<CustomerBaseResponseModel>, NotFound, BadRequest<object>, ForbidHttpResult>> UpdateCustomerById(Guid id, CustomerUpdateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
     {
-        var updatedUser = await customerRepository.Update(id, requestModel);
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+
+        var updateEntity = mapper.Map<Customer>(requestModel);
+
+        if (userRole == SystemUserRole.Customer)
+        {
+            if (updateEntity.SystemUserId != systemUserId)
+            {
+                return TypedResults.Forbid();
+            }
+        }
+
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(updateEntity);
+        var isValid = Validator.TryValidateObject(updateEntity, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
+        var updatedUser = await customerRepository.Update(id, updateEntity);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<CustomerBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<CustomerBaseResponseModel>, BadRequest>> CreateCustomer(CustomerCreateRequestModel requestModel, ICustomerRepository customerRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Created<CustomerBaseResponseModel>, BadRequest<object>, ForbidHttpResult>> CreateCustomer(CustomerCreateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
     {
-        var customerModel = mapper.Map<Customer>(requestModel);
-        var createdCustomer = await customerRepository.Create(customerModel);
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+
+        var newEntity = mapper.Map<Customer>(requestModel);
+
+        if (userRole == SystemUserRole.Customer)
+        {
+            if (newEntity.SystemUserId != systemUserId)
+            {
+                return TypedResults.Forbid();
+            }
+        }
+
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(newEntity);
+        var isValid = Validator.TryValidateObject(newEntity, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
+        var createdCustomer = await customerRepository.Create(newEntity);
         if (createdCustomer is null)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { message = "Cannot create Customer" });
         }
         return TypedResults.Created($"/api/Customers/{createdCustomer.Id}", mapper.Map<CustomerBaseResponseModel>(createdCustomer));
     }

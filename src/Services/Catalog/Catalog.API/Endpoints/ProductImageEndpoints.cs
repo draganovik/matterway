@@ -28,7 +28,7 @@ public static class ProductImageEndpoints
                 Summary = "Get a ProductImage by id."
             });
 
-        group.MapPut("/{productId}/{id}", UpdateProductImageById)
+        group.MapPatch("/{productId}/{id}", UpdateProductImageById)
             .WithName("UpdateProductImageById").WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a ProductImage by id."

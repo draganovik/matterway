@@ -28,7 +28,7 @@ public static class ProductDetailEndpoints
                 Summary = "Get a ProductDetail by id."
             });
 
-        group.MapPut("/{id}", UpdateProductDetailById)
+        group.MapPatch("/{id}", UpdateProductDetailById)
             .WithName("UpdateProductDetailById").WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a ProductDetail by id."

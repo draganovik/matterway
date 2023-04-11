@@ -14,7 +14,6 @@ public class CustomersDbContext : DbContext
 
     public DbSet<CartItem> CartItem { get; set; } = default!;
 
-    // add data to database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>().HasData(

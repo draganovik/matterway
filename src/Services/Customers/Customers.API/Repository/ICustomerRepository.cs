@@ -1,5 +1,4 @@
 ﻿using Customers.API.Entities;
-using Customers.API.Models.CustomerModels;
 
 namespace Customers.API.Repository;
 
@@ -13,7 +12,7 @@ public interface ICustomerRepository
 
     Task<Customer?> Create(Customer requestModel);
 
-    Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel);
+    Task<Customer?> Update(Guid id, Customer requestModel);
 
     Task<bool> Delete(Guid id);
 }

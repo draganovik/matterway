@@ -28,7 +28,11 @@ public class IdentityServiceBroker : IIdentityServiceBroker
         {
             var content = await response.Content.ReadAsStringAsync();
             var claims = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
-            if (claims == null) return null;
+            if (claims == null)
+            {
+                return null;
+            }
+
             var claimsIdentity = new ClaimsIdentity(claims.Select(x => new Claim(x.Key, x.Value)), "Token");
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             return claimsPrincipal;

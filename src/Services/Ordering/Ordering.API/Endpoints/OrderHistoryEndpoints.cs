@@ -17,19 +17,34 @@ public static class OrderHistoryEndpoints
         var group = routes.MapGroup("/api/OrderHistories").WithTags(nameof(OrderHistory));
 
         group.MapGet("/", QueryOrderHistories)
-            .WithName("QueryOrderHistories").WithOpenApi();
+            .WithName("QueryOrderHistories").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Order Histories",
+            });
 
         group.MapGet("/{id}", GetOrderHistoryById)
-            .WithName("GetOrderHistoryById").WithOpenApi();
+            .WithName("GetOrderHistoryById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get Order History By Id",
+            });
 
-        group.MapPut("/{id}", UpdateOrderHistoryById)
-            .WithName("UpdateOrderHistoryById").WithOpenApi();
+        group.MapPatch("/{id}", UpdateOrderHistoryById)
+            .WithName("UpdateOrderHistoryById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update Order History By Id",
+            });
 
         group.MapPost("/", CreateOrderHistory)
-            .WithName("CreateOrderHistory").WithOpenApi();
+            .WithName("CreateOrderHistory").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Order History",
+            });
 
         group.MapDelete("/{id}", DeleteOrderHistory)
-            .WithName("DeleteOrderHistory").WithOpenApi();
+            .WithName("DeleteOrderHistory").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete Order History",
+            });
     }
 
 

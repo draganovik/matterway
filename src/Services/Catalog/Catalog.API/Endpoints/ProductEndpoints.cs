@@ -29,7 +29,7 @@ public static class ProductEndpoints
                 Summary = "Get a Product by id."
             });
 
-        group.MapPut("/{id}", UpdateProductById)
+        group.MapPatch("/{id}", UpdateProductById)
             .WithName("UpdateProductById").WithOpenApi(operation => new(operation)
             {
                 Summary = "Update a Product by id."

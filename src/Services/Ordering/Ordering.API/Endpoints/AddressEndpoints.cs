@@ -17,19 +17,34 @@ public static class AddressEndpoints
         var group = routes.MapGroup("/api/Addresses").WithTags(nameof(Address));
 
         group.MapGet("/", QueryAddresses)
-            .WithName("QueryAddresses").WithOpenApi();
+            .WithName("QueryAddresses").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Addresses",
+            });
 
         group.MapGet("/{id}", GetAddressById)
-            .WithName("GetAddressById").WithOpenApi();
+            .WithName("GetAddressById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get Address By Id",
+            });
 
-        group.MapPut("/{id}", UpdateAddressById)
-            .WithName("UpdateAddressById").WithOpenApi();
+        group.MapPatch("/{id}", UpdateAddressById)
+            .WithName("UpdateAddressById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update Address By Id",
+            });
 
         group.MapPost("/", CreateAddress)
-            .WithName("CreateAddress").WithOpenApi();
+            .WithName("CreateAddress").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Address",
+            });
 
         group.MapDelete("/{id}", DeleteAddress)
-            .WithName("DeleteAddress").WithOpenApi();
+            .WithName("DeleteAddress").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete Address",
+            });
     }
 
 

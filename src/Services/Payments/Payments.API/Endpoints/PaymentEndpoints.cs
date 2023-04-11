@@ -17,19 +17,34 @@ public static class PaymentEndpoints
         var group = routes.MapGroup("/api/Payments").WithTags(nameof(Payment));
 
         group.MapGet("/", QueryPayments)
-            .WithName("QueryPayments").WithOpenApi();
+            .WithName("QueryPayments").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query Payments",
+            });
 
         group.MapGet("/{id}", GetPaymentById)
-            .WithName("GetPaymentById").WithOpenApi();
+            .WithName("GetPaymentById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get Payment By Id",
+            });
 
         group.MapPatch("/{id}", UpdatePaymentById)
-            .WithName("UpdatePaymentById").WithOpenApi();
+            .WithName("UpdatePaymentById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update Payment By Id",
+            });
 
         group.MapPost("/", CreatePayment)
-            .WithName("CreatePayment").WithOpenApi();
+            .WithName("CreatePayment").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create Payment",
+            });
 
         group.MapDelete("/{id}", DeletePayment)
-            .WithName("DeletePayment").WithOpenApi();
+            .WithName("DeletePayment").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete Payment",
+            });
     }
 
 

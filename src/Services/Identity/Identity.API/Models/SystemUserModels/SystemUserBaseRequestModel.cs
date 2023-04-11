@@ -18,5 +18,5 @@ public class SystemUserBaseRequestModel
     public string? Password { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public SystemUserRole Role { get; set; }
+    public SystemUserRole? Role { get; set; }
 }

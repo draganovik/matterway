@@ -45,7 +45,11 @@ public class SessionRepository : ISessionRepository
     public async Task<bool> DeleteByToken(string token)
     {
         var session = await context.Session.FirstOrDefaultAsync(s => s.Token == token);
-        if (session == null) return false;
+        if (session == null)
+        {
+            return false;
+        }
+
         context.Session.Remove(session);
         await context.SaveChangesAsync();
         return true;
@@ -54,7 +58,11 @@ public class SessionRepository : ISessionRepository
     public async Task<bool> DeleteByRefreshToken(string refreshToken)
     {
         var session = await context.Session.FirstOrDefaultAsync(s => s.RefreshToken == refreshToken);
-        if (session == null) return false;
+        if (session == null)
+        {
+            return false;
+        }
+
         context.Session.Remove(session);
         await context.SaveChangesAsync();
         return true;

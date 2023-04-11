@@ -20,16 +20,28 @@ public static class CartItemEndpoints
         var group = routes.MapGroup("/api/Customers").WithTags(nameof(CartItem));
 
         group.MapGet("/CartItems", QueryCartItems)
-            .WithName("QueryCartItems").WithOpenApi();
+            .WithName("QueryCartItems").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query CartItems",
+            });
 
         group.MapGet("/{id}/CartItems/{productId}", GetCartItemById)
-            .WithName("GetCartItemById").WithOpenApi();
+            .WithName("GetCartItemById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get CartItem by Id",
+            });
 
         group.MapPut("/{id}/CartItems/{productId}", PutCartItem)
-            .WithName("UpdateCartItemById").WithOpenApi();
+            .WithName("UpdateCartItemById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update CartItem by Id",
+            });
 
         group.MapDelete("{id}/CartItems/{productId}", DeleteCartItem)
-            .WithName("DeleteCartItem").WithOpenApi();
+            .WithName("DeleteCartItem").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete CartItem",
+            });
     }
 
 

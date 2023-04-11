@@ -1,6 +1,5 @@
 ﻿using Customers.API.Data;
 using Customers.API.Entities;
-using Customers.API.Models.CustomerModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Customers.API.Repository;
@@ -51,7 +50,7 @@ public class CustomerRepository : ICustomerRepository
             .ToListAsync();
     }
 
-    public async Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel)
+    public async Task<Customer?> Update(Guid id, Customer requestModel)
     {
         var currentCustomerModel = await context.Customer.FindAsync(id);
         if (currentCustomerModel is null)

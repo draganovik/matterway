@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Identity.API.Endpoints;
 
@@ -18,19 +19,34 @@ public static class SystemUserEndpoints
         var group = routes.MapGroup("/api/SystemUsers").WithTags(nameof(SystemUser));
 
         group.MapGet("/", QuerySystemUsers)
-            .WithName("QuerySystemUsers").WithOpenApi();
+            .WithName("QuerySystemUsers").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Query System Users",
+            });
 
         group.MapGet("/{id}", GetSystemUserById)
-            .WithName("GetSystemUserById").WithOpenApi();
+            .WithName("GetSystemUserById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get System User By Id",
+            });
 
-        group.MapPut("/{id}", UpdateSystemUserById)
-            .WithName("UpdateSystemUserById").WithOpenApi();
+        group.MapPatch("/{id}", UpdateSystemUserById)
+            .WithName("UpdateSystemUserById").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Update System User By Id",
+            });
 
         group.MapPost("/", CreateSystemUser)
-            .WithName("CreateSystemUser").WithOpenApi();
+            .WithName("CreateSystemUser").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Create System User",
+            });
 
         group.MapDelete("/{id}", DeleteSystemUser)
-            .WithName("DeleteSystemUser").WithOpenApi();
+            .WithName("DeleteSystemUser").WithOpenApi(operation => new(operation)
+            {
+                Summary = "Delete System User",
+            });
     }
 
 
@@ -69,8 +85,7 @@ public static class SystemUserEndpoints
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest<object>>> CreateSystemUser(SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest<object>, ForbidHttpResult>> CreateSystemUser(SystemUserBaseRequestModel requestModel, HttpContext httpContext, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -82,8 +97,33 @@ public static class SystemUserEndpoints
             return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
         }
 
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            requestModel.Role ??= SystemUserRole.Customer;
+            if (requestModel.Role != SystemUserRole.Customer)
+            {
+                return TypedResults.Forbid();
+            }
+        }
+        if (userRole == SystemUserRole.Manager && requestModel.Role == SystemUserRole.Admin)
+        {
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Manager can not create Admin" } });
+        }
+
+        if (userRole == SystemUserRole.Manager && requestModel.Role == SystemUserRole.Manager)
+        {
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Manager can not create Manager" } });
+        }
+
+        if (userRole == SystemUserRole.Customer)
+        {
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Customer can not create other users" } });
+        }
+
         var systemUserModel = mapper.Map<SystemUser>(requestModel);
-        systemUserModel.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(systemUserModel, requestModel.Password);
+        systemUserModel.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(systemUserModel, requestModel.Password!);
         var createdSystemUser = await systemUserRepository.Create(systemUserModel);
         if (createdSystemUser is null)
         {
