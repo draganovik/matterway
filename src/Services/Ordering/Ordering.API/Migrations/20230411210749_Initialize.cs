@@ -92,6 +92,23 @@ namespace Ordering.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.Sql(@"
+                CREATE TRIGGER CreateOrderHistoryTrigger ON [Order]
+                AFTER INSERT
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    DECLARE @InsertedOrderIds TABLE (Id UNIQUEIDENTIFIER);
+                    INSERT INTO @InsertedOrderIds
+                    SELECT Id FROM Inserted;
+
+                    INSERT INTO OrderHistory (Id, OrderId, OrderStatus, Description, CreatedDate)
+                    SELECT  newid(), Id, 0, 'Order is created', GETDATE()
+                    FROM @InsertedOrderIds;
+                END
+            ");
+
             migrationBuilder.InsertData(
                 table: "Address",
                 columns: new[] { "Id", "City", "Country", "Note", "ReceiverName", "Residence", "Street", "ZipCode" },
@@ -115,9 +132,8 @@ namespace Ordering.API.Migrations
                 columns: new[] { "Id", "CreatedDate", "Description", "OrderId", "OrderStatus" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), new DateTime(2023, 4, 11, 17, 22, 20, 662, DateTimeKind.Local).AddTicks(8899), "Order Created", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), 1 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), new DateTime(2023, 4, 11, 18, 22, 20, 662, DateTimeKind.Local).AddTicks(8907), "Order Created", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), 0 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new DateTime(2023, 4, 11, 20, 22, 20, 662, DateTimeKind.Local).AddTicks(8910), "Order Created", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), 0 }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1045), "Order Ready", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), 1 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1051), "Order Canceled", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), 5 }
                 });
 
             migrationBuilder.InsertData(
