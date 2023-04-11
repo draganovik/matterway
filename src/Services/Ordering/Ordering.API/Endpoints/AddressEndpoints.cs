@@ -88,7 +88,7 @@ public static class AddressEndpoints
         newEntity = await addressRepository.Create(newEntity);
         if (newEntity is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create object" });
+            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
         }
         return TypedResults.Created($"/api/Addresses/{newEntity.Id}", mapper.Map<AddressBaseResponseModel>(newEntity));
     }

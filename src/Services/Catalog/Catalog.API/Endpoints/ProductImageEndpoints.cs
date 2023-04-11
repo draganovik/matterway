@@ -5,6 +5,7 @@ using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Endpoints;
 
@@ -65,20 +66,40 @@ public static class ProductImageEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound>> UpdateProductImageById(Guid productId, int id, ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound, BadRequest<object>>> UpdateProductImageById(Guid productId, int id, ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var updatedUser = await productImageRepository.Update(productId, id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<ProductImageBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest>> CreateProductImage(ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest<object>>> CreateProductImage(ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var productImageModel = mapper.Map<ProductImage>(requestModel);
         var createdProductImage = await productImageRepository.Create(productImageModel);
         if (createdProductImage is null)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
         }
         return TypedResults.Created($"/api/ProductImages/{createdProductImage.Id}", mapper.Map<ProductImageBaseResponseModel>(createdProductImage));
     }

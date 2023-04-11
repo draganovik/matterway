@@ -88,7 +88,7 @@ public static class OrderHistoryEndpoints
         newEntity = await orderHistoryRepository.Create(newEntity);
         if (newEntity is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create object" });
+            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
         }
         return TypedResults.Created($"/api/OrderHistories/{newEntity.Id}", mapper.Map<OrderHistoryBaseResponseModel>(newEntity));
     }

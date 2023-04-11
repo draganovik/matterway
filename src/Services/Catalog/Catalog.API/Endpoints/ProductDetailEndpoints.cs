@@ -5,6 +5,7 @@ using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Endpoints;
 
@@ -65,20 +66,39 @@ public static class ProductDetailEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound>> UpdateProductDetailById(Guid id, ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound, BadRequest<object>>> UpdateProductDetailById(Guid id, ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
         var updatedUser = await productDetailRepository.Update(id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductDetailBaseResponseModel>, BadRequest>> CreateProductDetail(ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductDetailBaseResponseModel>, BadRequest<object>>> CreateProductDetail(ProductDetailBaseRequestModel requestModel, IProductDetailRepository productDetailRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var productDetailModel = mapper.Map<ProductDetail>(requestModel);
         var createdProductDetail = await productDetailRepository.Create(productDetailModel);
         if (createdProductDetail is null)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
         }
         return TypedResults.Created($"/api/ProductDetails/{createdProductDetail.Id}", mapper.Map<ProductDetailBaseResponseModel>(createdProductDetail));
     }

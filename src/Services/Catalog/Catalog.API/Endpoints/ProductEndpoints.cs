@@ -5,6 +5,7 @@ using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Endpoints;
 
@@ -62,20 +63,40 @@ public static class ProductEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<object>>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var updatedUser = await productRepository.Update(id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<ProductBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest>> CreateProduct(ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<object>>> CreateProduct(ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var productModel = mapper.Map<Product>(requestModel);
         var createdProduct = await productRepository.Create(productModel);
         if (createdProduct is null)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
         }
         return TypedResults.Created($"/api/Products/{createdProduct.Id}", mapper.Map<ProductBaseResponseModel>(createdProduct));
     }

@@ -9,6 +9,7 @@ public class ProductImageBaseRequestModel
     [Required]
     public Guid ProductId { get; set; }
     [Required]
+    [Url]
     public string? ImageUrl { get; set; }
     [Required]
     public string? ImageAlt { get; set; }

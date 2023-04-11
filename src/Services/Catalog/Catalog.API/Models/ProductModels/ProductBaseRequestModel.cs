@@ -5,6 +5,7 @@ namespace Catalog.API.Models.ProductModels;
 public class ProductBaseRequestModel
 {
     [Required]
+    [RegularExpression(@"^[A-Z0-9]{5,10}$", ErrorMessage = "Product code must be 5-10 characters and only contain uppercase letters and numbers.")]
     public string? ProductCode { get; set; }
     [Required]
     public string? Title { get; set; }

@@ -9,6 +9,7 @@ public class ProductImage
     public int Id { get; set; }
     public Guid ProductId { get; set; }
     [Required]
+    [Url]
     public string? ImageUrl { get; set; }
     [Required]
     public string? ImageAlt { get; set; } = "Product Image";

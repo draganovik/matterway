@@ -78,7 +78,7 @@ public static class OrderItemEndpoints
         var updateEntity = await OrderItemRepository.Put(updatedEntity);
         if (updateEntity is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Can't save entity" });
+            return TypedResults.NotFound<object>(new { message = "Cannot save entity" });
         }
         return TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(updateEntity));
     }
