@@ -54,7 +54,7 @@ public static class OrderEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound<object>, BadRequest<object>, UnauthorizedHttpResult>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound<object>, BadRequest<object>, UnauthorizedHttpResult, ForbidHttpResult>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -72,7 +72,7 @@ public static class OrderEndpoints
             var customerId = await customerServiceBroker.VerifyBySystemUserId(systemUserId);
             if (customerId == null || customerId != requestModel.CustomerId.Value)
             {
-                return TypedResults.BadRequest<object>(new { message = "Customer Id is not valid Id from Customers API" });
+                return TypedResults.Forbid();
             }
         }
         else if (requestModel.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(requestModel.CustomerId.Value))
@@ -99,7 +99,7 @@ public static class OrderEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
+    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult, ForbidHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -119,7 +119,7 @@ public static class OrderEndpoints
             var customerId = await customerServiceBroker.VerifyBySystemUserId(systemUserId);
             if (customerId == null || customerId != newEntity.CustomerId.Value)
             {
-                return TypedResults.BadRequest<object>(new { message = "Customer Id is not valid Id from Customers API" });
+                return TypedResults.Forbid();
             }
         }
         else if (newEntity.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(newEntity.CustomerId.Value))
