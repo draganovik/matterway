@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Catalog.API.Entities;
+using Catalog.API.Filters;
 using Catalog.API.Models.ProductModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -47,9 +48,9 @@ public static class ProductEndpoints
             });
     }
 
-    public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts([FromQuery] int pageIndex, [FromQuery] int pageSize, [AsParameters] ProductFilter productFilter, IProductRepository productRepository, IMapper mapper)
     {
-        return await productRepository.Query(pageIndex, pageSize)
+        return await productRepository.Query(pageIndex, pageSize, productFilter)
             is IEnumerable<Product> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<ProductBaseResponseModel>>(value))
                 : TypedResults.NoContent();
