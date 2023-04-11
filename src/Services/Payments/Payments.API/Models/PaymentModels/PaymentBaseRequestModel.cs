@@ -2,12 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Payments.API.Entities;
+namespace Payments.API.Models.PaymentModels;
 
-public class Payment
+public class PaymentBaseRequestModel
 {
-    [Key]
-    public Guid Id { get; set; }
     [Required]
     [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$", ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000-0000")]
     public string? ReferenceNumber { get; set; }

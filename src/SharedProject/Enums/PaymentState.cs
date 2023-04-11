@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Shared.Enums;
 
-namespace SharedProject.Enums
+public enum PaymentState
 {
-    public enum PaymentState
-    {
-        Pending = 0,
-        Processed = 1,
-        Failed = 2
-    }
+    Pending = 0,
+    Processed = 1,
+    Failed = 2
 }
