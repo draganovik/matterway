@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-	<DockerComposeProjectName>matterway-system</DockerComposeProjectName>
+    <DockerComposeProjectName>matterway-system</DockerComposeProjectName>
     <ProjectGuid>03617130-c538-43da-8788-fd527fd8a7b2</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>

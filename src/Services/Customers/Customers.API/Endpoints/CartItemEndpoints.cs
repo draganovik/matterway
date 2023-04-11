@@ -1,0 +1,89 @@
+﻿using AutoMapper;
+using Customers.API.Entities;
+using Customers.API.Models.CartItemModels;
+using Customers.API.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Enums;
+using Shared.Models;
+using Shared.ServiceBrokers;
+using System.ComponentModel.DataAnnotations;
+
+namespace Customers.API.Endpoints;
+
+public static class CartItemEndpoints
+{
+    public static void MapCartItemEndpoints(this IEndpointRouteBuilder routes)
+    {
+        var group = routes.MapGroup("/api/Customers").WithTags(nameof(CartItem));
+
+        group.MapGet("/CartItems", QueryCartItems)
+            .WithName("QueryCartItems").WithOpenApi();
+
+        group.MapGet("/{id}/CartItems/{productId}", GetCartItemById)
+            .WithName("GetCartItemById").WithOpenApi();
+
+        group.MapPut("/{id}/CartItems/{productId}", PutCartItem)
+            .WithName("UpdateCartItemById").WithOpenApi();
+
+        group.MapDelete("{id}/CartItems/{productId}", DeleteCartItem)
+            .WithName("DeleteCartItem").WithOpenApi();
+    }
+
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent>> QueryCartItems(ICartItemRepository cartItemRepository, IMapper mapper)
+    {
+        return await cartItemRepository.Query()
+            is IEnumerable<CartItem> value && value.Any()
+                ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(value))
+                : TypedResults.NoContent();
+    }
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound>> GetCartItemById(Guid id, Guid productId, ICartItemRepository cartItemRepository, IMapper mapper)
+    {
+        return await cartItemRepository.GetById(id, productId)
+            is CartItem value
+                ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(value))
+                : TypedResults.NotFound();
+    }
+
+    [Authorize]
+    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> PutCartItem(Guid id, Guid productId, CartItemBaseRequestModel requestModel, ICartItemRepository cartItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
+    {
+        var newEntity = mapper.Map<CartItem>(requestModel);
+        newEntity.CustomerId = id;
+        newEntity.ProductId = productId;
+
+        Product? product = await catalogServiceBroker.GetProductById(newEntity.ProductId);
+        if (product is null)
+        {
+            return TypedResults.NotFound<object>(new { message = "Product not found" });
+        }
+
+        newEntity.ProductName = product.Title;
+        newEntity.UnitPrice = product.Price ?? 0;
+
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
+        newEntity = await cartItemRepository.Put(newEntity);
+        return newEntity is not null ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(newEntity)) : TypedResults.NotFound<object>(new { message = "Update not performed" });
+    }
+
+    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    public static async Task<Results<NoContent, NotFound>> DeleteCartItem(Guid id, Guid productId, ICartItemRepository cartItemRepository, IMapper mapper)
+    {
+        var isDeleted = await cartItemRepository.Delete(id, productId);
+
+        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
+    }
+}

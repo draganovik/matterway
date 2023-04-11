@@ -2,7 +2,7 @@
 
 namespace Identity.API.Entities;
 
-public class Session : IValidatableObject
+public class Session
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -17,40 +17,21 @@ public class Session : IValidatableObject
     [Required(ErrorMessage = "RefreshToken is required.")]
     public string RefreshToken { get; set; } = string.Empty;
 
-    public DateTime? Created { get; set; }
+    public DateTime? Created { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "Expires is required.")]
     public DateTime? Expires { get; set; }
 
+    [Required(ErrorMessage = "Refresh expires is required.")]
+    public DateTime? RefreshExpires { get; set; }
+
     public bool IsExpired()
     {
-        return DateTime.UtcNow >= Expires;
+        return DateTime.Now >= Expires;
     }
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    public bool IsExpiredRefresh()
     {
-        var results = new List<ValidationResult>();
-
-        if (SystemUserId == Guid.Empty)
-        {
-            results.Add(new ValidationResult("SystemUserId is required."));
-        }
-
-        if (string.IsNullOrEmpty(Token))
-        {
-            results.Add(new ValidationResult("Token is required."));
-        }
-
-        if (string.IsNullOrEmpty(RefreshToken))
-        {
-            results.Add(new ValidationResult("RefreshToken is required."));
-        }
-
-        if (Expires == null)
-        {
-            results.Add(new ValidationResult("Expires is required."));
-        }
-
-        return results;
+        return DateTime.Now >= Expires;
     }
 }

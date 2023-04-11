@@ -1,8 +1,8 @@
 ﻿using Identity.API.Entities;
-using Identity.API.Enums;
 using Identity.API.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Enums;
 
 namespace Identity.API.Data;
 
@@ -31,15 +31,15 @@ public class IdentityDbContext : DbContext
         {
             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
             Email = "user@example.com",
-            Role = SystemUserRole.Customer
+            Role = SystemUserRole.Admin
         };
 
-        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "password1");
+        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "string");
 
         modelBuilder.Entity<SystemUser>().HasData(initUser);
 
         var (token1, desc) = JwtOperations.Generate(initUser, configuration);
-        var (token2, _) = JwtOperations.Generate(initUser, configuration, true);
+        var (token2, rdesc) = JwtOperations.Generate(initUser, configuration, true);
 
         modelBuilder.Entity<Session>().HasData(new Session
         {
@@ -48,7 +48,8 @@ public class IdentityDbContext : DbContext
             Token = token1,
             RefreshToken = token2,
             Created = desc.IssuedAt.GetValueOrDefault(),
-            Expires = desc.Expires.GetValueOrDefault()
+            Expires = desc.Expires.GetValueOrDefault(),
+            RefreshExpires = rdesc.Expires.GetValueOrDefault()
         });
 
         base.OnModelCreating(modelBuilder);

@@ -35,6 +35,10 @@ partial class IdentityDbContextModelSnapshot : ModelSnapshot
                     .IsRequired()
                     .HasColumnType("datetime2");
 
+                b.Property<DateTime?>("RefreshExpires")
+                    .IsRequired()
+                    .HasColumnType("datetime2");
+
                 b.Property<string>("RefreshToken")
                     .IsRequired()
                     .HasColumnType("nvarchar(max)");
@@ -57,11 +61,12 @@ partial class IdentityDbContextModelSnapshot : ModelSnapshot
                     new
                     {
                         Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                        Created = new DateTime(2023, 3, 29, 12, 41, 30, 617, DateTimeKind.Utc).AddTicks(9144),
-                        Expires = new DateTime(2023, 3, 29, 12, 56, 30, 617, DateTimeKind.Utc).AddTicks(9151),
-                        RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODAwOTM2OTAsImV4cCI6MTY4MTEzMDQ5MCwiaWF0IjoxNjgwMDkzNjkwfQ.4kli39ZAbjFUdvx6bDKaGLdib2yCGVf3bZMpNugiN88",
+                        Created = new DateTime(2023, 4, 10, 15, 3, 29, 448, DateTimeKind.Utc).AddTicks(3882),
+                        Expires = new DateTime(2023, 4, 10, 15, 18, 29, 448, DateTimeKind.Utc).AddTicks(3889),
+                        RefreshExpires = new DateTime(2023, 4, 22, 15, 3, 29, 448, DateTimeKind.Utc).AddTicks(5368),
+                        RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODExMzkwMDksImV4cCI6MTY4MjE3NTgwOSwiaWF0IjoxNjgxMTM5MDA5fQ.GzroQO36mJm9I80czlxd0Qisi7c44If1XJCzjiOk9LY",
                         SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                        Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQ3VzdG9tZXIiLCJuYmYiOjE2ODAwOTM2OTAsImV4cCI6MTY4MDA5NDU5MCwiaWF0IjoxNjgwMDkzNjkwfQ.gNWDQE5bQhRSSO86lytNw_5YcfNEu4NdQBY9ThSBp6Y"
+                        Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODExMzkwMDksImV4cCI6MTY4MTEzOTkwOSwiaWF0IjoxNjgxMTM5MDA5fQ.T0M-fQvuncXmkCD-O7CJt0GlZp4D8o-jiRCbAHFivlM"
                     });
             });
 
@@ -93,10 +98,10 @@ partial class IdentityDbContextModelSnapshot : ModelSnapshot
                     new
                     {
                         Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                        Created = new DateTime(2023, 3, 29, 12, 41, 30, 552, DateTimeKind.Utc).AddTicks(4511),
+                        Created = new DateTime(2023, 4, 10, 15, 3, 29, 391, DateTimeKind.Utc).AddTicks(2303),
                         Email = "user@example.com",
-                        PasswordHash = "AQAAAAIAAYagAAAAEIMI7VIsCF1eEv5GSXxkRXOmu3qpjbGKEPCKcMqyuzMjx1RMwM2ZAPIqrwB7K7upWw==",
-                        Role = 2
+                        PasswordHash = "AQAAAAIAAYagAAAAEAlare2oJP0vS3Fg4YXY7aW3y9dY8tYCM0AZaeDhTyvbavRc/6pOgYWe6S32OxZelQ==",
+                        Role = 0
                     });
             });
 

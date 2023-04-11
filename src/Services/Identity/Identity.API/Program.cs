@@ -1,6 +1,7 @@
 using Identity.API.Data;
 using Identity.API.Endpoints;
 using Identity.API.Entities;
+using Identity.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdentityDbContext>(options =>
@@ -16,6 +18,12 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
+builder.Services
+    .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,7 +72,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         //ValidIssuer = builder.Configuration["Jwt:Issuer"],
         //ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 
     options.Events = new JwtBearerEvents
@@ -110,26 +118,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.MapSystemUserEndpoints();
 
 app.MapSessionEndpoints();
-
-app.Use(async (ctx, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (BadHttpRequestException ex)
-    {
-        ctx.Response.StatusCode = ex.StatusCode;
-        await ctx.Response.WriteAsync(ex.Message);
-    }
-});
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();
