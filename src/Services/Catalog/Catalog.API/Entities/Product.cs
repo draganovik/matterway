@@ -18,9 +18,9 @@ public class Product
     public ICollection<ProductDetail>? ProductDetails { get; set; }
     public ICollection<ProductImage>? ProductImages { get; set; }
     [Required]
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
     [Required]
-    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.Now;
     [Required]
     public bool IsAvailable { get; set; } = false;
 }

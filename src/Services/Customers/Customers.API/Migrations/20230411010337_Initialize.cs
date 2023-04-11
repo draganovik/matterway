@@ -19,7 +19,7 @@ public partial class Initialize : Migration
                 FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                DefaultAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                DefaultAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
             constraints: table =>
             {
@@ -30,7 +30,6 @@ public partial class Initialize : Migration
             name: "CartItem",
             columns: table => new
             {
-                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Quantity = table.Column<int>(type: "int", nullable: false),
@@ -39,7 +38,7 @@ public partial class Initialize : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_CartItem", x => x.Id);
+                table.PrimaryKey("PK_CartItem", x => new { x.CustomerId, x.ProductId });
                 table.ForeignKey(
                     name: "FK_CartItem_Customer_CustomerId",
                     column: x => x.CustomerId,
@@ -47,11 +46,6 @@ public partial class Initialize : Migration
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
             });
-
-        migrationBuilder.CreateIndex(
-            name: "IX_CartItem_CustomerId",
-            table: "CartItem",
-            column: "CustomerId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Customer_SystemUserId",

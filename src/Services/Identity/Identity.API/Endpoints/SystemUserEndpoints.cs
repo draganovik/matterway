@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Identity.API.Endpoints;
 
@@ -51,21 +52,41 @@ public static class SystemUserEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound, BadRequest<object>>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var updatedUser = await systemUserRepository.Update(id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest>> CreateSystemUser(SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest<object>>> CreateSystemUser(SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
+        {
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
         var systemUserModel = mapper.Map<SystemUser>(requestModel);
         systemUserModel.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(systemUserModel, requestModel.Password);
         var createdSystemUser = await systemUserRepository.Create(systemUserModel);
         if (createdSystemUser is null)
         {
-            return TypedResults.BadRequest();
+            return TypedResults.BadRequest<object>(new { message = "User is not created" });
         }
         return TypedResults.Created($"/api/SystemUsers/{createdSystemUser.Id}", mapper.Map<SystemUserBaseResponseModel>(createdSystemUser));
     }

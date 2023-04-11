@@ -1,6 +1,5 @@
 ﻿using Customers.API.Data;
 using Customers.API.Entities;
-using Customers.API.Models.CartItemModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Customers.API.Repository;
@@ -20,22 +19,23 @@ public class CartItemRepository : ICartItemRepository
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
         {
-            return await context.CartItem.FindAsync(requestModel.Id);
+            return await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == requestModel.CustomerId && x.ProductId == requestModel.ProductId);
         }
         return null;
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<bool> Delete(Guid id, Guid productId)
     {
         var affected = await context.CartItem
-            .Where(model => model.Id == id)
+            .Where(model => model.CustomerId == id)
+            .Where(model => model.ProductId == productId)
             .ExecuteDeleteAsync();
         return affected == 1;
     }
 
-    public async Task<CartItem?> GetById(Guid id)
+    public async Task<CartItem?> GetById(Guid id, Guid productId)
     {
-        return await context.CartItem.FindAsync(id);
+        return await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == id && x.ProductId == productId);
     }
 
     public async Task<ICollection<CartItem>> Query()
@@ -44,20 +44,29 @@ public class CartItemRepository : ICartItemRepository
         .ToListAsync();
     }
 
-    public async Task<CartItem?> Update(Guid id, CartItemUpdateRequestModel requestModel)
+    public async Task<CartItem?> Put(CartItem requestModel)
     {
-        var currentCartItemModel = await context.CartItem.FindAsync(id);
+        var currentCartItemModel = await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == requestModel.CustomerId && x.ProductId == requestModel.ProductId);
+        var affected = 0;
         if (currentCartItemModel is null)
         {
+            context.CartItem.Add(requestModel);
+            affected = await context.SaveChangesAsync();
+            if (affected == 1)
+            {
+                return await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == requestModel.CustomerId && x.ProductId == requestModel.ProductId);
+            }
             return null;
         }
-        var affected = await context.CartItem
-        .Where(model => model.Id == id)
+        affected = await context.CartItem
+            .Where(model => model.CustomerId == currentCartItemModel.CustomerId)
+            .Where(model => model.ProductId == currentCartItemModel.ProductId)
         .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.CustomerId, requestModel.CustomerId)
-              .SetProperty(m => m.ProductId, requestModel.ProductId)
-              .SetProperty(m => m.UnitPrice, requestModel.UnitPrice)
-              .SetProperty(m => m.ProductName, requestModel.ProductName)
+               .SetProperty(m => m.CustomerId, requestModel.CustomerId)
+               .SetProperty(m => m.ProductId, requestModel.ProductId)
+               .SetProperty(m => m.UnitPrice, requestModel.UnitPrice)
+               .SetProperty(m => m.Quantity, requestModel.Quantity)
+               .SetProperty(m => m.ProductName, requestModel.ProductName)
             );
         await context.Entry(currentCartItemModel).ReloadAsync();
         return affected == 1 ? currentCartItemModel : null;

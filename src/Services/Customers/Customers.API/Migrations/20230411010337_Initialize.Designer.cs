@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Customers.API.Migrations;
 
 [DbContext(typeof(CustomersDbContext))]
-[Migration("20230410150322_Initialize")]
+[Migration("20230411010337_Initialize")]
 partial class Initialize
 {
     /// <inheritdoc />
@@ -27,10 +27,6 @@ partial class Initialize
 
         modelBuilder.Entity("Customers.API.Entities.CartItem", b =>
             {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
-
                 b.Property<Guid>("CustomerId")
                     .HasColumnType("uniqueidentifier");
 
@@ -47,9 +43,7 @@ partial class Initialize
                 b.Property<double>("UnitPrice")
                     .HasColumnType("float");
 
-                b.HasKey("Id");
-
-                b.HasIndex("CustomerId");
+                b.HasKey("CustomerId", "ProductId");
 
                 b.ToTable("CartItem");
             });
@@ -63,7 +57,7 @@ partial class Initialize
                 b.Property<DateTime>("BirthDate")
                     .HasColumnType("datetime2");
 
-                b.Property<Guid>("DefaultAddressId")
+                b.Property<Guid?>("DefaultAddressId")
                     .HasColumnType("uniqueidentifier");
 
                 b.Property<string>("FirstName")

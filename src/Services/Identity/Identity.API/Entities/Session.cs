@@ -17,7 +17,7 @@ public class Session
     [Required(ErrorMessage = "RefreshToken is required.")]
     public string RefreshToken { get; set; } = string.Empty;
 
-    public DateTime? Created { get; set; } = DateTime.UtcNow;
+    public DateTime? Created { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "Expires is required.")]
     public DateTime? Expires { get; set; }
@@ -27,11 +27,11 @@ public class Session
 
     public bool IsExpired()
     {
-        return DateTime.UtcNow >= Expires;
+        return DateTime.Now >= Expires;
     }
 
     public bool IsExpiredRefresh()
     {
-        return DateTime.UtcNow >= Expires;
+        return DateTime.Now >= Expires;
     }
 }

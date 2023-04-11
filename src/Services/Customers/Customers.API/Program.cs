@@ -16,6 +16,8 @@ builder.Services.AddDbContext<CustomersDbContext>(options =>
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
+builder.Services.AddScoped<ICatalogServiceBroker, CatalogServiceBroker>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 

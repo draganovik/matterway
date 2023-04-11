@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Customers.API.Entities;
 
+[PrimaryKey(nameof(CustomerId), nameof(ProductId))]
 public class CartItem
 {
-    [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
     [Required]
     public Guid CustomerId { get; set; }
     [ForeignKey(nameof(CustomerId))]

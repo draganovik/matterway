@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace Identity.API.Endpoints;
@@ -59,12 +60,22 @@ public static class SessionEndpoints
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(currentSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<string>>> CreateSession(SessionBaseRequestModel request, ISessionRepository sessionRepository, ISystemUserRepository systemUserRepository, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<object>>> CreateSession(SessionBaseRequestModel requestModel, ISessionRepository sessionRepository, ISystemUserRepository systemUserRepository, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
     {
-        var existingUser = await systemUserRepository.GetByEmail(request.Email);
-        if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, request.Password) != PasswordVerificationResult.Success)
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
         {
-            return TypedResults.BadRequest("Invalid email or password.");
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+        }
+
+        var existingUser = await systemUserRepository.GetByEmail(requestModel.Email);
+        if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password) != PasswordVerificationResult.Success)
+        {
+            return TypedResults.BadRequest<object>(new { message = "Invalid email or password." });
         }
         // Generate a JWT for the user session
         var (token, tdescriptor) = JwtOperations.Generate(existingUser, configuration);
@@ -75,9 +86,9 @@ public static class SessionEndpoints
             SystemUserId = existingUser.Id,
             Token = token,
             RefreshToken = refresh,
-            Created = tdescriptor.IssuedAt ?? DateTime.UtcNow,
-            Expires = tdescriptor.Expires ?? DateTime.UtcNow,
-            RefreshExpires = rdescriptor.Expires ?? DateTime.UtcNow
+            Created = tdescriptor.IssuedAt ?? DateTime.Now,
+            Expires = tdescriptor.Expires ?? DateTime.Now,
+            RefreshExpires = rdescriptor.Expires ?? DateTime.Now
         };
         var createdSession = await sessionRepository.Create(session);
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(createdSession));
@@ -110,9 +121,9 @@ public static class SessionEndpoints
         // Update the session with the new tokens
         session.Token = token;
         session.RefreshToken = refresh;
-        session.Created = tdescriptor.IssuedAt ?? DateTime.UtcNow;
-        session.Expires = tdescriptor.Expires ?? DateTime.UtcNow;
-        session.RefreshExpires = rdescriptor.Expires ?? DateTime.UtcNow;
+        session.Created = tdescriptor.IssuedAt ?? DateTime.Now;
+        session.Expires = tdescriptor.Expires ?? DateTime.Now;
+        session.RefreshExpires = rdescriptor.Expires ?? DateTime.Now;
         var refreshedSession = await sessionRepository.Refresh(session);
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(refreshedSession));
     }

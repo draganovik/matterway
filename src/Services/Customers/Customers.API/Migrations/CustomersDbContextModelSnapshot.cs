@@ -24,10 +24,6 @@ partial class CustomersDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("Customers.API.Entities.CartItem", b =>
             {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
-
                 b.Property<Guid>("CustomerId")
                     .HasColumnType("uniqueidentifier");
 
@@ -44,9 +40,7 @@ partial class CustomersDbContextModelSnapshot : ModelSnapshot
                 b.Property<double>("UnitPrice")
                     .HasColumnType("float");
 
-                b.HasKey("Id");
-
-                b.HasIndex("CustomerId");
+                b.HasKey("CustomerId", "ProductId");
 
                 b.ToTable("CartItem");
             });
@@ -60,7 +54,7 @@ partial class CustomersDbContextModelSnapshot : ModelSnapshot
                 b.Property<DateTime>("BirthDate")
                     .HasColumnType("datetime2");
 
-                b.Property<Guid>("DefaultAddressId")
+                b.Property<Guid?>("DefaultAddressId")
                     .HasColumnType("uniqueidentifier");
 
                 b.Property<string>("FirstName")

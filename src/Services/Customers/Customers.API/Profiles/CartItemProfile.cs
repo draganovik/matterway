@@ -10,7 +10,6 @@ public class CartItemProfile : Profile
     {
         CreateMap<CartItem, CartItemBaseResponseModel>();
 
-        CreateMap<CartItemCreateRequestModel, CartItem>();
-        CreateMap<CartItemUpdateRequestModel, CartItem>();
+        CreateMap<CartItemBaseRequestModel, CartItem>();
     }
 }

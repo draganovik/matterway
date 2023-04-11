@@ -4,9 +4,6 @@ namespace Customers.API.Models.CartItemModels;
 
 public class CartItemBaseResponseModel
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [Required]
     public Guid CustomerId { get; set; }
 

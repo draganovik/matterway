@@ -15,7 +15,7 @@ public static class OrderItemEndpoints
 {
     public static void MapOrderItemEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/Orders").WithTags(nameof(Order));
+        var group = routes.MapGroup("/api/Orders").WithTags(nameof(OrderItem));
 
         group.MapGet("/Items", QueryOrderItems)
             .WithName("QueryOrderItems").WithOpenApi();

@@ -19,7 +19,7 @@ public class SystemUser
 
     public IEnumerable<Session>? Sessions { get; set; }
 
-    public DateTime Created { get; set; } = DateTime.UtcNow;
+    public DateTime Created { get; set; } = DateTime.Now;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public SystemUserRole Role { get; set; } = SystemUserRole.Customer;

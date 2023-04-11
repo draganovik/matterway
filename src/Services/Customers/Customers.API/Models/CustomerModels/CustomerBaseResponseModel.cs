@@ -7,5 +7,5 @@ public class CustomerBaseResponseModel
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime BirthDate { get; set; }
-    public Guid DefaultAddressId { get; set; }
+    public Guid? DefaultAddressId { get; set; }
 }

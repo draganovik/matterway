@@ -25,6 +25,7 @@ services:
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
+      - Services__Catalog__Url=http://catalog_api:80
     ports:
       - "2002:443"
     volumes:

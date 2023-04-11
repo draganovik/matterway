@@ -21,8 +21,8 @@ public static class JwtOperations
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, user.Role.ToString())
             }),
-            IssuedAt = DateTime.UtcNow,
-            Expires = isRefresh ? DateTime.UtcNow.AddDays(12) : DateTime.UtcNow.AddMinutes(15),
+            IssuedAt = DateTime.Now,
+            Expires = isRefresh ? DateTime.Now.AddDays(12) : DateTime.Now.AddMinutes(15),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };

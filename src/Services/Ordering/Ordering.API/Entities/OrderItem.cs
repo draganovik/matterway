@@ -4,8 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ordering.API.Entities;
 
-// primary key should be a complex type of Order and Product
-// Set the OrderId and ProductId as the primary key on OrderItem annotation
 [PrimaryKey(nameof(OrderId), nameof(ProductId))]
 public class OrderItem
 {
@@ -21,6 +19,6 @@ public class OrderItem
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than 0")]
     public double UnitPrice { get; set; }
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Units must be greater than 0")]
-    public int Units { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
+    public int Quantity { get; set; }
 }

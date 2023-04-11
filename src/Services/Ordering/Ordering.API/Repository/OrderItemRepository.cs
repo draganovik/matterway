@@ -66,7 +66,7 @@ public class OrderItemRepository : IOrderItemRepository
                   .SetProperty(m => m.ProductId, requestModel.ProductId)
                   .SetProperty(m => m.ProductName, requestModel.ProductName)
                   .SetProperty(m => m.UnitPrice, requestModel.UnitPrice)
-                  .SetProperty(m => m.Units, requestModel.Units)
+                  .SetProperty(m => m.Quantity, requestModel.Quantity)
             );
         await context.Entry(currentOrderItemModel).ReloadAsync();
         return affected == 1 ? currentOrderItemModel : null;
