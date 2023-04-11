@@ -73,4 +73,13 @@ public class CartItemRepository : ICartItemRepository
         await context.Entry(currentCartItemModel).ReloadAsync();
         return affected == 1 ? currentCartItemModel : null;
     }
+
+    public async Task<ICollection<CartItem>> QueryByCustomerId(Guid systemUserId, int pageIndex, int pageSize)
+    {
+        return await context.CartItem.Where(x => x.Customer != null && x.Customer.SystemUserId == systemUserId)
+            .AsNoTracking()
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }
