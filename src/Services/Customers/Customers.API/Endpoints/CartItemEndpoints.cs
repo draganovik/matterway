@@ -71,11 +71,27 @@ public static class CartItemEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> PutCartItem(Guid id, Guid productId, CartItemBaseRequestModel requestModel, ICartItemRepository cartItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound<object>, BadRequest<object>, ForbidHttpResult>> PutCartItem(Guid id, Guid productId, CartItemBaseRequestModel requestModel, HttpContext httpContext, ICartItemRepository cartItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var newEntity = mapper.Map<CartItem>(requestModel);
         newEntity.CustomerId = id;
         newEntity.ProductId = productId;
+
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (userRole == SystemUserRole.Customer && id != systemUserId)
+        {
+            return TypedResults.Forbid();
+        }
 
         Product? product = await catalogServiceBroker.GetProductById(newEntity.ProductId);
         if (product is null)
@@ -101,8 +117,24 @@ public static class CartItemEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<NoContent, NotFound>> DeleteCartItem(Guid id, Guid productId, ICartItemRepository cartItemRepository, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteCartItem(Guid id, Guid productId, HttpContext httpContext, ICartItemRepository cartItemRepository, IMapper mapper)
     {
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (userRole == SystemUserRole.Customer && id != systemUserId)
+        {
+            return TypedResults.Forbid();
+        }
+
         var isDeleted = await cartItemRepository.Delete(id, productId);
 
         return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
