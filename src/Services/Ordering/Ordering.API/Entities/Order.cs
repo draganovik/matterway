@@ -17,17 +17,17 @@ public class Order
     [Required]
     public ICollection<OrderHistory> OrderHistory { get; set; } = new List<OrderHistory>();
 
-    [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$", ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000-0000")]
+    [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}$", ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000")]
     public string ReferenceNumber { get; set; } = GenerateReferenceNumber();
 
     public static string GenerateReferenceNumber()
     {
         var random = new Random();
         var referenceNumber = string.Empty;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             referenceNumber += random.Next(1000, 9999).ToString();
-            if (i < 3)
+            if (i < 2)
             {
                 referenceNumber += "-";
             }

@@ -12,7 +12,7 @@ using Payments.API.Data;
 namespace Payments.API.Migrations
 {
     [DbContext(typeof(PaymentsDbContext))]
-    [Migration("20230411162114_Initialize")]
+    [Migration("20230411182227_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -63,6 +63,32 @@ namespace Payments.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Payment");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            CardHolder = "Mara Jakov",
+                            CardNumber = "1234-5678-1234-5678",
+                            ExpirationDate = "12/26",
+                            PaymentAmount = 39998.0,
+                            PaymentDate = new DateTime(2023, 4, 11, 17, 22, 27, 190, DateTimeKind.Local).AddTicks(5591),
+                            PaymentState = 1,
+                            ReferenceNumber = "5655-6666-7877",
+                            SecurityCode = "1234"
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            CardHolder = "Stefan Stefanov",
+                            CardNumber = "8856-5678-1234-3366",
+                            ExpirationDate = "06/24",
+                            PaymentAmount = 4999.0,
+                            PaymentDate = new DateTime(2023, 4, 11, 20, 22, 27, 190, DateTimeKind.Local).AddTicks(5600),
+                            PaymentState = 1,
+                            ReferenceNumber = "6666-8888-6588",
+                            SecurityCode = "6658"
+                        });
                 });
 #pragma warning restore 612, 618
         }

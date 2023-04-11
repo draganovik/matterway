@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Identity.API.Migrations
 {
@@ -51,12 +54,13 @@ namespace Identity.API.Migrations
             migrationBuilder.InsertData(
                 table: "SystemUser",
                 columns: new[] { "Id", "Created", "Email", "PasswordHash", "Role" },
-                values: new object[] { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 4, 11, 18, 20, 56, 525, DateTimeKind.Local).AddTicks(8524), "user@example.com", "AQAAAAIAAYagAAAAENAesqXfquHEfJYh+ynr1fmN3ecZp2cMlenQlaSAe9danzKtk4gTONACMjY0inx+Jg==", 0 });
-
-            migrationBuilder.InsertData(
-                table: "Session",
-                columns: new[] { "Id", "Created", "Expires", "RefreshExpires", "RefreshToken", "SystemUserId", "Token" },
-                values: new object[] { new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"), new DateTime(2023, 4, 11, 18, 20, 56, 586, DateTimeKind.Local).AddTicks(3333), new DateTime(2023, 4, 11, 18, 35, 56, 586, DateTimeKind.Local).AddTicks(3397), new DateTime(2023, 4, 23, 18, 20, 56, 586, DateTimeKind.Local).AddTicks(4887), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEyMzAwNTYsImV4cCI6MTY4MjI2Njg1NiwiaWF0IjoxNjgxMjMwMDU2fQ._jMWo7w8znGJNGBtaYnlXeFRjxAMAkPSDZaHocxkLnA", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEyMzAwNTYsImV4cCI6MTY4MTIzMDk1NiwiaWF0IjoxNjgxMjMwMDU2fQ.BSTZfs0-iFhkQ_G1DjscUzJt1d-P6c_85KvWMF8uBIc" });
+                values: new object[,]
+                {
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 4, 11, 20, 22, 9, 292, DateTimeKind.Local).AddTicks(1647), "mladen@matterway.com", "AQAAAAIAAYagAAAAEPzJrgrSHvlWMNcuRY61SIa97LzzESCMd9z/c3U3JJpwW78pYAS8CzFxwf/T4mj3kw==", 0 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"), new DateTime(2023, 4, 11, 20, 22, 9, 348, DateTimeKind.Local).AddTicks(858), "jelena@matterway.com", "AQAAAAIAAYagAAAAEIDx+M7HXM1Kl2zzUb8FiuoDP7fBbBMZ/p70CdaqyxtZYWt6JPor9OkTytpBkQeyyw==", 1 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), new DateTime(2023, 4, 11, 20, 22, 9, 404, DateTimeKind.Local).AddTicks(3301), "stefan999@gmail.com", "AQAAAAIAAYagAAAAENE0Fpv9DGGx4FOw04QfzvZ2EG07+UscItavmJLtZsQ83H7dZrW7lk1ZJK0UAPgH6g==", 2 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new DateTime(2023, 4, 11, 20, 22, 9, 459, DateTimeKind.Local).AddTicks(4763), "marag2@gmail.com", "AQAAAAIAAYagAAAAEACFx7d5JHJmkOKu0q2Bp60MKQlM7EGiis3GjvkTm2qNYWeSjcBWtaGe0zxapYEP5w==", 2 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Session_SystemUserId",

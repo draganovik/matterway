@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.API.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20230411162056_Initialize")]
+    [Migration("20230411182209_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -59,18 +59,6 @@ namespace Identity.API.Migrations
                     b.HasIndex("SystemUserId");
 
                     b.ToTable("Session");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-                            Created = new DateTime(2023, 4, 11, 18, 20, 56, 586, DateTimeKind.Local).AddTicks(3333),
-                            Expires = new DateTime(2023, 4, 11, 18, 35, 56, 586, DateTimeKind.Local).AddTicks(3397),
-                            RefreshExpires = new DateTime(2023, 4, 23, 18, 20, 56, 586, DateTimeKind.Local).AddTicks(4887),
-                            RefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEyMzAwNTYsImV4cCI6MTY4MjI2Njg1NiwiaWF0IjoxNjgxMjMwMDU2fQ._jMWo7w8znGJNGBtaYnlXeFRjxAMAkPSDZaHocxkLnA",
-                            SystemUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhOWQ2NGI2NC05M2MxLTQxYTgtYTc0Mi04YThiYTgxZTIwYjEiLCJyb2xlIjoiQWRtaW4iLCJuYmYiOjE2ODEyMzAwNTYsImV4cCI6MTY4MTIzMDk1NiwiaWF0IjoxNjgxMjMwMDU2fQ.BSTZfs0-iFhkQ_G1DjscUzJt1d-P6c_85KvWMF8uBIc"
-                        });
                 });
 
             modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
@@ -101,10 +89,34 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 4, 11, 18, 20, 56, 525, DateTimeKind.Local).AddTicks(8524),
-                            Email = "user@example.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAENAesqXfquHEfJYh+ynr1fmN3ecZp2cMlenQlaSAe9danzKtk4gTONACMjY0inx+Jg==",
+                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 292, DateTimeKind.Local).AddTicks(1647),
+                            Email = "mladen@matterway.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPzJrgrSHvlWMNcuRY61SIa97LzzESCMd9z/c3U3JJpwW78pYAS8CzFxwf/T4mj3kw==",
                             Role = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
+                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 348, DateTimeKind.Local).AddTicks(858),
+                            Email = "jelena@matterway.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIDx+M7HXM1Kl2zzUb8FiuoDP7fBbBMZ/p70CdaqyxtZYWt6JPor9OkTytpBkQeyyw==",
+                            Role = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 404, DateTimeKind.Local).AddTicks(3301),
+                            Email = "stefan999@gmail.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAENE0Fpv9DGGx4FOw04QfzvZ2EG07+UscItavmJLtZsQ83H7dZrW7lk1ZJK0UAPgH6g==",
+                            Role = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 459, DateTimeKind.Local).AddTicks(4763),
+                            Email = "marag2@gmail.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEACFx7d5JHJmkOKu0q2Bp60MKQlM7EGiis3GjvkTm2qNYWeSjcBWtaGe0zxapYEP5w==",
+                            Role = 2
                         });
                 });
 
