@@ -12,7 +12,7 @@ using Ordering.API.Data;
 namespace Ordering.API.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
-    [Migration("20230411011926_Initialize")]
+    [Migration("20230411182220_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -61,6 +61,28 @@ namespace Ordering.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Address");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            City = "Sremska Mitrovica",
+                            Country = "Serbia",
+                            ReceiverName = "Mara Jakov",
+                            Residence = "54",
+                            Street = "Njegoševa",
+                            ZipCode = "22000"
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            City = "Novi Sad",
+                            Country = "Serbia",
+                            ReceiverName = "Stefan Stefanov",
+                            Residence = "3",
+                            Street = "Narodnih Heroja",
+                            ZipCode = "21000"
+                        });
                 });
 
             modelBuilder.Entity("Ordering.API.Entities.Order", b =>
@@ -84,6 +106,22 @@ namespace Ordering.API.Migrations
                     b.HasIndex("DeliveryAddressId");
 
                     b.ToTable("Order");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            ReferenceNumber = "5655-6666-7877"
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            ReferenceNumber = "6666-8888-6588"
+                        });
                 });
 
             modelBuilder.Entity("Ordering.API.Entities.OrderHistory", b =>
@@ -109,6 +147,32 @@ namespace Ordering.API.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderHistory");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                            CreatedDate = new DateTime(2023, 4, 11, 17, 22, 20, 662, DateTimeKind.Local).AddTicks(8899),
+                            Description = "Order Created",
+                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                            OrderStatus = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"),
+                            CreatedDate = new DateTime(2023, 4, 11, 18, 22, 20, 662, DateTimeKind.Local).AddTicks(8907),
+                            Description = "Order Created",
+                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                            OrderStatus = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
+                            CreatedDate = new DateTime(2023, 4, 11, 20, 22, 20, 662, DateTimeKind.Local).AddTicks(8910),
+                            Description = "Order Created",
+                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                            OrderStatus = 0
+                        });
                 });
 
             modelBuilder.Entity("Ordering.API.Entities.OrderItem", b =>
@@ -132,6 +196,24 @@ namespace Ordering.API.Migrations
                     b.HasKey("OrderId", "ProductId");
 
                     b.ToTable("OrderItem");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                            ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ProductName = "Ring Spotlight Cam",
+                            Quantity = 2,
+                            UnitPrice = 19999.0
+                        },
+                        new
+                        {
+                            OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                            ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ProductName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
+                            Quantity = 1,
+                            UnitPrice = 4999.0
+                        });
                 });
 
             modelBuilder.Entity("Ordering.API.Entities.Order", b =>

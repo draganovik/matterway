@@ -1,5 +1,4 @@
 ﻿using Identity.API.Entities;
-using Identity.API.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
@@ -27,30 +26,43 @@ public class IdentityDbContext : DbContext
             .HasForeignKey(s => s.SystemUserId)
             .IsRequired();
 
-        var initUser = new SystemUser
+        var adminUser = new SystemUser
         {
             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-            Email = "user@example.com",
+            Email = "mladen@matterway.com",
             Role = SystemUserRole.Admin
         };
 
-        initUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(initUser, "string");
+        adminUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(adminUser, "sifr45");
 
-        modelBuilder.Entity<SystemUser>().HasData(initUser);
-
-        var (token1, desc) = JwtOperations.Generate(initUser, configuration);
-        var (token2, rdesc) = JwtOperations.Generate(initUser, configuration, true);
-
-        modelBuilder.Entity<Session>().HasData(new Session
+        var managerUser = new SystemUser
         {
-            Id = new Guid("4e54e945-90e7-4f75-88f7-9d9b84d7c81c"),
-            SystemUserId = initUser.Id,
-            Token = token1,
-            RefreshToken = token2,
-            Created = desc.IssuedAt.GetValueOrDefault(),
-            Expires = desc.Expires.GetValueOrDefault(),
-            RefreshExpires = rdesc.Expires.GetValueOrDefault()
-        });
+            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
+            Email = "jelena@matterway.com",
+            Role = SystemUserRole.Manager
+        };
+
+        managerUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(managerUser, "sifr56");
+
+        var customer1User = new SystemUser
+        {
+            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+            Email = "stefan999@gmail.com",
+            Role = SystemUserRole.Customer
+        };
+
+        customer1User.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(customer1User, "sifr67");
+
+        var customer2User = new SystemUser
+        {
+            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+            Email = "marag2@gmail.com",
+            Role = SystemUserRole.Customer
+        };
+
+        customer2User.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(customer2User, "sifr78");
+
+        modelBuilder.Entity<SystemUser>().HasData(adminUser, managerUser, customer1User, customer2User);
 
         base.OnModelCreating(modelBuilder);
     }
