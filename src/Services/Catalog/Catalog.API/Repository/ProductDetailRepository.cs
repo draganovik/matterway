@@ -38,10 +38,12 @@ public class ProductDetailRepository : IProductDetailRepository
         return await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
     }
 
-    public async Task<ICollection<ProductDetail>> Query()
+    public async Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductDetail.Include(pd => pd.Product).AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel)

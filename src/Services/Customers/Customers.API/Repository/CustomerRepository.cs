@@ -43,10 +43,12 @@ public class CustomerRepository : ICustomerRepository
         return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == id);
     }
 
-    public async Task<ICollection<Customer>> Query()
+    public async Task<ICollection<Customer>> Query(int pageIndex, int pageSize)
     {
         return await context.Customer.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Customer?> Update(Guid id, CustomerUpdateRequestModel requestModel)

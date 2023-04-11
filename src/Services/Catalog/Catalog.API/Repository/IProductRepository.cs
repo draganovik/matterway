@@ -5,7 +5,7 @@ namespace Catalog.API.Repository;
 
 public interface IProductDetailRepository
 {
-    Task<ICollection<ProductDetail>> Query();
+    Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize);
 
     Task<ProductDetail?> GetById(Guid id);
 

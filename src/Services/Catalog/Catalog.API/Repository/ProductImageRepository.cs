@@ -39,10 +39,12 @@ public class ProductImageRepository : IProductImageRepository
         return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
     }
 
-    public async Task<ICollection<ProductImage>> Query()
+    public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductImage.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequestModel requestModel)

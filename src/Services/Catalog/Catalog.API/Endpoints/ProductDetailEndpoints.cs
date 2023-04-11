@@ -4,6 +4,7 @@ using Catalog.API.Models.ProductDetailModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -48,9 +49,9 @@ public static class ProductDetailEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<ProductDetailBaseResponseModel>>, NoContent>> QueryProductDetails(IProductDetailRepository productDetailRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<ProductDetailBaseResponseModel>>, NoContent>> QueryProductDetails([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductDetailRepository productDetailRepository, IMapper mapper)
     {
-        return await productDetailRepository.Query()
+        return await productDetailRepository.Query(pageIndex, pageSize)
             is IEnumerable<ProductDetail> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<ProductDetailBaseResponseModel>>(value))
                 : TypedResults.NoContent();

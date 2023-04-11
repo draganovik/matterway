@@ -38,10 +38,12 @@ public class OrderRepository : IOrderRepository
         return await context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).FirstOrDefaultAsync(o => o.Id == id);
     }
 
-    public async Task<ICollection<Order>> Query()
+    public async Task<ICollection<Order>> Query(int pageIndex, int pageSize)
     {
         return await context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Order?> Update(Guid id, OrderUpdateRequestModel requestModel)

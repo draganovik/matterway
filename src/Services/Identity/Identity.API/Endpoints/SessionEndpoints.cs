@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -36,12 +37,12 @@ public static class SessionEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<SessionBaseResponseModel>>, NoContent>> QuerySessions(ISessionRepository sessionRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<SessionBaseResponseModel>>, NoContent>> QuerySessions([FromQuery] int pageIndex, [FromQuery] int pageSize, ISessionRepository sessionRepository, IMapper mapper)
     {
-        var ss = await sessionRepository.Query();
-        return ss is IEnumerable<Session> value && value.Any()
-            ? TypedResults.Ok(mapper.Map<IEnumerable<SessionBaseResponseModel>>(value))
-            : TypedResults.NoContent();
+        return await sessionRepository.Query(pageIndex, pageSize)
+         is IEnumerable<Session> value && value.Any()
+             ? TypedResults.Ok(mapper.Map<IEnumerable<SessionBaseResponseModel>>(value))
+             : TypedResults.NoContent();
     }
 
     [Authorize]
@@ -94,25 +95,27 @@ public static class SessionEndpoints
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(createdSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult>> RefreshSession(SessionRefreshBaseRequestModel request, HttpContext context, ISessionRepository sessionRepository, IConfiguration configuration, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult>> RefreshSession(SessionRefreshBaseRequestModel requestModel, ISessionRepository sessionRepository, IConfiguration configuration, IMapper mapper)
     {
-        var identity = context.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(requestModel);
+        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+
+        if (!isValid)
         {
-            return TypedResults.Unauthorized();
+            var errors = results.Select(r => r.ErrorMessage).ToList();
+            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
         }
-        var session = await sessionRepository.GetByRefreshToken(request.RefreshToken);
-        if (session == null || session.Expires < DateTime.Now)
+
+        var session = await sessionRepository.GetByRefreshToken(requestModel.RefreshToken!);
+        if (session == null || session.Expires > DateTime.Now)
         {
             return TypedResults.BadRequest<object>(new { message = "Token did not expire or refresh token was invalid." });
         }
-        if (session.SystemUserId != systemUserId)
-        {
-            return TypedResults.Unauthorized();
-        }
+
         if (session.IsExpiredRefresh())
         {
-            await sessionRepository.DeleteByRefreshToken(request.RefreshToken);
+            await sessionRepository.DeleteByRefreshToken(requestModel.RefreshToken!);
             return TypedResults.BadRequest<object>(new { message = "Refresh token has expired." });
         }
         // Generate a new JWT for the user session

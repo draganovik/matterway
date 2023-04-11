@@ -4,6 +4,7 @@ using Catalog.API.Models.ProductModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -46,9 +47,9 @@ public static class ProductEndpoints
             });
     }
 
-    public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts(IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductRepository productRepository, IMapper mapper)
     {
-        return await productRepository.Query()
+        return await productRepository.Query(pageIndex, pageSize)
             is IEnumerable<Product> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<ProductBaseResponseModel>>(value))
                 : TypedResults.NoContent();

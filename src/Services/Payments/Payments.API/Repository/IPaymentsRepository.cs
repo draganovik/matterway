@@ -5,7 +5,7 @@ namespace Payments.API.Repository;
 
 public interface IPaymentRepository
 {
-    Task<ICollection<Payment>> Query();
+    Task<ICollection<Payment>> Query(int pageIndex, int pageSize);
 
     Task<Payment?> GetById(Guid id);
 

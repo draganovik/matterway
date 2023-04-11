@@ -27,11 +27,11 @@ public class Session
 
     public bool IsExpired()
     {
-        return DateTime.Now >= Expires;
+        return Expires <= DateTime.Now;
     }
 
     public bool IsExpiredRefresh()
     {
-        return DateTime.Now >= Expires;
+        return RefreshExpires <= DateTime.Now;
     }
 }

@@ -38,10 +38,12 @@ public class OrderItemRepository : IOrderItemRepository
         return await context.OrderItem.FirstOrDefaultAsync(x => x.ProductId == productId && x.OrderId == orderId);
     }
 
-    public async Task<ICollection<OrderItem>> Query()
+    public async Task<ICollection<OrderItem>> Query(int pageIndex, int pageSize)
     {
         return await context.OrderItem.AsNoTracking()
-        .ToListAsync();
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<OrderItem?> Put(OrderItem requestModel)

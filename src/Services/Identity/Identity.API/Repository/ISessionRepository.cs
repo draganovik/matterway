@@ -4,7 +4,7 @@ namespace Identity.API.Repository;
 
 public interface ISessionRepository
 {
-    Task<ICollection<Session>> Query();
+    Task<ICollection<Session>> Query(int pageIndex, int pageSize);
 
     Task<Session?> GetById(Guid id);
 

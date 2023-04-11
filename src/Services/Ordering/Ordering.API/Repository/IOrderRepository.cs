@@ -5,7 +5,7 @@ namespace Ordering.API.Repository;
 
 public interface IOrderRepository
 {
-    Task<ICollection<Order>> Query();
+    Task<ICollection<Order>> Query(int pageIndex, int pageSize);
 
     Task<Order?> GetById(Guid id);
 

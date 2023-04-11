@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Entities;
 using Ordering.API.Models.OrderHistoryModels;
 using Ordering.API.Repository;
@@ -33,9 +34,9 @@ public static class OrderHistoryEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<OrderHistoryBaseResponseModel>>, NoContent>> QueryOrderHistories(IOrderHistoryRepository orderHistoryRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<OrderHistoryBaseResponseModel>>, NoContent>> QueryOrderHistories([FromQuery] int pageIndex, [FromQuery] int pageSize, IOrderHistoryRepository orderHistoryRepository, IMapper mapper)
     {
-        return await orderHistoryRepository.Query()
+        return await orderHistoryRepository.Query(pageIndex, pageSize)
             is IEnumerable<OrderHistory> entityCollection && entityCollection.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<OrderHistoryBaseResponseModel>>(entityCollection))
                 : TypedResults.NoContent();

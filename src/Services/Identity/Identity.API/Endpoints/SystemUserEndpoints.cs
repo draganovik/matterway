@@ -5,6 +5,7 @@ using Identity.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -34,9 +35,9 @@ public static class SystemUserEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<SystemUserBaseResponseModel>>, NoContent>> QuerySystemUsers(ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<SystemUserBaseResponseModel>>, NoContent>> QuerySystemUsers([FromQuery] int pageIndex, [FromQuery] int pageSize, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
-        return await systemUserRepository.Query()
+        return await systemUserRepository.Query(pageIndex, pageSize)
             is IEnumerable<SystemUser> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<SystemUserBaseResponseModel>>(value))
                 : TypedResults.NoContent();

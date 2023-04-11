@@ -5,7 +5,7 @@ namespace Ordering.API.Repository;
 
 public interface IAddressRepository
 {
-    Task<ICollection<Address>> Query();
+    Task<ICollection<Address>> Query(int pageIndex, int pageSize);
 
     Task<Address?> GetById(Guid id);
 

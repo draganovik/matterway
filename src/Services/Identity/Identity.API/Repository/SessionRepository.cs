@@ -11,9 +11,12 @@ public class SessionRepository : ISessionRepository
     {
         this.context = context;
     }
-    public async Task<ICollection<Session>> Query()
+    public async Task<ICollection<Session>> Query(int pageIndex, int pageSize)
     {
-        return await context.Session.Include(s => s.SystemUser).ToListAsync();
+        return await context.Session.Include(s => s.SystemUser)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
     public async Task<Session?> GetById(Guid id)
     {

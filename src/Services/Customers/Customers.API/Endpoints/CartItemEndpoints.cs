@@ -4,6 +4,7 @@ using Customers.API.Models.CartItemModels;
 using Customers.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using Shared.Models;
 using Shared.ServiceBrokers;
@@ -32,9 +33,9 @@ public static class CartItemEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent>> QueryCartItems(ICartItemRepository cartItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent>> QueryCartItems([FromQuery] int pageIndex, [FromQuery] int pageSize, ICartItemRepository cartItemRepository, IMapper mapper)
     {
-        return await cartItemRepository.Query()
+        return await cartItemRepository.Query(pageIndex, pageSize)
             is IEnumerable<CartItem> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(value))
                 : TypedResults.NoContent();

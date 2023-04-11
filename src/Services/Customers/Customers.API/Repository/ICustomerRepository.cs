@@ -5,7 +5,7 @@ namespace Customers.API.Repository;
 
 public interface ICustomerRepository
 {
-    Task<ICollection<Customer>> Query();
+    Task<ICollection<Customer>> Query(int pageIndex, int pageSize);
 
     Task<Customer?> GetById(Guid id);
 
