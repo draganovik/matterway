@@ -9,6 +9,7 @@ using Shared.Enums;
 using Shared.Models;
 using Shared.ServiceBrokers;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Customers.API.Endpoints;
 
@@ -32,9 +33,28 @@ public static class CartItemEndpoints
     }
 
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent>> QueryCartItems([FromQuery] int pageIndex, [FromQuery] int pageSize, ICartItemRepository cartItemRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent, ForbidHttpResult>> QueryCartItems([FromQuery] int pageIndex, [FromQuery] int pageSize, HttpContext httpContext, ICartItemRepository cartItemRepository, IMapper mapper)
     {
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (userRole == SystemUserRole.Customer)
+        {
+            return await cartItemRepository.QueryByCustomerId(systemUserId, pageIndex, pageSize)
+                is IEnumerable<CartItem> items && items.Any()
+                    ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(items))
+                    : TypedResults.NoContent();
+        }
+
         return await cartItemRepository.Query(pageIndex, pageSize)
             is IEnumerable<CartItem> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(value))

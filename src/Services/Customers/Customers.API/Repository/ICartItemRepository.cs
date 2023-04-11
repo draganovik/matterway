@@ -5,6 +5,7 @@ namespace Customers.API.Repository;
 public interface ICartItemRepository
 {
     Task<ICollection<CartItem>> Query(int pageIndex, int pageSize);
+    Task<ICollection<CartItem>> QueryByCustomerId(Guid systemUserId, int pageIndex, int pageSize);
 
     Task<CartItem?> GetById(Guid id, Guid productId);
 
