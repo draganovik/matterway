@@ -82,7 +82,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__PaymentsDbContext=Server=payment_db;Database=payment;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__PaymentsDbContext=Server=payment_db;Database=payments;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
