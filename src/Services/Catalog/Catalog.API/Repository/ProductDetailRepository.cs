@@ -38,6 +38,11 @@ public class ProductDetailRepository : IProductDetailRepository
         return await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
     }
 
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.ProductDetail.CountAsync();
+    }
+
     public async Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductDetail.Include(pd => pd.Product).AsNoTracking()

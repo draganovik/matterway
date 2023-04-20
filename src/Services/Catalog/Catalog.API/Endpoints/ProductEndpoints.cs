@@ -58,7 +58,6 @@ public static class ProductEndpoints
                 Title = "Invalid page or pageSize.",
                 Status = StatusCodes.Status400BadRequest,
                 Detail = "Page and pageSize must be greater than zero.",
-                Instance = httpContext.Request.Path
             };
             var results = new List<ValidationResult>();
             if (page < 1)
@@ -94,7 +93,7 @@ public static class ProductEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, HttpContext httpContext, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -107,8 +106,7 @@ public static class ProductEndpoints
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred.",
-                Instance = httpContext.Request.Path
+                Detail = "One or more validation errors occurred."
             };
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
@@ -119,7 +117,7 @@ public static class ProductEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<ProblemDetails>>> CreateProduct(ProductBaseRequestModel requestModel, HttpContext httpContext, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<ProblemDetails>>> CreateProduct(ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -131,8 +129,7 @@ public static class ProductEndpoints
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred.",
-                Instance = httpContext.Request.Path
+                Detail = "One or more validation errors occurred."
             };
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
@@ -146,8 +143,7 @@ public static class ProductEndpoints
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Cannot create entity",
-                Instance = httpContext.Request.Path
+                Detail = "Cannot create entity"
             };
             return TypedResults.BadRequest(problemDetails);
         }

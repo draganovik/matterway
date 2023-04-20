@@ -39,6 +39,11 @@ public class ProductImageRepository : IProductImageRepository
         return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
     }
 
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.ProductImage.CountAsync();
+    }
+
     public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductImage.AsNoTracking()

@@ -14,4 +14,6 @@ public interface IProductDetailRepository
     Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
 }

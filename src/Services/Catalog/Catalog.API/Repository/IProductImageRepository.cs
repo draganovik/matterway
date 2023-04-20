@@ -14,4 +14,6 @@ public interface IProductImageRepository
     Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid parentId, int id);
+
+    Task<int> GetTotalEntities();
 }

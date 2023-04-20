@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Endpoints;
@@ -49,11 +50,38 @@ public static class ProductImageEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<ProductImageBaseResponseModel>>, NoContent>> QueryProductImages([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<ProductImageBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryProductImages([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IProductImageRepository productImageRepository, IMapper mapper)
     {
-        return await productImageRepository.Query(pageIndex, pageSize)
-            is IEnumerable<ProductImage> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<ProductImageBaseResponseModel>>(value))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero."
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await productImageRepository.GetTotalEntities();
+        var entities = await productImageRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
+
+        var paginationResponse = new PaginationResponse<ProductImageBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<ProductImageBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<ProductImage> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -67,7 +95,7 @@ public static class ProductImageEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound, BadRequest<object>>> UpdateProductImageById(Guid productId, int id, ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateProductImageById(Guid productId, int id, ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -76,7 +104,14 @@ public static class ProductImageEndpoints
         if (!isValid)
         {
             var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updatedUser = await productImageRepository.Update(productId, id, requestModel);
@@ -84,7 +119,7 @@ public static class ProductImageEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest<object>>> CreateProductImage(ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest<ProblemDetails>>> CreateProductImage(ProductImageBaseRequestModel requestModel, IProductImageRepository productImageRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -92,15 +127,27 @@ public static class ProductImageEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var productImageModel = mapper.Map<ProductImage>(requestModel);
         var createdProductImage = await productImageRepository.Create(productImageModel);
         if (createdProductImage is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/ProductImages/{createdProductImage.Id}", mapper.Map<ProductImageBaseResponseModel>(createdProductImage));
     }
