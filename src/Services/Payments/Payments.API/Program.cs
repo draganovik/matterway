@@ -6,6 +6,7 @@ using Payments.API.Data;
 using Payments.API.Endpoints;
 using Payments.API.Repository;
 using Shared.ServiceBrokers;
+using SharedProject.Profiles;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,7 +21,10 @@ builder.Services
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ValidationProfile>();
+}, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
@@ -110,8 +114,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

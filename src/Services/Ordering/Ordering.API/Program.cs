@@ -6,6 +6,7 @@ using Ordering.API.Data;
 using Ordering.API.Endpoints;
 using Ordering.API.Repository;
 using Shared.ServiceBrokers;
+using SharedProject.Profiles;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -22,7 +23,10 @@ builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 builder.Services.AddScoped<ICatalogServiceBroker, CatalogServiceBroker>();
 builder.Services.AddScoped<ICustomersServiceBroker, CustomersServiceBroker>();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ValidationProfile>();
+}, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -115,8 +119,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

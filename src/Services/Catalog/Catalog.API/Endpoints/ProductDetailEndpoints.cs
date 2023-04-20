@@ -49,9 +49,30 @@ public static class ProductDetailEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<ProductDetailBaseResponseModel>>, NoContent>> QueryProductDetails([FromQuery] int pageIndex, [FromQuery] int pageSize, IProductDetailRepository productDetailRepository, IMapper mapper)
+    public static async Task<Results<Ok<IEnumerable<ProductDetailBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryProductDetails([FromQuery] int page, [FromQuery] int pageSize, IProductDetailRepository productDetailRepository, IMapper mapper)
     {
-        return await productDetailRepository.Query(pageIndex, pageSize)
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero."
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+        return await productDetailRepository.Query(page, pageSize)
             is IEnumerable<ProductDetail> value && value.Any()
                 ? TypedResults.Ok(mapper.Map<IEnumerable<ProductDetailBaseResponseModel>>(value))
                 : TypedResults.NoContent();
