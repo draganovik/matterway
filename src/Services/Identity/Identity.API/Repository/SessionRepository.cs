@@ -67,4 +67,9 @@ public class SessionRepository : ISessionRepository
         await context.SaveChangesAsync();
         return true;
     }
+
+    public Task<int> GetTotalEntities()
+    {
+        return context.Session.CountAsync();
+    }
 }

@@ -18,4 +18,6 @@ public interface ISystemUserRepository
     Task<SystemUser?> Update(Guid id, SystemUserBaseRequestModel user);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
 }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -52,12 +53,39 @@ public static class SessionEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<SessionBaseResponseModel>>, NoContent>> QuerySessions([FromQuery] int pageIndex, [FromQuery] int pageSize, ISessionRepository sessionRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<SessionBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QuerySessions([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, ISessionRepository sessionRepository, IMapper mapper)
     {
-        return await sessionRepository.Query(pageIndex, pageSize)
-         is IEnumerable<Session> value && value.Any()
-             ? TypedResults.Ok(mapper.Map<IEnumerable<SessionBaseResponseModel>>(value))
-             : TypedResults.NoContent();
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await sessionRepository.GetTotalEntities();
+        var entities = await sessionRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Sessions");
+
+        var paginationResponse = new PaginationResponse<SessionBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<SessionBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<Session> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
+                : TypedResults.NoContent();
     }
 
     [Authorize]
@@ -80,7 +108,7 @@ public static class SessionEndpoints
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(currentSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<object>>> CreateSession(SessionBaseRequestModel requestModel, ISessionRepository sessionRepository, ISystemUserRepository systemUserRepository, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>>> CreateSession(SessionBaseRequestModel requestModel, ISessionRepository sessionRepository, ISystemUserRepository systemUserRepository, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -88,14 +116,26 @@ public static class SessionEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var existingUser = await systemUserRepository.GetByEmail(requestModel.Email!);
         if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password!) != PasswordVerificationResult.Success)
         {
-            return TypedResults.BadRequest<object>(new { message = "Invalid email or password." });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         // Generate a JWT for the user session
         var (token, tdescriptor) = JwtOperations.Generate(existingUser, configuration);
@@ -114,7 +154,7 @@ public static class SessionEndpoints
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(createdSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult>> RefreshSession(SessionRefreshBaseRequestModel requestModel, ISessionRepository sessionRepository, IConfiguration configuration, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult>> RefreshSession(SessionRefreshBaseRequestModel requestModel, ISessionRepository sessionRepository, IConfiguration configuration, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -122,20 +162,38 @@ public static class SessionEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var session = await sessionRepository.GetByRefreshToken(requestModel.RefreshToken!);
         if (session == null || session.Expires > DateTime.Now)
         {
-            return TypedResults.BadRequest<object>(new { message = "Token did not expire or refresh token was invalid." });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Token did not expire or refresh token was invalid."
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         if (session.IsExpiredRefresh())
         {
             await sessionRepository.DeleteByRefreshToken(requestModel.RefreshToken!);
-            return TypedResults.BadRequest<object>(new { message = "Refresh token has expired." });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Refresh token has expired."
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         // Generate a new JWT for the user session
         var (token, tdescriptor) = JwtOperations.Generate(session.SystemUser!, configuration);
