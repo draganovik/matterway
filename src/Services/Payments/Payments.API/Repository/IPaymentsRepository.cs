@@ -14,4 +14,6 @@ public interface IPaymentRepository
     Task<Payment?> Update(Guid id, PaymentBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
 }

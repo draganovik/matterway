@@ -38,6 +38,11 @@ public class PaymentRepository : IPaymentRepository
         return await context.Payment.FindAsync(id);
     }
 
+    public Task<int> GetTotalEntities()
+    {
+        return context.Payment.CountAsync();
+    }
+
     public async Task<ICollection<Payment>> Query(int pageIndex, int pageSize)
     {
         return await context.Payment.AsNoTracking()
