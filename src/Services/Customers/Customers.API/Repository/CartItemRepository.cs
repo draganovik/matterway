@@ -82,4 +82,14 @@ public class CartItemRepository : ICartItemRepository
             .Take(pageSize)
             .ToListAsync();
     }
+
+    public async Task<int> GetTotalEntities(Guid systemUserId)
+    {
+        return await context.CartItem.Where(x => x.Customer != null && x.Customer.SystemUserId == systemUserId).CountAsync();
+    }
+
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.CartItem.CountAsync();
+    }
 }

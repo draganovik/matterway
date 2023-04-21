@@ -15,4 +15,6 @@ public interface ICustomerRepository
     Task<Customer?> Update(Guid id, Customer requestModel);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
 }

@@ -76,7 +76,7 @@ public static class ProductImageEndpoints
 
         var total = await productImageRepository.GetTotalEntities();
         var entities = await productImageRepository.Query(page, pageSize);
-        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/ProductImages");
 
         var paginationResponse = new PaginationResponse<ProductImageBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<ProductImageBaseResponseModel>>(entities).ToList(), baseUri);
 
@@ -103,7 +103,6 @@ public static class ProductImageEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
             var problemDetails = new ProblemDetails
             {
                 Title = "Bad Request",

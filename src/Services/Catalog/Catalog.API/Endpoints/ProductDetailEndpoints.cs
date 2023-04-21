@@ -76,7 +76,7 @@ public static class ProductDetailEndpoints
 
         var total = await productDetailRepository.GetTotalEntities();
         var entities = await productDetailRepository.Query(page, pageSize);
-        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/ProductDetails");
 
         var paginationResponse = new PaginationResponse<ProductDetailBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<ProductDetailBaseResponseModel>>(entities).ToList(), baseUri);
 

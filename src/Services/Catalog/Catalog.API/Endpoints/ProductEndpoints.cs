@@ -101,7 +101,6 @@ public static class ProductEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
             var problemDetails = new ProblemDetails
             {
                 Title = "Bad Request",
