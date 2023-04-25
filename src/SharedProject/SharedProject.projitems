@@ -17,6 +17,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModelTemplates\PaginationResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Profiles\ValidationProfile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\CatalogServiceBroker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\CustomersServiceBroker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\ICustomersServiceBroker.cs" />

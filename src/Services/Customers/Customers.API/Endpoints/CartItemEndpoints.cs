@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
 using Shared.Models;
 using Shared.ServiceBrokers;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -46,8 +47,30 @@ public static class CartItemEndpoints
 
 
     [Authorize]
-    public static async Task<Results<Ok<IEnumerable<CartItemBaseResponseModel>>, NoContent, ForbidHttpResult>> QueryCartItems([FromQuery] int pageIndex, [FromQuery] int pageSize, HttpContext httpContext, ICartItemRepository cartItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<CartItemBaseResponseModel>>, NoContent, ForbidHttpResult, BadRequest<ProblemDetails>>> QueryCartItems([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, ICartItemRepository cartItemRepository, IMapper mapper)
     {
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero."
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
         {
@@ -58,18 +81,25 @@ public static class CartItemEndpoints
         {
             return TypedResults.Forbid();
         }
+        int total;
+        IEnumerable<CartItem>? entities;
 
         if (userRole == SystemUserRole.Customer)
         {
-            return await cartItemRepository.QueryByCustomerId(systemUserId, pageIndex, pageSize)
-                is IEnumerable<CartItem> items && items.Any()
-                    ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(items))
-                    : TypedResults.NoContent();
+            total = await cartItemRepository.GetTotalEntities(systemUserId);
+            entities = await cartItemRepository.QueryByCustomerId(systemUserId, page, pageSize);
+        }
+        else
+        {
+            total = await cartItemRepository.GetTotalEntities();
+            entities = await cartItemRepository.Query(page, pageSize);
         }
 
-        return await cartItemRepository.Query(pageIndex, pageSize)
-            is IEnumerable<CartItem> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<CartItemBaseResponseModel>>(value))
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Customers/CartItems");
+        var paginationResponse = new PaginationResponse<CartItemBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<CartItemBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<CartItem> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -83,7 +113,7 @@ public static class CartItemEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound<object>, BadRequest<object>, ForbidHttpResult>> PutCartItem(Guid id, Guid productId, CartItemBaseRequestModel requestModel, HttpContext httpContext, ICartItemRepository cartItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<CartItemBaseResponseModel>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>> PutCartItem(Guid id, Guid productId, CartItemBaseRequestModel requestModel, HttpContext httpContext, ICartItemRepository cartItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var newEntity = mapper.Map<CartItem>(requestModel);
         newEntity.CustomerId = id;
@@ -108,7 +138,7 @@ public static class CartItemEndpoints
         Product? product = await catalogServiceBroker.GetProductById(newEntity.ProductId);
         if (product is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Product not found" });
+            return TypedResults.NotFound();
         }
 
         newEntity.ProductName = product.Title;
@@ -120,12 +150,18 @@ public static class CartItemEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         newEntity = await cartItemRepository.Put(newEntity);
-        return newEntity is not null ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(newEntity)) : TypedResults.NotFound<object>(new { message = "Update not performed" });
+        return newEntity is not null ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(newEntity)) : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]

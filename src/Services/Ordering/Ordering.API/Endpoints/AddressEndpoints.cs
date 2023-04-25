@@ -6,6 +6,7 @@ using Ordering.API.Entities;
 using Ordering.API.Models.AddressModels;
 using Ordering.API.Repository;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.API.Endpoints;
@@ -49,11 +50,36 @@ public static class AddressEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<AddressBaseResponseModel>>, NoContent>> QueryAddresses([FromQuery] int pageIndex, [FromQuery] int pageSize, IAddressRepository addressRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<AddressBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryAddresses([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IAddressRepository addressRepository, IMapper mapper)
     {
-        return await addressRepository.Query(pageIndex, pageSize)
-            is IEnumerable<Address> entityCollection && entityCollection.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<AddressBaseResponseModel>>(entityCollection))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+        var total = await addressRepository.GetTotalEntities();
+        var entities = await addressRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Addresses");
+        var paginationResponse = new PaginationResponse<AddressBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<AddressBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<Address> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -67,7 +93,7 @@ public static class AddressEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<AddressBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateAddressById(Guid id, AddressBaseRequestModel requestModel, IAddressRepository addressRepository, IMapper mapper)
+    public static async Task<Results<Ok<AddressBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateAddressById(Guid id, AddressBaseRequestModel requestModel, IAddressRepository addressRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -75,20 +101,26 @@ public static class AddressEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updateEntity = await addressRepository.Update(id, requestModel);
         if (updateEntity is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Entity not found" });
+            return TypedResults.NotFound();
         }
         return TypedResults.Ok(mapper.Map<AddressBaseResponseModel>(updateEntity));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<AddressBaseResponseModel>, BadRequest<object>>> CreateAddress(AddressBaseRequestModel requestModel, IAddressRepository addressRepository, IMapper mapper)
+    public static async Task<Results<Created<AddressBaseResponseModel>, BadRequest<ProblemDetails>>> CreateAddress(AddressBaseRequestModel requestModel, IAddressRepository addressRepository, IMapper mapper)
     {
         var newEntity = mapper.Map<Address>(requestModel);
         var results = new List<ValidationResult>();
@@ -97,14 +129,26 @@ public static class AddressEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         newEntity = await addressRepository.Create(newEntity);
         if (newEntity is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/Addresses/{newEntity.Id}", mapper.Map<AddressBaseResponseModel>(newEntity));
     }

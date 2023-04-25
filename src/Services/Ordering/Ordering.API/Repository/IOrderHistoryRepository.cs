@@ -14,4 +14,6 @@ public interface IOrderHistoryRepository
     Task<OrderHistory?> Update(Guid id, OrderHistoryBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
 }

@@ -42,6 +42,11 @@ public class CustomerRepository : ICustomerRepository
         return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == id);
     }
 
+    public Task<int> GetTotalEntities()
+    {
+        return context.Customer.CountAsync();
+    }
+
     public async Task<ICollection<Customer>> Query(int pageIndex, int pageSize)
     {
         return await context.Customer.AsNoTracking()

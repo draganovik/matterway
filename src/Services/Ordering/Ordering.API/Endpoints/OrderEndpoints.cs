@@ -7,6 +7,7 @@ using Ordering.API.Models.OrderModels;
 using Ordering.API.Repository;
 using Shared.Enums;
 using Shared.ServiceBrokers;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -51,25 +52,50 @@ public static class OrderEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<OrderBaseResponseModel>>, NoContent>> QueryOrders([FromQuery] int pageIndex, [FromQuery] int pageSize, IOrderRepository OrderRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<OrderBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryOrders([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IOrderRepository orderRepository, IMapper mapper)
     {
-        return await OrderRepository.Query(pageIndex, pageSize)
-            is IEnumerable<Order> entityCollection && entityCollection.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<OrderBaseResponseModel>>(entityCollection))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+        var total = await orderRepository.GetTotalEntities();
+        var entities = await orderRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Orders");
+        var paginationResponse = new PaginationResponse<OrderBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<OrderBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<Order> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound>> GetOrderById(Guid id, IOrderRepository OrderRepository, IMapper mapper)
+    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound>> GetOrderById(Guid id, IOrderRepository orderRepository, IMapper mapper)
     {
-        return await OrderRepository.GetById(id)
+        return await orderRepository.GetById(id)
             is Order entity
                 ? TypedResults.Ok(mapper.Map<OrderBaseResponseModel>(entity))
                 : TypedResults.NotFound();
     }
 
     [Authorize]
-    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound<object>, BadRequest<object>, UnauthorizedHttpResult, ForbidHttpResult>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<OrderBaseResponseModel>, NotFound, BadRequest<ProblemDetails>, UnauthorizedHttpResult, ForbidHttpResult>> UpdateOrderById(Guid id, OrderUpdateRequestModel requestModel, HttpContext httpContext, IOrderRepository orderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -92,7 +118,13 @@ public static class OrderEndpoints
         }
         else if (requestModel.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(requestModel.CustomerId.Value))
         {
-            return TypedResults.BadRequest<object>(new { message = "Customer Id is not registrated in Customers API" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Customer Id is not registrated in Customers API"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var results = new List<ValidationResult>();
@@ -101,20 +133,26 @@ public static class OrderEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
-        var updateEntity = await OrderRepository.Update(id, requestModel);
+        var updateEntity = await orderRepository.Update(id, requestModel);
         if (updateEntity is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Entity not found" });
+            return TypedResults.NotFound();
         }
         return TypedResults.Ok(mapper.Map<OrderBaseResponseModel>(updateEntity));
     }
 
     [Authorize]
-    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<object>, UnauthorizedHttpResult, ForbidHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository OrderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
+    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult, ForbidHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository orderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -139,7 +177,13 @@ public static class OrderEndpoints
         }
         else if (newEntity.CustomerId != null && !await customerServiceBroker.VerifyByCustomerId(newEntity.CustomerId.Value))
         {
-            return TypedResults.BadRequest<object>(new { message = "Customer Id is not registrated in Customers API" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Customer Id is not registrated in Customers API"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var results = new List<ValidationResult>();
@@ -148,23 +192,35 @@ public static class OrderEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
-        newEntity = await OrderRepository.Create(newEntity);
+        newEntity = await orderRepository.Create(newEntity);
         if (newEntity is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create object" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         return TypedResults.Created($"/api/Orders/{newEntity.Id}", mapper.Map<OrderBaseResponseModel>(newEntity));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<NoContent, NotFound>> DeleteOrder(Guid id, IOrderRepository OrderRepository, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound>> DeleteOrder(Guid id, IOrderRepository orderRepository, IMapper mapper)
     {
-        var isDeleted = await OrderRepository.Delete(id);
+        var isDeleted = await orderRepository.Delete(id);
 
         return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }

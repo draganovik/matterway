@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Endpoints;
@@ -48,11 +49,38 @@ public static class ProductEndpoints
             });
     }
 
-    public static async Task<Results<Ok<IEnumerable<ProductBaseResponseModel>>, NoContent>> QueryProducts([FromQuery] int pageIndex, [FromQuery] int pageSize, [AsParameters] ProductFilter productFilter, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<ProductBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryProducts([FromQuery] int page, [FromQuery] int pageSize, [AsParameters] ProductFilter productFilter, HttpContext httpContext, IProductRepository productRepository, IMapper mapper)
     {
-        return await productRepository.Query(pageIndex, pageSize, productFilter)
-            is IEnumerable<Product> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<ProductBaseResponseModel>>(value))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await productRepository.GetTotalEntities();
+        var entities = await productRepository.Query(page, pageSize, productFilter);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
+
+        var paginationResponse = new PaginationResponse<ProductBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<ProductBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<Product> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -65,7 +93,7 @@ public static class ProductEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<object>>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateProductById(Guid id, ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -73,8 +101,14 @@ public static class ProductEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updatedUser = await productRepository.Update(id, requestModel);
@@ -82,7 +116,7 @@ public static class ProductEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<object>>> CreateProduct(ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
+    public static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<ProblemDetails>>> CreateProduct(ProductBaseRequestModel requestModel, IProductRepository productRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -90,15 +124,27 @@ public static class ProductEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var productModel = mapper.Map<Product>(requestModel);
         var createdProduct = await productRepository.Create(productModel);
         if (createdProduct is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create entity" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/Products/{createdProduct.Id}", mapper.Map<ProductBaseResponseModel>(createdProduct));
     }

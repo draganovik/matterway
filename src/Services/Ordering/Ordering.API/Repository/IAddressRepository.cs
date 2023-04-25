@@ -14,4 +14,7 @@ public interface IAddressRepository
     Task<Address?> Update(Guid id, AddressBaseRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
+
+    Task<int> GetTotalEntities();
+
 }

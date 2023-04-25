@@ -13,4 +13,8 @@ public interface IOrderItemRepository
     Task<OrderItem?> Put(OrderItem requestModel);
 
     Task<bool> Delete(Guid orderId, Guid productId);
+
+    Task<int> GetTotalEntities(Guid systemUserId);
+
+    Task<int> GetTotalEntities();
 }

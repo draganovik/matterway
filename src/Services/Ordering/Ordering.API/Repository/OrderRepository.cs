@@ -38,6 +38,16 @@ public class OrderRepository : IOrderRepository
         return await context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).FirstOrDefaultAsync(o => o.Id == id);
     }
 
+    public async Task<int> GetTotalEntities(Guid systemUserId)
+    {
+        return await context.OrderItem.Where(model => model.Order != null && model.Order.CustomerId == systemUserId).CountAsync();
+    }
+
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.Order.CountAsync();
+    }
+
     public async Task<ICollection<Order>> Query(int pageIndex, int pageSize)
     {
         return await context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).AsNoTracking()

@@ -19,4 +19,6 @@ public interface ISessionRepository
     Task<bool> DeleteByToken(string token);
 
     Task<bool> DeleteByRefreshToken(string refreshToken);
+
+    Task<int> GetTotalEntities();
 }

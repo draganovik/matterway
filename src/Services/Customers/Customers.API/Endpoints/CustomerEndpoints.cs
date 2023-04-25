@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -56,11 +57,38 @@ public static class CustomerEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<CustomerBaseResponseModel>>, NoContent>> QueryCustomers([FromQuery] int pageIndex, [FromQuery] int pageSize, ICustomerRepository customerRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<CustomerBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryCustomers([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
     {
-        return await customerRepository.Query(pageIndex, pageSize)
-            is IEnumerable<Customer> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<CustomerBaseResponseModel>>(value))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await customerRepository.GetTotalEntities();
+        var entities = await customerRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Customers");
+
+        var paginationResponse = new PaginationResponse<CustomerBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<CustomerBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<Customer> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -94,7 +122,7 @@ public static class CustomerEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Ok<CustomerBaseResponseModel>, NotFound, BadRequest<object>, ForbidHttpResult>> UpdateCustomerById(Guid id, CustomerUpdateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
+    public static async Task<Results<Ok<CustomerBaseResponseModel>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>> UpdateCustomerById(Guid id, CustomerUpdateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -123,8 +151,14 @@ public static class CustomerEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updatedUser = await customerRepository.Update(id, updateEntity);
@@ -132,7 +166,7 @@ public static class CustomerEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<Created<CustomerBaseResponseModel>, BadRequest<object>, ForbidHttpResult>> CreateCustomer(CustomerCreateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
+    public static async Task<Results<Created<CustomerBaseResponseModel>, BadRequest<ProblemDetails>, ForbidHttpResult>> CreateCustomer(CustomerCreateRequestModel requestModel, HttpContext httpContext, ICustomerRepository customerRepository, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
@@ -161,14 +195,26 @@ public static class CustomerEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var createdCustomer = await customerRepository.Create(newEntity);
         if (createdCustomer is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "Cannot create Customer" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/Customers/{createdCustomer.Id}", mapper.Map<CustomerBaseResponseModel>(createdCustomer));
     }

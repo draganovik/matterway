@@ -73,4 +73,15 @@ public class OrderItemRepository : IOrderItemRepository
         await context.Entry(currentOrderItemModel).ReloadAsync();
         return affected == 1 ? currentOrderItemModel : null;
     }
+
+    public async Task<int> GetTotalEntities(Guid systemUserId)
+    {
+        return await context.OrderItem.Where(model => model.Order != null && model.Order.CustomerId == systemUserId)
+            .CountAsync();
+    }
+
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.Address.CountAsync();
+    }
 }

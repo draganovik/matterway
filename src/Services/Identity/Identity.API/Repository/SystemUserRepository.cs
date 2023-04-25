@@ -57,6 +57,11 @@ public class SystemUserRepository : ISystemUserRepository
         return await context.SystemUser.FindAsync(id);
     }
 
+    public Task<int> GetTotalEntities()
+    {
+        return context.SystemUser.CountAsync();
+    }
+
     public async Task<ICollection<SystemUser>> Query(int pageIndex, int pageSize)
     {
         return await context.SystemUser.AsNoTracking()

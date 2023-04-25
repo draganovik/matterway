@@ -14,4 +14,7 @@ public interface IOrderRepository
     Task<Order?> Update(Guid id, OrderUpdateRequestModel requestModel);
 
     Task<bool> Delete(Guid id);
+    Task<int> GetTotalEntities(Guid systemUserId);
+
+    Task<int> GetTotalEntities();
 }

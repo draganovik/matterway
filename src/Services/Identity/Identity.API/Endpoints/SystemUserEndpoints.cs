@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -51,11 +52,38 @@ public static class SystemUserEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<SystemUserBaseResponseModel>>, NoContent>> QuerySystemUsers([FromQuery] int pageIndex, [FromQuery] int pageSize, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<SystemUserBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QuerySystemUsers([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
-        return await systemUserRepository.Query(pageIndex, pageSize)
-            is IEnumerable<SystemUser> value && value.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<SystemUserBaseResponseModel>>(value))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await systemUserRepository.GetTotalEntities();
+        var entities = await systemUserRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/SystemUsers");
+
+        var paginationResponse = new PaginationResponse<SystemUserBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<SystemUserBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<SystemUser> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -69,7 +97,7 @@ public static class SystemUserEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound, BadRequest<object>>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Ok<SystemUserBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateSystemUserById(Guid id, SystemUserBaseRequestModel requestModel, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -77,15 +105,21 @@ public static class SystemUserEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updatedUser = await systemUserRepository.Update(id, requestModel);
         return updatedUser is not null ? TypedResults.Ok(mapper.Map<SystemUserBaseResponseModel>(updatedUser)) : TypedResults.NotFound();
     }
 
-    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest<object>, ForbidHttpResult>> CreateSystemUser(SystemUserBaseRequestModel requestModel, HttpContext httpContext, ISystemUserRepository systemUserRepository, IMapper mapper)
+    public static async Task<Results<Created<SystemUserBaseResponseModel>, BadRequest<ProblemDetails>, ForbidHttpResult>> CreateSystemUser(SystemUserBaseRequestModel requestModel, HttpContext httpContext, ISystemUserRepository systemUserRepository, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -93,8 +127,14 @@ public static class SystemUserEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var identity = httpContext.User.Identity as ClaimsIdentity;
@@ -109,17 +149,35 @@ public static class SystemUserEndpoints
         }
         if (userRole == SystemUserRole.Manager && requestModel.Role == SystemUserRole.Admin)
         {
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Manager can not create Admin" } });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Manager can not create Admin"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         if (userRole == SystemUserRole.Manager && requestModel.Role == SystemUserRole.Manager)
         {
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Manager can not create Manager" } });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Manager can not create Manager"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         if (userRole == SystemUserRole.Customer)
         {
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors = new List<string> { "Customer can not create other users" } });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Customer can not create other users"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var systemUserModel = mapper.Map<SystemUser>(requestModel);
@@ -127,7 +185,13 @@ public static class SystemUserEndpoints
         var createdSystemUser = await systemUserRepository.Create(systemUserModel);
         if (createdSystemUser is null)
         {
-            return TypedResults.BadRequest<object>(new { message = "User is not created" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "User is not created"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/SystemUsers/{createdSystemUser.Id}", mapper.Map<SystemUserBaseResponseModel>(createdSystemUser));
     }

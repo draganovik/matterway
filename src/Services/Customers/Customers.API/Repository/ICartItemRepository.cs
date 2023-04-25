@@ -14,4 +14,8 @@ public interface ICartItemRepository
     Task<CartItem?> Put(CartItem requestModel);
 
     Task<bool> Delete(Guid id, Guid productId);
+
+    Task<int> GetTotalEntities(Guid systemUserId);
+
+    Task<int> GetTotalEntities();
 }
