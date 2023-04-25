@@ -38,6 +38,11 @@ public class OrderHistoryRepository : IOrderHistoryRepository
         return await context.OrderHistory.FindAsync(id);
     }
 
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.OrderHistory.CountAsync();
+    }
+
     public async Task<ICollection<OrderHistory>> Query(int pageIndex, int pageSize)
     {
         return await context.OrderHistory.AsNoTracking()

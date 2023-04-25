@@ -38,6 +38,11 @@ public class AddressRepository : IAddressRepository
         return await context.Address.FindAsync(id);
     }
 
+    public async Task<int> GetTotalEntities()
+    {
+        return await context.Address.CountAsync();
+    }
+
     public async Task<ICollection<Address>> Query(int pageIndex, int pageSize)
     {
         return await context.Address.AsNoTracking()

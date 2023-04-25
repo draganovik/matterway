@@ -8,6 +8,7 @@ using Ordering.API.Repository;
 using Shared.Enums;
 using Shared.Models;
 using Shared.ServiceBrokers;
+using SharedProject.ModelTemplates;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.API.Endpoints;
@@ -45,11 +46,37 @@ public static class OrderItemEndpoints
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<IEnumerable<OrderItemBaseResponseModel>>, NoContent>> QueryOrderItems([FromQuery] int pageIndex, [FromQuery] int pageSize, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaginationResponse<OrderItemBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryOrderItems([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IOrderItemRepository orderItemRepository, IMapper mapper)
     {
-        return await OrderItemRepository.Query(pageIndex, pageSize)
-            is IEnumerable<OrderItem> entityCollection && entityCollection.Any()
-                ? TypedResults.Ok(mapper.Map<IEnumerable<OrderItemBaseResponseModel>>(entityCollection))
+        if (page < 1 || pageSize < 1)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Invalid page or pageSize.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Page and pageSize must be greater than zero.",
+            };
+            var results = new List<ValidationResult>();
+            if (page < 1)
+            {
+                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            }
+            if (pageSize < 1)
+            {
+                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+            }
+
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
+        }
+
+        var total = await orderItemRepository.GetTotalEntities();
+        var entities = await orderItemRepository.Query(page, pageSize);
+        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Orders/Items");
+        var paginationResponse = new PaginationResponse<OrderItemBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<OrderItemBaseResponseModel>>(entities).ToList(), baseUri);
+
+        return entities is IEnumerable<OrderItem> value && value.Any()
+                ? TypedResults.Ok(paginationResponse)
                 : TypedResults.NoContent();
     }
 
@@ -63,7 +90,7 @@ public static class OrderItemEndpoints
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound<object>, BadRequest<object>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var updatedEntity = mapper.Map<OrderItem>(requestModel);
         updatedEntity.OrderId = id;
@@ -72,7 +99,7 @@ public static class OrderItemEndpoints
         Product? product = await catalogServiceBroker.GetProductById(updatedEntity.ProductId);
         if (product is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Product not found" });
+            return TypedResults.NotFound();
         }
 
         updatedEntity.ProductName = product.Title;
@@ -84,14 +111,26 @@ public static class OrderItemEndpoints
 
         if (!isValid)
         {
-            var errors = results.Select(r => r.ErrorMessage).ToList();
-            return TypedResults.BadRequest<object>(new { message = "Bad Request", errors });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more validation errors occurred."
+            };
+            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
+            return TypedResults.BadRequest(problemDetails);
         }
 
         var updateEntity = await OrderItemRepository.Put(updatedEntity);
         if (updateEntity is null)
         {
-            return TypedResults.NotFound<object>(new { message = "Cannot save entity" });
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Cannot create entity"
+            };
+            return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(updateEntity));
     }

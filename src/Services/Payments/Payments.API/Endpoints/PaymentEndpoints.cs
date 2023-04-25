@@ -148,9 +148,8 @@ public static class PaymentEndpoints
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred."
+                Detail = "Cannot create entity"
             };
-            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
         }
         return TypedResults.Created($"/api/Payments/{newEntity.Id}", mapper.Map<PaymentBaseResponseModel>(newEntity));
