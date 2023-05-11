@@ -27,7 +27,7 @@ const carousel = ref([
 </script>
 
 <template>
-  <div id="default-carousel" class="relative w-full" data-carousel="static">
+  <div id="default-carousel" class="relative w-full" data-carousel="slide">
     <!-- Carousel wrapper -->
     <div class="relative overflow-hidden rounded-xl h-[50svh] min-h-[20rem]">
       <div

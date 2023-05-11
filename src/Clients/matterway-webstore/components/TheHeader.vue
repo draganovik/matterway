@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="bg-white border-slate-200 dark:border-slate-700 dark:bg-slate-800 border rounded-lg m-4 fixed z-40 w-[calc(100%-2rem)]"
+    class="bg-white border-slate-200/90 dark:border-slate-700 dark:bg-slate-800/90 border rounded-lg m-4 fixed z-40 w-[calc(100%-2rem)] backdrop-filter backdrop-blur-md"
   >
     <div
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
@@ -118,7 +118,7 @@
           />
         </div>
         <ul
-          class="flex items-center flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-lg bg-slate-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-slate-800 md:dark:bg-slate-800 dark:border-slate-700"
+          class="flex md:items-center flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-lg bg-slate-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-transparent dark:bg-slate-800 dark:border-slate-700"
         >
           <li>
             <NuxtLink
@@ -148,22 +148,29 @@
               data-collapse-toggle="navbar-search"
               aria-controls="navbar-search"
               aria-expanded="false"
-              class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 mr-1"
+              class="relative text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 mr-1"
             >
               <svg
                 class="w-5 h-5"
-                aria-hidden="true"
-                fill="currentColor"
-                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path
-                  fill-rule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  clip-rule="evenodd"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                 ></path>
               </svg>
-              <span class="sr-only">Search</span>
+              <span class="sr-only">Cart</span>
+              <div
+                class="absolute inline-flex items-center justify-center w-5 h-5 text-[8pt] font-bold text-white bg-blue-600/70 border-white rounded-md bottom-0 right-0 dark:border-blue-700/50 border-blue-400/40 border"
+              >
+                20
+              </div>
             </button>
           </li>
         </ul>
