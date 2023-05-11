@@ -118,29 +118,53 @@
           />
         </div>
         <ul
-          class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-lg bg-slate-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-slate-800 md:dark:bg-slate-800 dark:border-slate-700"
+          class="flex items-center flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-lg bg-slate-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-slate-800 md:dark:bg-slate-800 dark:border-slate-700"
         >
           <li>
-            <a
-              href="#"
-              class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
-              aria-current="page"
-              >Home</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
+            <NuxtLink
+              to="/"
               class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
-              >About</a
+            >
+              Home
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
+              href="/products"
+              class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
+              >Products</NuxtLink
             >
           </li>
           <li>
-            <a
-              href="#"
+            <NuxtLink
+              href="/login"
               class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
-              >Services</a
+              >Login</NuxtLink
             >
+          </li>
+          <li>
+            <button
+              type="button"
+              data-collapse-toggle="navbar-search"
+              aria-controls="navbar-search"
+              aria-expanded="false"
+              class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 mr-1"
+            >
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <span class="sr-only">Search</span>
+            </button>
           </li>
         </ul>
       </div>
@@ -157,4 +181,8 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.router-link-active {
+  @apply md:text-blue-700 md:dark:text-blue-500 md:bg-transparent bg-blue-700;
+}
+</style>

@@ -18,15 +18,3 @@
     grid-template-rows: 100% auto;
   }
 }
-
-@layer utilities {
-  button[role="tab"][aria-selected="true"] {
-    @apply border-slate-900 dark:border-slate-100;
-  }
-  .pill {
-    @apply bg-slate-800/50;
-  }
-  .pill[aria-current="true"] {
-    @apply bg-slate-200/80;
-  }
-}
