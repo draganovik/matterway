@@ -29,7 +29,7 @@ const carousel = ref([
 <template>
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
     <!-- Carousel wrapper -->
-    <div class="relative overflow-hidden rounded-xl h-[50svh] min-h-[20rem]">
+    <div class="relative overflow-hidden rounded-xl h-[60svh] min-h-[20rem]">
       <div
         v-for="(item, index) in carousel"
         :key="index"
@@ -38,7 +38,7 @@ const carousel = ref([
       >
         <img
           :src="item.url"
-          class="absolute flex w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover"
+          class="absolute flex w-full h-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 object-cover"
           :alt="index.toString()"
         />
       </div>
