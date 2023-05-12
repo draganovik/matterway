@@ -1,18 +1,18 @@
 <template>
   <nav
-    class="bg-white border-slate-200/90 dark:border-slate-700 dark:bg-slate-800/90 border rounded-lg m-4 fixed z-40 w-[calc(100%-2rem)] backdrop-filter backdrop-blur-md"
+    class="fixed z-40 m-4 w-[calc(100%-2rem)] rounded-lg border border-slate-200/90 bg-white backdrop-blur-md backdrop-filter dark:border-slate-700 dark:bg-slate-800/90"
   >
     <div
-      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+      class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4"
     >
       <a href="https://flowbite.com/" class="flex items-center">
         <img
           src="https://flowbite.com/docs/images/logo.svg"
-          class="h-8 mr-3"
+          class="mr-3 h-8"
           alt="Flowbite Logo"
         />
         <span
-          class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
+          class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
           >Flowbite</span
         >
       </a>
@@ -22,10 +22,10 @@
           data-collapse-toggle="navbar-search"
           aria-controls="navbar-search"
           aria-expanded="false"
-          class="md:hidden text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 mr-1"
+          class="mr-1 rounded-lg p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:hidden"
         >
           <svg
-            class="w-5 h-5"
+            class="h-5 w-5"
             aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -39,12 +39,12 @@
           </svg>
           <span class="sr-only">Search</span>
         </button>
-        <div class="relative hidden md:block w-60">
+        <div class="relative hidden w-60 md:block">
           <div
-            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
           >
             <svg
-              class="w-5 h-5 text-slate-500"
+              class="h-5 w-5 text-slate-500"
               aria-hidden="true"
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -61,20 +61,20 @@
           <input
             type="text"
             id="search-navbar"
-            class="block w-full p-2 pl-10 text-sm text-slate-900 border border-slate-300 rounded-lg bg-slate-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             placeholder="Search..."
           />
         </div>
         <button
           data-collapse-toggle="navbar-search"
           type="button"
-          class="inline-flex items-center p-2 text-sm text-slate-500 rounded-lg md:hidden hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-600"
+          class="inline-flex items-center rounded-lg p-2 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-600 md:hidden"
           aria-controls="navbar-search"
           aria-expanded="false"
         >
           <span class="sr-only">Open menu</span>
           <svg
-            class="w-6 h-6"
+            class="h-6 w-6"
             aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -89,15 +89,15 @@
         </button>
       </div>
       <div
-        class="items-center justify-between hidden w-full md:flex md:w-auto md:order-2"
+        class="hidden w-full items-center justify-between md:order-2 md:flex md:w-auto"
         id="navbar-search"
       >
         <div class="relative mt-3 md:hidden">
           <div
-            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
           >
             <svg
-              class="w-5 h-5 text-slate-500"
+              class="h-5 w-5 text-slate-500"
               aria-hidden="true"
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -113,17 +113,17 @@
           <input
             type="text"
             id="search-navbar"
-            class="block w-full p-2 pl-10 text-sm text-slate-900 border border-slate-300 rounded-lg bg-slate-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             placeholder="Search..."
           />
         </div>
         <ul
-          class="flex md:items-center flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-lg bg-slate-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-transparent dark:bg-slate-800 dark:border-slate-700"
+          class="mt-4 flex flex-col rounded-lg border border-slate-100 bg-slate-50 p-4 font-medium dark:border-slate-700 dark:bg-slate-800 md:mt-0 md:flex-row md:items-center md:space-x-8 md:border-0 md:bg-transparent md:p-0"
         >
           <li>
             <NuxtLink
               to="/"
-              class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
+              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
             >
               Home
             </NuxtLink>
@@ -131,14 +131,14 @@
           <li>
             <NuxtLink
               href="/products"
-              class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
+              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
               >Products</NuxtLink
             >
           </li>
           <li>
             <NuxtLink
               href="/login"
-              class="block py-2 pl-3 pr-4 text-slate-900 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-slate-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-slate-700"
+              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
               >Login</NuxtLink
             >
           </li>
@@ -148,10 +148,10 @@
               data-collapse-toggle="navbar-search"
               aria-controls="navbar-search"
               aria-expanded="false"
-              class="relative text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5 mr-1"
+              class="relative mr-1 rounded-lg p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
             >
               <svg
-                class="w-5 h-5"
+                class="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="1.5"
@@ -167,7 +167,7 @@
               </svg>
               <span class="sr-only">Cart</span>
               <div
-                class="absolute inline-flex items-center justify-center w-5 h-5 text-[8pt] font-bold text-white bg-blue-600/70 border-white rounded-md bottom-0 right-0 dark:border-blue-700/50 border-blue-400/40 border"
+                class="absolute bottom-0 right-0 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50"
               >
                 20
               </div>
@@ -190,6 +190,6 @@ onMounted(() => {
 
 <style scoped>
 .router-link-active {
-  @apply md:text-blue-700 md:dark:text-blue-500 md:bg-transparent bg-blue-700;
+  @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
 }
 </style>
