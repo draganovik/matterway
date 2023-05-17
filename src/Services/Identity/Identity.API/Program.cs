@@ -114,6 +114,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
+
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 
@@ -132,5 +143,7 @@ if (app.Environment.IsDevelopment())
 app.MapSystemUserEndpoints();
 
 app.MapSessionEndpoints();
+
+app.UseCors();
 
 app.Run();

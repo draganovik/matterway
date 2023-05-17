@@ -112,7 +112,7 @@
           </div>
           <input
             type="text"
-            id="search-navbar"
+            id="search-navbar-mini"
             class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             placeholder="Search..."
           />
@@ -135,7 +135,7 @@
               >Products</NuxtLink
             >
           </li>
-          <li>
+          <li v-if="!session.isLoggedIn">
             <NuxtLink
               href="/login"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
@@ -181,6 +181,9 @@
 
 <script lang="ts" setup>
 import { initFlowbite } from "flowbite";
+import { useSessionStore } from "~/store/session";
+
+const session = useSessionStore()
 
 // initialize components based on data attribute selectors
 onMounted(() => {

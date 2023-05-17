@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import { initTabs } from "flowbite";
+import { useSessionStore } from "~/store/session";
+
+const sessionStore = useSessionStore();
 
 // initialize components based on data attribute selectors
 onMounted(() => {
   initTabs();
+  console.log(sessionStore.getSessionData)
 });
 </script>
 

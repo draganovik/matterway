@@ -1,6 +1,6 @@
 <template>
   <TheHeader />
-  <main class="max-w-7xl mx-auto mt-[7rem] px-4 w-full">
+  <main class="mx-auto mt-[7rem] grid w-full max-w-7xl px-4">
     <slot></slot>
   </main>
   <TheFooter />
