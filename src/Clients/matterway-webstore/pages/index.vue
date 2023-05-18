@@ -7,7 +7,7 @@ const sessionStore = useSessionStore();
 // initialize components based on data attribute selectors
 onMounted(() => {
   initTabs();
-  console.log(sessionStore.getSessionData)
+  console.log(sessionStore.getSessionData);
 });
 </script>
 

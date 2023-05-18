@@ -1,4 +1,9 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({
+  middleware: "auth",
+  authNoSession: true,
+});
+</script>
 
 <template>
   <div>Page: foo</div>

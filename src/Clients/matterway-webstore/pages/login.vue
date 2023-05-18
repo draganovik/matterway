@@ -1,7 +1,11 @@
 <script lang="ts" setup>
-import { randomInt } from "crypto";
 import { ref } from "vue";
 import { useSessionStore } from "~/store/session";
+
+definePageMeta({
+  middleware: "auth",
+  authNoSession: true,
+});
 
 const loginModel = ref(new LoginModel());
 
@@ -10,20 +14,22 @@ const sessionStore = useSessionStore();
 const isSubmitting = ref(false);
 
 async function submitFormLogin() {
-  if(sessionStore.session != null) {
-    console.log(sessionStore.session)
-    return
+  if (sessionStore.session != null) {
+    console.log(sessionStore.session);
+    return;
   }
   try {
     isSubmitting.value = true;
-    if(loginModel.value.validate())
-    {
-      sessionStore.login(loginModel.value);
+    if (loginModel.value.validate()) {
+      await sessionStore.login(loginModel.value);
     }
   } catch (error) {
     // Handle any errors that occur during form submission
   } finally {
     isSubmitting.value = false;
+    if (sessionStore.isLoggedIn) {
+      navigateTo("/");
+    }
   }
 }
 </script>

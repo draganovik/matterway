@@ -8,10 +8,8 @@ export default class LoginModel {
   }
 
   public validate(): boolean {
-    const regex = new RegExp(
-      "^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$"
-    )
-    
+    const regex = new RegExp("^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$");
+
     if (this.email.length == 0) {
       return false;
     }

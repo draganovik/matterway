@@ -7,5 +7,5 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: ['@pinia/nuxt']
+  modules: ["@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
 });

@@ -16,7 +16,7 @@ export default function useSessionData(): {
   const rawToken = useState<string | undefined>("jwtToken", undefined);
 
   const extractDataFromToken = (
-    token: string | undefined
+    token: string | undefined,
   ): TokenData | undefined => {
     if (!token) return undefined;
 
@@ -27,7 +27,7 @@ export default function useSessionData(): {
         .atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
 
     const { userId, username } = JSON.parse(jsonPayload) as {

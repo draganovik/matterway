@@ -183,7 +183,7 @@
 import { initFlowbite } from "flowbite";
 import { useSessionStore } from "~/store/session";
 
-const session = useSessionStore()
+const session = useSessionStore();
 
 // initialize components based on data attribute selectors
 onMounted(() => {
@@ -191,7 +191,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .router-link-active {
   @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
 }

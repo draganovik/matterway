@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
-  authorize: [UserRole.Customer],
   middleware: "auth",
+  authOnlyRoles: [UserRole.Customer],
 });
 </script>
 

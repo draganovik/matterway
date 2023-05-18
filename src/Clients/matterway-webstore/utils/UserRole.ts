@@ -1,5 +1,5 @@
 export enum UserRole {
-    Administrator,
-    Manager,
-    Customer
+  Administrator,
+  Manager,
+  Customer,
 }
