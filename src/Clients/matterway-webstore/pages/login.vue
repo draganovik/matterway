@@ -58,17 +58,20 @@ async function submitFormLogin() {
         d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
       ></path>
     </svg>
+    <h1 class="mb-8 text-center text-3xl font-bold">
+      Prijavite se na Matterway
+    </h1>
     <div class="mb-6">
       <label
         for="email"
-        class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+        class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
         >Email adresa</label
       >
       <input
         type="email"
         id="email"
         v-model="loginModel.email"
-        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+        class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         placeholder="john.doe@company.com"
         required
       />
@@ -76,14 +79,14 @@ async function submitFormLogin() {
     <div class="mb-6">
       <label
         for="password"
-        class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+        class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
         >Lozinka</label
       >
       <input
         type="password"
         id="password"
         v-model="loginModel.password"
-        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+        class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         placeholder="•••••••••"
         required
       />

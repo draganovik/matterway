@@ -20,13 +20,13 @@ onMounted(() => {
           <div>
             <label
               for="company"
-              class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
               >Company</label
             >
             <input
               type="text"
               id="company"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="Flowbite"
               required
             />
@@ -34,13 +34,13 @@ onMounted(() => {
           <div>
             <label
               for="phone"
-              class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
               >Phone number</label
             >
             <input
               type="tel"
               id="phone"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="123-45-678"
               pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
               required
@@ -49,13 +49,13 @@ onMounted(() => {
           <div>
             <label
               for="visitors"
-              class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
               >Unique visitors (per month)</label
             >
             <input
               type="number"
               id="visitors"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder=""
               required
             />
@@ -67,13 +67,13 @@ onMounted(() => {
               id="remember"
               type="checkbox"
               value=""
-              class="focus:ring-3 h-4 w-4 rounded border border-gray-300 bg-gray-50 focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
+              class="focus:ring-3 h-4 w-4 rounded border border-slate-300 bg-slate-50 focus:ring-blue-300 dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800 dark:focus:ring-blue-600"
               required
             />
           </div>
           <label
             for="remember"
-            class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            class="ml-2 text-sm font-medium text-slate-900 dark:text-slate-300"
             >I agree with the
             <a href="#" class="text-blue-600 hover:underline dark:text-blue-500"
               >terms and conditions</a
@@ -88,8 +88,13 @@ onMounted(() => {
         </button>
       </form>
     </aside>
-    <section class="grid place-items-center gap-6">
-      <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
+    <section class="grid w-full place-items-center gap-6">
+      <div class="grid w-full grid-cols-2 gap-4 lg:grid-cols-3">
+        <ProductCartSkeleton
+          v-if="catalogStore.catalog == null"
+          v-for="product in [...Array(3).keys()]"
+          :key="product"
+        />
         <ProductCard
           v-for="product in catalogStore.catalog"
           :key="product.id"
@@ -102,7 +107,7 @@ onMounted(() => {
           <li>
             <a
               href="#"
-              class="ml-0 block rounded-l-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="ml-0 block rounded-l-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <span class="sr-only">Previous</span>
               <svg
@@ -123,14 +128,14 @@ onMounted(() => {
           <li>
             <a
               href="#"
-              class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
               >1</a
             >
           </li>
           <li>
             <a
               href="#"
-              class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
               >2</a
             >
           </li>
@@ -138,28 +143,28 @@ onMounted(() => {
             <a
               href="#"
               aria-current="page"
-              class="z-10 border border-blue-300 bg-blue-50 px-3 py-2 leading-tight text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+              class="z-10 border border-blue-300 bg-blue-50 px-3 py-2 leading-tight text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-700 dark:text-white"
               >3</a
             >
           </li>
           <li>
             <a
               href="#"
-              class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
               >4</a
             >
           </li>
           <li>
             <a
               href="#"
-              class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
               >5</a
             >
           </li>
           <li>
             <a
               href="#"
-              class="block rounded-r-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              class="block rounded-r-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <span class="sr-only">Next</span>
               <svg

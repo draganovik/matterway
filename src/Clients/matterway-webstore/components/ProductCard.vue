@@ -8,7 +8,7 @@ defineProps({
 </script>
 <template>
   <div
-    class="grid w-full max-w-sm grid-rows-[min-content] flex-col place-items-stretch rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800"
+    class="grid w-full max-w-sm grid-rows-[min-content] flex-col place-items-stretch rounded-lg border border-slate-200 bg-white shadow dark:border-slate-700 dark:bg-slate-800"
   >
     <a href="#" class="h-60 w-full" v-if="product.productImages.length > 0">
       <img
@@ -26,7 +26,7 @@ defineProps({
     <div class="flex w-full flex-col justify-between gap-8 p-5 pt-3">
       <a href="#">
         <h5
-          class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white"
+          class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white"
         >
           {{ product.title }}
         </h5>
@@ -99,7 +99,7 @@ defineProps({
       </div>
       <div class="flex flex-col items-end justify-between gap-4">
         <span
-          class="text-right text-3xl font-bold text-gray-900 dark:text-white"
+          class="text-right text-3xl font-bold text-slate-900 dark:text-white"
           >{{ formatMoney(product.price) }}</span
         >
         <a

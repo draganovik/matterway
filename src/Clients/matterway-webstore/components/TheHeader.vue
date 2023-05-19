@@ -171,23 +171,23 @@
               <!-- Dropdown menu -->
               <div
                 id="dropdownNavbar"
-                class="z-10 hidden w-44 divide-y divide-gray-100 overflow-hidden rounded-lg bg-white font-normal shadow dark:divide-gray-600 dark:bg-gray-700"
+                class="z-10 hidden w-44 divide-y divide-slate-100 overflow-hidden rounded-lg bg-white font-normal shadow dark:divide-slate-600 dark:bg-slate-700"
               >
                 <ul
-                  class="py-2 text-sm text-gray-700 dark:text-gray-400"
+                  class="py-2 text-sm text-slate-700 dark:text-slate-400"
                   aria-labelledby="dropdownLargeButton"
                 >
                   <li>
                     <a
                       href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
                       >Profil</a
                     >
                   </li>
                   <li>
                     <a
                       href="#"
-                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
                       >Istorija kupovine</a
                     >
                   </li>
@@ -198,7 +198,7 @@
                     aria-controls="navbar-search"
                     aria-expanded="true"
                     @click="logout()"
-                    class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                    class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-600 dark:hover:text-white"
                   >
                     Odjava
                   </button>

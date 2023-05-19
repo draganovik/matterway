@@ -24,16 +24,16 @@ const getCurrentYear = () => {
           class="mb-6 flex flex-wrap items-center text-sm font-medium text-slate-500 dark:text-slate-400 sm:mb-0"
         >
           <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">About</a>
+            <a href="#" class="mr-4 hover:underline md:mr-6">Informacije</a>
           </li>
           <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">Privacy Policy</a>
+            <a href="#" class="mr-4 hover:underline md:mr-6">Politika privatnosti</a>
           </li>
           <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">Licensing</a>
+            <a href="#" class="mr-4 hover:underline md:mr-6">Licenciranje</a>
           </li>
           <li>
-            <a href="#" class="hover:underline">Contact</a>
+            <a href="#" class="hover:underline">Kontakt</a>
           </li>
         </ul>
       </div>
