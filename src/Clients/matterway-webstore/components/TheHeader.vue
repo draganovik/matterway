@@ -5,17 +5,17 @@
     <div
       class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4"
     >
-      <a href="https://flowbite.com/" class="flex items-center">
+      <NuxtLink to="/" class="flex items-center">
         <img
           src="https://flowbite.com/docs/images/logo.svg"
           class="mr-3 h-8"
-          alt="Flowbite Logo"
+          alt="Matterway Logo"
         />
         <span
           class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
-          >Flowbite</span
+          >Matterway</span
         >
-      </a>
+      </NuxtLink>
       <div class="flex md:order-1">
         <button
           type="button"
@@ -122,25 +122,87 @@
         >
           <li>
             <NuxtLink
-              to="/"
+              href="/"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
+              >Naslovna</NuxtLink
             >
-              Home
-            </NuxtLink>
           </li>
           <li>
             <NuxtLink
               href="/products"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-              >Products</NuxtLink
+              >Proizvodi</NuxtLink
             >
           </li>
           <li v-if="!session.isLoggedIn">
             <NuxtLink
               href="/login"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-              >Login</NuxtLink
+              >Prijava</NuxtLink
             >
+          </li>
+          <li v-if="session.isLoggedIn">
+            <button
+              type="button"
+              data-dropdown-toggle="dropdownNavbar"
+              aria-expanded="false"
+              class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
+            >
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                ></path>
+              </svg>
+              <span class="text-slate-900 dark:text-white md:sr-only"
+                >Nalog</span
+              >
+            </button>
+            <!-- Dropdown menu -->
+            <div
+              id="dropdownNavbar"
+              class="z-10 hidden w-44 divide-y divide-gray-100 rounded-lg bg-white font-normal shadow dark:divide-gray-600 dark:bg-gray-700"
+            >
+              <ul
+                class="py-2 text-sm text-gray-700 dark:text-gray-400"
+                aria-labelledby="dropdownLargeButton"
+              >
+                <li>
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    >Profil</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    >Narudžbine</a
+                  >
+                </li>
+              </ul>
+              <div class="py-1">
+                <button
+                  type="button"
+                  aria-controls="navbar-search"
+                  aria-expanded="true"
+                  @click="logout()"
+                  class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Odjava
+                </button>
+              </div>
+            </div>
           </li>
           <li>
             <button
@@ -148,7 +210,7 @@
               data-collapse-toggle="navbar-search"
               aria-controls="navbar-search"
               aria-expanded="false"
-              class="relative mr-1 rounded-lg p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+              class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
             >
               <svg
                 class="h-5 w-5"
@@ -165,11 +227,13 @@
                   d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                 ></path>
               </svg>
-              <span class="sr-only">Cart</span>
-              <div
-                class="absolute bottom-0 right-0 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50"
+              <span class="text-slate-900 dark:text-white md:sr-only"
+                >Korpa</span
               >
-                20
+              <div
+                class="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50 md:bottom-0 md:right-0"
+              >
+                8
               </div>
             </button>
           </li>
@@ -185,6 +249,12 @@ import { useSessionStore } from "~/store/session";
 
 const session = useSessionStore();
 
+const logout = () => {
+  session.logout();
+};
+
+let navbarOpen = ref(false);
+
 // initialize components based on data attribute selectors
 onMounted(() => {
   initFlowbite();
@@ -192,7 +262,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="postcss">
-.router-link-active {
+.router-link-active:not([href="/"]) {
   @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
 }
 </style>

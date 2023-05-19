@@ -54,12 +54,19 @@ export const useSessionStore = defineStore("session", {
       const response = await fetch(
         "https://localhost:2003/api/Sessions/revoke",
         {
-          method: "POST",
+          method: "DELETE",
+          headers: {
+            Authorization: `${this.session?.tokenType} ${this.session?.token}`,
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          credentials: "include",
         },
       );
       if (response.ok) {
         this.setSession(null);
       }
+      console.log(response);
     },
 
     setSession(session: SessionModel | null) {
