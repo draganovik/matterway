@@ -5,6 +5,12 @@ export default defineNuxtConfig({
       titleTemplate: "%s - Matterway Web Store",
     },
   },
+  runtimeConfig: {
+    public: {
+      auth_api_base_url: process.env.AUTH_API_BASE_URI,
+      catalog_api_base_url: process.env.CATALOG_API_BASE_URI,
+    },
+  },
   css: ["@/assets/css/main.css"],
   postcss: {
     plugins: {

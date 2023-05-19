@@ -193,6 +193,13 @@ public class CatalogDbContext : DbContext
             new ProductImage
             {
                 Id = 0,
+                ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                ImageAlt = "Spotlight Cam Plus",
+                ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
+            },
+            new ProductImage
+            {
+                Id = 0,
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 ImageAlt = "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View",
                 ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg"

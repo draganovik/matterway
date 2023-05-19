@@ -142,7 +142,7 @@
             >
           </li>
           <div class="flex flex-col md:flex-row">
-            <li v-if="session.isLoggedIn">
+            <li v-show="session.isLoggedIn">
               <button
                 type="button"
                 data-dropdown-toggle="dropdownNavbar"

@@ -1,7 +1,7 @@
 export default class SessionModel {
-  token!: String;
-  refreshToken!: String;
-  tokenType!: String;
-  created!: Date;
-  expires!: Date;
+  token!: string;
+  refreshToken!: string;
+  tokenType!: string;
+  created!: string;
+  expires!: string;
 }

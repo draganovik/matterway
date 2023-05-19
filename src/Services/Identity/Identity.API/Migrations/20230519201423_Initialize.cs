@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -55,10 +56,10 @@ namespace Identity.API.Migrations
                 columns: new[] { "Id", "Created", "Email", "PasswordHash", "Role" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 4, 11, 20, 22, 9, 292, DateTimeKind.Local).AddTicks(1647), "mladen@matterway.com", "AQAAAAIAAYagAAAAEPzJrgrSHvlWMNcuRY61SIa97LzzESCMd9z/c3U3JJpwW78pYAS8CzFxwf/T4mj3kw==", 0 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"), new DateTime(2023, 4, 11, 20, 22, 9, 348, DateTimeKind.Local).AddTicks(858), "jelena@matterway.com", "AQAAAAIAAYagAAAAEIDx+M7HXM1Kl2zzUb8FiuoDP7fBbBMZ/p70CdaqyxtZYWt6JPor9OkTytpBkQeyyw==", 1 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), new DateTime(2023, 4, 11, 20, 22, 9, 404, DateTimeKind.Local).AddTicks(3301), "stefan999@gmail.com", "AQAAAAIAAYagAAAAENE0Fpv9DGGx4FOw04QfzvZ2EG07+UscItavmJLtZsQ83H7dZrW7lk1ZJK0UAPgH6g==", 2 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new DateTime(2023, 4, 11, 20, 22, 9, 459, DateTimeKind.Local).AddTicks(4763), "marag2@gmail.com", "AQAAAAIAAYagAAAAEACFx7d5JHJmkOKu0q2Bp60MKQlM7EGiis3GjvkTm2qNYWeSjcBWtaGe0zxapYEP5w==", 2 }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), new DateTime(2023, 5, 19, 22, 14, 23, 462, DateTimeKind.Local).AddTicks(4361), "mladen@matterway.com", "AQAAAAIAAYagAAAAEEqMsFNFhWyMQXEN0rB6Mp4cFGB5GmXQgH2ZCqOkmm0oGKVRSWgbFy47iIEP++tMGA==", 0 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"), new DateTime(2023, 5, 19, 22, 14, 23, 525, DateTimeKind.Local).AddTicks(5091), "jelena@matterway.com", "AQAAAAIAAYagAAAAEJ5gC972Ja2WkjhcvANz+CoARvsoWoO4zUQyq27YOvD6jKx1nyv91Ks1YuhHeV65RA==", 1 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), new DateTime(2023, 5, 19, 22, 14, 23, 598, DateTimeKind.Local).AddTicks(9885), "stefan999@gmail.com", "AQAAAAIAAYagAAAAEO5rXg/F4umM8Ij0848OWgklsQeGJiANCcElu+/hJjOulHtbTDlmQGNnVharzfAyPA==", 2 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new DateTime(2023, 5, 19, 22, 14, 23, 692, DateTimeKind.Local).AddTicks(9253), "marag2@gmail.com", "AQAAAAIAAYagAAAAENpnbURk+8JmVcACvRb4P/hDHnPd4xkjo3BfGzR/GEFuJeCJ1uzmzMtstphFHh42GA==", 2 }
                 });
 
             migrationBuilder.CreateIndex(

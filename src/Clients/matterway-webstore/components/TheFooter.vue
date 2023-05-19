@@ -9,17 +9,17 @@ const getCurrentYear = () => {
   <footer class="rounded-lg bg-white shadow dark:bg-slate-900">
     <div class="mx-auto w-full max-w-screen-xl p-4 md:py-8">
       <div class="sm:flex sm:items-center sm:justify-between">
-        <a href="https://flowbite.com/" class="mb-4 flex items-center sm:mb-0">
+        <NuxtLink to="/" class="mb-4 flex items-center sm:mb-0">
           <img
             src="https://flowbite.com/docs/images/logo.svg"
             class="mr-3 h-8"
-            alt="Flowbite Logo"
+            alt="Matterway Logo"
           />
           <span
             class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
-            >Flowbite</span
+            >Matterway</span
           >
-        </a>
+        </NuxtLink>
         <ul
           class="mb-6 flex flex-wrap items-center text-sm font-medium text-slate-500 dark:text-slate-400 sm:mb-0"
         >

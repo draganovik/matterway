@@ -19,7 +19,7 @@ export const useSessionStore = defineStore("session", {
     isLoggedIn(): boolean {
       if (
         this.session?.expires == undefined ||
-        this.session?.expires <= new Date()
+        new Date(this.session.expires) <= new Date()
       ) {
         this.session = null;
       }
@@ -39,14 +39,15 @@ export const useSessionStore = defineStore("session", {
 
   actions: {
     async login(credentials: LoginModel) {
+      const config = useRuntimeConfig();
       const response = await fetch(
-        "https://localhost:2003/api/Sessions/create",
+        `${config.public.auth_api_base_url}/api/Sessions/create`,
         {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             accept: "application/json",
           },
-          method: "POST",
           body: JSON.stringify(credentials),
         },
       );
@@ -57,14 +58,15 @@ export const useSessionStore = defineStore("session", {
     },
 
     async logout() {
+      const config = useRuntimeConfig();
       const response = await fetch(
-        "https://localhost:2003/api/Sessions/revoke",
+        `${config.public.auth_api_base_url}/api/Sessions/revoke`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `${this.session?.tokenType} ${this.session?.token}`,
             "Content-Type": "application/json",
             accept: "application/json",
+            Authorization: `${this.session?.tokenType} ${this.session?.token}`,
           },
           credentials: "include",
         },
@@ -72,7 +74,6 @@ export const useSessionStore = defineStore("session", {
       if (response.ok) {
         this.setSession(null);
       }
-      console.log(response);
     },
 
     setSession(session: SessionModel | null) {

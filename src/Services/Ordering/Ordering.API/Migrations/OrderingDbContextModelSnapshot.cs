@@ -149,16 +149,16 @@ namespace Ordering.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            CreatedDate = new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1045),
-                            Description = "Order Created",
+                            CreatedDate = new DateTime(2023, 5, 19, 22, 14, 38, 723, DateTimeKind.Local).AddTicks(6554),
+                            Description = "Order Ready",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                             OrderStatus = 1
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
-                            CreatedDate = new DateTime(2023, 4, 11, 23, 7, 49, 43, DateTimeKind.Local).AddTicks(1051),
-                            Description = "Order Created",
+                            CreatedDate = new DateTime(2023, 5, 19, 22, 14, 38, 723, DateTimeKind.Local).AddTicks(6560),
+                            Description = "Order Canceled",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
                             OrderStatus = 5
                         });

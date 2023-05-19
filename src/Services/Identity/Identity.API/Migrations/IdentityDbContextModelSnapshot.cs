@@ -86,33 +86,33 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 292, DateTimeKind.Local).AddTicks(1647),
+                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 462, DateTimeKind.Local).AddTicks(4361),
                             Email = "mladen@matterway.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPzJrgrSHvlWMNcuRY61SIa97LzzESCMd9z/c3U3JJpwW78pYAS8CzFxwf/T4mj3kw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEqMsFNFhWyMQXEN0rB6Mp4cFGB5GmXQgH2ZCqOkmm0oGKVRSWgbFy47iIEP++tMGA==",
                             Role = 0
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 348, DateTimeKind.Local).AddTicks(858),
+                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 525, DateTimeKind.Local).AddTicks(5091),
                             Email = "jelena@matterway.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIDx+M7HXM1Kl2zzUb8FiuoDP7fBbBMZ/p70CdaqyxtZYWt6JPor9OkTytpBkQeyyw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ5gC972Ja2WkjhcvANz+CoARvsoWoO4zUQyq27YOvD6jKx1nyv91Ks1YuhHeV65RA==",
                             Role = 1
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 404, DateTimeKind.Local).AddTicks(3301),
+                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 598, DateTimeKind.Local).AddTicks(9885),
                             Email = "stefan999@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAENE0Fpv9DGGx4FOw04QfzvZ2EG07+UscItavmJLtZsQ83H7dZrW7lk1ZJK0UAPgH6g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEO5rXg/F4umM8Ij0848OWgklsQeGJiANCcElu+/hJjOulHtbTDlmQGNnVharzfAyPA==",
                             Role = 2
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            Created = new DateTime(2023, 4, 11, 20, 22, 9, 459, DateTimeKind.Local).AddTicks(4763),
+                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 692, DateTimeKind.Local).AddTicks(9253),
                             Email = "marag2@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEACFx7d5JHJmkOKu0q2Bp60MKQlM7EGiis3GjvkTm2qNYWeSjcBWtaGe0zxapYEP5w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENpnbURk+8JmVcACvRb4P/hDHnPd4xkjo3BfGzR/GEFuJeCJ1uzmzMtstphFHh42GA==",
                             Role = 2
                         });
                 });

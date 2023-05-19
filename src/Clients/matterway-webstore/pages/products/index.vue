@@ -1,11 +1,19 @@
 <script lang="ts" setup>
+import { useCatalogStore } from "~/store/catalog";
+
+const catalogStore = useCatalogStore();
+
 useHead({
   title: "Proizvodi",
+});
+
+onMounted(() => {
+  catalogStore.fetchCatalog();
 });
 </script>
 
 <template>
-  <div class="grid grid-flow-row gap-6 md:grid-cols-5 md:gap-4">
+  <div class="flex flex-col gap-6 md:flex-row md:gap-4">
     <aside>
       <form>
         <div class="mb-6 grid gap-6">
@@ -80,97 +88,18 @@ useHead({
         </button>
       </form>
     </aside>
-    <section class="grid place-items-center gap-6 md:col-span-4">
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-4.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-5.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-6.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-7.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-8.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-9.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-10.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-11.jpg"
-            alt=""
-          />
-        </div>
+    <section class="grid place-items-center gap-6">
+      <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <ProductCard
+          v-for="product in catalogStore.catalog"
+          :key="product.id"
+          :product="product"
+        />
       </div>
 
-      <nav aria-label="Page navigation example">
+      <nav aria-label="Catalog pagination">
         <ul class="inline-flex items-center -space-x-px">
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="ml-0 block rounded-l-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -191,21 +120,21 @@ useHead({
               </svg>
             </a>
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >1</a
             >
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >2</a
             >
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               aria-current="page"
@@ -213,21 +142,21 @@ useHead({
               >3</a
             >
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >4</a
             >
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >5</a
             >
           </li>
-          <li class="flex">
+          <li>
             <a
               href="#"
               class="block rounded-r-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -254,4 +183,8 @@ useHead({
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+[aria-label="Catalog pagination"] ul li {
+  display: flex;
+}
+</style>
