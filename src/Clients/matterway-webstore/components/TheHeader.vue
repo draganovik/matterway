@@ -39,7 +39,7 @@
           </svg>
           <span class="sr-only">Search</span>
         </button>
-        <div class="relative hidden w-60 md:block">
+        <div class="w-58 relative hidden md:block lg:w-64">
           <div
             class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
           >
@@ -118,7 +118,7 @@
           />
         </div>
         <ul
-          class="mt-4 flex flex-col rounded-lg border border-slate-100 bg-slate-50 p-4 font-medium dark:border-slate-700 dark:bg-slate-800 md:mt-0 md:flex-row md:items-center md:space-x-8 md:border-0 md:bg-transparent md:p-0"
+          class="mt-4 flex flex-col rounded-lg border border-slate-100 bg-slate-50 p-4 font-medium dark:border-slate-700 dark:bg-slate-800 md:mt-0 md:flex-row md:items-center md:gap-5 md:border-0 md:bg-transparent md:p-0 lg:gap-8"
         >
           <li>
             <NuxtLink
@@ -141,102 +141,105 @@
               >Prijava</NuxtLink
             >
           </li>
-          <li v-if="session.isLoggedIn">
-            <button
-              type="button"
-              data-dropdown-toggle="dropdownNavbar"
-              aria-expanded="false"
-              class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
-            >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
+          <div class="flex flex-col md:flex-row">
+            <li v-if="session.isLoggedIn">
+              <button
+                type="button"
+                data-dropdown-toggle="dropdownNavbar"
+                aria-expanded="false"
+                class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                ></path>
-              </svg>
-              <span class="text-slate-900 dark:text-white md:sr-only"
-                >Nalog</span
-              >
-            </button>
-            <!-- Dropdown menu -->
-            <div
-              id="dropdownNavbar"
-              class="z-10 hidden w-44 divide-y divide-gray-100 rounded-lg bg-white font-normal shadow dark:divide-gray-600 dark:bg-gray-700"
-            >
-              <ul
-                class="py-2 text-sm text-gray-700 dark:text-gray-400"
-                aria-labelledby="dropdownLargeButton"
-              >
-                <li>
-                  <a
-                    href="#"
-                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >Profil</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >Narudžbine</a
-                  >
-                </li>
-              </ul>
-              <div class="py-1">
-                <button
-                  type="button"
-                  aria-controls="navbar-search"
-                  aria-expanded="true"
-                  @click="logout()"
-                  class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
-                  Odjava
-                </button>
-              </div>
-            </div>
-          </li>
-          <li>
-            <button
-              type="button"
-              data-collapse-toggle="navbar-search"
-              aria-controls="navbar-search"
-              aria-expanded="false"
-              class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
-            >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                ></path>
-              </svg>
-              <span class="text-slate-900 dark:text-white md:sr-only"
-                >Korpa</span
-              >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  ></path>
+                </svg>
+                <span class="text-slate-900 dark:text-white md:sr-only"
+                  >Nalog</span
+                >
+              </button>
+              <!-- Dropdown menu -->
               <div
-                class="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50 md:bottom-0 md:right-0"
+                id="dropdownNavbar"
+                class="z-10 hidden w-44 divide-y divide-gray-100 overflow-hidden rounded-lg bg-white font-normal shadow dark:divide-gray-600 dark:bg-gray-700"
               >
-                8
+                <ul
+                  class="py-2 text-sm text-gray-700 dark:text-gray-400"
+                  aria-labelledby="dropdownLargeButton"
+                >
+                  <li>
+                    <a
+                      href="#"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >Profil</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >Istorija kupovine</a
+                    >
+                  </li>
+                </ul>
+                <div class="py-1">
+                  <button
+                    type="button"
+                    aria-controls="navbar-search"
+                    aria-expanded="true"
+                    @click="logout()"
+                    class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                    Odjava
+                  </button>
+                </div>
               </div>
-            </button>
-          </li>
+            </li>
+            <li>
+              <NuxtLink
+                to="cart"
+                data-collapse-toggle="navbar-search"
+                aria-controls="navbar-search"
+                aria-expanded="false"
+                class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
+              >
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                  ></path>
+                </svg>
+                <span
+                  class="text-base text-slate-900 dark:text-white md:sr-only"
+                  >Korpa</span
+                >
+                <div
+                  class="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50 md:bottom-0 md:right-0"
+                >
+                  8
+                </div>
+              </NuxtLink>
+            </li>
+          </div>
         </ul>
       </div>
     </div>
@@ -261,8 +264,11 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="postcss">
-.router-link-active:not([href="/"]) {
+<style scoped>
+.router-link-active:not([href="/"]):not([href="/cart"]) {
   @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
+}
+.router-link-active[href="/cart"] {
+  @apply bg-blue-700 md:bg-transparent;
 }
 </style>

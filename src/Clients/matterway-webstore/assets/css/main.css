@@ -19,7 +19,7 @@
   }
   @supports (height: 100svh) {
     #__nuxt {
-      grid-template-rows: 100svh auto;
+      grid-template-rows: minmax(100svh, max-content) auto;
     }
   }
 }

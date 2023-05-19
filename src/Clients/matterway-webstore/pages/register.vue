@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+useHead({
+  title: "Registracija",
+});
 definePageMeta({
   middleware: "auth",
   authNoSession: true,

@@ -17,6 +17,12 @@ export const useSessionStore = defineStore("session", {
 
   getters: {
     isLoggedIn(): boolean {
+      if (
+        this.session?.expires == undefined ||
+        this.session?.expires <= new Date()
+      ) {
+        this.session = null;
+      }
       return this.session != null;
     },
     getSessionData(): SessionModel | null {

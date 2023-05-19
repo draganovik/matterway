@@ -2,6 +2,10 @@
 import { ref } from "vue";
 import { useSessionStore } from "~/store/session";
 
+useHead({
+  title: "Prijava",
+});
+
 definePageMeta({
   middleware: "auth",
   authNoSession: true,

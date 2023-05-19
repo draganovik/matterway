@@ -1,4 +1,8 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+useHead({
+  title: "Korpa",
+});
+</script>
 
 <template>
   <div>Page: foo</div>
