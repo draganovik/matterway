@@ -19,9 +19,15 @@ export const useCartStore = defineStore("cart", {
     getCartItems(): CartItemModel[] {
       return this.cartItems;
     },
-  },
-
-  actions: {
+    isProductInCart(): (productId: string) => boolean {
+      return (productId: string) =>
+        this.cartItems?.some((item) => item.productId === productId);
+    },
+    countProductsInCart(): (productId: string) => number {
+      return (productId: string) =>
+        this.cartItems?.find((item) => item.productId === productId)
+          ?.quantity || 0;
+    },
     getTotalPrice(): number {
       return this.cartItems
         ? this.cartItems.reduce(
@@ -35,7 +41,39 @@ export const useCartStore = defineStore("cart", {
         ? this.cartItems.reduce((total, item) => total + item.quantity, 0)
         : 0;
     },
+  },
 
+  actions: {
+    async removeFromCart(product: ProductModel) {
+      const config = useRuntimeConfig();
+      const session = useSessionStore();
+      const findItem = this.cartItems.find(
+        (item) => item.productId === product.id,
+      );
+      if (findItem && findItem.quantity > 1) {
+        findItem.quantity--;
+        const response = await request(
+          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${findItem?.productId}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ quantity: findItem.quantity }),
+          },
+        );
+        if (response.ok) {
+          console.log(await response.json());
+        }
+      } else {
+        this.cartItems = this.cartItems.filter(
+          (item) => item.productId !== product.id,
+        );
+        await request(
+          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${product.id}`,
+          {
+            method: "DELETE",
+          },
+        );
+      }
+    },
     async addToCart(product: ProductModel) {
       const config = useRuntimeConfig();
       const session = useSessionStore();
@@ -52,9 +90,6 @@ export const useCartStore = defineStore("cart", {
         (item) => item.productId === product.id,
       );
 
-      console.log(session.getTokenData);
-      console.log("cart", this.cartItems);
-
       const response = await request(
         `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${currentItem?.productId}`,
         {
@@ -69,7 +104,6 @@ export const useCartStore = defineStore("cart", {
 
     async fetchCartItems(page: number = 1, pageSize: number = 10) {
       const config = useRuntimeConfig();
-      const session = useSessionStore();
 
       const response = await request(
         `${config.public.customers_api_base_url}/api/Customers/CartItems?page=${page}&pageSize=${pageSize}`,

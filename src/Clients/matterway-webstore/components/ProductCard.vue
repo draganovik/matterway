@@ -109,13 +109,34 @@ defineProps({
           class="text-right text-3xl font-bold text-slate-900 dark:text-white"
           >{{ formatMoney(product.price) }}</span
         >
-        <button
-          type="button"
-          @click="userCartStore.addToCart(product)"
-          class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Dodaj u korpu
-        </button>
+        <div class="grid w-full grid-cols-5 gap-4">
+          <p
+            v-if="userCartStore.isProductInCart(product.id)"
+            class="grid place-items-center rounded bg-slate-500/20 text-xl font-semibold"
+          >
+            {{ userCartStore.countProductsInCart(product.id) }}
+          </p>
+          <button
+            type="button"
+            v-if="userCartStore.isProductInCart(product.id)"
+            @click="userCartStore.removeFromCart(product)"
+            :class="
+              userCartStore.isProductInCart(product.id)
+                ? 'col-span-4'
+                : 'col-span-5'
+            "
+            class="w-full rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+          >
+            Ukloni iz korpe
+          </button>
+          <button
+            type="button"
+            @click="userCartStore.addToCart(product)"
+            class="col-span-5 w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Dodaj u korpu
+          </button>
+        </div>
       </div>
     </div>
   </div>

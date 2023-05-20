@@ -35,5 +35,5 @@ export async function request(
     return response;
   }
   const error = await response.json();
-  throw new Error(error);
+  throw new Error(error.title);
 }

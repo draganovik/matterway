@@ -43,15 +43,15 @@ useHead({
               {{ item.quantity }}
             </td>
             <td class="px-6 py-4">
-              {{ formatMoney(item.quantity * item.unitPrice || 0) }}
+              {{ formatMoney(item.quantity * (item.unitPrice || 0)) }}
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr class="font-semibold text-gray-900 dark:text-white">
             <th scope="row" class="px-6 py-3 text-base">Ukupna za naplatu</th>
-            <td class="px-6 py-3">{{ cart.getTotalItemCount() }}</td>
-            <td class="px-6 py-3">{{ formatMoney(cart.getTotalPrice()) }}</td>
+            <td class="px-6 py-3">{{ cart.getTotalItemCount }}</td>
+            <td class="px-6 py-3">{{ formatMoney(cart.getTotalPrice) }}</td>
           </tr>
         </tfoot>
       </table>

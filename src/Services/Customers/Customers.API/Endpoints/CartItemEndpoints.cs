@@ -164,7 +164,7 @@ public static class CartItemEndpoints
         return newEntity is not null ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(newEntity)) : TypedResults.NotFound();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
+    [Authorize]
     public static async Task<Results<NoContent, NotFound, ForbidHttpResult>> DeleteCartItem(Guid id, Guid productId, HttpContext httpContext, ICartItemRepository cartItemRepository, IMapper mapper)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
@@ -178,9 +178,12 @@ public static class CartItemEndpoints
             return TypedResults.Forbid();
         }
 
-        if (userRole == SystemUserRole.Customer && id != systemUserId)
+        if(userRole != SystemUserRole.Admin)
         {
-            return TypedResults.Forbid();
+            if (id != systemUserId)
+            {
+                return TypedResults.Forbid();
+            }
         }
 
         var isDeleted = await cartItemRepository.Delete(id, productId);
