@@ -21,6 +21,24 @@ export const useCatalogStore = defineStore("catalog", {
   },
 
   actions: {
+    async fetchProductById(id: string): Promise<ProductModel | null> {
+      const config = useRuntimeConfig();
+      const response = await fetch(
+        `${config.public.catalog_api_base_url}/api/Products/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+        },
+      );
+      const responseObject = await response.json();
+      if (response.ok) {
+        return responseObject;
+      }
+      return null;
+    },
     async fetchCatalog(page: number = 1, pageSize: number = 10) {
       const config = useRuntimeConfig();
       const response = await fetch(

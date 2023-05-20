@@ -27,7 +27,9 @@ const getCurrentYear = () => {
             <a href="#" class="mr-4 hover:underline md:mr-6">Informacije</a>
           </li>
           <li>
-            <a href="#" class="mr-4 hover:underline md:mr-6">Politika privatnosti</a>
+            <a href="#" class="mr-4 hover:underline md:mr-6"
+              >Politika privatnosti</a
+            >
           </li>
           <li>
             <a href="#" class="mr-4 hover:underline md:mr-6">Licenciranje</a>

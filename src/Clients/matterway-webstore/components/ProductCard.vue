@@ -10,7 +10,11 @@ defineProps({
   <div
     class="grid w-full max-w-sm grid-rows-[min-content] flex-col place-items-stretch rounded-lg border border-slate-200 bg-white shadow dark:border-slate-700 dark:bg-slate-800"
   >
-    <a href="#" class="h-60 w-full" v-if="product.productImages.length > 0">
+    <NuxtLink
+      :to="'/products/' + product.id"
+      class="h-60 w-full"
+      v-if="product.productImages.length > 0"
+    >
       <img
         class="h-full w-full rounded-t-lg object-cover"
         :src="
@@ -22,7 +26,7 @@ defineProps({
             .imageAlt
         "
       />
-    </a>
+    </NuxtLink>
     <div class="flex w-full flex-col justify-between gap-8 p-5 pt-3">
       <a href="#">
         <h5
