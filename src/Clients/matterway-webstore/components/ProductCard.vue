@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { useCartStore } from "~/store/cart";
+
+const userCartStore = useCartStore();
 defineProps({
   product: {
     type: ProductModel,
@@ -106,11 +109,13 @@ defineProps({
           class="text-right text-3xl font-bold text-slate-900 dark:text-white"
           >{{ formatMoney(product.price) }}</span
         >
-        <a
-          href="#"
+        <button
+          role="button"
+          @click="userCartStore.addToCart(product)"
           class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >Dodaj u korpu</a
         >
+          Dodaj u korpu
+        </button>
       </div>
     </div>
   </div>

@@ -1,3 +1,24 @@
+<script lang="ts" setup>
+import { initFlowbite } from "flowbite";
+import { useCartStore } from "~/store/cart";
+import { useSessionStore } from "~/store/session";
+
+const cart = useCartStore();
+const session = useSessionStore();
+
+const logout = () => {
+  session.logout();
+};
+
+let navbarOpen = ref(false);
+
+// initialize components based on data attribute selectors
+onMounted(() => {
+  initFlowbite();
+  cart.fetchCartItems();
+});
+</script>
+
 <template>
   <nav
     class="fixed z-40 m-4 w-[calc(100%-2rem)] rounded-lg border border-slate-200/90 bg-white backdrop-blur-md backdrop-filter dark:border-slate-700 dark:bg-slate-800/90"
@@ -233,9 +254,10 @@
                   >Korpa</span
                 >
                 <div
+                  v-if="cart.getCartItems.length > 0"
                   class="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50 md:bottom-0 md:right-0"
                 >
-                  8
+                  {{ cart.getCartItems.length }}
                 </div>
               </NuxtLink>
             </li>
@@ -245,24 +267,6 @@
     </div>
   </nav>
 </template>
-
-<script lang="ts" setup>
-import { initFlowbite } from "flowbite";
-import { useSessionStore } from "~/store/session";
-
-const session = useSessionStore();
-
-const logout = () => {
-  session.logout();
-};
-
-let navbarOpen = ref(false);
-
-// initialize components based on data attribute selectors
-onMounted(() => {
-  initFlowbite();
-});
-</script>
 
 <style scoped>
 .router-link-active:not([href="/"]):not([href="/cart"]) {

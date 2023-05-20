@@ -9,6 +9,9 @@ export default class ProductModel {
   createdAt!: string;
   updatedAt!: string;
   isAvailable!: boolean;
+  constructor(product: ProductModel) {
+    Object.assign(this, product);
+  }
 }
 
 export class ProductDetails {
