@@ -6,17 +6,25 @@ import ProductModel from "~/utils/ProductModel";
 interface CatalogState {
   catalog: ProductModel[] | null;
   catalogMeta: any;
+  catalogLinks: any;
 }
 
 export const useCatalogStore = defineStore("catalog", {
   state: (): CatalogState => ({
     catalog: null,
     catalogMeta: null,
+    catalogLinks: null,
   }),
 
   getters: {
     getCatalogData(): ProductModel[] | null {
       return this.catalog;
+    },
+    getCatalogMeta(): any {
+      return this.catalogMeta;
+    },
+    getCatalogLinks(): any {
+      return this.catalogLinks;
     },
   },
 
@@ -55,10 +63,14 @@ export const useCatalogStore = defineStore("catalog", {
       if (response.ok) {
         this.setCatalog(responseObject.data);
         this.setCatalogMeta(responseObject.meta);
+        this.setCatalogLinks(responseObject.links);
       }
     },
     setCatalogMeta(catalogMeta: any) {
       this.catalogMeta = catalogMeta;
+    },
+    setCatalogLinks(catalogLinks: any) {
+      this.catalogLinks = catalogLinks;
     },
     setCatalog(catalog: ProductModel[] | null) {
       this.catalog = catalog;

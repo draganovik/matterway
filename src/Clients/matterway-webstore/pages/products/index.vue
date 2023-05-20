@@ -1,14 +1,21 @@
 <script lang="ts" setup>
 import { useCatalogStore } from "~/store/catalog";
 
+const route = useRoute();
 const catalogStore = useCatalogStore();
-
+watch(
+  () => route.query,
+  () => refresh(),
+);
+const refresh = () => {
+  catalogStore.fetchCatalog(
+    (route.query.page || 1) as number,
+    (route.query.pageSize || 3) as number,
+  );
+};
+refresh();
 useHead({
   title: "Proizvodi",
-});
-
-onMounted(() => {
-  catalogStore.fetchCatalog();
 });
 </script>
 
@@ -105,8 +112,14 @@ onMounted(() => {
       <nav aria-label="Catalog pagination">
         <ul class="inline-flex items-center -space-x-px">
           <li>
-            <a
-              href="#"
+            <NuxtLink
+              :to="{
+                path: '/products',
+                query: {
+                  page: 1,
+                  pageSize: catalogStore.getCatalogMeta?.pageSize || 3,
+                },
+              }"
               class="ml-0 block rounded-l-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <span class="sr-only">Previous</span>
@@ -123,47 +136,35 @@ onMounted(() => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-            </a>
+            </NuxtLink>
           </li>
-          <li>
-            <a
-              href="#"
+          <li
+            v-for="page in [
+              ...Array(catalogStore.getCatalogMeta?.totalPages || 1).keys(),
+            ]"
+          >
+            <NuxtLink
+              :to="{
+                path: '/products',
+                query: {
+                  page: page + 1,
+                  pageSize: catalogStore.getCatalogMeta?.pageSize || 3,
+                },
+              }"
+              :current-page="page + 1 == route.query.page ? true : false"
               class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
-              >1</a
+              >{{ page + 1 }}</NuxtLink
             >
           </li>
           <li>
-            <a
-              href="#"
-              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
-              >2</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              aria-current="page"
-              class="z-10 border border-blue-300 bg-blue-50 px-3 py-2 leading-tight text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-700 dark:text-white"
-              >3</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
-              >4</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
-              >5</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
+            <NuxtLink
+              :to="{
+                path: '/products',
+                query: {
+                  page: catalogStore.getCatalogMeta?.totalPages,
+                  pageSize: catalogStore.getCatalogMeta?.pageSize || 3,
+                },
+              }"
               class="block rounded-r-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <span class="sr-only">Next</span>
@@ -180,7 +181,7 @@ onMounted(() => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-            </a>
+            </NuxtLink>
           </li>
         </ul>
       </nav>
@@ -191,5 +192,8 @@ onMounted(() => {
 <style scoped>
 [aria-label="Catalog pagination"] ul li {
   display: flex;
+}
+a[current-page="true"] {
+  @apply bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-white;
 }
 </style>
