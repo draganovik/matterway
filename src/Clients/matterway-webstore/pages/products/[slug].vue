@@ -236,7 +236,7 @@ watch(product, () => {
                   <th
                     scope="col"
                     class="px-6 py-3"
-                    v-if="sessionStore.isLoggedIn"
+                    v-if="sessionStore.getTokenData?.role === 'Admin'"
                   >
                     Action
                   </th>
@@ -256,7 +256,7 @@ watch(product, () => {
                   <td class="px-6 py-4">
                     {{ detail?.value + (detail?.unit ? detail?.unit : "") }}
                   </td>
-                  <td class="px-6 py-4" v-if="sessionStore.isLoggedIn">
+                  <td class="px-6 py-4" v-if="sessionStore.getTokenData?.role === 'Admin'">
                     <a
                       href="#"
                       class="font-medium text-blue-600 hover:underline dark:text-blue-500"
