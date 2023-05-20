@@ -104,17 +104,26 @@ export const useCartStore = defineStore("cart", {
 
     async fetchCartItems(page: number = 1, pageSize: number = 10) {
       const config = useRuntimeConfig();
-
+      try {
       const response = await request(
         `${config.public.customers_api_base_url}/api/Customers/CartItems?page=${page}&pageSize=${pageSize}`,
         {
           method: "GET",
         },
       );
+      if(response.status === 204) {
+        this.cartItems = [];
+        return;
+      }
       if (response.ok) {
         let responseItems = await response.json();
         this.cartItems = responseItems.data;
+        return;
       }
+    } catch (error) {
+      this.cartItems = [];
+      return;
+    }
     },
   },
 });

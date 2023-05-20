@@ -5,6 +5,7 @@ import { Buffer } from "buffer";
 import LoginModel from "~/utils/LoginModel";
 import SessionModel from "~/utils/SessionModel";
 import JwtModel from "~/utils/JwtModel";
+import { useCartStore } from "./cart";
 
 interface SessionState {
   session: SessionModel | null;
@@ -18,6 +19,8 @@ export const useSessionStore = defineStore("session", {
 
   getters: {
     isLoggedIn(): boolean {
+      const cartStore = useCartStore();
+      cartStore.fetchCartItems();
       return this.session != null && !this.isSessionExpired;
     },
     isSessionExpired(): boolean {
@@ -69,7 +72,9 @@ export const useSessionStore = defineStore("session", {
         },
       );
       if (response.ok) {
+        const cartStore = useCartStore();
         this.setSession(null);
+        cartStore.fetchCartItems();
       }
     },
     async refreshToken() {
