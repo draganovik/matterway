@@ -39,9 +39,10 @@ public class ProductRepository : IProductRepository
         return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<int> GetTotalEntities()
+    public async Task<int> GetTotalEntities(ProductFilter productFilter)
     {
-        return await context.Product.CountAsync();
+        var productQuery = productFilter.GenerateQuery(context.Product.AsQueryable());
+        return await productQuery.CountAsync();
     }
 
     public async Task<ICollection<Product>> Query(int pageIndex, int pageSize, ProductFilter productFilter)

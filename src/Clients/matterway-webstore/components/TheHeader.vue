@@ -3,6 +3,8 @@ import { initFlowbite } from "flowbite";
 import { useCartStore } from "~/store/cart";
 import { useSessionStore } from "~/store/session";
 
+const router = useRouter();
+
 const cart = useCartStore();
 const session = useSessionStore();
 
@@ -10,7 +12,20 @@ const logout = () => {
   session.logout();
 };
 
-let navbarOpen = ref(false);
+const search = () => {
+  if (searchTerm.value == undefined || searchTerm.value == "") {
+    return;
+  }
+  router.push({
+    path: "/products",
+    query: {
+      productName: searchTerm.value,
+    },
+  });
+  searchTerm.value = undefined;
+};
+
+let searchTerm = ref(undefined);
 
 // initialize components based on data attribute selectors
 onMounted(() => {
@@ -80,6 +95,8 @@ onMounted(() => {
             <span class="sr-only">Search icon</span>
           </div>
           <input
+            v-model="searchTerm"
+            v-on:keyup.enter="search()"
             type="text"
             id="search-navbar"
             class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
@@ -132,6 +149,8 @@ onMounted(() => {
             </svg>
           </div>
           <input
+            v-model="searchTerm"
+            v-on:keyup.enter="search()"
             type="text"
             id="search-navbar-mini"
             class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"

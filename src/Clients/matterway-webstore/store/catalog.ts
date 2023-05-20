@@ -47,10 +47,26 @@ export const useCatalogStore = defineStore("catalog", {
       }
       return null;
     },
-    async fetchCatalog(page: number = 1, pageSize: number = 10) {
+    async fetchCatalog(
+      page: number = 1,
+      pageSize: number = 10,
+      titleLike: string = "",
+      priceMin: number = 0,
+      priceMax: number = 0,
+    ) {
+      let advancedQuery = "";
+      if (titleLike != "") {
+        advancedQuery = `&TitleLike=${titleLike}`;
+      }
+      if (priceMin > 0) {
+        advancedQuery = `${advancedQuery}&PriceMin=${priceMin}`;
+      }
+      if (priceMax > 0) {
+        advancedQuery = `${advancedQuery}&PriceMax=${priceMax}`;
+      }
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalog_api_base_url}/api/Products?page=${page}&pageSize=${pageSize}`,
+        `${config.public.catalog_api_base_url}/api/Products?page=${page}&pageSize=${pageSize}${advancedQuery}`,
         {
           method: "GET",
           headers: {
@@ -59,21 +75,31 @@ export const useCatalogStore = defineStore("catalog", {
           },
         },
       );
+
+      if (response.status == 204) {
+        this.setCatalog(null);
+        this.setCatalogMeta(null);
+        this.setCatalogLinks(null);
+        return;
+      }
+
       const responseObject = await response.json();
+
       if (response.ok) {
         this.setCatalog(responseObject.data);
         this.setCatalogMeta(responseObject.meta);
         this.setCatalogLinks(responseObject.links);
+        return;
       }
     },
     setCatalogMeta(catalogMeta: any) {
-      this.catalogMeta = catalogMeta;
+      this.catalogMeta = catalogMeta || [];
     },
     setCatalogLinks(catalogLinks: any) {
-      this.catalogLinks = catalogLinks;
+      this.catalogLinks = catalogLinks || [];
     },
     setCatalog(catalog: ProductModel[] | null) {
-      this.catalog = catalog;
+      this.catalog = catalog || [];
     },
   },
 });
