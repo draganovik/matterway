@@ -62,16 +62,10 @@ export const useSessionStore = defineStore("session", {
 
     async logout() {
       const config = useRuntimeConfig();
-      const response = await fetch(
+      const response = await request(
         `${config.public.auth_api_base_url}/api/Sessions/revoke`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "application/json",
-            Authorization: `${this.session?.tokenType} ${this.session?.token}`,
-          },
-          credentials: "include",
         },
       );
       if (response.ok) {
