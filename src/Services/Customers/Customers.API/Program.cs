@@ -112,6 +112,17 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+               .AllowAnyMethod()
+               .AllowAnyHeader().AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 
@@ -130,5 +141,7 @@ if (app.Environment.IsDevelopment())
 app.MapCustomerEndpoints();
 
 app.MapCartItemEndpoints();
+
+app.UseCors();
 
 app.Run();

@@ -73,7 +73,7 @@ public static class ProductEndpoints
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var total = await productRepository.GetTotalEntities();
+        var total = await productRepository.GetTotalEntities(productFilter);
         var entities = await productRepository.Query(page, pageSize, productFilter);
         var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
 

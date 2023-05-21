@@ -1,6 +1,9 @@
 version: '3.4'
 
 services:
+  webstore.web:
+    ports:
+      - "3001:3000"
   catalog.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

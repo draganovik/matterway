@@ -1,0 +1,25 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  app: {
+    head: {
+      titleTemplate: "%s - Matterway Web Store",
+    },
+  },
+  runtimeConfig: {
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    public: {
+      appDomain: process.env.APP_DOMAIN,
+      auth_api_base_url: process.env.AUTH_API_BASE_URI,
+      catalog_api_base_url: process.env.CATALOG_API_BASE_URI,
+      customers_api_base_url: process.env.CUSTOMERS_API_BASE_URI,
+    },
+  },
+  css: ["@/assets/css/main.css"],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  modules: ["@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
+});

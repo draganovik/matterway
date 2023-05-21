@@ -1,6 +1,17 @@
 version: '3.4'
 
 services:
+  webstore.web:
+    container_name: webstore_web
+    image: ${DOCKER_REGISTRY-}webstoreweb
+    environment:
+      NUXT_APP_VERSION: "1.0.0"
+    command: node /app/.output/server/index.mjs
+    tty: true
+    build:
+      context: src/Clients/matterway-webstore
+      dockerfile: /Dockerfile
+
   catalog.api:
     container_name: catalog_api
     image: ${DOCKER_REGISTRY-}catalogapi

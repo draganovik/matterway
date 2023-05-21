@@ -69,7 +69,7 @@ namespace Payments.API.Migrations
                             CardNumber = "1234-5678-1234-5678",
                             ExpirationDate = "12/26",
                             PaymentAmount = 39998.0,
-                            PaymentDate = new DateTime(2023, 4, 11, 17, 22, 27, 190, DateTimeKind.Local).AddTicks(5591),
+                            PaymentDate = new DateTime(2023, 5, 19, 19, 14, 46, 798, DateTimeKind.Local).AddTicks(9572),
                             PaymentState = 1,
                             ReferenceNumber = "5655-6666-7877",
                             SecurityCode = "1234"
@@ -81,7 +81,7 @@ namespace Payments.API.Migrations
                             CardNumber = "8856-5678-1234-3366",
                             ExpirationDate = "06/24",
                             PaymentAmount = 4999.0,
-                            PaymentDate = new DateTime(2023, 4, 11, 20, 22, 27, 190, DateTimeKind.Local).AddTicks(5600),
+                            PaymentDate = new DateTime(2023, 5, 19, 22, 14, 46, 798, DateTimeKind.Local).AddTicks(9582),
                             PaymentState = 1,
                             ReferenceNumber = "6666-8888-6588",
                             SecurityCode = "6658"

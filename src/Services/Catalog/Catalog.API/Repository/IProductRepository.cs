@@ -16,5 +16,5 @@ public interface IProductRepository
 
     Task<bool> Delete(Guid id);
 
-    Task<int> GetTotalEntities();
+    Task<int> GetTotalEntities(ProductFilter productFilter);
 }
