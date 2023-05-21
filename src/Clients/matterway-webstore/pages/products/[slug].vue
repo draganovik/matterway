@@ -191,7 +191,7 @@ watch(product, () => {
       </div>
       <div class="flex gap-4">
         <button
-        @click="userCartStore.addToCart(product)"
+          @click="userCartStore.addToCart(product)"
           type="button"
           class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
@@ -210,16 +210,20 @@ watch(product, () => {
           </svg>
           Dodaj u korpu
         </button>
-          <p v-if="userCartStore.isProductInCart(product.id)" class=" px-3 min-w-[3rem] text-xl font-semibold bg-slate-500/20 rounded grid place-items-center">{{ userCartStore.countProductsInCart(product.id) }}</p>
-          <button
+        <p
+          v-if="userCartStore.isProductInCart(product.id)"
+          class="grid min-w-[3rem] place-items-center rounded bg-slate-500/20 px-3 text-xl font-semibold"
+        >
+          {{ userCartStore.countProductsInCart(product.id) }}
+        </p>
+        <button
           type="button"
           v-if="userCartStore.isProductInCart(product.id)"
           @click="userCartStore.removeFromCart(product)"
-          class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+          class="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >
           Ukloni iz korpe
         </button>
-        
       </div>
 
       <div>
