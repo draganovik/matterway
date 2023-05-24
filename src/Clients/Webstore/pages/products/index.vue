@@ -124,7 +124,7 @@ watch(
         </button>
       </form>
     </aside>
-    <section class="grid w-full place-items-center gap-6">
+    <section class="w-full">
       <div
         v-if="catalogStore.catalog?.length == 0"
         class="grid w-full place-items-center gap-4 text-center text-slate-500"
@@ -157,7 +157,11 @@ watch(
         />
       </div>
 
-      <nav aria-label="Catalog pagination">
+      <nav
+        v-if="catalogStore.getCatalogMeta?.totalPages"
+        class="mt-8 grid place-items-center"
+        aria-label="Catalog pagination"
+      >
         <ul class="inline-flex items-center -space-x-px">
           <li>
             <button
