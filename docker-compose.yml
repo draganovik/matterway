@@ -9,7 +9,7 @@ services:
     command: node /app/.output/server/index.mjs
     tty: true
     build:
-      context: src/Clients/matterway-webstore
+      context: src/Clients/Webstore
       dockerfile: /Dockerfile
 
   catalog.api:
