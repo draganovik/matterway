@@ -47,6 +47,7 @@ export const useCatalogStore = defineStore("catalog", {
       }
       return null;
     },
+
     async fetchCatalog(
       page: number = 1,
       pageSize: number = 10,
@@ -92,6 +93,7 @@ export const useCatalogStore = defineStore("catalog", {
         return;
       }
     },
+
     setCatalogMeta(catalogMeta: any) {
       this.catalogMeta = catalogMeta || [];
     },
@@ -100,6 +102,25 @@ export const useCatalogStore = defineStore("catalog", {
     },
     setCatalog(catalog: ProductModel[] | null) {
       this.catalog = catalog || [];
+    },
+    async updateProduct(product: ProductModel) {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/Products/${product.id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(product),
+        },
+      );
+      console.log(response);
+      if (response.ok) {
+        if (this.catalog) {
+          const index = this.catalog.findIndex((p) => p.id == product.id);
+          if (index > -1) {
+            this.catalog[index] = product;
+          }
+        }
+      }
     },
   },
 });

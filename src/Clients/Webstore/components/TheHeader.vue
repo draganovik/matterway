@@ -162,21 +162,21 @@ onMounted(() => {
         >
           <li>
             <NuxtLink
-              href="/"
+              to="/"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
               >Naslovna</NuxtLink
             >
           </li>
           <li>
             <NuxtLink
-              href="/products"
+              to="/products"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
               >Proizvodi</NuxtLink
             >
           </li>
           <li v-if="!session.isLoggedIn">
             <NuxtLink
-              href="/login"
+              to="/login"
               class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
               >Prijava</NuxtLink
             >
@@ -218,17 +218,17 @@ onMounted(() => {
                   aria-labelledby="dropdownLargeButton"
                 >
                   <li>
-                    <a
-                      href="#"
+                    <NuxtLink
+                      to="#"
                       class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
-                      >Profil</a
+                      >Profil</NuxtLink
                     >
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <NuxtLink
+                      to="#"
                       class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
-                      >Istorija kupovine</a
+                      >Istorija kupovine</NuxtLink
                     >
                   </li>
                 </ul>
@@ -247,7 +247,7 @@ onMounted(() => {
             </li>
             <li>
               <NuxtLink
-                to="cart"
+                to="/cart"
                 data-collapse-toggle="navbar-search"
                 aria-controls="navbar-search"
                 aria-expanded="false"
