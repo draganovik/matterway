@@ -43,8 +43,8 @@ onMounted(() => {
     >
       <NuxtLink to="/" class="flex items-center">
         <img
-          src="https://flowbite.com/docs/images/logo.svg"
-          class="mr-3 h-8"
+          src="../assets/brand/logo.svg"
+          class="mr-3 h-9"
           alt="Matterway Logo"
         />
         <span
@@ -288,10 +288,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.router-link-active:not([href="/"]):not([href="/cart"]) {
+.router-link-exact-active:not([href="/"]):not([href="/cart"]) {
   @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
 }
-.router-link-active[href="/cart"] {
+.router-link-exact-active[href="/cart"] {
   @apply bg-blue-700 md:bg-transparent;
 }
 </style>
