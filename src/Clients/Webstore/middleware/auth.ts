@@ -23,7 +23,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return navigateTo(from.path);
   }
 
-  if (!sessionData.isLoggedIn && to.path != "/login") {
+  if (
+    !sessionData.isLoggedIn &&
+    to.path != "/login" &&
+    to.path != "/register"
+  ) {
     return navigateTo("/login");
   }
 });

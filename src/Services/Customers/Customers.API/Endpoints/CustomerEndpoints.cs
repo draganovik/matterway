@@ -205,6 +205,8 @@ public static class CustomerEndpoints
             return TypedResults.BadRequest(problemDetails);
         }
 
+        newEntity.Id = newEntity.SystemUserId;
+
         var createdCustomer = await customerRepository.Create(newEntity);
         if (createdCustomer is null)
         {

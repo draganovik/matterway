@@ -1,0 +1,51 @@
+import { useSessionStore } from "~/store/session";
+import LoginModel from "~/utils/LoginModel";
+
+export async function createUser(
+  firstName: string,
+  lastName: string,
+  birthDate: Date,
+  email: string,
+  password: string,
+): Promise<Response> {
+  const config = useRuntimeConfig();
+
+  const createUser = await fetch(
+    `${config.public.auth_api_base_url}/api/SystemUsers`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    },
+  );
+  if (createUser.ok) {
+    const user = await createUser.json();
+    const loginModel = new LoginModel();
+    loginModel.email = email;
+    loginModel.password = password;
+
+    const session = useSessionStore();
+    await session.login(loginModel);
+
+    const createCustomer = await request(
+      `${config.public.customers_api_base_url}/api/Customers`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          systemUserId: user.id,
+          firstName: firstName,
+          lastName: lastName,
+          birthDate: birthDate,
+        }),
+      },
+    );
+
+    return createCustomer;
+  }
+  return createUser;
+}
