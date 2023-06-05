@@ -20,6 +20,11 @@ const createProduct = async () => {
 useHead({
   title: "Proizvod",
 });
+
+definePageMeta({
+  middleware: ["auth"],
+  authOnlyRoles: ["Admin", "Manager"],
+});
 </script>
 
 <template>

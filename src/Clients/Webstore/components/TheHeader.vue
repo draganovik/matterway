@@ -10,6 +10,7 @@ const session = useSessionStore();
 
 const logout = () => {
   session.logout();
+  router.push("/");
 };
 
 const search = () => {

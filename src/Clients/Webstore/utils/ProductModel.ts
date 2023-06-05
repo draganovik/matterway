@@ -20,6 +20,7 @@ export class ProductDetails {
 }
 
 export class ProductImages {
+  id!: number;
   imageUrl!: string;
   imageAlt!: string;
   isMain!: boolean;

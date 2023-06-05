@@ -14,19 +14,25 @@ const inputSpecs = ref({
   value: "",
 });
 
+const inputImage = ref({
+  imageId: 0,
+  imageUrl: "",
+  imageAlt: "product image",
+});
+
 const addSpec = async () => {
   if (product.value == null) {
     return;
   }
-  const response = await catalogStore.uploadProductSpec(
+  const response = await catalogStore.createProductSpec(
     product.value.id,
     inputSpecs.value.title,
     inputSpecs.value.value,
   );
   if (response.ok) {
-    loadProduct();
     inputSpecs.value.title = "";
     inputSpecs.value.value = "";
+    loadProduct();
   }
 };
 
@@ -34,7 +40,7 @@ const removeSpec = async (detailId: string) => {
   if (product.value == null) {
     return;
   }
-  const response = await catalogStore.removeProductSpec(detailId);
+  const response = await catalogStore.deleteProductSpec(detailId);
   if (response.ok) {
     loadProduct();
   }
@@ -49,6 +55,37 @@ const updateSpec = async (detail: ProductDetails) => {
     product.value.id,
     detail.title,
     detail.value,
+  );
+  if (response.ok) {
+    loadProduct();
+  }
+};
+
+const addImage = async () => {
+  if (product.value == null) {
+    return;
+  }
+  const response = await catalogStore.createProductImage(
+    product.value.id,
+    inputImage.value.imageId,
+    inputImage.value.imageUrl,
+    inputImage.value.imageAlt,
+  );
+  if (response.ok) {
+    inputImage.value.imageId = 0;
+    inputImage.value.imageUrl = "";
+    inputImage.value.imageAlt = "";
+    loadProduct();
+  }
+};
+
+const deleteImage = async (imageId: number) => {
+  if (product.value == null) {
+    return;
+  }
+  const response = await catalogStore.deleteProductImage(
+    product.value.id,
+    imageId,
   );
   if (response.ok) {
     loadProduct();
@@ -72,7 +109,7 @@ const loadProduct = async () => {
   product.value = await catalogStore.fetchProductById(
     route.params.slug.toString(),
   );
-  initCarousels();
+  //initCarousels();
 };
 
 useHead({
@@ -82,6 +119,15 @@ useHead({
 onMounted(async () => {
   loadProduct();
 });
+watch(
+  () => product.value,
+  () => {
+    //wait for dom to update
+    setTimeout(() => {
+      initCarousels();
+    }, 1000);
+  },
+);
 </script>
 
 <template>
@@ -137,16 +183,17 @@ onMounted(async () => {
     class="flex flex-col gap-8 md:grid md:grid-cols-5"
   >
     <div
-      id="indicators-carousel"
+      id="default-carousel"
       class="relative col-span-2 aspect-video w-full md:aspect-[4/3]"
       data-carousel="static"
     >
       <!-- Carousel wrapper -->
       <div class="relative h-full w-full overflow-hidden rounded-lg">
         <div
-          v-for="image in product?.productImages"
-          class="duration-700 ease-in-out"
-          data-carousel-item="active"
+          data-carousel-item="true"
+          :key="index"
+          v-for="(image, index) in product?.productImages"
+          class="hidden h-full w-full duration-700 ease-in-out"
         >
           <img
             :src="image.imageUrl"
@@ -157,14 +204,14 @@ onMounted(async () => {
       </div>
       <!-- Slider indicators -->
       <div
-        class="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 space-x-3"
+        class="indicators absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 space-x-3"
       >
         <button
           v-for="(_, index) in product?.productImages"
           type="button"
-          class="h-3 w-3 rounded-full"
-          :aria-current="index == 0 ? true : false"
-          :aria-label="'Slide' + index"
+          class="pill h-3 w-3 rounded-full"
+          :aria-current="index == 0 ? 'true' : 'false'"
+          :aria-label="'Slide' + index.toString()"
           :data-carousel-slide-to="index"
         ></button>
       </div>
@@ -232,6 +279,9 @@ onMounted(async () => {
             v-for="image in product.productImages"
             class="bg-white dark:bg-gray-800"
           >
+            <th>
+              <div class="grid place-items-center">{{ image.id }}</div>
+            </th>
             <th
               scope="row"
               class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
@@ -246,6 +296,7 @@ onMounted(async () => {
             </th>
             <td class="px-6 py-4 text-right">
               <button
+                @click="deleteImage(image.id)"
                 type="button"
                 class="font-medium text-red-600 hover:underline dark:text-red-500"
               >
@@ -258,18 +309,29 @@ onMounted(async () => {
           <tr
             class="bg-slate-50 text-xs font-semibold uppercase text-slate-700 dark:bg-slate-700 dark:text-slate-400"
           >
-            <td colspan="3">
-              <div
-                class="grid grid-flow-col-dense place-items-center gap-2 p-2"
-              >
-                <input
-                  placeholder="Add image url..."
-                  type="text"
-                  id="small-input"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
-                />
+            <td class="w-min">
+              <input
+                placeholder="ID"
+                type="number"
+                v-model="inputImage.imageId"
+                id="small-input"
+                class="m-1 w-16 rounded-lg border border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
+              />
+            </td>
+            <td class="w-full">
+              <input
+                placeholder="Add image url..."
+                type="text"
+                v-model="inputImage.imageUrl"
+                id="small-input"
+                class="m-1 block w-full rounded-lg border border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
+              />
+            </td>
+            <td>
+              <div class="flex w-max p-2">
                 <button
                   type="button"
+                  @click="addImage()"
                   class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
                 >
                   Dodaj sliku
@@ -463,6 +525,7 @@ onMounted(async () => {
       </button>
       <div class="flex gap-4">
         <button
+          @click="router.push('/products')"
           type="button"
           class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
         >
