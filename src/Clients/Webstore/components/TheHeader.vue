@@ -31,7 +31,7 @@ let searchTerm = ref(undefined);
 // initialize components based on data attribute selectors
 onMounted(() => {
   initFlowbite();
-  if(session.isLoggedIn) {
+  if (session.isLoggedIn) {
     cart.fetchCartItems();
   }
 });

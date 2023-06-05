@@ -9,7 +9,7 @@ const registerModel = ref({
   confirmPassword: "",
 });
 
-const submitFormRegister = async() => {
+const submitFormRegister = async () => {
   if (registerModel.value.password !== registerModel.value.confirmPassword) {
     alert("Lozinke se ne poklapaju");
     return;
@@ -21,7 +21,7 @@ const submitFormRegister = async() => {
     registerModel.value.email,
     registerModel.value.password,
   );
-  if(response.ok) {
+  if (response.ok) {
     router.push("/");
   }
   console.log(registerModel);
