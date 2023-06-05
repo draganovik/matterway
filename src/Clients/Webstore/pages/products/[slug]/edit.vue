@@ -2,13 +2,58 @@
 import { useCatalogStore } from "~/store/catalog";
 import { initCarousels } from "flowbite";
 import ProductModel from "~/utils/ProductModel";
-import { useSessionStore } from "~/store/session";
+import { ProductDetails } from "~/utils/ProductModel";
 
 const catalogStore = useCatalogStore();
-const sessionStore = useSessionStore();
 const route = useRoute();
 const router = useRouter();
 let product: Ref<ProductModel> | Ref<null> = ref(null);
+
+const inputSpecs = ref({
+  title: "",
+  value: "",
+});
+
+const addSpec = async () => {
+  if (product.value == null) {
+    return;
+  }
+  const response = await catalogStore.uploadProductSpec(
+    product.value.id,
+    inputSpecs.value.title,
+    inputSpecs.value.value,
+  );
+  if (response.ok) {
+    loadProduct();
+    inputSpecs.value.title = "";
+    inputSpecs.value.value = "";
+  }
+};
+
+const removeSpec = async (detailId: string) => {
+  if (product.value == null) {
+    return;
+  }
+  const response = await catalogStore.removeProductSpec(detailId);
+  if (response.ok) {
+    loadProduct();
+  }
+};
+
+const updateSpec = async (detail: ProductDetails) => {
+  if (product.value == null) {
+    return;
+  }
+  const response = await catalogStore.updateProductSpec(
+    detail.id,
+    product.value.id,
+    detail.title,
+    detail.value,
+  );
+  if (response.ok) {
+    loadProduct();
+  }
+};
 
 const deleteProduct = async () => {
   if (product.value == null) {
@@ -23,17 +68,19 @@ const deleteProduct = async () => {
   }
 };
 
-useHead({
-  title: "Proizvod",
-});
-onMounted(async () => {
+const loadProduct = async () => {
   product.value = await catalogStore.fetchProductById(
     route.params.slug.toString(),
   );
-  console.log(product.value);
-});
-watch(product, () => {
   initCarousels();
+};
+
+useHead({
+  title: "Proizvod",
+});
+
+onMounted(async () => {
+  loadProduct();
 });
 </script>
 
@@ -311,13 +358,7 @@ watch(product, () => {
                 <tr>
                   <th scope="col" class="px-6 py-3">Naziv</th>
                   <th scope="col" class="px-6 py-3">Vrednost</th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3"
-                    v-if="sessionStore.getTokenData?.role === 'Admin'"
-                  >
-                    Action
-                  </th>
+                  <th scope="col" class="px-6 py-3">Operacije</th>
                 </tr>
               </thead>
               <tbody>
@@ -345,16 +386,23 @@ watch(product, () => {
                       placeholder="Vrednost opisa proizvoda"
                     ></textarea>
                   </td>
-                  <td
-                    class="px-6 py-4"
-                    v-if="sessionStore.getTokenData?.role === 'Admin'"
-                  >
-                    <button
-                      type="button"
-                      class="w-full font-medium text-red-600 hover:underline dark:text-red-500"
-                    >
-                      Ukloni
-                    </button>
+                  <td class="px-6 py-4">
+                    <div class="flex gap-4">
+                      <button
+                        @click="updateSpec(detail)"
+                        type="button"
+                        class="w-full font-medium text-green-600 hover:underline dark:text-green-500"
+                      >
+                        Sačuvaj
+                      </button>
+                      <button
+                        @click="removeSpec(detail.id)"
+                        type="button"
+                        class="w-full font-medium text-red-600 hover:underline dark:text-red-500"
+                      >
+                        Ukloni
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -371,6 +419,7 @@ watch(product, () => {
                       id="small-input"
                       class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
                       placeholder="Naziv opisa proizvoda"
+                      v-model="inputSpecs.title"
                     />
                   </th>
                   <td class="px-6 py-4">
@@ -379,11 +428,13 @@ watch(product, () => {
                       rows="4"
                       class="block w-full resize-none rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                       placeholder="Vrednost opisa proizvoda"
+                      v-model="inputSpecs.value"
                     ></textarea>
                   </td>
                   <td class="px-6 py-4">
                     <button
                       type="button"
+                      @click="addSpec()"
                       class="w-full rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
                     >
                       Dodaj opis

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { useCartStore } from "~/store/cart";
+import { useSessionStore } from "~/store/session";
+
+const session = useSessionStore();
 
 const userCartStore = useCartStore();
 defineProps({
@@ -109,7 +112,13 @@ defineProps({
           class="text-right text-3xl font-bold text-slate-900 dark:text-white"
           >{{ formatMoney(product.price) }}</span
         >
-        <div class="grid w-full grid-cols-5 gap-4">
+        <div
+          class="grid w-full grid-cols-5 gap-4"
+          v-if="
+            session.getTokenData?.role != 'Admin' &&
+            session.getTokenData?.role != 'Manager'
+          "
+        >
           <p
             v-if="userCartStore.isProductInCart(product.id)"
             class="grid place-items-center rounded bg-slate-500/20 text-xl font-semibold"

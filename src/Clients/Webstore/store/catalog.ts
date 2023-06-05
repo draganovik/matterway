@@ -164,5 +164,59 @@ export const useCatalogStore = defineStore("catalog", {
       }
       return response;
     },
+    async uploadProductSpec(
+      productId: string,
+      title: string,
+      value: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            productId: productId,
+            type: "Specification",
+            title: title,
+            value: value,
+          }),
+        },
+      );
+      console.log(response);
+      return response;
+    },
+    async removeProductSpec(specId: string): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails/${specId}`,
+        {
+          method: "DELETE",
+        },
+      );
+      console.log(response);
+      return response;
+    },
+    async updateProductSpec(
+      specId: string,
+      productId: string,
+      title: string,
+      value: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails/${specId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            productId: productId,
+            type: "Specification",
+            title: title,
+            value: value,
+          }),
+        },
+      );
+      console.log(response);
+      return response;
+    },
   },
 });

@@ -219,14 +219,14 @@ onMounted(() => {
                 >
                   <li>
                     <NuxtLink
-                      to="#"
+                      to="/profile"
                       class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
                       >Profil</NuxtLink
                     >
                   </li>
                   <li>
                     <NuxtLink
-                      to="#"
+                      to="/orders"
                       class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
                       >Istorija kupovine</NuxtLink
                     >
@@ -247,6 +247,10 @@ onMounted(() => {
             </li>
             <li>
               <NuxtLink
+                v-if="
+                  session.getTokenData?.role != 'Admin' &&
+                  session.getTokenData?.role != 'Manager'
+                "
                 to="/cart"
                 data-collapse-toggle="navbar-search"
                 aria-controls="navbar-search"

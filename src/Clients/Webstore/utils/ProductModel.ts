@@ -12,6 +12,7 @@ export default class ProductModel {
 }
 
 export class ProductDetails {
+  id!: string;
   type!: string;
   title!: string;
   value!: string;

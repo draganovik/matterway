@@ -290,13 +290,6 @@ watch(product, () => {
                 <tr>
                   <th scope="col" class="px-6 py-3">Naziv</th>
                   <th scope="col" class="px-6 py-3">Vrednost</th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3"
-                    v-if="sessionStore.getTokenData?.role === 'Admin'"
-                  >
-                    Action
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -312,16 +305,6 @@ watch(product, () => {
                   </th>
                   <td class="px-6 py-4">
                     {{ detail?.value + (detail?.unit ? detail?.unit : "") }}
-                  </td>
-                  <td
-                    class="px-6 py-4"
-                    v-if="sessionStore.getTokenData?.role === 'Admin'"
-                  >
-                    <a
-                      href="#"
-                      class="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                      >Edit</a
-                    >
                   </td>
                 </tr>
               </tbody>
