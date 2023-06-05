@@ -31,13 +31,13 @@ defineProps({
       />
     </NuxtLink>
     <div class="flex w-full flex-col justify-between gap-8 p-5 pt-3">
-      <a href="#">
+      <NuxtLink :to="'/products/' + product.id">
         <h5
           class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white"
         >
           {{ product.title }}
         </h5>
-      </a>
+      </NuxtLink>
       <div class="mb-5 mt-2.5 flex items-center" v-if="false">
         <svg
           aria-hidden="true"

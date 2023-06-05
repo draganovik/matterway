@@ -1,181 +1,29 @@
 <script lang="ts" setup>
 import { useCatalogStore } from "~/store/catalog";
-import { initCarousels } from "flowbite";
 import ProductModel from "~/utils/ProductModel";
 import { useSessionStore } from "~/store/session";
 
 const catalogStore = useCatalogStore();
 const sessionStore = useSessionStore();
-const route = useRoute();
 const router = useRouter();
-let product: Ref<ProductModel> | Ref<null> = ref(null);
+let product: Ref<ProductModel> = ref(new ProductModel());
 
-const deleteProduct = async () => {
-  if (product.value == null) {
-    return;
-  }
-  if (!confirm("Da li ste sigurni da želite da obrišete proizvod?")) {
-    return;
-  }
-  const response = await catalogStore.deleteProduct(product.value);
-  if (response.ok) {
-    router.push("/products");
+const createProduct = async () => {
+  const response = await catalogStore.createProduct(product.value);
+  if (response) {
+    const data = await response.json();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    router.push({ name: `products/${data.id}` });
   }
 };
 
 useHead({
   title: "Proizvod",
 });
-onMounted(async () => {
-  product.value = await catalogStore.fetchProductById(
-    route.params.slug.toString(),
-  );
-  console.log(product.value);
-});
-watch(product, () => {
-  initCarousels();
-});
 </script>
 
 <template>
-  <section
-    v-if="product == null"
-    role="status"
-    class="flex animate-pulse flex-col gap-8 md:grid md:grid-cols-5"
-  >
-    <div
-      class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded bg-slate-300 dark:bg-slate-700 md:aspect-[4/3]"
-    >
-      <svg
-        class="h-12 w-12 text-slate-200"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 640 512"
-      >
-        <path
-          d="M480 80C480 35.82 515.8 0 560 0C604.2 0 640 35.82 640 80C640 124.2 604.2 160 560 160C515.8 160 480 124.2 480 80zM0 456.1C0 445.6 2.964 435.3 8.551 426.4L225.3 81.01C231.9 70.42 243.5 64 256 64C268.5 64 280.1 70.42 286.8 81.01L412.7 281.7L460.9 202.7C464.1 196.1 472.2 192 480 192C487.8 192 495 196.1 499.1 202.7L631.1 419.1C636.9 428.6 640 439.7 640 450.9C640 484.6 612.6 512 578.9 512H55.91C25.03 512 .0006 486.1 .0006 456.1L0 456.1z"
-        />
-      </svg>
-    </div>
-    <div class="col-span-3 flex w-full flex-col md:grid-cols-5">
-      <div
-        class="mt-4 h-3 w-full rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <div
-        class="mt-2.5 h-3 w-full rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <br />
-      <div
-        class="mt-2.5 h-2.5 max-w-[480px] rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <div
-        class="mt-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <div
-        class="mt-2.5 h-2.5 max-w-[440px] rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <div
-        class="mt-2.5 h-2.5 max-w-[460px] rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-      <div
-        class="mt-2.5 h-2.5 max-w-[360px] rounded-full bg-slate-200 dark:bg-slate-700"
-      ></div>
-    </div>
-    <span class="sr-only">Loading...</span>
-  </section>
-
-  <section
-    v-if="product != null"
-    class="flex flex-col gap-8 md:grid md:grid-cols-5"
-  >
-    <div
-      id="indicators-carousel"
-      class="relative col-span-2 aspect-video w-full md:aspect-[4/3]"
-      data-carousel="static"
-    >
-      <!-- Carousel wrapper -->
-      <div class="relative h-full w-full overflow-hidden rounded-lg">
-        <div
-          v-for="image in product?.productImages"
-          class="duration-700 ease-in-out"
-          data-carousel-item="active"
-        >
-          <img
-            :src="image.imageUrl"
-            class="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 object-cover"
-            :alt="image.imageAlt"
-          />
-        </div>
-      </div>
-      <!-- Slider indicators -->
-      <div
-        class="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 space-x-3"
-      >
-        <button
-          v-for="(_, index) in product?.productImages"
-          type="button"
-          class="h-3 w-3 rounded-full"
-          :aria-current="index == 0 ? true : false"
-          :aria-label="'Slide' + index"
-          :data-carousel-slide-to="index"
-        ></button>
-      </div>
-      <!-- Slider controls -->
-      <button
-        type="button"
-        class="group absolute left-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-        data-carousel-prev
-      >
-        <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
-        >
-          <svg
-            aria-hidden="true"
-            class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            ></path>
-          </svg>
-          <span class="sr-only">Previous</span>
-        </span>
-      </button>
-      <button
-        type="button"
-        class="group absolute right-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-        data-carousel-next
-      >
-        <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
-        >
-          <svg
-            aria-hidden="true"
-            class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            ></path>
-          </svg>
-          <span class="sr-only">Next</span>
-        </span>
-      </button>
-    </div>
-
+  <section class="flex flex-col gap-8 md:grid md:grid-cols-5">
     <div class="col-span-2 col-start-1 overflow-x-auto">
       <table
         class="w-full overflow-hidden rounded text-left text-sm text-gray-500 dark:text-gray-400"
@@ -403,13 +251,6 @@ watch(product, () => {
     class="sticky bottom-4 mt-8 h-min w-full rounded-lg border border-slate-200/90 bg-white p-4 backdrop-blur-md backdrop-filter dark:border-slate-700 dark:bg-slate-800/90"
   >
     <div class="flex justify-between gap-4">
-      <button
-        @click="deleteProduct()"
-        type="button"
-        class="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-      >
-        Izbriši proizvod
-      </button>
       <div class="flex gap-4">
         <button
           type="button"
@@ -418,11 +259,11 @@ watch(product, () => {
           Otkaži izmene
         </button>
         <button
-          @click="catalogStore.updateProduct(product)"
+          @click="createProduct()"
           type="button"
           class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Sačuvaj izmene
+          Sačuvaj proizvod
         </button>
       </div>
     </div>

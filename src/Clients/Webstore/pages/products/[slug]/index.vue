@@ -9,7 +9,21 @@ const catalogStore = useCatalogStore();
 const sessionStore = useSessionStore();
 const userCartStore = useCartStore();
 const route = useRoute();
+const router = useRouter();
 let product: Ref<ProductModel> | Ref<null> = ref(null);
+
+const deleteProduct = async () => {
+  if (product.value == null) {
+    return;
+  }
+  if (!confirm("Da li ste sigurni da želite da obrišete proizvod?")) {
+    return;
+  }
+  const response = await catalogStore.deleteProduct(product.value);
+  if (response.ok) {
+    router.push("/products");
+  }
+};
 
 useHead({
   title: "Proizvod",
@@ -189,7 +203,13 @@ watch(product, () => {
           {{ formatMoney(product?.price || 0) }}
         </p>
       </div>
-      <div class="flex gap-4">
+      <div
+        class="flex gap-4"
+        v-if="
+          sessionStore.getTokenData?.role != 'Admin' &&
+          sessionStore.getTokenData?.role != 'Manager'
+        "
+      >
         <button
           @click="userCartStore.addToCart(product)"
           type="button"
@@ -223,6 +243,26 @@ watch(product, () => {
           class="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
         >
           Ukloni iz korpe
+        </button>
+      </div>
+      <div
+        class="flex gap-4"
+        v-if="
+          sessionStore.getTokenData?.role == 'Admin' ||
+          sessionStore.getTokenData?.role == 'Manager'
+        "
+      >
+        <NuxtLink
+          :to="route.path + '/edit'"
+          class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >Izmeni proizvod</NuxtLink
+        >
+        <button
+          type="button"
+          @click="deleteProduct()"
+          class="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+        >
+          Obriši proivod
         </button>
       </div>
 
