@@ -9,12 +9,10 @@ export default class ProductModel {
   createdAt!: string;
   updatedAt!: string;
   isAvailable!: boolean;
-  constructor(product: ProductModel) {
-    Object.assign(this, product);
-  }
 }
 
 export class ProductDetails {
+  id!: string;
   type!: string;
   title!: string;
   value!: string;
@@ -22,6 +20,7 @@ export class ProductDetails {
 }
 
 export class ProductImages {
+  id!: number;
   imageUrl!: string;
   imageAlt!: string;
   isMain!: boolean;

@@ -159,8 +159,20 @@ public static class CartItemEndpoints
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
         }
-
-        newEntity = await cartItemRepository.Put(newEntity);
+        try
+        {
+            newEntity = await cartItemRepository.Put(newEntity);
+        }
+        catch (Exception ex)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = ex.Message
+            };
+            return TypedResults.BadRequest<ProblemDetails>(problemDetails);
+        }
         return newEntity is not null ? TypedResults.Ok(mapper.Map<CartItemBaseResponseModel>(newEntity)) : TypedResults.NotFound();
     }
 
@@ -178,7 +190,7 @@ public static class CartItemEndpoints
             return TypedResults.Forbid();
         }
 
-        if(userRole != SystemUserRole.Admin)
+        if (userRole != SystemUserRole.Admin)
         {
             if (id != systemUserId)
             {

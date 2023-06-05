@@ -92,6 +92,7 @@ export const useCatalogStore = defineStore("catalog", {
         return;
       }
     },
+
     setCatalogMeta(catalogMeta: any) {
       this.catalogMeta = catalogMeta || [];
     },
@@ -100,6 +101,161 @@ export const useCatalogStore = defineStore("catalog", {
     },
     setCatalog(catalog: ProductModel[] | null) {
       this.catalog = catalog || [];
+    },
+
+    async updateProduct(product: ProductModel): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/Products/${product.id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(product),
+        },
+      );
+      console.log(response);
+      if (response.ok) {
+        if (this.catalog) {
+          const index = this.catalog.findIndex((p) => p.id == product.id);
+          if (index > -1) {
+            this.catalog[index] = product;
+          }
+        }
+      }
+      return response;
+    },
+    async deleteProduct(product: ProductModel): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/Products/${product.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+      console.log(response);
+      if (response.ok) {
+        if (this.catalog) {
+          const index = this.catalog.findIndex((p) => p.id == product.id);
+          if (index > -1) {
+            this.catalog.splice(index, 1);
+          }
+        }
+      }
+      return response;
+    },
+    async createProduct(product: ProductModel): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/Products`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            productCode: product.productCode,
+            title: product.title,
+            price: product.price,
+            description: product.description,
+            isAvailable: product.isAvailable,
+          }),
+        },
+      );
+      console.log(response);
+      if (response.ok) {
+        if (this.catalog) {
+          this.catalog.push(product);
+        }
+      }
+      return response;
+    },
+
+    async createProductSpec(
+      productId: string,
+      title: string,
+      value: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            productId: productId,
+            type: "Specification",
+            title: title,
+            value: value,
+          }),
+        },
+      );
+      console.log(response);
+      return response;
+    },
+    async deleteProductSpec(specId: string): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails/${specId}`,
+        {
+          method: "DELETE",
+        },
+      );
+      console.log(response);
+      return response;
+    },
+    async updateProductSpec(
+      specId: string,
+      productId: string,
+      title: string,
+      value: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductDetails/${specId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            productId: productId,
+            type: "Specification",
+            title: title,
+            value: value,
+          }),
+        },
+      );
+      console.log(response);
+      return response;
+    },
+
+    async createProductImage(
+      productId: string,
+      imageId: number,
+      imageUrl: string,
+      imageAlt: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductImages`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            id: imageId,
+            productId: productId,
+            imageUrl: imageUrl,
+            imageAlt: imageAlt,
+          }),
+        },
+      );
+      console.log(response);
+      return response;
+    },
+    async deleteProductImage(
+      productId: string,
+      imageId: number,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const response = await request(
+        `${config.public.catalog_api_base_url}/api/ProductImages/${productId}/${imageId}`,
+        {
+          method: "DELETE",
+        },
+      );
+      console.log(response);
+      return response;
     },
   },
 });
