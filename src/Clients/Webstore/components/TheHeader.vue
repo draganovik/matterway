@@ -230,6 +230,9 @@ onMounted(() => {
                   <li>
                     <NuxtLink
                       to="/orders"
+                      v-if="session.getSessionData"
+                      aria-controls="navbar-search"
+                      aria-expanded="true"
                       class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
                       >Istorija kupovine</NuxtLink
                     >

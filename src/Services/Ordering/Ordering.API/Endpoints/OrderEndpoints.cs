@@ -51,8 +51,8 @@ public static class OrderEndpoints
     }
 
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<PaginationResponse<OrderBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryOrders([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IOrderRepository orderRepository, IMapper mapper)
+    [Authorize]
+    public static async Task<Results<Ok<PaginationResponse<OrderBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>, ForbidHttpResult>> QueryOrders([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IOrderRepository orderRepository, IMapper mapper)
     {
         if (page < 1 || pageSize < 1)
         {
@@ -75,8 +75,30 @@ public static class OrderEndpoints
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
         }
-        var total = await orderRepository.GetTotalEntities();
-        var entities = await orderRepository.Query(page, pageSize);
+
+        var identity = httpContext.User.Identity as ClaimsIdentity;
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
+        {
+            return TypedResults.Forbid();
+        }
+
+        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
+        {
+            return TypedResults.Forbid();
+        }
+        int total;
+        IEnumerable<Order>? entities;
+        if (userRole == SystemUserRole.Customer)
+        {
+            total = await orderRepository.GetTotalEntities(systemUserId);
+            entities = await orderRepository.QueryByCustomerId(systemUserId, page, pageSize);
+        }
+        else
+        {
+            total = await orderRepository.GetTotalEntities();
+            entities = await orderRepository.Query(page, pageSize);
+        }
+
         var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Orders");
         var paginationResponse = new PaginationResponse<OrderBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<OrderBaseResponseModel>>(entities).ToList(), baseUri);
 
