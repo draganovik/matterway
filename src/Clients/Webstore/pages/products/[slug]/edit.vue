@@ -74,7 +74,6 @@ const addImage = async () => {
   if (response.ok) {
     inputImage.value.imageId = 0;
     inputImage.value.imageUrl = "";
-    inputImage.value.imageAlt = "";
     loadProduct();
   }
 };

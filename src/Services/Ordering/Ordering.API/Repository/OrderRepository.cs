@@ -56,6 +56,15 @@ public class OrderRepository : IOrderRepository
             .ToListAsync();
     }
 
+    public Task<IEnumerable<Order>?> QueryByCustomerId(Guid systemUserId, int page, int pageSize)
+    {
+        return Task.FromResult<IEnumerable<Order>?>(context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).AsNoTracking()
+            .Where(model => model.CustomerId == systemUserId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList());
+    }
+
     public async Task<Order?> Update(Guid id, OrderUpdateRequestModel requestModel)
     {
         var currentOrderModel = await context.Order.Include(o => o.OrderHistory).Include(o => o.OrderItems).Include(o => o.Address).FirstOrDefaultAsync(o => o.Id == id);

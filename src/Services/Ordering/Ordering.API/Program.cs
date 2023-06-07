@@ -118,6 +118,17 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+               .AllowAnyMethod()
+               .AllowAnyHeader().AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 
@@ -140,5 +151,7 @@ app.MapOrderHistoryEndpoints();
 app.MapOrderEndpoints();
 
 app.MapOrderItemEndpoints();
+
+app.UseCors();
 
 app.Run();

@@ -12,6 +12,7 @@ export default defineNuxtConfig({
       auth_api_base_url: process.env.AUTH_API_BASE_URI,
       catalog_api_base_url: process.env.CATALOG_API_BASE_URI,
       customers_api_base_url: process.env.CUSTOMERS_API_BASE_URI,
+      ordering_api_base_url: process.env.ORDERING_API_BASE_URI,
     },
   },
   css: ["@/assets/css/main.css"],

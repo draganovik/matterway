@@ -92,6 +92,23 @@ namespace Ordering.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.Sql(@"
+                CREATE TRIGGER CreateOrderHistoryTrigger ON [Order]
+                AFTER INSERT
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    DECLARE @InsertedOrderIds TABLE (Id UNIQUEIDENTIFIER);
+                    INSERT INTO @InsertedOrderIds
+                    SELECT Id FROM Inserted;
+
+                    INSERT INTO OrderHistory (Id, OrderId, OrderStatus, Description, CreatedDate)
+                    SELECT  newid(), Id, 0, 'Order is created', GETDATE()
+                    FROM @InsertedOrderIds;
+                END
+            ");
+
             migrationBuilder.InsertData(
                 table: "Address",
                 columns: new[] { "Id", "City", "Country", "Note", "ReceiverName", "Residence", "Street", "ZipCode" },

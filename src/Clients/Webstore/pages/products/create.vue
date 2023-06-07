@@ -13,7 +13,7 @@ const createProduct = async () => {
   if (response) {
     const data = await response.json();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push({ name: `products/${data.id}` });
+    router.push(`${data.id}/edit`);
   }
 };
 

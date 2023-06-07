@@ -17,4 +17,5 @@ public interface IOrderRepository
     Task<int> GetTotalEntities(Guid systemUserId);
 
     Task<int> GetTotalEntities();
+    Task<IEnumerable<Order>?> QueryByCustomerId(Guid systemUserId, int page, int pageSize);
 }

@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { initTabs } from "flowbite";
 import { useSessionStore } from "~/store/session";
+import { useCatalogStore } from "~/store/catalog";
+
+const catalogStore = useCatalogStore();
 
 const sessionStore = useSessionStore();
 
@@ -12,6 +15,7 @@ useHead({
 onMounted(() => {
   initTabs();
   console.log(sessionStore.getSessionData);
+  catalogStore.fetchCatalog(1, 3, "", 0, 0);
 });
 </script>
 
@@ -86,90 +90,11 @@ onMounted(() => {
       aria-labelledby="profile-tab"
     >
       <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-4.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-5.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-6.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-7.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-8.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-9.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-10.jpg"
-            alt=""
-          />
-        </div>
-        <div>
-          <img
-            class="h-auto max-w-full rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-11.jpg"
-            alt=""
-          />
-        </div>
+        <ProductCard
+          v-for="product in catalogStore.catalog"
+          :key="product.id"
+          :product="product"
+        />
       </div>
     </section>
     <div
@@ -181,7 +106,7 @@ onMounted(() => {
       <p class="text-sm text-slate-500 dark:text-slate-400">
         This is some placeholder content the
         <strong class="font-medium text-slate-800 dark:text-white"
-          >Dashboard tab's associated content</strong
+          >Akcijska ponuda tab's associated content</strong
         >. Clicking another tab will toggle the visibility of this one for the
         next. The tab JavaScript swaps classes to control the content visibility
         and styling.
@@ -196,7 +121,7 @@ onMounted(() => {
       <p class="text-sm text-slate-500 dark:text-slate-400">
         This is some placeholder content the
         <strong class="font-medium text-slate-800 dark:text-white"
-          >Settings tab's associated content</strong
+          >Rasveta tab's associated content</strong
         >. Clicking another tab will toggle the visibility of this one for the
         next. The tab JavaScript swaps classes to control the content visibility
         and styling.
@@ -211,7 +136,7 @@ onMounted(() => {
       <p class="text-sm text-slate-500 dark:text-slate-400">
         This is some placeholder content the
         <strong class="font-medium text-slate-800 dark:text-white"
-          >Contacts tab's associated content</strong
+          >Automatizacija tab's associated content</strong
         >. Clicking another tab will toggle the visibility of this one for the
         next. The tab JavaScript swaps classes to control the content visibility
         and styling.
