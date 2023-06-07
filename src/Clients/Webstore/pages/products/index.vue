@@ -6,10 +6,11 @@ const route = useRoute();
 const router = useRouter();
 const catalogStore = useCatalogStore();
 const session = useSessionStore();
+const pageSize = 6;
 
 const queryParams = ref({
   page: route.query.page || 1,
-  pageSize: route.query.pageSize || 3,
+  pageSize: route.query.pageSize || pageSize,
   productName: route.query.productName || undefined,
   minPrice: route.query.minPrice || undefined,
   maxPrice: route.query.maxPrice || undefined,
@@ -21,7 +22,7 @@ const pageLoad = () => {
   queryParams.value.maxPrice = route.query.maxPrice || undefined;
   catalogStore.fetchCatalog(
     (route.query.page || 1) as number,
-    (route.query.pageSize || 3) as number,
+    (route.query.pageSize || pageSize) as number,
     (route.query.productName || "") as string,
     (route.query.minPrice || 0) as number,
     (route.query.maxPrice || 0) as number,
@@ -33,7 +34,7 @@ const paginate = (page: number = 1) => {
   router.push({
     query: {
       page: queryParams.value.page || 1,
-      pageSize: queryParams.value.pageSize || 3,
+      pageSize: queryParams.value.pageSize || pageSize,
       productName: queryParams.value.productName || undefined,
       minPrice: queryParams.value.minPrice || undefined,
       maxPrice: queryParams.value.maxPrice || undefined,
@@ -45,7 +46,7 @@ const search = () => {
   router.push({
     query: {
       page: 1,
-      pageSize: 3,
+      pageSize: pageSize,
       productName: queryParams.value.productName || undefined,
       minPrice: queryParams.value.minPrice || undefined,
       maxPrice: queryParams.value.maxPrice || undefined,

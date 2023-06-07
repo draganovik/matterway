@@ -19,7 +19,7 @@ defineProps({
     <NuxtLink
       :to="'/products/' + product.id"
       class="h-60 w-full"
-      v-if="product.productImages.length > 0"
+      v-if="product.productImages != null && product.productImages?.length > 0"
     >
       <img
         class="h-full w-full rounded-t-lg object-cover"
