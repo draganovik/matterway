@@ -1,13 +1,13 @@
 // Import necessary dependencies
 import Stripe from "stripe";
+import AddressModel from "~/utils/AddressModel";
+import CardPaymentModel from "~/utils/CardPaymentModel";
 
 // Create a function to handle the payment
 export async function payWithStripe(
-  cardNumber: string,
-  expMonth: number,
-  expYear: number,
-  cvc: string,
-  amount: number,
+  cardPayment: CardPaymentModel,
+  address: AddressModel,
+  userId: string,
   secretkey: string,
 ): Promise<string> {
   // Set up your Stripe API key
@@ -19,20 +19,34 @@ export async function payWithStripe(
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
-        number: cardNumber,
-        exp_month: expMonth,
-        exp_year: expYear,
-        cvc: cvc,
+        number: cardPayment.cardNumber,
+        exp_month: cardPayment.expMonth,
+        exp_year: cardPayment.expYear,
+        cvc: cardPayment.cvc,
       },
     });
     console.log(paymentMethod);
 
     // Create a Stripe payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, // Stripe expects the amount in cents
+      amount: cardPayment.amount * 100, // Stripe expects the amount in cents
       currency: "rsd",
       payment_method: paymentMethod.id,
       confirm: true,
+      shipping: {
+        name: address.receiverName,
+        address: {
+          line1: address.street,
+          line2: address.residence,
+          city: address.city,
+          postal_code: address.zipCode,
+          country: "RS",
+        },
+      },
+      metadata: {
+        client_id: userId,
+        note: address.note || "",
+      },
     });
 
     // Return the payment intent's client secret

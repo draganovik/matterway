@@ -5,24 +5,26 @@ const config = useRuntimeConfig();
 export default defineEventHandler(async (event) => {
   const stripeEvent: StripeEventWebhookModel = await readBody(event);
 
-  //await initializeOrder()
-
   switch (stripeEvent.type) {
     case "payment_intent.created":
-      //putPayment()
-      console.log('created', stripeEvent)
+      //updatePayment()
+      console.log("created");
       break;
     case "payment_intent.succeeded":
-      //putPayment()
-      console.log('succeeded', stripeEvent)
+      //updatePayment()
+      console.log("succeeded");
       break;
     case "charge.succeeded":
+      //postAddress()
+      //postOrder()
       //putPayment()
-      console.log('chargeed', stripeEvent)
+      console.log("chargeed");
       break;
     default:
-      //putPayment()
-      console.log('other', stripeEvent)
+      throw createError({
+        statusCode: 400,
+        message: "Event type not supported",
+      });
       break;
   }
 });
