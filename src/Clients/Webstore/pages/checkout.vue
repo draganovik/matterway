@@ -21,14 +21,15 @@ const pay = async () => {
     body: JSON.stringify({
       ...paymentData.value,
       ...addressData.value,
+      items: cart.getCartItems,
       userId: session.getTokenData?.nameid,
     }),
   });
-  if(response.ok) {
+  if (response.ok) {
     const order = await response.json();
     console.log(order);
-    cart.AddToOrder(order.id);
-    //navigateTo("/orders");
+    cart.clearCart();
+    navigateTo("/orders");
   }
 };
 

@@ -2,12 +2,14 @@
 import Stripe from "stripe";
 import AddressModel from "~/utils/AddressModel";
 import CardPaymentModel from "~/utils/CardPaymentModel";
+import CartItemModel from "~/utils/CartItemModel";
 
 // Create a function to handle the payment
 export async function payWithStripe(
   cardPayment: CardPaymentModel,
   address: AddressModel,
   userId: string,
+  items: CartItemModel[],
   secretkey: string,
 ): Promise<string> {
   // Set up your Stripe API key
@@ -45,6 +47,14 @@ export async function payWithStripe(
       },
       metadata: {
         client_id: userId,
+        items: JSON.stringify(
+          items.map((item) => {
+            return {
+              id: item.productId,
+              quantity: item.quantity,
+            };
+          }),
+        ),
         note: address.note || "",
       },
     });

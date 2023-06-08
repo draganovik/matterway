@@ -1,4 +1,5 @@
 import { payWithStripe } from "@/services/stripeService";
+import { Console } from "console";
 import AddressModel from "~/utils/AddressModel";
 import CardPaymentModel from "~/utils/CardPaymentModel";
 
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
     city,
     zipCode,
     note,
+    items,
     userId,
   } = await readBody(event);
   // create Order (needs address)
@@ -47,17 +49,14 @@ export default defineEventHandler(async (event) => {
       message: "Address is not valid",
     });
 
-  try {
-    const clientSecret = await payWithStripe(
-      cardPayment,
-      address,
-      userId,
-      config.stripeSecretKey,
-    );
-    return { clientSecret };
-  } catch (error) {
-    throw createError({
-      statusCode: 500,
-    });
-  }
+  console.log("items", items);
+
+  const clientSecret = await payWithStripe(
+    cardPayment,
+    address,
+    userId,
+    items,
+    config.stripeSecretKey,
+  );
+  return { clientSecret };
 });

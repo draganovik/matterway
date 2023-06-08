@@ -1,5 +1,6 @@
 import { payWithStripe } from "@/services/stripeService";
 import AddressModel from "~/utils/AddressModel";
+import CartItemModel from "~/utils/CartItemModel";
 
 const config = useRuntimeConfig();
 
@@ -29,6 +30,7 @@ export default defineEventHandler(async (event) => {
         createdAddress.id,
       );
       await postPayment(stripeEvent, createdOrder);
+      await postOrderItems(stripeEvent, createdOrder);
       console.log("chargeed");
       break;
     default:
@@ -63,7 +65,7 @@ const postAddress = async (address: AddressModel) => {
 };
 
 const postOrder = async (userId: string, addressId: string) => {
-  console.log("ADDRESS", userId, addressId)
+  console.log("ADDRESS", userId, addressId);
   const response = await fetch(
     `${config.public.ordering_api_base_url}/api/Orders`,
     {
@@ -116,4 +118,36 @@ const postPayment = async (event: StripeEventWebhookModel, order: any) => {
     console.log("--------------------");
     return await data;
   }
+};
+
+class OrderItems {
+  id?: string;
+  quantity?: number;
+}
+
+const postOrderItems = async (event: StripeEventWebhookModel, order: any) => {
+  const items: OrderItems[] = JSON.parse(event.data?.object.metadata.items!);
+  console.log(items);
+  items.forEach(async (item) => {
+    const response = await fetch(
+      `${config.public.ordering_api_base_url}/api/Orders/${order.id}/Items/${item.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify({
+          quantity: item.quantity,
+        }),
+      },
+    );
+    console.log(response);
+    if (response.ok) {
+      console.log("--------------------");
+      const data = await response.json();
+      console.log(data);
+      console.log("--------------------");
+    }
+  });
 };
