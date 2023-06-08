@@ -121,7 +121,6 @@ public static class PaymentEndpoints
         return TypedResults.Ok(mapper.Map<PaymentBaseResponseModel>(updateEntity));
     }
 
-    [Authorize]
     public static async Task<Results<Created<PaymentBaseResponseModel>, BadRequest<ProblemDetails>>> CreatePayment(PaymentBaseRequestModel requestModel, IPaymentRepository paymentRepository, IMapper mapper)
     {
         var newEntity = mapper.Map<Payment>(requestModel);

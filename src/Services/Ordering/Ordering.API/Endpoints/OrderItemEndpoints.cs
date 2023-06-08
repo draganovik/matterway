@@ -89,7 +89,6 @@ public static class OrderItemEndpoints
                 : TypedResults.NotFound();
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
     public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var updatedEntity = mapper.Map<OrderItem>(requestModel);

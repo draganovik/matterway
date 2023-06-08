@@ -173,10 +173,9 @@ public static class OrderEndpoints
         return TypedResults.Ok(mapper.Map<OrderBaseResponseModel>(updateEntity));
     }
 
-    [Authorize]
-    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult, ForbidHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository orderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper)
+    public static async Task<Results<Created<OrderBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult, ForbidHttpResult>> CreateOrder(OrderCreateRequestModel requestModel, HttpContext httpContext, IOrderRepository orderRepository, ICustomersServiceBroker customerServiceBroker, IMapper mapper, IConfiguration configuration)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
+        /*var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
         {
             return TypedResults.Unauthorized();
@@ -206,8 +205,8 @@ public static class OrderEndpoints
                 Detail = "Customer Id is not registrated in Customers API"
             };
             return TypedResults.BadRequest(problemDetails);
-        }
-
+        }*/
+        var newEntity = mapper.Map<Order>(requestModel);
         var results = new List<ValidationResult>();
         var context = new ValidationContext(newEntity);
         var isValid = Validator.TryValidateObject(newEntity, context, results, true);

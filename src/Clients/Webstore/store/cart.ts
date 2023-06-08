@@ -101,6 +101,19 @@ export const useCartStore = defineStore("cart", {
         console.log(await response.json());
       }
     },
+    async clearCart() {
+      const config = useRuntimeConfig();
+      const session = useSessionStore();
+      this.cartItems.forEach(async (item) => {
+        await request(
+          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${item.productId}`,
+          {
+            method: "DELETE",
+          },
+        );
+      });
+      this.cartItems = [];
+    },
 
     async fetchCartItems(page: number = 1, pageSize: number = 10) {
       const config = useRuntimeConfig();

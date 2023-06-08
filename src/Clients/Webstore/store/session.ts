@@ -21,7 +21,10 @@ export const useSessionStore = defineStore("session", {
     isLoggedIn(): boolean {
       const cartStore = useCartStore();
       cartStore.fetchCartItems();
-      return this.session != null && !this.isSessionExpired;
+      if (this.isSessionExpired) {
+        this.session = null;
+      }
+      return this.session != null;
     },
     isSessionExpired(): boolean {
       return (
