@@ -27,7 +27,8 @@ class StripeEventWebhookModel {
       last_payment_error: null | object;
       latest_charge: null | string;
       livemode: boolean;
-      metadata: object;
+      metadata: any;
+      shipping: StripeShipping;
       next_action: null | object;
       transfer_data: null | object;
       transfer_group: null | string;
@@ -40,4 +41,17 @@ class StripeEventWebhookModel {
     idempotency_key: string;
   };
   type?: string;
+}
+
+class StripeAddress {
+  city?: string;
+  country?: string;
+  line1?: string;
+  line2?: string;
+  postal_code?: string;
+}
+
+class StripeShipping {
+  address?: StripeAddress;
+  name?: string;
 }

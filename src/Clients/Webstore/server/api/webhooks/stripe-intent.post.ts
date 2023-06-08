@@ -1,23 +1,34 @@
 import { payWithStripe } from "@/services/stripeService";
+import AddressModel from "~/utils/AddressModel";
 
 const config = useRuntimeConfig();
 
 export default defineEventHandler(async (event) => {
   const stripeEvent: StripeEventWebhookModel = await readBody(event);
+  const stripeAddress = stripeEvent.data?.object.shipping.address;
+  console.log(stripeAddress);
+  const address: AddressModel = new AddressModel(
+    stripeEvent.data?.object.shipping.name!,
+    stripeAddress?.line2!,
+    stripeAddress?.line1!,
+    stripeAddress?.city!,
+    stripeAddress?.postal_code!,
+  );
 
   switch (stripeEvent.type) {
     case "payment_intent.created":
-      //updatePayment()
       console.log("created");
       break;
     case "payment_intent.succeeded":
-      //updatePayment()
       console.log("succeeded");
       break;
     case "charge.succeeded":
-      //postAddress()
-      //postOrder()
-      //putPayment()
+      const createdAddress: any = await postAddress(address);
+      const createdOrder = await postOrder(
+        stripeEvent.data?.object.metadata.client_id!,
+        createdAddress.id,
+      );
+      await postPayment(stripeEvent, createdOrder);
       console.log("chargeed");
       break;
     default:
@@ -25,6 +36,84 @@ export default defineEventHandler(async (event) => {
         statusCode: 400,
         message: "Event type not supported",
       });
-      break;
   }
 });
+
+const postAddress = async (address: AddressModel) => {
+  const response = await fetch(
+    `${config.public.ordering_api_base_url}/api/Addresses`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify(address),
+    },
+  );
+  if (response.ok) {
+    console.log("--------------------");
+    const data = await response.json();
+    console.log(data);
+    console.log("--------------------");
+    return await data;
+  }
+  console.log(await response.json());
+  return null;
+};
+
+const postOrder = async (userId: string, addressId: string) => {
+  console.log("ADDRESS", userId, addressId)
+  const response = await fetch(
+    `${config.public.ordering_api_base_url}/api/Orders`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        customerId: userId,
+        deliveryAddressId: addressId,
+      }),
+    },
+  );
+  console.log(response);
+  if (response.ok) {
+    console.log("--------------------");
+    const data = await response.json();
+    console.log(data);
+    console.log("--------------------");
+    return await data;
+  }
+};
+
+const postPayment = async (event: StripeEventWebhookModel, order: any) => {
+  const response = await fetch(
+    `${config.public.payments_api_base_url}/api/Payments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        referenceNumber: order.referenceNumber,
+        paymentDate: new Date(event.data?.object.created! * 1000),
+        paymentAmount: event.data?.object.amount! / 100,
+        cardNumber: "0000-0000-0000-0000",
+        cardHolder: "string",
+        expirationDate: "00/00",
+        securityCode: "000",
+        paymentState: "Completed",
+      }),
+    },
+  );
+  if (response.ok) {
+    console.log("--------------------");
+    const data = await response.json();
+    console.log(data);
+    console.log("--------------------");
+    return await data;
+  }
+};

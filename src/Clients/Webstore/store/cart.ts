@@ -101,6 +101,32 @@ export const useCartStore = defineStore("cart", {
         console.log(await response.json());
       }
     },
+    async AddToOrder(orderId: string) {
+      const config = useRuntimeConfig();
+      this.cartItems.forEach(async item => {
+        const response = await request(
+          `${config.public.ordering_api_base_url}/api/Orders/${orderId}/Items/${item.productId}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ quantity: item.quantity }),
+          },
+        );
+      });
+      await this.clearCart();
+    },
+    async clearCart() {
+      const config = useRuntimeConfig();
+      const session = useSessionStore();
+      this.cartItems.forEach(async item => {
+        const response = await request(
+          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/Items/${item.productId}`,
+          {
+            method: "DELETE",
+          },
+        );
+      });
+      this.cartItems = [];
+    },
 
     async fetchCartItems(page: number = 1, pageSize: number = 10) {
       const config = useRuntimeConfig();

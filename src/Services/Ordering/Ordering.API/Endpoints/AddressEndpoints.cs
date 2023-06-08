@@ -119,7 +119,6 @@ public static class AddressEndpoints
         return TypedResults.Ok(mapper.Map<AddressBaseResponseModel>(updateEntity));
     }
 
-    [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
     public static async Task<Results<Created<AddressBaseResponseModel>, BadRequest<ProblemDetails>>> CreateAddress(AddressBaseRequestModel requestModel, IAddressRepository addressRepository, IMapper mapper)
     {
         var newEntity = mapper.Map<Address>(requestModel);

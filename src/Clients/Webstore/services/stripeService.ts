@@ -25,7 +25,7 @@ export async function payWithStripe(
         cvc: cardPayment.cvc,
       },
     });
-    console.log(paymentMethod);
+    //console.log(paymentMethod);
 
     // Create a Stripe payment intent
     const paymentIntent = await stripe.paymentIntents.create({

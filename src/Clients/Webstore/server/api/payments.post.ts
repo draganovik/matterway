@@ -56,7 +56,6 @@ export default defineEventHandler(async (event) => {
     );
     return { clientSecret };
   } catch (error) {
-    console.log(error);
     throw createError({
       statusCode: 500,
     });

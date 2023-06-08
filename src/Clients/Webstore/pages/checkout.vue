@@ -16,7 +16,7 @@ const addressData: Ref<AddressModel> = ref(
 );
 
 const pay = async () => {
-  const response = useFetch("/api/payments", {
+  const response = await fetch("/api/payments", {
     method: "POST",
     body: JSON.stringify({
       ...paymentData.value,
@@ -24,7 +24,12 @@ const pay = async () => {
       userId: session.getTokenData?.nameid,
     }),
   });
-  console.log(await response);
+  if(response.ok) {
+    const order = await response.json();
+    console.log(order);
+    cart.AddToOrder(order.id);
+    //navigateTo("/orders");
+  }
 };
 
 const tableSummary = {

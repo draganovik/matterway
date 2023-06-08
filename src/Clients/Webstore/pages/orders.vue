@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="order in orders"
+          v-for="order in orders.reverse()"
           class="border-b border-gray-200 dark:border-gray-700"
         >
           <th
