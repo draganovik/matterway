@@ -99,7 +99,7 @@ const config = useRuntimeConfig();
 const getOrders = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const response = await request(
-    `${config.public.ordering_api_base_url}/api/Orders?page=1&pageSize=100`,
+    `${config.public.orderingApiBaseUrl}/api/Orders?page=1&pageSize=100`,
     {},
   );
   orders.value = (await response.json()).data;

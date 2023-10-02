@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
 
 const postAddress = async (address: AddressModel) => {
   const response = await fetch(
-    `${config.public.ordering_api_base_url}/api/Addresses`,
+    `${config.public.orderingApiBaseUrl}/api/Addresses`,
     {
       method: "POST",
       headers: {
@@ -67,7 +67,7 @@ const postAddress = async (address: AddressModel) => {
 const postOrder = async (userId: string, addressId: string) => {
   console.log("ADDRESS", userId, addressId);
   const response = await fetch(
-    `${config.public.ordering_api_base_url}/api/Orders`,
+    `${config.public.orderingApiBaseUrl}/api/Orders`,
     {
       method: "POST",
       headers: {
@@ -92,7 +92,7 @@ const postOrder = async (userId: string, addressId: string) => {
 
 const postPayment = async (event: StripeEventWebhookModel, order: any) => {
   const response = await fetch(
-    `${config.public.payments_api_base_url}/api/Payments`,
+    `${config.public.paymentsApiBaseUrl}/api/Payments`,
     {
       method: "POST",
       headers: {
@@ -130,7 +130,7 @@ const postOrderItems = async (event: StripeEventWebhookModel, order: any) => {
   console.log(items);
   items.forEach(async (item) => {
     const response = await fetch(
-      `${config.public.ordering_api_base_url}/api/Orders/${order.id}/Items/${item.id}`,
+      `${config.public.orderingApiBaseUrl}/api/Orders/${order.id}/Items/${item.id}`,
       {
         method: "PUT",
         headers: {

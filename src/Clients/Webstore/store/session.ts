@@ -50,7 +50,7 @@ export const useSessionStore = defineStore("session", {
     async login(credentials: LoginModel) {
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.auth_api_base_url}/api/Sessions/create`,
+        `${config.public.authApiBaseUrl}/api/Sessions/create`,
         {
           method: "POST",
           headers: {
@@ -69,7 +69,7 @@ export const useSessionStore = defineStore("session", {
     async logout() {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.auth_api_base_url}/api/Sessions/revoke`,
+        `${config.public.authApiBaseUrl}/api/Sessions/revoke`,
         {
           method: "DELETE",
         },
@@ -83,7 +83,7 @@ export const useSessionStore = defineStore("session", {
     async refreshToken() {
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.auth_api_base_url}/api/Sessions/refresh`,
+        `${config.public.authApiBaseUrl}/api/Sessions/refresh`,
         {
           method: "POST",
           headers: {
