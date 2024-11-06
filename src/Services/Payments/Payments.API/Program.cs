@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -7,24 +11,19 @@ using Payments.API.Endpoints;
 using Payments.API.Repository;
 using Shared.ServiceBrokers;
 using SharedProject.Profiles;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PaymentsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PaymentsDbContext") ?? throw new InvalidOperationException("Connection string 'PaymentsDbContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PaymentsDbContext") ??
+                         throw new InvalidOperationException("Connection string 'PaymentsDbContext' not found.")));
 builder.Services
     .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<ValidationProfile>();
-}, AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
+    AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
@@ -82,34 +81,24 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = async context =>
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             // Get the system user ID from the token
             if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            {
                 context.Fail("Unauthorized");
-            }
 
             // Get the token from the context
             var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
 
-            if (token == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (token == null) context.Fail("Unauthorized");
 
             // Get the session from the database based on the user ID and token
             // TODO: make a call to the Identity API to validate the token
 
-            var identityServiceBroker = context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
+            var identityServiceBroker =
+                context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
             var claimsPrincipal = await identityServiceBroker.ValidateTokenAsync(token!);
-            if (claimsPrincipal == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (claimsPrincipal == null) context.Fail("Unauthorized");
         }
     };
 });
@@ -119,8 +108,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(builder =>
     {
         builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
-               .AllowAnyMethod()
-               .AllowAnyHeader().AllowCredentials();
+            .AllowAnyMethod()
+            .AllowAnyHeader().AllowCredentials();
     });
 });
 

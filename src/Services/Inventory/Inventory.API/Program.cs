@@ -1,18 +1,16 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.ServiceBrokers;
 using SharedProject.Profiles;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<ValidationProfile>();
-}, AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
+    AppDomain.CurrentDomain.GetAssemblies());
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,34 +66,24 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = async context =>
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             // Get the system user ID from the token
             if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            {
                 context.Fail("Unauthorized");
-            }
 
             // Get the token from the context
             var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
 
-            if (token == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (token == null) context.Fail("Unauthorized");
 
             // Get the session from the database based on the user ID and token
             // TODO: make a call to the Identity API to validate the token
 
-            var identityServiceBroker = context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
+            var identityServiceBroker =
+                context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
             var claimsPrincipal = await identityServiceBroker.ValidateTokenAsync(token!);
-            if (claimsPrincipal == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (claimsPrincipal == null) context.Fail("Unauthorized");
         }
     };
 });

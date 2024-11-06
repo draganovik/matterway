@@ -16,5 +16,4 @@ public interface IAddressRepository
     Task<bool> Delete(Guid id);
 
     Task<int> GetTotalEntities();
-
 }

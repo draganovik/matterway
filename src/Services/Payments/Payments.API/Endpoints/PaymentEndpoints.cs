@@ -1,13 +1,14 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using Payments.API.Entities;
 using Payments.API.Models.PaymentModels;
 using Payments.API.Repository;
 using Shared.Enums;
 using SharedProject.ModelTemplates;
-using System.ComponentModel.DataAnnotations;
 
 namespace Payments.API.Endpoints;
 
@@ -18,39 +19,42 @@ public static class PaymentEndpoints
         var group = routes.MapGroup("/api/Payments").WithTags(nameof(Payment));
 
         group.MapGet("/", QueryPayments)
-            .WithName("QueryPayments").WithOpenApi(operation => new(operation)
+            .WithName("QueryPayments").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Query Payments",
+                Summary = "Query Payments"
             });
 
         group.MapGet("/{id}", GetPaymentById)
-            .WithName("GetPaymentById").WithOpenApi(operation => new(operation)
+            .WithName("GetPaymentById").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Get Payment By Id",
+                Summary = "Get Payment By Id"
             });
 
         group.MapPatch("/{id}", UpdatePaymentById)
-            .WithName("UpdatePaymentById").WithOpenApi(operation => new(operation)
+            .WithName("UpdatePaymentById").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Update Payment By Id",
+                Summary = "Update Payment By Id"
             });
 
         group.MapPost("/", CreatePayment)
-            .WithName("CreatePayment").WithOpenApi(operation => new(operation)
+            .WithName("CreatePayment").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Create Payment",
+                Summary = "Create Payment"
             });
 
         group.MapDelete("/{id}", DeletePayment)
-            .WithName("DeletePayment").WithOpenApi(operation => new(operation)
+            .WithName("DeletePayment").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Delete Payment",
+                Summary = "Delete Payment"
             });
     }
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<PaginationResponse<PaymentBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryPayments([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IPaymentRepository paymentRepository, IMapper mapper)
+    public static async
+        Task<Results<Ok<PaginationResponse<PaymentBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        QueryPayments([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext,
+            IPaymentRepository paymentRepository, IMapper mapper)
     {
         if (page < 1 || pageSize < 1)
         {
@@ -58,17 +62,12 @@ public static class PaymentEndpoints
             {
                 Title = "Invalid page or pageSize.",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Page and pageSize must be greater than zero.",
+                Detail = "Page and pageSize must be greater than zero."
             };
             var results = new List<ValidationResult>();
-            if (page < 1)
-            {
-                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
-            }
+            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
             if (pageSize < 1)
-            {
                 results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
-            }
 
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
@@ -76,26 +75,32 @@ public static class PaymentEndpoints
 
         var total = await paymentRepository.GetTotalEntities();
         var entities = await paymentRepository.Query(page, pageSize);
-        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Payments");
+        var baseUri =
+            new Uri(
+                $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Payments");
 
-        var paginationResponse = new PaginationResponse<PaymentBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<PaymentBaseResponseModel>>(entities).ToList(), baseUri);
+        var paginationResponse = new PaginationResponse<PaymentBaseResponseModel>(total, page, pageSize,
+            mapper.Map<IEnumerable<PaymentBaseResponseModel>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<Payment> value && value.Any()
-                ? TypedResults.Ok(paginationResponse)
-                : TypedResults.NoContent();
+            ? TypedResults.Ok(paginationResponse)
+            : TypedResults.NoContent();
     }
 
     [Authorize]
-    public static async Task<Results<Ok<PaymentBaseResponseModel>, NotFound>> GetPaymentById(Guid id, IPaymentRepository paymentRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaymentBaseResponseModel>, NotFound>> GetPaymentById(Guid id,
+        IPaymentRepository paymentRepository, IMapper mapper)
     {
         return await paymentRepository.GetById(id)
             is Payment entity
-                ? TypedResults.Ok(mapper.Map<PaymentBaseResponseModel>(entity))
-                : TypedResults.NotFound();
+            ? TypedResults.Ok(mapper.Map<PaymentBaseResponseModel>(entity))
+            : TypedResults.NotFound();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)}")]
-    public static async Task<Results<Ok<PaymentBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdatePaymentById(Guid id, PaymentBaseRequestModel requestModel, IPaymentRepository paymentRepository, IMapper mapper)
+    public static async Task<Results<Ok<PaymentBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>>
+        UpdatePaymentById(Guid id, PaymentBaseRequestModel requestModel, IPaymentRepository paymentRepository,
+            IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -114,14 +119,12 @@ public static class PaymentEndpoints
         }
 
         var updateEntity = await paymentRepository.Update(id, requestModel);
-        if (updateEntity is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (updateEntity is null) return TypedResults.NotFound();
         return TypedResults.Ok(mapper.Map<PaymentBaseResponseModel>(updateEntity));
     }
 
-    public static async Task<Results<Created<PaymentBaseResponseModel>, BadRequest<ProblemDetails>>> CreatePayment(PaymentBaseRequestModel requestModel, IPaymentRepository paymentRepository, IMapper mapper)
+    public static async Task<Results<Created<PaymentBaseResponseModel>, BadRequest<ProblemDetails>>> CreatePayment(
+        PaymentBaseRequestModel requestModel, IPaymentRepository paymentRepository, IMapper mapper)
     {
         var newEntity = mapper.Map<Payment>(requestModel);
         var results = new List<ValidationResult>();
@@ -151,11 +154,13 @@ public static class PaymentEndpoints
             };
             return TypedResults.BadRequest(problemDetails);
         }
+
         return TypedResults.Created($"/api/Payments/{newEntity.Id}", mapper.Map<PaymentBaseResponseModel>(newEntity));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)}")]
-    public static async Task<Results<NoContent, NotFound>> DeletePayment(Guid id, IPaymentRepository paymentRepository, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound>> DeletePayment(Guid id, IPaymentRepository paymentRepository,
+        IMapper mapper)
     {
         var isDeleted = await paymentRepository.Delete(id);
 

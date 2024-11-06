@@ -1,4 +1,8 @@
-﻿using Catalog.API.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
+using Catalog.API.Data;
 using Catalog.API.Endpoints;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,14 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.ServiceBrokers;
 using SharedProject.Profiles;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CatalogDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext") ?? throw new InvalidOperationException("Connection string 'CatalogDbContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext") ??
+                         throw new InvalidOperationException("Connection string 'CatalogDbContext' not found.")));
 
 builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
 
@@ -26,10 +27,8 @@ builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
 builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<ValidationProfile>();
-}, AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
+    AppDomain.CurrentDomain.GetAssemblies());
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -85,33 +84,23 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = async context =>
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             // Get the system user ID from the token
             if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            {
                 context.Fail("Unauthorized");
-            }
 
             // Get the token from the context
             var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
 
-            if (token == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (token == null) context.Fail("Unauthorized");
 
             // Get the session from the database based on the user ID and token
 
-            var identityServiceBroker = context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
+            var identityServiceBroker =
+                context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
             var claimsPrincipal = await identityServiceBroker.ValidateTokenAsync(token!);
-            if (claimsPrincipal == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (claimsPrincipal == null) context.Fail("Unauthorized");
         }
     };
 });
@@ -121,8 +110,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(builder =>
     {
         builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
-               .AllowAnyMethod()
-               .AllowAnyHeader().AllowCredentials();
+            .AllowAnyMethod()
+            .AllowAnyHeader().AllowCredentials();
     });
 });
 

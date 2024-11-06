@@ -10,7 +10,8 @@ public class ProductImageProfile : Profile
     {
         CreateMap<ProductImage, ProductImageProductResponseModel>();
         CreateMap<ProductImage, ProductImageBaseResponseModel>()
-            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Title : null));
+            .ForMember(dest => dest.ProductName,
+                opt => opt.MapFrom(src => src.Product != null ? src.Product.Title : null));
 
         CreateMap<ProductImageBaseRequestModel, ProductImage>();
     }

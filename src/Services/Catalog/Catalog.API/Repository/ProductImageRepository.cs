@@ -19,9 +19,8 @@ public class ProductImageRepository : IProductImageRepository
         context.ProductImage.Add(requestModel);
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
-        {
-            return await context.ProductImage.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId);
-        }
+            return await context.ProductImage.Include(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId);
         return null;
     }
 
@@ -54,20 +53,18 @@ public class ProductImageRepository : IProductImageRepository
 
     public async Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequestModel requestModel)
     {
-        var currentProductImageModel = await context.ProductImage.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
-        if (currentProductImageModel is null)
-        {
-            return null;
-        }
+        var currentProductImageModel = await context.ProductImage.Include(x => x.Product)
+            .FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
+        if (currentProductImageModel is null) return null;
         var affected = await context.ProductImage
             .Where(model => model.ProductId == parentId)
             .Where(model => model.Id == id)
             .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.Id, requestModel.Id)
-              .SetProperty(m => m.ProductId, requestModel.ProductId)
-              .SetProperty(m => m.ImageUrl, requestModel.ImageUrl)
-              .SetProperty(m => m.ImageAlt, requestModel.ImageAlt)
-              .SetProperty(m => m.IsMain, requestModel.IsMain)
+                .SetProperty(m => m.Id, requestModel.Id)
+                .SetProperty(m => m.ProductId, requestModel.ProductId)
+                .SetProperty(m => m.ImageUrl, requestModel.ImageUrl)
+                .SetProperty(m => m.ImageAlt, requestModel.ImageAlt)
+                .SetProperty(m => m.IsMain, requestModel.IsMain)
             );
         await context.Entry(currentProductImageModel).ReloadAsync();
         return affected == 1 ? currentProductImageModel : null;

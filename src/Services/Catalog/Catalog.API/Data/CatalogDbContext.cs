@@ -24,7 +24,8 @@ public class CatalogDbContext : DbContext
             {
                 Id = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 Title = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
-                Description = "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
+                Description =
+                    "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
                 Price = 4999,
                 ProductCode = "PH-002",
                 IsAvailable = true
@@ -33,7 +34,8 @@ public class CatalogDbContext : DbContext
             {
                 Id = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 Title = "Nest Learning Thermostat",
-                Description = "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
+                Description =
+                    "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
                 Price = 24999,
                 ProductCode = "NT-003",
                 IsAvailable = true
@@ -42,7 +44,8 @@ public class CatalogDbContext : DbContext
             {
                 Id = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 Title = "August Wi-Fi Smart Lock Pro",
-                Description = "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
+                Description =
+                    "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
                 Price = 27999,
                 ProductCode = "AL-001",
                 IsAvailable = true
@@ -51,7 +54,8 @@ public class CatalogDbContext : DbContext
             {
                 Id = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 Title = "Amazon Echo (4th Gen)",
-                Description = "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
+                Description =
+                    "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
                 Price = 9999,
                 ProductCode = "AE-004",
                 IsAvailable = true
@@ -60,7 +64,8 @@ public class CatalogDbContext : DbContext
             {
                 Id = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 Title = "Ring Spotlight Cam",
-                Description = "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
+                Description =
+                    "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
                 Price = 19999,
                 ProductCode = "RS-001",
                 IsAvailable = true
@@ -195,14 +200,16 @@ public class CatalogDbContext : DbContext
                 Id = 0,
                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 ImageAlt = "Spotlight Cam Plus",
-                ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
+                ImageUrl =
+                    "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
             },
             new ProductImage
             {
                 Id = 0,
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 ImageAlt = "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View",
-                ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg"
+                ImageUrl =
+                    "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg"
             },
             new ProductImage
             {
@@ -216,12 +223,9 @@ public class CatalogDbContext : DbContext
                 Id = 0,
                 ProductId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 ImageAlt = "August Wi-Fi Smart Lock Pro - Front View",
-                ImageUrl = "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg"
+                ImageUrl =
+                    "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg"
             }
         );
     }
-
-
-
-
 }

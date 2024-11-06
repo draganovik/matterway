@@ -19,9 +19,8 @@ public class ProductDetailRepository : IProductDetailRepository
         context.ProductDetail.Add(requestModel);
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
-        {
-            return await context.ProductDetail.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == requestModel.Id);
-        }
+            return await context.ProductDetail.Include(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == requestModel.Id);
         return null;
     }
 
@@ -53,19 +52,17 @@ public class ProductDetailRepository : IProductDetailRepository
 
     public async Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel)
     {
-        var currentProductDetailModel = await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
-        if (currentProductDetailModel is null)
-        {
-            return null;
-        }
+        var currentProductDetailModel =
+            await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
+        if (currentProductDetailModel is null) return null;
         var affected = await context.ProductDetail
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.Type, requestModel.Type)
-              .SetProperty(m => m.ProductId, requestModel.ProductId)
-              .SetProperty(m => m.Title, requestModel.Title)
-              .SetProperty(m => m.Value, requestModel.Value)
-              .SetProperty(m => m.Unit, requestModel.Unit)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.Type, requestModel.Type)
+                .SetProperty(m => m.ProductId, requestModel.ProductId)
+                .SetProperty(m => m.Title, requestModel.Title)
+                .SetProperty(m => m.Value, requestModel.Value)
+                .SetProperty(m => m.Unit, requestModel.Unit)
             );
         await context.Entry(currentProductDetailModel).ReloadAsync();
         return affected == 1 ? currentProductDetailModel : null;

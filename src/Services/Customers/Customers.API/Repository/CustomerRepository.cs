@@ -17,10 +17,7 @@ public class CustomerRepository : ICustomerRepository
     {
         context.Customer.Add(requestModel);
         var affected = await context.SaveChangesAsync();
-        if (affected == 1)
-        {
-            return await context.Customer.FindAsync(requestModel.Id);
-        }
+        if (affected == 1) return await context.Customer.FindAsync(requestModel.Id);
         return null;
     }
 
@@ -58,18 +55,15 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> Update(Guid id, Customer requestModel)
     {
         var currentCustomerModel = await context.Customer.FindAsync(id);
-        if (currentCustomerModel is null)
-        {
-            return null;
-        }
+        if (currentCustomerModel is null) return null;
         var affected = await context.Customer
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.SystemUserId, requestModel.SystemUserId)
-              .SetProperty(m => m.FirstName, requestModel.FirstName)
-              .SetProperty(m => m.LastName, requestModel.LastName)
-              .SetProperty(m => m.BirthDate, requestModel.BirthDate)
-              .SetProperty(m => m.DefaultAddressId, requestModel.DefaultAddressId)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.SystemUserId, requestModel.SystemUserId)
+                .SetProperty(m => m.FirstName, requestModel.FirstName)
+                .SetProperty(m => m.LastName, requestModel.LastName)
+                .SetProperty(m => m.BirthDate, requestModel.BirthDate)
+                .SetProperty(m => m.DefaultAddressId, requestModel.DefaultAddressId)
             );
         await context.Entry(currentCustomerModel).ReloadAsync();
         return affected == 1 ? currentCustomerModel : null;
