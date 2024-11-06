@@ -106,7 +106,7 @@ services:
 
   catalog.db:
     container_name: catalog_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1401:1433'
     environment:
@@ -115,7 +115,7 @@ services:
 
   customers.db:
     container_name: customers_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1402:1433'
     environment:
@@ -124,7 +124,7 @@ services:
 
   identity.db:
     container_name: identity_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1403:1433'
     environment:
@@ -133,7 +133,7 @@ services:
 
   inventory.db:
     container_name: inventory_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1404:1433'
     environment:
@@ -142,7 +142,7 @@ services:
 
   ordering.db:
     container_name: ordering_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1405:1433'
     environment:
@@ -151,7 +151,7 @@ services:
 
   payment.db:
     container_name: payment_db
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1406:1433'
     environment:
