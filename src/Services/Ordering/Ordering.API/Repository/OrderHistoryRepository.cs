@@ -18,10 +18,7 @@ public class OrderHistoryRepository : IOrderHistoryRepository
     {
         context.OrderHistory.Add(requestModel);
         var affected = await context.SaveChangesAsync();
-        if (affected == 1)
-        {
-            return await context.OrderHistory.FindAsync(requestModel.Id);
-        }
+        if (affected == 1) return await context.OrderHistory.FindAsync(requestModel.Id);
         return null;
     }
 
@@ -54,16 +51,13 @@ public class OrderHistoryRepository : IOrderHistoryRepository
     public async Task<OrderHistory?> Update(Guid id, OrderHistoryBaseRequestModel requestModel)
     {
         var currentOrderHistoryModel = await context.OrderHistory.FindAsync(id);
-        if (currentOrderHistoryModel is null)
-        {
-            return null;
-        }
+        if (currentOrderHistoryModel is null) return null;
         var affected = await context.OrderHistory
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.OrderId, requestModel.OrderId)
-              .SetProperty(m => m.OrderStatus, requestModel.OrderStatus)
-              .SetProperty(m => m.Description, requestModel.Description)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.OrderId, requestModel.OrderId)
+                .SetProperty(m => m.OrderStatus, requestModel.OrderStatus)
+                .SetProperty(m => m.Description, requestModel.Description)
             );
         await context.Entry(currentOrderHistoryModel).ReloadAsync();
         return affected == 1 ? currentOrderHistoryModel : null;

@@ -7,9 +7,11 @@ namespace Shared.ServiceBrokers;
 public class IdentityServiceBroker : IIdentityServiceBroker
 {
     private readonly HttpClient _httpClient;
+
     public IdentityServiceBroker(IConfiguration configuration)
     {
-        var serviceUrl = configuration["Services:Identity:Url"] ?? throw new ArgumentNullException(nameof(configuration));
+        var serviceUrl = configuration["Services:Identity:Url"] ??
+                         throw new ArgumentNullException(nameof(configuration));
         _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
     }
 
@@ -28,15 +30,13 @@ public class IdentityServiceBroker : IIdentityServiceBroker
         {
             var content = await response.Content.ReadAsStringAsync();
             var claims = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
-            if (claims == null)
-            {
-                return null;
-            }
+            if (claims == null) return null;
 
             var claimsIdentity = new ClaimsIdentity(claims.Select(x => new Claim(x.Key, x.Value)), "Token");
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             return claimsPrincipal;
         }
+
         return null;
     }
 }

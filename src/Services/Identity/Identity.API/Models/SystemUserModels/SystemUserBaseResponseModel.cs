@@ -1,6 +1,6 @@
-﻿using Shared.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Shared.Enums;
 
 namespace Identity.API.Models.SystemUserModels;
 

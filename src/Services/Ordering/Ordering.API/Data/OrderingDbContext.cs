@@ -29,7 +29,7 @@ public class OrderingDbContext : DbContext
                 Residence = "54",
                 City = "Sremska Mitrovica",
                 ZipCode = "22000",
-                ReceiverName = "Mara Jakov",
+                ReceiverName = "Mara Jakov"
             },
             new Address
             {
@@ -38,7 +38,7 @@ public class OrderingDbContext : DbContext
                 Residence = "3",
                 City = "Novi Sad",
                 ZipCode = "21000",
-                ReceiverName = "Stefan Stefanov",
+                ReceiverName = "Stefan Stefanov"
             }
         );
         modelBuilder.Entity<Order>().HasData(
@@ -47,25 +47,25 @@ public class OrderingDbContext : DbContext
                 DeliveryAddressId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                 CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
-                ReferenceNumber = "5655-6666-7877",
+                ReferenceNumber = "5655-6666-7877"
             },
             new Order
             {
                 DeliveryAddressId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                 CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                ReferenceNumber = "6666-8888-6588",
+                ReferenceNumber = "6666-8888-6588"
             }
         );
         modelBuilder.Entity<OrderItem>().HasData(
-             new OrderItem
-             {
-                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
-                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                 ProductName = "Ring Spotlight Cam",
-                 UnitPrice = 19999,
-                 Quantity = 2
-             },
+            new OrderItem
+            {
+                OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                ProductName = "Ring Spotlight Cam",
+                UnitPrice = 19999,
+                Quantity = 2
+            },
             new OrderItem
             {
                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
@@ -93,6 +93,5 @@ public class OrderingDbContext : DbContext
                 CreatedDate = DateTime.Now
             }
         );
-
     }
 }

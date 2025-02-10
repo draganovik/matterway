@@ -1,17 +1,22 @@
-﻿using Catalog.API.Models.ProductDetailModels;
+﻿using System.ComponentModel.DataAnnotations;
+using Catalog.API.Models.ProductDetailModels;
 using Catalog.API.Models.ProductImageModels;
-using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.API.Models.ProductModels;
 
 public class ProductBaseResponseModel
 {
     public Guid Id { get; set; }
-    [RegularExpression(@"^[A-Z0-9]{5,10}$", ErrorMessage = "Product code must be 5-10 characters and only contain uppercase letters and numbers.")]
+
+    [RegularExpression(@"^[A-Z0-9]{5,10}$",
+        ErrorMessage = "Product code must be 5-10 characters and only contain uppercase letters and numbers.")]
     public string? ProductCode { get; set; }
+
     public string? Title { get; set; }
+
     [Range(0.01, double.MaxValue)]
     public double? Price { get; set; }
+
     public string? Description { get; set; }
     public ICollection<ProductDetailProductResponseModel>? ProductDetails { get; set; }
     public ICollection<ProductImageProductResponseModel>? ProductImages { get; set; }

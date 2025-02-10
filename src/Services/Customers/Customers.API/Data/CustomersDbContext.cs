@@ -43,14 +43,14 @@ public class CustomersDbContext : DbContext
                 UnitPrice = 4999,
                 Quantity = 3
             },
-             new CartItem
-             {
-                 CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                 ProductName = "Ring Spotlight Cam",
-                 UnitPrice = 19999,
-                 Quantity = 1
-             }
+            new CartItem
+            {
+                CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                ProductName = "Ring Spotlight Cam",
+                UnitPrice = 19999,
+                Quantity = 1
+            }
         );
     }
 }

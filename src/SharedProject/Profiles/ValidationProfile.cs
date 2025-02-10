@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace SharedProject.Profiles;
 
@@ -14,22 +14,22 @@ public class ValidationProfile : Profile
         }
     }
 
-    public class ValidationResultToDictionaryConverter : ITypeConverter<List<ValidationResult>, Dictionary<string, string>>
+    public class
+        ValidationResultToDictionaryConverter : ITypeConverter<List<ValidationResult>, Dictionary<string, string>>
     {
-        public Dictionary<string, string> Convert(List<ValidationResult> source, Dictionary<string, string> destination, ResolutionContext context)
+        public Dictionary<string, string> Convert(List<ValidationResult> source, Dictionary<string, string> destination,
+            ResolutionContext context)
         {
             var dictionary = new Dictionary<string, string>();
             foreach (var validationResult in source)
+            foreach (var member in validationResult.MemberNames)
             {
-                foreach (var member in validationResult.MemberNames)
-                {
-                    char[] memberName = member.ToCharArray();
-                    memberName[0] = char.ToLower(member[0]);
-                    dictionary.Add(new string(memberName) ?? "Unknown", validationResult.ErrorMessage ?? "Unknown");
-                }
+                var memberName = member.ToCharArray();
+                memberName[0] = char.ToLower(member[0]);
+                dictionary.Add(new string(memberName) ?? "Unknown", validationResult.ErrorMessage ?? "Unknown");
             }
+
             return dictionary;
         }
     }
-
 }

@@ -1,14 +1,16 @@
-﻿using Shared.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Shared.Models;
 
 namespace Shared.ServiceBrokers;
 
 public class CustomersServiceBroker : ICustomersServiceBroker
 {
     private readonly HttpClient _httpClient;
+
     public CustomersServiceBroker(IConfiguration configuration)
     {
-        var serviceUrl = configuration["Services:Customers:Url"] ?? throw new ArgumentNullException(nameof(configuration));
+        var serviceUrl = configuration["Services:Customers:Url"] ??
+                         throw new ArgumentNullException(nameof(configuration));
         _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
     }
 
@@ -24,11 +26,9 @@ public class CustomersServiceBroker : ICustomersServiceBroker
                 PropertyNameCaseInsensitive = true
             };
             var customer = JsonSerializer.Deserialize<Customer>(content, options);
-            if (customer != null)
-            {
-                return customer.Id;
-            }
+            if (customer != null) return customer.Id;
         }
+
         return null;
     }
 

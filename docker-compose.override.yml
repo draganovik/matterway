@@ -2,27 +2,34 @@ version: '3.4'
 
 services:
   webstore.web:
+    environment:
+      - NUXT_PUBLIC_APP_DOMAIN=localhost
+      - NUXT_PUBLIC_AUTH_API_BASE_URI=http://localhost:2003
+      - NUXT_PUBLIC_CATALOG_API_BASE_URI=http://localhost:2001
+      - NUXT_PUBLIC_CUSTOMERS_API_BASE_URI=http://localhost:2002
+      - NUXT_PUBLIC_ORDERING_API_BASE_URI=http://localhost:2005
+      - NUXT_PUBLIC_PAYMENT_API_BASE_URI=http://localhost:2006
     ports:
-      - "3001:3000"
+      - '3001:3000'
   catalog.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__CatalogDbContext=Server=catalog_db;Database=catalog;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
     ports:
-      - "2001:443"
+      - '2001:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
 
   customers.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__CustomersDbContext=Server=customers_db;Database=customers;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
@@ -30,44 +37,44 @@ services:
       - Services__Identity__Url=http://identity_api:80
       - Services__Catalog__Url=http://catalog_api:80
     ports:
-      - "2002:443"
+      - '2002:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
 
   identity.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__IdentityDbContext=Server=identity_db;Database=identity;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
     ports:
-      - "2003:443"
+      - '2003:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-     
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
+
   inventory.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__InventoryDbContext=Server=inventory_db;Database=inventory;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
     ports:
-      - "2004:443"
+      - '2004:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
 
   ordering.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__OrderingDbContext=Server=ordering_db;Database=ordering;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
@@ -76,82 +83,77 @@ services:
       - Services__Catalog__Url=http://catalog_api:80
       - Services__Customers__Url=http://customers_api:80
     ports:
-      - "2005:443"
+      - '2005:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
 
   payment.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__PaymentsDbContext=Server=payment_db;Database=payments;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
     ports:
-      - "2006:443"
+      - '2006:80'
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${HOME}/.microsoft/usersecrets:${HOME}/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:${HOME}/.aspnet/https:ro
+    command: dotnet dev-certs https; dotnet dev-certs https --trust
 
   catalog.db:
     container_name: catalog_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1401:1433"
+      - '1401:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH
 
   customers.db:
     container_name: customers_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1402:1433"
+      - '1402:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH
 
   identity.db:
     container_name: identity_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1403:1433"
+      - '1403:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH
 
   inventory.db:
     container_name: inventory_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1404:1433"
+      - '1404:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH
 
   ordering.db:
     container_name: ordering_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1405:1433"
+      - '1405:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH
 
   payment.db:
     container_name: payment_db
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1406:1433"
+      - '1406:1433'
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=M55QL_4UTH
-      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=M55QL_4UTH

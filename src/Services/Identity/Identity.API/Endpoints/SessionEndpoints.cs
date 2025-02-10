@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using AutoMapper;
 using Identity.API.Entities;
 using Identity.API.Helpers;
 using Identity.API.Models.SessionModels;
@@ -8,10 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using Shared.Enums;
 using SharedProject.ModelTemplates;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 
 namespace Identity.API.Endpoints;
 
@@ -22,38 +23,41 @@ public static class SessionEndpoints
         var group = routes.MapGroup("/api/Sessions").WithTags(nameof(Session));
 
         group.MapGet("/", QuerySessions)
-            .WithName("QuerySessions").WithOpenApi(operation => new(operation)
+            .WithName("QuerySessions").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Query Sessions",
+                Summary = "Query Sessions"
             });
 
         group.MapGet("/introspect", IntrospectSession)
-            .WithName("IntrospectSession").WithOpenApi(operation => new(operation)
+            .WithName("IntrospectSession").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Introspect Session",
+                Summary = "Introspect Session"
             });
 
         group.MapPost("/create", CreateSession)
-            .WithName("CreateSession").WithOpenApi(operation => new(operation)
+            .WithName("CreateSession").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Create Session",
+                Summary = "Create Session"
             });
 
         group.MapPost("/refresh", RefreshSession)
-            .WithName("RefreshSession").WithOpenApi(operation => new(operation)
+            .WithName("RefreshSession").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Refresh Session",
+                Summary = "Refresh Session"
             });
 
         group.MapDelete("/revoke", RevokeSession)
-            .WithName("RevokeSession").WithOpenApi(operation => new(operation)
+            .WithName("RevokeSession").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Revoke Session",
+                Summary = "Revoke Session"
             });
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<PaginationResponse<SessionBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QuerySessions([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, ISessionRepository sessionRepository, IMapper mapper)
+    public static async
+        Task<Results<Ok<PaginationResponse<SessionBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        QuerySessions([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext,
+            ISessionRepository sessionRepository, IMapper mapper)
     {
         if (page < 1 || pageSize < 1)
         {
@@ -61,17 +65,12 @@ public static class SessionEndpoints
             {
                 Title = "Invalid page or pageSize.",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Page and pageSize must be greater than zero.",
+                Detail = "Page and pageSize must be greater than zero."
             };
             var results = new List<ValidationResult>();
-            if (page < 1)
-            {
-                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
-            }
+            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
             if (pageSize < 1)
-            {
                 results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
-            }
 
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
@@ -79,36 +78,38 @@ public static class SessionEndpoints
 
         var total = await sessionRepository.GetTotalEntities();
         var entities = await sessionRepository.Query(page, pageSize);
-        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Sessions");
+        var baseUri =
+            new Uri(
+                $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Sessions");
 
-        var paginationResponse = new PaginationResponse<SessionBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<SessionBaseResponseModel>>(entities).ToList(), baseUri);
+        var paginationResponse = new PaginationResponse<SessionBaseResponseModel>(total, page, pageSize,
+            mapper.Map<IEnumerable<SessionBaseResponseModel>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<Session> value && value.Any()
-                ? TypedResults.Ok(paginationResponse)
-                : TypedResults.NoContent();
+            ? TypedResults.Ok(paginationResponse)
+            : TypedResults.NoContent();
     }
 
     [Authorize]
-    public static async Task<Results<Ok<SessionBaseResponseModel>, UnauthorizedHttpResult>> IntrospectSession(HttpContext context, ISessionRepository sessionRepository, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, UnauthorizedHttpResult>> IntrospectSession(
+        HttpContext context, ISessionRepository sessionRepository, IMapper mapper)
     {
         var user = context.User;
         var identity = user.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out Guid systemUserId))
-        {
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
             return TypedResults.Unauthorized();
-        }
         // Get the token from the context
         var token = context.GetTokenAsync("access_token").Result;
-        if (token == null)
-        {
-            return TypedResults.Unauthorized();
-        }
+        if (token == null) return TypedResults.Unauthorized();
 
         var currentSession = await sessionRepository.GetByToken(token);
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(currentSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>>> CreateSession(SessionBaseRequestModel requestModel, ISessionRepository sessionRepository, ISystemUserRepository systemUserRepository, IConfiguration configuration, IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>>> CreateSession(
+        SessionBaseRequestModel requestModel, ISessionRepository sessionRepository,
+        ISystemUserRepository systemUserRepository, IConfiguration configuration,
+        IPasswordHasher<SystemUser> passwordHasher, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -127,7 +128,9 @@ public static class SessionEndpoints
         }
 
         var existingUser = await systemUserRepository.GetByEmail(requestModel.Email!);
-        if (existingUser == null || passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password!) != PasswordVerificationResult.Success)
+        if (existingUser == null ||
+            passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, requestModel.Password!) !=
+            PasswordVerificationResult.Success)
         {
             var problemDetails = new ProblemDetails
             {
@@ -137,6 +140,7 @@ public static class SessionEndpoints
             };
             return TypedResults.BadRequest(problemDetails);
         }
+
         // Generate a JWT for the user session
         var (token, tdescriptor) = JwtOperations.Generate(existingUser, configuration);
         var (refresh, rdescriptor) = JwtOperations.Generate(existingUser, configuration, true);
@@ -154,7 +158,9 @@ public static class SessionEndpoints
         return TypedResults.Ok(mapper.Map<SessionBaseResponseModel>(createdSession));
     }
 
-    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult>> RefreshSession(SessionRefreshBaseRequestModel requestModel, ISessionRepository sessionRepository, IConfiguration configuration, IMapper mapper)
+    public static async Task<Results<Ok<SessionBaseResponseModel>, BadRequest<ProblemDetails>, UnauthorizedHttpResult>>
+        RefreshSession(SessionRefreshBaseRequestModel requestModel, ISessionRepository sessionRepository,
+            IConfiguration configuration, IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);
@@ -195,6 +201,7 @@ public static class SessionEndpoints
             };
             return TypedResults.BadRequest(problemDetails);
         }
+
         // Generate a new JWT for the user session
         var (token, tdescriptor) = JwtOperations.Generate(session.SystemUser!, configuration);
         var (refresh, rdescriptor) = JwtOperations.Generate(session.SystemUser!, configuration, true);
@@ -209,13 +216,12 @@ public static class SessionEndpoints
     }
 
     [Authorize]
-    public static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> RevokeSession(HttpContext context, ISessionRepository sessionRepository)
+    public static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> RevokeSession(HttpContext context,
+        ISessionRepository sessionRepository)
     {
         var identity = context.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out _))
-        {
             return TypedResults.Unauthorized();
-        }
         // Get the token from the context
         var token = context.GetTokenAsync("access_token").Result;
         var isDeleted = await sessionRepository.DeleteByToken(token!);

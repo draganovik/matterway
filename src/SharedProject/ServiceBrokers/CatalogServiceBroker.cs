@@ -1,16 +1,19 @@
-﻿using Shared.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Shared.Models;
 
 namespace Shared.ServiceBrokers;
 
 public class CatalogServiceBroker : ICatalogServiceBroker
 {
     private readonly HttpClient _httpClient;
+
     public CatalogServiceBroker(IConfiguration configuration)
     {
-        var serviceUrl = configuration["Services:Catalog:Url"] ?? throw new ArgumentNullException(nameof(configuration));
+        var serviceUrl = configuration["Services:Catalog:Url"] ??
+                         throw new ArgumentNullException(nameof(configuration));
         _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
     }
+
     public async Task<Product?> GetProductById(Guid id)
     {
         // call a Get endpoint on Catalog.API to get Product by Id
@@ -28,6 +31,7 @@ public class CatalogServiceBroker : ICatalogServiceBroker
             };
             return JsonSerializer.Deserialize<Product>(content, options);
         }
+
         return null;
     }
 }

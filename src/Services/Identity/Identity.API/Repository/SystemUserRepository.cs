@@ -21,10 +21,7 @@ public class SystemUserRepository : ISystemUserRepository
     {
         context.SystemUser.Add(user);
         var affected = await context.SaveChangesAsync();
-        if (affected == 1)
-        {
-            return await context.SystemUser.FindAsync(user.Id);
-        }
+        if (affected == 1) return await context.SystemUser.FindAsync(user.Id);
         return null;
     }
 
@@ -39,11 +36,9 @@ public class SystemUserRepository : ISystemUserRepository
     public async Task<SystemUser?> GetByCredentials(string email, string password)
     {
         var user = await context.SystemUser
-        .SingleOrDefaultAsync(u => u.Email == email);
-        if (user is null || passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, password) != PasswordVerificationResult.Success)
-        {
-            return null;
-        }
+            .SingleOrDefaultAsync(u => u.Email == email);
+        if (user is null || passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, password) !=
+            PasswordVerificationResult.Success) return null;
         return user;
     }
 
@@ -73,16 +68,13 @@ public class SystemUserRepository : ISystemUserRepository
     public async Task<SystemUser?> Update(Guid id, SystemUserBaseRequestModel user)
     {
         var currentUserModel = await context.SystemUser.FindAsync(id);
-        if (currentUserModel is null)
-        {
-            return null;
-        }
+        if (currentUserModel is null) return null;
         var affected = await context.SystemUser
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.Email, user.Email)
-              .SetProperty(m => m.Role, user.Role)
-              .SetProperty(m => m.PasswordHash, passwordHasher.HashPassword(currentUserModel, user.Password!))
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.Email, user.Email)
+                .SetProperty(m => m.Role, user.Role)
+                .SetProperty(m => m.PasswordHash, passwordHasher.HashPassword(currentUserModel, user.Password!))
             );
         await context.Entry(currentUserModel).ReloadAsync();
         return affected == 1 ? currentUserModel : null;

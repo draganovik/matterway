@@ -18,10 +18,7 @@ public class PaymentRepository : IPaymentRepository
     {
         context.Payment.Add(requestModel);
         var affected = await context.SaveChangesAsync();
-        if (affected == 1)
-        {
-            return await context.Payment.FindAsync(requestModel.Id);
-        }
+        if (affected == 1) return await context.Payment.FindAsync(requestModel.Id);
         return null;
     }
 
@@ -54,21 +51,18 @@ public class PaymentRepository : IPaymentRepository
     public async Task<Payment?> Update(Guid id, PaymentBaseRequestModel requestModel)
     {
         var currentPaymentModel = await context.Payment.FindAsync(id);
-        if (currentPaymentModel is null)
-        {
-            return null;
-        }
+        if (currentPaymentModel is null) return null;
         var affected = await context.Payment
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.ReferenceNumber, requestModel.ReferenceNumber)
-              .SetProperty(m => m.PaymentDate, requestModel.PaymentDate)
-              .SetProperty(m => m.PaymentAmount, requestModel.PaymentAmount)
-              .SetProperty(m => m.CardNumber, requestModel.CardNumber)
-              .SetProperty(m => m.CardHolder, requestModel.CardHolder)
-              .SetProperty(m => m.ExpirationDate, requestModel.ExpirationDate)
-              .SetProperty(m => m.SecurityCode, requestModel.SecurityCode)
-              .SetProperty(m => m.PaymentState, requestModel.PaymentState)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.ReferenceNumber, requestModel.ReferenceNumber)
+                .SetProperty(m => m.PaymentDate, requestModel.PaymentDate)
+                .SetProperty(m => m.PaymentAmount, requestModel.PaymentAmount)
+                .SetProperty(m => m.CardNumber, requestModel.CardNumber)
+                .SetProperty(m => m.CardHolder, requestModel.CardHolder)
+                .SetProperty(m => m.ExpirationDate, requestModel.ExpirationDate)
+                .SetProperty(m => m.SecurityCode, requestModel.SecurityCode)
+                .SetProperty(m => m.PaymentState, requestModel.PaymentState)
             );
         await context.Entry(currentPaymentModel).ReloadAsync();
         return affected == 1 ? currentPaymentModel : null;

@@ -20,9 +20,8 @@ public class ProductRepository : IProductRepository
         context.Product.Add(requestModel);
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
-        {
-            return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == requestModel.Id);
-        }
+            return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+                .FirstOrDefaultAsync(x => x.Id == requestModel.Id);
         return null;
     }
 
@@ -36,7 +35,8 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetById(Guid id)
     {
-        return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == id);
+        return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<int> GetTotalEntities(ProductFilter productFilter)
@@ -56,19 +56,17 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> Update(Guid id, ProductBaseRequestModel requestModel)
     {
-        var currentProductModel = await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == id);
-        if (currentProductModel is null)
-        {
-            return null;
-        }
+        var currentProductModel = await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+            .FirstOrDefaultAsync(x => x.Id == id);
+        if (currentProductModel is null) return null;
         var affected = await context.Product
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.ProductCode, requestModel.ProductCode)
-              .SetProperty(m => m.Title, requestModel.Title)
-              .SetProperty(m => m.Price, requestModel.Price)
-              .SetProperty(m => m.Description, requestModel.Description)
-              .SetProperty(m => m.IsAvailable, requestModel.IsAvailable)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.ProductCode, requestModel.ProductCode)
+                .SetProperty(m => m.Title, requestModel.Title)
+                .SetProperty(m => m.Price, requestModel.Price)
+                .SetProperty(m => m.Description, requestModel.Description)
+                .SetProperty(m => m.IsAvailable, requestModel.IsAvailable)
             );
         await context.Entry(currentProductModel).ReloadAsync();
         return affected == 1 ? currentProductModel : null;

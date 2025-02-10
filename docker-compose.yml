@@ -10,7 +10,7 @@ services:
     tty: true
     build:
       context: src/Clients/Webstore
-      dockerfile: /Dockerfile
+      dockerfile: Dockerfile
 
   catalog.api:
     container_name: catalog_api

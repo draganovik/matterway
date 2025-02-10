@@ -1,15 +1,15 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using Ordering.API.Entities;
 using Ordering.API.Models.OrderItemModels;
 using Ordering.API.Repository;
 using Shared.Enums;
-using Shared.Models;
 using Shared.ServiceBrokers;
 using SharedProject.ModelTemplates;
-using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.API.Endpoints;
 
@@ -20,33 +20,36 @@ public static class OrderItemEndpoints
         var group = routes.MapGroup("/api/Orders").WithTags(nameof(OrderItem));
 
         group.MapGet("/Items", QueryOrderItems)
-            .WithName("QueryOrderItems").WithOpenApi(operation => new(operation)
+            .WithName("QueryOrderItems").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Query Order Items",
+                Summary = "Query Order Items"
             });
 
         group.MapGet("/{id}/Items/{itemId}", GetOrderItemById)
-            .WithName("GetOrderItemById").WithOpenApi(operation => new(operation)
+            .WithName("GetOrderItemById").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Get Order Item By Id",
+                Summary = "Get Order Item By Id"
             });
 
         group.MapPut("/{id}/Items/{itemId}", UpdateOrderItemById)
-            .WithName("UpdateOrderItemById").WithOpenApi(operation => new(operation)
+            .WithName("UpdateOrderItemById").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Update Order Item By Id",
+                Summary = "Update Order Item By Id"
             });
 
         group.MapDelete("/{id}/Items/{itemId}", DeleteOrderItem)
-            .WithName("DeleteOrderItem").WithOpenApi(operation => new(operation)
+            .WithName("DeleteOrderItem").WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Delete Order Item",
+                Summary = "Delete Order Item"
             });
     }
 
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<PaginationResponse<OrderItemBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>> QueryOrderItems([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext, IOrderItemRepository orderItemRepository, IMapper mapper)
+    public static async
+        Task<Results<Ok<PaginationResponse<OrderItemBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        QueryOrderItems([FromQuery] int page, [FromQuery] int pageSize, HttpContext httpContext,
+            IOrderItemRepository orderItemRepository, IMapper mapper)
     {
         if (page < 1 || pageSize < 1)
         {
@@ -54,17 +57,12 @@ public static class OrderItemEndpoints
             {
                 Title = "Invalid page or pageSize.",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Page and pageSize must be greater than zero.",
+                Detail = "Page and pageSize must be greater than zero."
             };
             var results = new List<ValidationResult>();
-            if (page < 1)
-            {
-                results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
-            }
+            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
             if (pageSize < 1)
-            {
                 results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
-            }
 
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
@@ -72,34 +70,37 @@ public static class OrderItemEndpoints
 
         var total = await orderItemRepository.GetTotalEntities();
         var entities = await orderItemRepository.Query(page, pageSize);
-        var baseUri = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Orders/Items");
-        var paginationResponse = new PaginationResponse<OrderItemBaseResponseModel>(total, page, pageSize, mapper.Map<IEnumerable<OrderItemBaseResponseModel>>(entities).ToList(), baseUri);
+        var baseUri =
+            new Uri(
+                $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Orders/Items");
+        var paginationResponse = new PaginationResponse<OrderItemBaseResponseModel>(total, page, pageSize,
+            mapper.Map<IEnumerable<OrderItemBaseResponseModel>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<OrderItem> value && value.Any()
-                ? TypedResults.Ok(paginationResponse)
-                : TypedResults.NoContent();
+            ? TypedResults.Ok(paginationResponse)
+            : TypedResults.NoContent();
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound>> GetOrderItemById(Guid id, Guid itemId, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound>> GetOrderItemById(Guid id, Guid itemId,
+        IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
         return await OrderItemRepository.GetById(id, itemId)
             is OrderItem entity
-                ? TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(entity))
-                : TypedResults.NotFound();
+            ? TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(entity))
+            : TypedResults.NotFound();
     }
 
-    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel, IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
+    public static async Task<Results<Ok<OrderItemBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>>
+        UpdateOrderItemById(Guid id, Guid itemId, OrderItemBaseRequestModel requestModel,
+            IOrderItemRepository OrderItemRepository, ICatalogServiceBroker catalogServiceBroker, IMapper mapper)
     {
         var updatedEntity = mapper.Map<OrderItem>(requestModel);
         updatedEntity.OrderId = id;
         updatedEntity.ProductId = itemId;
 
-        Product? product = await catalogServiceBroker.GetProductById(updatedEntity.ProductId);
-        if (product is null)
-        {
-            return TypedResults.NotFound();
-        }
+        var product = await catalogServiceBroker.GetProductById(updatedEntity.ProductId);
+        if (product is null) return TypedResults.NotFound();
 
         updatedEntity.ProductName = product.Title;
         updatedEntity.UnitPrice = product.Price ?? 0;
@@ -131,11 +132,13 @@ public static class OrderItemEndpoints
             };
             return TypedResults.BadRequest(problemDetails);
         }
+
         return TypedResults.Ok(mapper.Map<OrderItemBaseResponseModel>(updateEntity));
     }
 
     [Authorize(Roles = $"{nameof(SystemUserRole.Admin)},{nameof(SystemUserRole.Manager)}")]
-    public static async Task<Results<NoContent, NotFound>> DeleteOrderItem(Guid id, Guid itemId, IOrderItemRepository OrderItemRepository, IMapper mapper)
+    public static async Task<Results<NoContent, NotFound>> DeleteOrderItem(Guid id, Guid itemId,
+        IOrderItemRepository OrderItemRepository, IMapper mapper)
     {
         var isDeleted = await OrderItemRepository.Delete(id, itemId);
 

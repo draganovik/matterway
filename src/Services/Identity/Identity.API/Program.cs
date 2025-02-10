@@ -1,3 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
 using Identity.API.Data;
 using Identity.API.Endpoints;
 using Identity.API.Entities;
@@ -8,30 +12,34 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SharedProject.Profiles;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext") ?? throw new InvalidOperationException("Connection string 'IdentityDbContext' not found.")));
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<ValidationProfile>();
-}, AppDomain.CurrentDomain.GetAssemblies());
+// Add the Identity database connection
+builder.Services.AddDbContext<IdentityDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext") ??
+                         throw new InvalidOperationException("Connection string 'IdentityDbContext' not found.")));
+
+// Add the AutoMapper service
+builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
+    AppDomain.CurrentDomain.GetAssemblies());
+
+// Add the PasswordHasher service
 builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
+
+// Configure the service controllers and JSON serialization options
 builder.Services
     .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+// Add repositories
 builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure ApiExplorer endpoints
 builder.Services.AddEndpointsApiExplorer();
+
+// Add the Swagger generator
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -59,6 +67,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Add authentication and authorization configurations
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -83,53 +92,48 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = async context =>
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             // Get the system user ID from the token
             if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            {
                 context.Fail("Unauthorized");
-            }
 
             // Get the token from the context
             var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
 
-            if (token == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (token == null) context.Fail("Unauthorized");
 
             // Get the session from the database based on the user ID and token
             var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDbContext>();
-            var session = await dbContext.Session.FirstOrDefaultAsync(s => s.SystemUserId == systemUserId && s.Token == token);
+            var session =
+                await dbContext.Session.FirstOrDefaultAsync(s => s.SystemUserId == systemUserId && s.Token == token);
 
-            if (session == null)
-            {
-                context.Fail("Unauthorized");
-            }
+            if (session == null) context.Fail("Unauthorized");
         }
     };
 });
 
+// Configure the CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
         builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
-               .AllowAnyMethod()
-               .AllowAnyHeader().AllowCredentials();
+            .AllowAnyMethod()
+            .AllowAnyHeader().AllowCredentials();
     });
 });
 
-
+// Add the authorization service
 builder.Services.AddAuthorization();
+
+// Add the ProblemDetails service
 builder.Services.AddProblemDetails();
 
+// Build the application
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
@@ -140,10 +144,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Map the endpoints
 app.MapSystemUserEndpoints();
-
 app.MapSessionEndpoints();
 
+// Enable CORS
 app.UseCors();
 
+// Run the application
 app.Run();

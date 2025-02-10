@@ -1,13 +1,12 @@
-﻿using Shared.Enums;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Shared.Enums;
 
 namespace Identity.API.Models.SystemUserModels;
 
 public class SystemUserBaseRequestModel
 {
-
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Invalid email format.")]
     public string? Email { get; set; }

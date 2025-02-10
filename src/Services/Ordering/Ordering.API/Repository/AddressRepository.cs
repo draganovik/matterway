@@ -18,10 +18,7 @@ public class AddressRepository : IAddressRepository
     {
         context.Address.Add(requestModel);
         var affected = await context.SaveChangesAsync();
-        if (affected == 1)
-        {
-            return await context.Address.FindAsync(requestModel.Id);
-        }
+        if (affected == 1) return await context.Address.FindAsync(requestModel.Id);
         return null;
     }
 
@@ -54,19 +51,16 @@ public class AddressRepository : IAddressRepository
     public async Task<Address?> Update(Guid id, AddressBaseRequestModel requestModel)
     {
         var currentAddressModel = await context.Address.FindAsync(id);
-        if (currentAddressModel is null)
-        {
-            return null;
-        }
+        if (currentAddressModel is null) return null;
         var affected = await context.Address
-        .Where(model => model.Id == id)
-        .ExecuteUpdateAsync(setters => setters
-              .SetProperty(m => m.ReceiverName, requestModel.ReceiverName)
-              .SetProperty(m => m.Residence, requestModel.Residence)
-              .SetProperty(m => m.Street, requestModel.Street)
-              .SetProperty(m => m.City, requestModel.City)
-              .SetProperty(m => m.ZipCode, requestModel.ZipCode)
-              .SetProperty(m => m.Note, requestModel.Note)
+            .Where(model => model.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(m => m.ReceiverName, requestModel.ReceiverName)
+                .SetProperty(m => m.Residence, requestModel.Residence)
+                .SetProperty(m => m.Street, requestModel.Street)
+                .SetProperty(m => m.City, requestModel.City)
+                .SetProperty(m => m.ZipCode, requestModel.ZipCode)
+                .SetProperty(m => m.Note, requestModel.Note)
             );
         await context.Entry(currentAddressModel).ReloadAsync();
         return affected == 1 ? currentAddressModel : null;

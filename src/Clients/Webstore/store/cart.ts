@@ -53,7 +53,7 @@ export const useCartStore = defineStore("cart", {
       if (findItem && findItem.quantity > 1) {
         findItem.quantity--;
         const response = await request(
-          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${findItem?.productId}`,
+          `${config.public.customersApiBaseUrl}/api/Customers/${session.getTokenData?.nameid}/CartItems/${findItem?.productId}`,
           {
             method: "PUT",
             body: JSON.stringify({ quantity: findItem.quantity }),
@@ -67,7 +67,7 @@ export const useCartStore = defineStore("cart", {
           (item) => item.productId !== product.id,
         );
         await request(
-          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${product.id}`,
+          `${config.public.customersApiBaseUrl}/api/Customers/${session.getTokenData?.nameid}/CartItems/${product.id}`,
           {
             method: "DELETE",
           },
@@ -91,7 +91,7 @@ export const useCartStore = defineStore("cart", {
       );
 
       const response = await request(
-        `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${currentItem?.productId}`,
+        `${config.public.customersApiBaseUrl}/api/Customers/${session.getTokenData?.nameid}/CartItems/${currentItem?.productId}`,
         {
           method: "PUT",
           body: JSON.stringify({ quantity: currentItem?.quantity }),
@@ -106,7 +106,7 @@ export const useCartStore = defineStore("cart", {
       const session = useSessionStore();
       this.cartItems.forEach(async (item) => {
         await request(
-          `${config.public.customers_api_base_url}/api/Customers/${session.getTokenData?.nameid}/CartItems/${item.productId}`,
+          `${config.public.customersApiBaseUrl}/api/Customers/${session.getTokenData?.nameid}/CartItems/${item.productId}`,
           {
             method: "DELETE",
           },
@@ -119,7 +119,7 @@ export const useCartStore = defineStore("cart", {
       const config = useRuntimeConfig();
       try {
         const response = await request(
-          `${config.public.customers_api_base_url}/api/Customers/CartItems?page=${page}&pageSize=${pageSize}`,
+          `${config.public.customersApiBaseUrl}/api/Customers/CartItems?page=${page}&pageSize=${pageSize}`,
           {
             method: "GET",
           },

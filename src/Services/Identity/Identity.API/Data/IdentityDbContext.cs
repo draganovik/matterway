@@ -7,7 +7,8 @@ namespace Identity.API.Data;
 
 public class IdentityDbContext : DbContext
 {
-    readonly IConfiguration configuration;
+    private readonly IConfiguration configuration;
+
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options, IConfiguration config)
         : base(options)
     {
