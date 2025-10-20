@@ -19,7 +19,7 @@ public class CreateProduct : IEndpoint
         app.MapPost("Products", Handler)
             .WithName("CreateProduct").WithSummary("Create a new Product.")
             .WithTags("Products")
-            .Produces<ProductBaseResponseModel>(StatusCodes.Status201Created)
+            .Produces<ProductBaseResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
@@ -27,15 +27,15 @@ public class CreateProduct : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Created<ProductBaseResponseModel>, BadRequest<ProblemDetails>>> Handler(
-        ProductBaseRequestModel requestModel,
+    private static async Task<Results<Created<ProductBaseResponse>, BadRequest<ProblemDetails>>> Handler(
+        ProductBaseRequest request,
         HttpContext httpContext,
         IProductRepository productRepository,
         IMapper mapper)
     {
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(request);
+        var isValid = Validator.TryValidateObject(request, context, results, true);
 
         if (!isValid)
         {
@@ -49,7 +49,7 @@ public class CreateProduct : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var productModel = mapper.Map<Product>(requestModel);
+        var productModel = mapper.Map<Product>(request);
         var createdProduct = await productRepository.Create(productModel);
         if (createdProduct is null)
         {
@@ -65,6 +65,6 @@ public class CreateProduct : IEndpoint
         var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Products/{createdProduct.Id}");
 
         return TypedResults.Created(location,
-            mapper.Map<ProductBaseResponseModel>(createdProduct));
+            mapper.Map<ProductBaseResponse>(createdProduct));
     }
 }

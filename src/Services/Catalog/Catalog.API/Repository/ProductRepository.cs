@@ -54,7 +54,7 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
     }
 
-    public async Task<Product?> Update(Guid id, ProductBaseRequestModel requestModel)
+    public async Task<Product?> Update(Guid id, ProductBaseRequest request)
     {
         var currentProductModel = await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -62,11 +62,11 @@ public class ProductRepository : IProductRepository
         var affected = await context.Product
             .Where(model => model.Id == id)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(m => m.ProductCode, requestModel.ProductCode)
-                .SetProperty(m => m.Title, requestModel.Title)
-                .SetProperty(m => m.Price, requestModel.Price)
-                .SetProperty(m => m.Description, requestModel.Description)
-                .SetProperty(m => m.IsAvailable, requestModel.IsAvailable)
+                .SetProperty(m => m.ProductCode, request.ProductCode)
+                .SetProperty(m => m.Title, request.Title)
+                .SetProperty(m => m.Price, request.Price)
+                .SetProperty(m => m.Description, request.Description)
+                .SetProperty(m => m.IsAvailable, request.IsAvailable)
             );
         await context.Entry(currentProductModel).ReloadAsync();
         return affected == 1 ? currentProductModel : null;

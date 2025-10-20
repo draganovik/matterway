@@ -1,8 +1,8 @@
 using SharedProject.Profiles;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class MapperConfiguration
+public static class MapperExtensions
 {
     public static IServiceCollection ConfigureMapper(this IServiceCollection services)
     {

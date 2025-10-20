@@ -1,10 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using Catalog.API.Data;
+using Microsoft.EntityFrameworkCore;
 
+namespace Catalog.API.Extensions;
 
-namespace Catalog.API.Configurations;
-
-public static class DatabaseConfiguration
+public static class DbContextExtensions
 {
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {

@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using Shared.Extensions;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class EndpointConfiguration
+public static class EndpointExtensions
 {
     public static WebApplication ApplyEndpoints(this WebApplication app)
     {

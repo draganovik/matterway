@@ -11,7 +11,7 @@ public interface IProductImageRepository
 
     Task<ProductImage?> Create(ProductImage requestModel);
 
-    Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequestModel requestModel);
+    Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequest request);
 
     Task<bool> Delete(Guid parentId, int id);
 

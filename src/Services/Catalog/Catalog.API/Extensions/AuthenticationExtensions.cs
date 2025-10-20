@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Shared.ServiceBrokers;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class AuthenticationConfiguration
+public static class AuthenticationExtensions
 {
     public static IServiceCollection ConfigureAuthentication(this IServiceCollection services,
         IConfiguration configuration)

@@ -20,14 +20,14 @@ public class QueryProducts : IEndpoint
         app.MapGet("Products", Handler)
             .WithName("QueryProducts").WithSummary("Query Products.")
             .WithTags("Products")
-            .Produces<PaginationResponse<ProductBaseResponseModel>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<ProductBaseResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<ProductBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        Task<Results<Ok<PaginationResponse<ProductBaseResponse>>, NoContent, BadRequest<ProblemDetails>>>
         Handler([FromQuery] [Range(1, int.MaxValue)] int page,
             [FromQuery] [Range(1, int.MaxValue)]
             int pageSize,
@@ -58,8 +58,8 @@ public class QueryProducts : IEndpoint
         var entities = await productRepository.Query(page, pageSize, productFilter);
         var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Products");
 
-        var paginationResponse = new PaginationResponse<ProductBaseResponseModel>(total, page, pageSize,
-            mapper.Map<IEnumerable<ProductBaseResponseModel>>(entities).ToList(), baseUri);
+        var paginationResponse = new PaginationResponse<ProductBaseResponse>(total, page, pageSize,
+            mapper.Map<IEnumerable<ProductBaseResponse>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<Product> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

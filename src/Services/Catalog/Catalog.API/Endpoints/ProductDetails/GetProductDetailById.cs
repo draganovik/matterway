@@ -15,19 +15,19 @@ public class GetProductDetailById : IEndpoint
         app.MapGet("ProductDetails/{id:guid}", Handler)
             .WithName("GetProductDetailById").WithSummary("Get a ProductDetail by id.")
             .WithTags(nameof(ProductDetail))
-            .Produces<ProductDetailBaseResponseModel>(StatusCodes.Status200OK)
+            .Produces<ProductDetailBaseResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound>> Handler(
+    private static async Task<Results<Ok<ProductDetailBaseResponse>, NotFound>> Handler(
         Guid id,
         IProductDetailRepository productDetailRepository,
         IMapper mapper)
     {
         return await productDetailRepository.GetById(id)
             is ProductDetail value
-            ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponseModel>(value))
+            ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponse>(value))
             : TypedResults.NotFound();
     }
 }

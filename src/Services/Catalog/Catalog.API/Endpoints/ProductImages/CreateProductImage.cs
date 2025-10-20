@@ -19,7 +19,7 @@ public class CreateProductImage : IEndpoint
         app.MapPost("ProductImages", Handler)
             .WithName("CreateProductImage").WithSummary("Create a new ProductImage.")
             .WithTags(nameof(ProductImage))
-            .Produces<ProductImageBaseResponseModel>(StatusCodes.Status201Created)
+            .Produces<ProductImageBaseResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
@@ -27,15 +27,15 @@ public class CreateProductImage : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest<ProblemDetails>>> Handler(
-        ProductImageBaseRequestModel requestModel,
+    private static async Task<Results<Created<ProductImageBaseResponse>, BadRequest<ProblemDetails>>> Handler(
+        ProductImageBaseRequest request,
         HttpContext httpContext,
         IProductImageRepository productImageRepository,
         IMapper mapper)
     {
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(request);
+        var isValid = Validator.TryValidateObject(request, context, results, true);
 
         if (!isValid)
         {
@@ -49,7 +49,7 @@ public class CreateProductImage : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var productImageModel = mapper.Map<ProductImage>(requestModel);
+        var productImageModel = mapper.Map<ProductImage>(request);
         var createdProductImage = await productImageRepository.Create(productImageModel);
         if (createdProductImage is null)
         {
@@ -66,6 +66,6 @@ public class CreateProductImage : IEndpoint
             $"ProductImages/{createdProductImage.ProductId}/{createdProductImage.Id}");
 
         return TypedResults.Created(location,
-            mapper.Map<ProductImageBaseResponseModel>(createdProductImage));
+            mapper.Map<ProductImageBaseResponse>(createdProductImage));
     }
 }

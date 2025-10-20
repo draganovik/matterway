@@ -15,12 +15,12 @@ public class GetProductImageById : IEndpoint
         app.MapGet("ProductImages/{productId:guid}/{id:int}", Handler)
             .WithName("GetProductImageById").WithSummary("Get a ProductImage by id.")
             .WithTags(nameof(ProductImage))
-            .Produces<ProductImageBaseResponseModel>(StatusCodes.Status200OK)
+            .Produces<ProductImageBaseResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound>> Handler(
+    private static async Task<Results<Ok<ProductImageBaseResponse>, NotFound>> Handler(
         Guid productId,
         int id,
         IProductImageRepository productImageRepository,
@@ -28,7 +28,7 @@ public class GetProductImageById : IEndpoint
     {
         return await productImageRepository.GetById(productId, id)
             is ProductImage value
-            ? TypedResults.Ok(mapper.Map<ProductImageBaseResponseModel>(value))
+            ? TypedResults.Ok(mapper.Map<ProductImageBaseResponse>(value))
             : TypedResults.NotFound();
     }
 }

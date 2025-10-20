@@ -4,7 +4,7 @@ using Catalog.API.Models.ProductImageModels;
 
 namespace Catalog.API.Models.ProductModels;
 
-public class ProductBaseResponseModel
+public class ProductBaseResponse
 {
     public Guid Id { get; set; }
 
@@ -18,8 +18,8 @@ public class ProductBaseResponseModel
     public double? Price { get; set; }
 
     public string? Description { get; set; }
-    public ICollection<ProductDetailProductResponseModel>? ProductDetails { get; set; }
-    public ICollection<ProductImageProductResponseModel>? ProductImages { get; set; }
+    public ICollection<ProductDetailProductResponse>? ProductDetails { get; set; }
+    public ICollection<ProductImageProductResponse>? ProductImages { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsAvailable { get; set; }

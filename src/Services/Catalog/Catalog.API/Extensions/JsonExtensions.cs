@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class JsonConfiguration
+public static class JsonExtensions
 {
     public static IServiceCollection ConfigureJsonOptions(this IServiceCollection services)
     {

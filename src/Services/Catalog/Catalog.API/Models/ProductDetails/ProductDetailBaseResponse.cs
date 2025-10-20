@@ -3,7 +3,7 @@ using Shared.Enums;
 
 namespace Catalog.API.Models.ProductDetailModels;
 
-public class ProductDetailBaseResponseModel
+public class ProductDetailBaseResponse
 {
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }

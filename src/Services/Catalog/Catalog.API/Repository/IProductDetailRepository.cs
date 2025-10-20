@@ -11,7 +11,7 @@ public interface IProductDetailRepository
 
     Task<ProductDetail?> Create(ProductDetail requestModel);
 
-    Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequestModel requestModel);
+    Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequest request);
 
     Task<bool> Delete(Guid id);
 

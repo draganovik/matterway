@@ -51,7 +51,7 @@ public class ProductImageRepository : IProductImageRepository
             .ToListAsync();
     }
 
-    public async Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequestModel requestModel)
+    public async Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequest request)
     {
         var currentProductImageModel = await context.ProductImage.Include(x => x.Product)
             .FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
@@ -60,11 +60,11 @@ public class ProductImageRepository : IProductImageRepository
             .Where(model => model.ProductId == parentId)
             .Where(model => model.Id == id)
             .ExecuteUpdateAsync(setters => setters
-                .SetProperty(m => m.Id, requestModel.Id)
-                .SetProperty(m => m.ProductId, requestModel.ProductId)
-                .SetProperty(m => m.ImageUrl, requestModel.ImageUrl)
-                .SetProperty(m => m.ImageAlt, requestModel.ImageAlt)
-                .SetProperty(m => m.IsMain, requestModel.IsMain)
+                .SetProperty(m => m.Id, request.Id)
+                .SetProperty(m => m.ProductId, request.ProductId)
+                .SetProperty(m => m.ImageUrl, request.ImageUrl)
+                .SetProperty(m => m.ImageAlt, request.ImageAlt)
+                .SetProperty(m => m.IsMain, request.IsMain)
             );
         await context.Entry(currentProductImageModel).ReloadAsync();
         return affected == 1 ? currentProductImageModel : null;

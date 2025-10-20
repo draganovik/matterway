@@ -8,8 +8,8 @@ public class ProductProfile : Profile
 {
     public ProductProfile()
     {
-        CreateMap<Product, ProductBaseResponseModel>();
+        CreateMap<Product, ProductBaseResponse>();
 
-        CreateMap<ProductBaseRequestModel, Product>();
+        CreateMap<ProductBaseRequest, Product>();
     }
 }

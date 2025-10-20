@@ -12,7 +12,7 @@ public interface IProductRepository
 
     Task<Product?> Create(Product requestModel);
 
-    Task<Product?> Update(Guid id, ProductBaseRequestModel requestModel);
+    Task<Product?> Update(Guid id, ProductBaseRequest request);
 
     Task<bool> Delete(Guid id);
 

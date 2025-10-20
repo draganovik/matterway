@@ -1,6 +1,6 @@
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class CorsConfiguration
+public static class CorsExtensions
 {
     public static IServiceCollection ConfigureCors(this IServiceCollection services)
     {

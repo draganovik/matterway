@@ -20,7 +20,7 @@ public class QueryProductImages : IEndpoint
         app.MapGet("ProductImages", Handler)
             .WithName("QueryProductImages").WithSummary("Query ProductImages.")
             .WithTags(nameof(ProductImage))
-            .Produces<PaginationResponse<ProductImageBaseResponseModel>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<ProductImageBaseResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -30,7 +30,7 @@ public class QueryProductImages : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<ProductImageBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        Task<Results<Ok<PaginationResponse<ProductImageBaseResponse>>, NoContent, BadRequest<ProblemDetails>>>
         Handler([FromQuery] [Range(1, int.MaxValue)] int page,
             [FromQuery] [Range(1, int.MaxValue)]
             int pageSize,
@@ -59,8 +59,8 @@ public class QueryProductImages : IEndpoint
         var entities = await productImageRepository.Query(page, pageSize);
         var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "ProductImages");
 
-        var paginationResponse = new PaginationResponse<ProductImageBaseResponseModel>(total, page, pageSize,
-            mapper.Map<IEnumerable<ProductImageBaseResponseModel>>(entities).ToList(), baseUri);
+        var paginationResponse = new PaginationResponse<ProductImageBaseResponse>(total, page, pageSize,
+            mapper.Map<IEnumerable<ProductImageBaseResponse>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<ProductImage> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

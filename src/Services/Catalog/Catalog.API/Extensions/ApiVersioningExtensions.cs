@@ -1,8 +1,8 @@
 using Asp.Versioning;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class ApiVersioningConfiguration
+public static class ApiVersioningExtensions
 {
     public static IServiceCollection ConfigureApiVersioning(this IServiceCollection services)
     {

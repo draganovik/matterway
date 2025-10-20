@@ -18,7 +18,7 @@ public class UpdateProductDetailById : IEndpoint
         app.MapPatch("ProductDetails/{id:guid}", Handler)
             .WithName("UpdateProductDetailById").WithSummary("Update a ProductDetail by id.")
             .WithTags(nameof(ProductDetail))
-            .Produces<ProductDetailBaseResponseModel>(StatusCodes.Status200OK)
+            .Produces<ProductDetailBaseResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -27,16 +27,16 @@ public class UpdateProductDetailById : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>>
+    private static async Task<Results<Ok<ProductDetailBaseResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handler(
             Guid id,
-            ProductDetailBaseRequestModel requestModel,
+            ProductDetailBaseRequest request,
             IProductDetailRepository productDetailRepository,
             IMapper mapper)
     {
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(request);
+        var isValid = Validator.TryValidateObject(request, context, results, true);
 
         if (!isValid)
         {
@@ -50,9 +50,9 @@ public class UpdateProductDetailById : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var updatedProductDetail = await productDetailRepository.Update(id, requestModel);
+        var updatedProductDetail = await productDetailRepository.Update(id, request);
         return updatedProductDetail is not null
-            ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponseModel>(updatedProductDetail))
+            ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponse>(updatedProductDetail))
             : TypedResults.NotFound();
     }
 }

@@ -18,7 +18,7 @@ public class UpdateProductImageById : IEndpoint
         app.MapPatch("ProductImages/{productId:guid}/{id:int}", Handler)
             .WithName("UpdateProductImageById").WithSummary("Update a ProductImage by id.")
             .WithTags(nameof(ProductImage))
-            .Produces<ProductImageBaseResponseModel>(StatusCodes.Status200OK)
+            .Produces<ProductImageBaseResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -27,16 +27,16 @@ public class UpdateProductImageById : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> Handler(
+    private static async Task<Results<Ok<ProductImageBaseResponse>, NotFound, BadRequest<ProblemDetails>>> Handler(
         Guid productId,
         int id,
-        ProductImageBaseRequestModel requestModel,
+        ProductImageBaseRequest request,
         IProductImageRepository productImageRepository,
         IMapper mapper)
     {
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(request);
+        var isValid = Validator.TryValidateObject(request, context, results, true);
 
         if (!isValid)
         {
@@ -50,9 +50,9 @@ public class UpdateProductImageById : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var updatedProductImage = await productImageRepository.Update(productId, id, requestModel);
+        var updatedProductImage = await productImageRepository.Update(productId, id, request);
         return updatedProductImage is not null
-            ? TypedResults.Ok(mapper.Map<ProductImageBaseResponseModel>(updatedProductImage))
+            ? TypedResults.Ok(mapper.Map<ProductImageBaseResponse>(updatedProductImage))
             : TypedResults.NotFound();
     }
 }

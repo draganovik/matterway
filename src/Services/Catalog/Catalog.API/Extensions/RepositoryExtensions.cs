@@ -1,9 +1,9 @@
 using Catalog.API.Repository;
 using Shared.ServiceBrokers;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class RepositoryConfiguration
+public static class RepositoryExtensions
 {
     public static IServiceCollection ConfigureRepositories(this IServiceCollection services)
     {

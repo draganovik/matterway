@@ -2,7 +2,7 @@
 
 namespace Catalog.API.Models.ProductModels;
 
-public class ProductBaseRequestModel
+public class ProductBaseRequest
 {
     [Required]
     [RegularExpression(@"^[A-Z0-9]{5,10}$",

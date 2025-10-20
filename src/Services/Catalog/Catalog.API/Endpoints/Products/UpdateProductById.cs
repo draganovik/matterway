@@ -17,7 +17,7 @@ public class UpdateProductById : IEndpoint
         app.MapPatch("Products/{id:guid}", Handler)
             .WithName("UpdateProductById").WithSummary("Update a Product by id.")
             .WithTags("Products")
-            .Produces<ProductBaseResponseModel>(StatusCodes.Status200OK)
+            .Produces<ProductBaseResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -26,15 +26,15 @@ public class UpdateProductById : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> Handler(
+    private static async Task<Results<Ok<ProductBaseResponse>, NotFound, BadRequest<ProblemDetails>>> Handler(
         Guid id,
-        ProductBaseRequestModel requestModel,
+        ProductBaseRequest request,
         IProductRepository productRepository,
         IMapper mapper)
     {
         var results = new List<ValidationResult>();
-        var context = new ValidationContext(requestModel);
-        var isValid = Validator.TryValidateObject(requestModel, context, results, true);
+        var context = new ValidationContext(request);
+        var isValid = Validator.TryValidateObject(request, context, results, true);
 
         if (!isValid)
         {
@@ -48,9 +48,9 @@ public class UpdateProductById : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var updatedProduct = await productRepository.Update(id, requestModel);
+        var updatedProduct = await productRepository.Update(id, request);
         return updatedProduct is not null
-            ? TypedResults.Ok(mapper.Map<ProductBaseResponseModel>(updatedProduct))
+            ? TypedResults.Ok(mapper.Map<ProductBaseResponse>(updatedProduct))
             : TypedResults.NotFound();
     }
 }

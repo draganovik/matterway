@@ -1,8 +1,8 @@
 using Scalar.AspNetCore;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class ScalarConfiguration
+public static class ScalarExtensions
 {
     public static WebApplication ApplyScalar(this WebApplication app)
     {

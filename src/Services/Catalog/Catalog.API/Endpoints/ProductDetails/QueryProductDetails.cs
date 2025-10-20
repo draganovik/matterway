@@ -20,7 +20,7 @@ public class QueryProductDetails : IEndpoint
         app.MapGet("ProductDetails", Handler)
             .WithName("QueryProductDetails").WithSummary("Query ProductDetails.")
             .WithTags(nameof(ProductDetail))
-            .Produces<PaginationResponse<ProductDetailBaseResponseModel>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<ProductDetailBaseResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -30,7 +30,7 @@ public class QueryProductDetails : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<ProductDetailBaseResponseModel>>, NoContent, BadRequest<ProblemDetails>>>
+        Task<Results<Ok<PaginationResponse<ProductDetailBaseResponse>>, NoContent, BadRequest<ProblemDetails>>>
         Handler([FromQuery] [Range(1, int.MaxValue)] int page,
             [FromQuery] [Range(1, int.MaxValue)]
             int pageSize,
@@ -59,8 +59,8 @@ public class QueryProductDetails : IEndpoint
         var entities = await productDetailRepository.Query(page, pageSize);
         var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "ProductDetails");
 
-        var paginationResponse = new PaginationResponse<ProductDetailBaseResponseModel>(total, page, pageSize,
-            mapper.Map<IEnumerable<ProductDetailBaseResponseModel>>(entities).ToList(), baseUri);
+        var paginationResponse = new PaginationResponse<ProductDetailBaseResponse>(total, page, pageSize,
+            mapper.Map<IEnumerable<ProductDetailBaseResponse>>(entities).ToList(), baseUri);
 
         return entities is IEnumerable<ProductDetail> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

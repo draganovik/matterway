@@ -2,9 +2,11 @@
 
 namespace Catalog.API.Models.ProductImageModels;
 
-public class ProductImageProductResponseModel
+public class ProductImageBaseResponse
 {
     public int Id { get; set; }
+    public Guid ProductId { get; set; }
+    public string? ProductName { get; set; }
 
     [Url]
     public string? ImageUrl { get; set; }

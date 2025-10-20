@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 
-namespace Catalog.API.Configurations;
+namespace Catalog.API.Extensions;
 
-public static class OpenApiConfiguration
+public static class OpenApiExtensions
 {
     public static IServiceCollection ConfigureOpenApi(this IServiceCollection services)
     {
