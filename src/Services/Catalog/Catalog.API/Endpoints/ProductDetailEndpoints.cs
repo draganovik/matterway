@@ -6,7 +6,7 @@ using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Shared.Enums;
 using SharedProject.ModelTemplates;
 
@@ -19,34 +19,19 @@ public static class ProductDetailEndpoints
         var group = routes.MapGroup("/api/ProductDetails").WithTags(nameof(ProductDetail));
 
         group.MapGet("/", QueryProductDetails)
-            .WithName("QueryProductDetails").WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Query ProductDetails."
-            });
+            .WithName("QueryProductDetails").WithSummary("Query ProductDetails");
 
-        group.MapGet("/{id}", GetProductDetailById)
-            .WithName("GetProductDetailById").WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Get a ProductDetail by id."
-            });
+        group.MapGet("/{id:Guid}", GetProductDetailById)
+            .WithName("GetProductDetailById").WithSummary("Get a ProductDetail by id.");
 
-        group.MapPatch("/{id}", UpdateProductDetailById)
-            .WithName("UpdateProductDetailById").WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Update a ProductDetail by id."
-            });
+        group.MapPatch("/{id:Guid}", UpdateProductDetailById)
+            .WithName("UpdateProductDetailById").WithSummary("Update a ProductDetail by id.");
 
         group.MapPost("/", CreateProductDetail)
-            .WithName("CreateProductDetail").WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Create a new ProductDetail."
-            });
+            .WithName("CreateProductDetail").WithSummary("Create a new ProductDetail.");
 
-        group.MapDelete("/{id}", DeleteProductDetail)
-            .WithName("DeleteProductDetail").WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Delete a ProductDetail by id."
-            });
+        group.MapDelete("/{id:Guid}", DeleteProductDetail)
+            .WithName("DeleteProductDetail").WithSummary("Delete a ProductDetail by id.");
     }
 
 

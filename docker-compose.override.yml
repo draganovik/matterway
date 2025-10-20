@@ -15,11 +15,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__CatalogDbContext=Server=catalog_db;Database=catalog;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__CatalogDbContext=Server=sqlserver;Database=catalog;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
+    depends_on:
+      - sqlserver
     ports:
       - '2001:80'
     volumes:
@@ -30,12 +32,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__CustomersDbContext=Server=customers_db;Database=customers;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__CustomersDbContext=Server=sqlserver;Database=customers;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
       - Services__Catalog__Url=http://catalog_api:80
+    depends_on:
+      - sqlserver
     ports:
       - '2002:80'
     volumes:
@@ -46,10 +50,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__IdentityDbContext=Server=identity_db;Database=identity;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__IdentityDbContext=Server=sqlserver;Database=identity;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
+    depends_on:
+      - sqlserver
     ports:
       - '2003:80'
     volumes:
@@ -60,11 +66,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__InventoryDbContext=Server=inventory_db;Database=inventory;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__InventoryDbContext=Server=sqlserver;Database=inventory;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
+    depends_on:
+      - sqlserver
     ports:
       - '2004:80'
     volumes:
@@ -75,13 +83,15 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__OrderingDbContext=Server=ordering_db;Database=ordering;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__OrderingDbContext=Server=sqlserver;Database=ordering;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
       - Services__Catalog__Url=http://catalog_api:80
       - Services__Customers__Url=http://customers_api:80
+    depends_on:
+      - sqlserver
     ports:
       - '2005:80'
     volumes:
@@ -92,11 +102,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__PaymentsDbContext=Server=payment_db;Database=payments;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
+      - ConnectionStrings__PaymentsDbContext=Server=sqlserver;Database=payments;User=SA;Password=M55QL_4UTH;TrustServerCertificate=True;
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
       - Services__Identity__Url=http://identity_api:80
+    depends_on:
+      - sqlserver
     ports:
       - '2006:80'
     volumes:
@@ -104,56 +116,16 @@ services:
       - ${HOME}/.aspnet/https:${HOME}/.aspnet/https:ro
     command: dotnet dev-certs https; dotnet dev-certs https --trust
 
-  catalog.db:
-    container_name: catalog_db
+  sqlserver:
+    container_name: sqlserver
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1401:1433'
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=M55QL_4UTH
+    volumes:
+      - sqlserver-data:/var/opt/mssql
 
-  customers.db:
-    container_name: customers_db
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - '1402:1433'
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=M55QL_4UTH
-
-  identity.db:
-    container_name: identity_db
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - '1403:1433'
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=M55QL_4UTH
-
-  inventory.db:
-    container_name: inventory_db
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - '1404:1433'
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=M55QL_4UTH
-
-  ordering.db:
-    container_name: ordering_db
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - '1405:1433'
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=M55QL_4UTH
-
-  payment.db:
-    container_name: payment_db
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - '1406:1433'
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=M55QL_4UTH
+volumes:
+  sqlserver-data:
