@@ -3,13 +3,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using Catalog.API.Data;
-using Catalog.API.Endpoints;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using Shared.Models;
 using Shared.ServiceBrokers;
 using SharedProject.Profiles;
 
@@ -24,11 +24,12 @@ ConfigureCors(builder.Services);
 builder.Services.AddProblemDetails();
 ConfigureOpenApi(builder.Services);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpoints(typeof(Program).Assembly);
 
 var app = builder.Build();
 
 ConfigurePipeline(app);
-MapEndpoints(app);
+app.MapEndpoints();
 
 app.Run();
 
@@ -172,11 +173,4 @@ static void ConfigurePipeline(WebApplication app)
         options.WithOpenApiRoutePattern("/openapi/{documentName}.yaml");
         options.WithTitle("Matterway Catalog API");
     });
-}
-
-static void MapEndpoints(WebApplication app)
-{
-    app.MapProductDetailEndpoints();
-    app.MapProductImageEndpoints();
-    app.MapProductEndpoints();
 }

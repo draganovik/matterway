@@ -1,0 +1,31 @@
+using System;
+using Catalog.API.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Shared.Enums;
+using Shared.Models;
+
+namespace Catalog.API.Endpoints.Products;
+
+public class DeleteProduct : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapDelete("/api/Products/{id:guid}", Handler)
+            .WithName("DeleteProduct").WithSummary("Delete a Product by id.")
+            .WithTags("Products")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(policy => policy.RequireRole(
+                nameof(SystemUserRole.Admin),
+                nameof(SystemUserRole.Manager)));
+    }
+
+    private static async Task<Results<NoContent, NotFound>> Handler(
+        Guid id,
+        IProductRepository productRepository)
+    {
+        var isDeleted = await productRepository.Delete(id);
+        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
+    }
+}

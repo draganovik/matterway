@@ -14,7 +14,7 @@ services:
 
   catalog.api:
     container_name: catalog_api
-    image: ${DOCKER_REGISTRY-}catalogapi
+    #image: ${DOCKER_REGISTRY-}catalogapi
     build:
       context: .
       dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
