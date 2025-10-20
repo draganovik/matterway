@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Catalog.API.Features.Shared;
 using Shared.Extensions;
 
 namespace Catalog.API.Extensions;

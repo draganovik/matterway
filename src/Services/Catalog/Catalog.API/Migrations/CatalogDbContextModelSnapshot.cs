@@ -22,7 +22,7 @@ namespace Catalog.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Catalog.API.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.API.Features.Products.Domain.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -117,7 +117,7 @@ namespace Catalog.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Catalog.API.Entities.ProductDetail", b =>
+            modelBuilder.Entity("Catalog.API.Features.ProductDetails.Domain.ProductDetail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -263,7 +263,7 @@ namespace Catalog.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Catalog.API.Entities.ProductImage", b =>
+            modelBuilder.Entity("Catalog.API.Features.ProductImages.Domain.ProductImage", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -331,9 +331,9 @@ namespace Catalog.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Catalog.API.Entities.ProductDetail", b =>
+            modelBuilder.Entity("Catalog.API.Features.ProductDetails.Domain.ProductDetail", b =>
                 {
-                    b.HasOne("Catalog.API.Entities.Product", "Product")
+                    b.HasOne("Catalog.API.Features.Products.Domain.Product", "Product")
                         .WithMany("ProductDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -342,9 +342,9 @@ namespace Catalog.API.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Catalog.API.Entities.ProductImage", b =>
+            modelBuilder.Entity("Catalog.API.Features.ProductImages.Domain.ProductImage", b =>
                 {
-                    b.HasOne("Catalog.API.Entities.Product", "Product")
+                    b.HasOne("Catalog.API.Features.Products.Domain.Product", "Product")
                         .WithMany("ProductImages")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,7 +353,7 @@ namespace Catalog.API.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Catalog.API.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.API.Features.Products.Domain.Product", b =>
                 {
                     b.Navigation("ProductDetails");
 

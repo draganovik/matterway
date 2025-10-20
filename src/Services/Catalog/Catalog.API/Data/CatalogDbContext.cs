@@ -1,4 +1,6 @@
-﻿using Catalog.API.Entities;
+﻿using Catalog.API.Features.ProductDetails.Domain;
+using Catalog.API.Features.ProductImages.Domain;
+using Catalog.API.Features.Products.Domain;
 using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
 

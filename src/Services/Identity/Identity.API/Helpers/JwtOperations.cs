@@ -17,11 +17,10 @@ public static class JwtOperations
                                          throw new InvalidOperationException("Jwt:Key not found."));
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new Claim[]
-            {
+            Subject = new ClaimsIdentity([
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Role, user.Role.ToString())
-            }),
+            ]),
             IssuedAt = DateTime.Now,
             Expires = isRefresh ? DateTime.Now.AddDays(12) : DateTime.Now.AddMinutes(15),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

@@ -23,6 +23,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureOpenApi();
 builder.Services.ConfigureApiVersioning();
 
+// Add Validation services
+builder.Services.AddValidation();
+
 // Add CORS policy
 builder.Services.ConfigureCors();
 

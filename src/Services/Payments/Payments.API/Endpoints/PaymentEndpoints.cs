@@ -65,9 +65,9 @@ public static class PaymentEndpoints
                 Detail = "Page and pageSize must be greater than zero."
             };
             var results = new List<ValidationResult>();
-            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", new[] { nameof(page) }));
+            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", [nameof(page)]));
             if (pageSize < 1)
-                results.Add(new ValidationResult("PageSize must be greater than zero.", new[] { nameof(pageSize) }));
+                results.Add(new ValidationResult("PageSize must be greater than zero.", [nameof(pageSize)]));
 
             problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
             return TypedResults.BadRequest(problemDetails);
