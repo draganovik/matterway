@@ -1,14 +1,13 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
+using Catalog.API.Helpers;
 using Catalog.API.Models.ProductImageModels;
 using Catalog.API.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
-using Shared.Models;
+using Shared.Iterfaces;
 using ProductImage = Catalog.API.Entities.ProductImage;
 
 namespace Catalog.API.Endpoints.ProductImages;
@@ -17,18 +16,20 @@ public class CreateProductImage : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/ProductImages", Handler)
+        app.MapPost("ProductImages", Handler)
             .WithName("CreateProductImage").WithSummary("Create a new ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces<ProductImageBaseResponseModel>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)));
+                nameof(SystemUserRole.Manager)))
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Created<ProductImageBaseResponseModel>, BadRequest<ProblemDetails>>> Handler(
         ProductImageBaseRequestModel requestModel,
+        HttpContext httpContext,
         IProductImageRepository productImageRepository,
         IMapper mapper)
     {
@@ -61,7 +62,10 @@ public class CreateProductImage : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        return TypedResults.Created($"/api/ProductImages/{createdProductImage.Id}",
+        var location = ResourceUrlHelper.BuildResourceLocation(httpContext,
+            $"ProductImages/{createdProductImage.ProductId}/{createdProductImage.Id}");
+
+        return TypedResults.Created(location,
             mapper.Map<ProductImageBaseResponseModel>(createdProductImage));
     }
 }

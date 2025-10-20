@@ -1,12 +1,9 @@
-using System;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
 using Catalog.API.Models.ProductModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Shared.Models;
-using Product = Catalog.API.Entities.Product;
+using Shared.Iterfaces;
 
 namespace Catalog.API.Endpoints.Products;
 
@@ -14,11 +11,12 @@ public class GetProductById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/Products/{id:guid}", Handler)
+        app.MapGet("Products/{id:guid}", Handler)
             .WithName("GetProductById").WithSummary("Get a Product by id.")
             .WithTags("Products")
             .Produces<ProductBaseResponseModel>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<ProductBaseResponseModel>, NotFound>> Handler(

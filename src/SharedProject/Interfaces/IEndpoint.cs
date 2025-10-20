@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Routing;
-
-namespace Shared.Models;
+namespace Shared.Iterfaces;
 
 public interface IEndpoint
 {

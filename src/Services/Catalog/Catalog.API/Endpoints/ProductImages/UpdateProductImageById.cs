@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
 using Catalog.API.Models.ProductImageModels;
 using Catalog.API.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
-using Shared.Models;
+using Shared.Iterfaces;
 using ProductImage = Catalog.API.Entities.ProductImage;
 
 namespace Catalog.API.Endpoints.ProductImages;
@@ -18,7 +15,7 @@ public class UpdateProductImageById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/api/ProductImages/{productId:guid}/{id:int}", Handler)
+        app.MapPatch("ProductImages/{productId:guid}/{id:int}", Handler)
             .WithName("UpdateProductImageById").WithSummary("Update a ProductImage by id.")
             .WithTags(nameof(ProductImage))
             .Produces<ProductImageBaseResponseModel>(StatusCodes.Status200OK)
@@ -26,7 +23,8 @@ public class UpdateProductImageById : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)));
+                nameof(SystemUserRole.Manager)))
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> Handler(

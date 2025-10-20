@@ -1,14 +1,13 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
+using Catalog.API.Helpers;
 using Catalog.API.Models.ProductDetailModels;
 using Catalog.API.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
-using Shared.Models;
+using Shared.Iterfaces;
 using ProductDetail = Catalog.API.Entities.ProductDetail;
 
 namespace Catalog.API.Endpoints.ProductDetails;
@@ -17,18 +16,20 @@ public class CreateProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/ProductDetails", Handler)
+        app.MapPost("ProductDetails", Handler)
             .WithName("CreateProductDetail").WithSummary("Create a new ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces<ProductDetailBaseResponseModel>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)));
+                nameof(SystemUserRole.Manager)))
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Created<ProductDetailBaseResponseModel>, BadRequest<ProblemDetails>>> Handler(
         ProductDetailBaseRequestModel requestModel,
+        HttpContext httpContext,
         IProductDetailRepository productDetailRepository,
         IMapper mapper)
     {
@@ -61,7 +62,10 @@ public class CreateProductDetail : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        return TypedResults.Created($"/api/ProductDetails/{createdProductDetail.Id}",
+        var location = ResourceUrlHelper.BuildResourceLocation(httpContext,
+            $"ProductDetails/{createdProductDetail.Id}");
+
+        return TypedResults.Created(location,
             mapper.Map<ProductDetailBaseResponseModel>(createdProductDetail));
     }
 }

@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
 using Catalog.API.Filters;
+using Catalog.API.Helpers;
 using Catalog.API.Models.ProductModels;
 using Catalog.API.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Enums;
-using Shared.Models;
+using Shared.Iterfaces;
 using SharedProject.ModelTemplates;
 using Product = Catalog.API.Entities.Product;
 
@@ -21,12 +17,13 @@ public class QueryProducts : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/Products", Handler)
-            .WithName("QueryProducts").WithSummary("Query Products 2.")
+        app.MapGet("Products", Handler)
+            .WithName("QueryProducts").WithSummary("Query Products.")
             .WithTags("Products")
             .Produces<PaginationResponse<ProductBaseResponseModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status400BadRequest);
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async
@@ -34,7 +31,8 @@ public class QueryProducts : IEndpoint
         Handler([FromQuery] [Range(1, int.MaxValue)] int page,
             [FromQuery] [Range(1, int.MaxValue)]
             int pageSize,
-            [AsParameters] ProductFilter productFilter,
+            [AsParameters]
+            ProductFilter productFilter,
             HttpContext httpContext,
             IProductRepository productRepository,
             IMapper mapper)
@@ -58,9 +56,7 @@ public class QueryProducts : IEndpoint
 
         var total = await productRepository.GetTotalEntities(productFilter);
         var entities = await productRepository.Query(page, pageSize, productFilter);
-        var baseUri =
-            new Uri(
-                $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/api/Products");
+        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Products");
 
         var paginationResponse = new PaginationResponse<ProductBaseResponseModel>(total, page, pageSize,
             mapper.Map<IEnumerable<ProductBaseResponseModel>>(entities).ToList(), baseUri);

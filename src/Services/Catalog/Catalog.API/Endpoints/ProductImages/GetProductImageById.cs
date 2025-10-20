@@ -1,10 +1,9 @@
-using System;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
 using Catalog.API.Models.ProductImageModels;
 using Catalog.API.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Models;
+using Shared.Iterfaces;
 using ProductImage = Catalog.API.Entities.ProductImage;
 
 namespace Catalog.API.Endpoints.ProductImages;
@@ -13,11 +12,12 @@ public class GetProductImageById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/ProductImages/{productId:guid}/{id:int}", Handler)
+        app.MapGet("ProductImages/{productId:guid}/{id:int}", Handler)
             .WithName("GetProductImageById").WithSummary("Get a ProductImage by id.")
             .WithTags(nameof(ProductImage))
             .Produces<ProductImageBaseResponseModel>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<ProductImageBaseResponseModel>, NotFound>> Handler(

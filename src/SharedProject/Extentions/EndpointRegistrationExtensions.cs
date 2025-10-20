@@ -1,7 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shared.Iterfaces;
 
-namespace Shared.Models;
+namespace Shared.Extensions;
 
 public static class EndpointRegistrationExtensions
 {
@@ -15,10 +16,10 @@ public static class EndpointRegistrationExtensions
         this IServiceCollection services,
         params Assembly[] assemblies)
     {
+        var assembly = typeof(IEndpoint).Assembly;
         var uniqueTypes = new HashSet<Type>();
 
         var serviceDescriptors = assemblies
-            .Where(assembly => assembly is not null)
             .SelectMany(assembly => assembly.DefinedTypes)
             .Where(type => type is { IsAbstract: false, IsInterface: false } &&
                            type.IsAssignableTo(typeof(IEndpoint)) &&

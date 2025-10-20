@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Entities;
 using Catalog.API.Models.ProductDetailModels;
 using Catalog.API.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Enums;
-using Shared.Models;
+using Shared.Iterfaces;
 using ProductDetail = Catalog.API.Entities.ProductDetail;
 
 namespace Catalog.API.Endpoints.ProductDetails;
@@ -18,7 +15,7 @@ public class UpdateProductDetailById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/api/ProductDetails/{id:guid}", Handler)
+        app.MapPatch("ProductDetails/{id:guid}", Handler)
             .WithName("UpdateProductDetailById").WithSummary("Update a ProductDetail by id.")
             .WithTags(nameof(ProductDetail))
             .Produces<ProductDetailBaseResponseModel>(StatusCodes.Status200OK)
@@ -26,14 +23,16 @@ public class UpdateProductDetailById : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)));
+                nameof(SystemUserRole.Manager)))
+            .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>> Handler(
-        Guid id,
-        ProductDetailBaseRequestModel requestModel,
-        IProductDetailRepository productDetailRepository,
-        IMapper mapper)
+    private static async Task<Results<Ok<ProductDetailBaseResponseModel>, NotFound, BadRequest<ProblemDetails>>>
+        Handler(
+            Guid id,
+            ProductDetailBaseRequestModel requestModel,
+            IProductDetailRepository productDetailRepository,
+            IMapper mapper)
     {
         var results = new List<ValidationResult>();
         var context = new ValidationContext(requestModel);

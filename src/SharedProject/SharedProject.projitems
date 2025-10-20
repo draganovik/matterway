@@ -13,8 +13,8 @@
         <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\PaymentState.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs"/>
-    <Compile Include="$(MSBuildThisFileDirectory)Extentions\EndpointRegistrationExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IEndpoint.cs" />
+        <Compile Include="$(MSBuildThisFileDirectory)Extentions\EndpointRegistrationExtensions.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IEndpoint.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Customer.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs"/>
@@ -27,5 +27,5 @@
         <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\ICatalogServiceBroker.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IdentityServiceBroker.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IIdentityServiceBroker.cs"/>
-  </ItemGroup>
+    </ItemGroup>
 </Project>
