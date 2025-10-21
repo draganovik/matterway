@@ -18,5 +18,8 @@ RUN dotnet publish "Ordering.API.csproj" -c Release -o /app/publish /p:UseAppHos
 
 FROM base AS final
 WORKDIR /app
+ARG ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
+COPY Properties/ ./Properties/
 ENTRYPOINT ["dotnet", "Ordering.API.dll"]

@@ -22,7 +22,7 @@ namespace Ordering.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Ordering.API.Entities.Address", b =>
+            modelBuilder.Entity("Ordering.API.Features.Addresses.Domain.Address", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -82,7 +82,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.Order", b =>
+            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.OrderHistory", b =>
+            modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,7 +164,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.OrderItem", b =>
+            modelBuilder.Entity("Ordering.API.Features.OrderItems.Domain.OrderItem", b =>
                 {
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -205,9 +205,9 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.Order", b =>
+            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
                 {
-                    b.HasOne("Ordering.API.Entities.Address", "Address")
+                    b.HasOne("Ordering.API.Features.Addresses.Domain.Address", "Address")
                         .WithMany()
                         .HasForeignKey("DeliveryAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -216,9 +216,9 @@ namespace Ordering.API.Migrations
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.OrderHistory", b =>
+            modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
                 {
-                    b.HasOne("Ordering.API.Entities.Order", "Order")
+                    b.HasOne("Ordering.API.Features.Orders.Domain.Order", "Order")
                         .WithMany("OrderHistory")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -227,9 +227,9 @@ namespace Ordering.API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.OrderItem", b =>
+            modelBuilder.Entity("Ordering.API.Features.OrderItems.Domain.OrderItem", b =>
                 {
-                    b.HasOne("Ordering.API.Entities.Order", "Order")
+                    b.HasOne("Ordering.API.Features.Orders.Domain.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,7 +238,7 @@ namespace Ordering.API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Ordering.API.Entities.Order", b =>
+            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
                 {
                     b.Navigation("OrderHistory");
 

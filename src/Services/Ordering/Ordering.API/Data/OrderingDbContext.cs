@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Ordering.API.Entities;
+using Ordering.API.Features.Addresses.Domain;
+using Ordering.API.Features.OrderHistories.Domain;
+using Ordering.API.Features.OrderItems.Domain;
+using Ordering.API.Features.Orders.Domain;
 using Shared.Enums;
 
 namespace Ordering.API.Data;
