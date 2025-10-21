@@ -16,7 +16,7 @@ const addressData: Ref<AddressModel> = ref(
 );
 
 const pay = async () => {
-  const response = await fetch("/api/payments", {
+  const response = await fetch("/api/v1.0/payments", {
     method: "POST",
     body: JSON.stringify({
       ...paymentData.value,

@@ -25,7 +25,7 @@ namespace Identity.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Identity.API.Entities.Session", b =>
+            modelBuilder.Entity("Identity.API.Features.Sessions.Domain.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace Identity.API.Migrations
                     b.ToTable("Session");
                 });
 
-            modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
+            modelBuilder.Entity("Identity.API.Features.SystemUsers.Domain.SystemUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -120,9 +120,9 @@ namespace Identity.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Identity.API.Entities.Session", b =>
+            modelBuilder.Entity("Identity.API.Features.Sessions.Domain.Session", b =>
                 {
-                    b.HasOne("Identity.API.Entities.SystemUser", "SystemUser")
+                    b.HasOne("Identity.API.Features.SystemUsers.Domain.SystemUser", "SystemUser")
                         .WithMany("Sessions")
                         .HasForeignKey("SystemUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -131,7 +131,7 @@ namespace Identity.API.Migrations
                     b.Navigation("SystemUser");
                 });
 
-            modelBuilder.Entity("Identity.API.Entities.SystemUser", b =>
+            modelBuilder.Entity("Identity.API.Features.SystemUsers.Domain.SystemUser", b =>
                 {
                     b.Navigation("Sessions");
                 });

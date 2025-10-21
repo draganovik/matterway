@@ -49,17 +49,15 @@ export const useSessionStore = defineStore("session", {
   actions: {
     async login(credentials: LoginModel) {
       const config = useRuntimeConfig();
-      const response = await fetch(
-        `${config.public.authApiBaseUrl}/api/Sessions/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "application/json",
-          },
-          body: JSON.stringify(credentials),
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
+      const response = await fetch(`${baseUrl}/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
         },
-      );
+        body: JSON.stringify(credentials),
+      });
       const data = await response.json();
       if (response.ok) {
         this.setSession(data);
@@ -68,12 +66,10 @@ export const useSessionStore = defineStore("session", {
 
     async logout() {
       const config = useRuntimeConfig();
-      const response = await request(
-        `${config.public.authApiBaseUrl}/api/Sessions/revoke`,
-        {
-          method: "DELETE",
-        },
-      );
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
+      const response = await request(`${baseUrl}/revoke`, {
+        method: "DELETE",
+      });
       if (response.ok) {
         const cartStore = useCartStore();
         this.setSession(null);
@@ -82,21 +78,19 @@ export const useSessionStore = defineStore("session", {
     },
     async refreshToken() {
       const config = useRuntimeConfig();
-      const response = await fetch(
-        `${config.public.authApiBaseUrl}/api/Sessions/refresh`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            refreshToken: this.session?.refreshToken,
-            tokenType: this.session?.tokenType,
-          }),
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
+      const response = await fetch(`${baseUrl}/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
         },
-      );
+        credentials: "include",
+        body: JSON.stringify({
+          refreshToken: this.session?.refreshToken,
+          tokenType: this.session?.tokenType,
+        }),
+      });
       const data = await response.json();
       if (response.ok) {
         this.setSession(data);

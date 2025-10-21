@@ -32,7 +32,7 @@ export const useCatalogStore = defineStore("catalog", {
     async fetchProductById(id: string): Promise<ProductModel | null> {
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/Products/${id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${id}`,
         {
           method: "GET",
           headers: {
@@ -66,7 +66,7 @@ export const useCatalogStore = defineStore("catalog", {
       }
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/Products?page=${page}&pageSize=${pageSize}${advancedQuery}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products?page=${page}&pageSize=${pageSize}${advancedQuery}`,
         {
           method: "GET",
           headers: {
@@ -106,7 +106,7 @@ export const useCatalogStore = defineStore("catalog", {
     async updateProduct(product: ProductModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/Products/${product.id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${product.id}`,
         {
           method: "PATCH",
           body: JSON.stringify(product),
@@ -126,7 +126,7 @@ export const useCatalogStore = defineStore("catalog", {
     async deleteProduct(product: ProductModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/Products/${product.id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${product.id}`,
         {
           method: "DELETE",
         },
@@ -145,7 +145,7 @@ export const useCatalogStore = defineStore("catalog", {
     async createProduct(product: ProductModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/Products`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -173,7 +173,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/ProductDetails`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -190,7 +190,7 @@ export const useCatalogStore = defineStore("catalog", {
     async deleteProductSpec(specId: string): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/ProductDetails/${specId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails/${specId}`,
         {
           method: "DELETE",
         },
@@ -206,7 +206,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/ProductDetails/${specId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails/${specId}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -229,7 +229,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/ProductImages`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -249,7 +249,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/ProductImages/${productId}/${imageId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${imageId}`,
         {
           method: "DELETE",
         },

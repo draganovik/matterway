@@ -23,7 +23,7 @@ public class IdentityServiceBroker : IIdentityServiceBroker
         // if token is invalid, Unauthorized should be thrown
         // if token is expired, Unauthorized should be thrown
         // if token is not found, Unauthorized should be thrown
-        var request = new HttpRequestMessage(HttpMethod.Get, "/api/Sessions/introspect");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1.0/Sessions/introspect");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)

@@ -19,7 +19,7 @@ services:
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
-      - Services__Identity__Url=http://identity_api:80
+      - Services__Identity__Url=http://identity-api:80
     depends_on:
       - sqlserver
     ports:
@@ -36,8 +36,8 @@ services:
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
-      - Services__Identity__Url=http://identity_api:80
-      - Services__Catalog__Url=http://catalog_api:80
+      - Services__Identity__Url=http://identity-api:80
+      - Services__Catalog__Url=http://catalog-api:80
     depends_on:
       - sqlserver
     ports:
@@ -70,7 +70,7 @@ services:
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
-      - Services__Identity__Url=http://identity_api:80
+      - Services__Identity__Url=http://identity-api:80
     depends_on:
       - sqlserver
     ports:
@@ -87,9 +87,9 @@ services:
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
-      - Services__Identity__Url=http://identity_api:80
-      - Services__Catalog__Url=http://catalog_api:80
-      - Services__Customers__Url=http://customers_api:80
+      - Services__Identity__Url=http://identity-api:80
+      - Services__Catalog__Url=http://catalog-api:80
+      - Services__Customers__Url=http://customers-api:80
     depends_on:
       - sqlserver
     ports:
@@ -106,7 +106,7 @@ services:
       - Jwt__Issuer=http://localhost:2003
       - Jwt__Key=2b23549ce5404449bf7b41a56856bfab
       - Jwt__Audience=http://localhost:2003
-      - Services__Identity__Url=http://identity_api:80
+      - Services__Identity__Url=http://identity-api:80
     depends_on:
       - sqlserver
     ports:

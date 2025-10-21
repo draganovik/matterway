@@ -1,12 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Identity.API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Shared.ServiceBrokers;
+using NuGet.Protocol;
 
-namespace Catalog.API.Extensions;
+namespace Identity.API.Extensions;
 
 public static class AuthenticationExtensions
 {
@@ -23,8 +25,10 @@ public static class AuthenticationExtensions
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                var signingKey = configuration["Jwt:Key"]
-                                 ?? throw new InvalidOperationException("JWT signing key not configured.");
+
+                var signingKey = configuration["Jwt:Key"] ??
+                                 throw new InvalidOperationException("JWT signing key not configured.");
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
@@ -33,26 +37,35 @@ public static class AuthenticationExtensions
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
                 };
+
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = async context =>
                     {
                         var identifier = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-                        if (!Guid.TryParse(identifier, out _) || context.SecurityToken is not JsonWebToken jwtToken ||
+
+                        if (!Guid.TryParse(identifier, out var userId) ||
+                            context.SecurityToken is not JsonWebToken jwtToken ||
                             string.IsNullOrWhiteSpace(jwtToken.EncodedToken))
                         {
                             context.Fail("Unauthorized");
                             return;
                         }
 
-                        var broker = context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
-                        if (await broker.ValidateTokenAsync(jwtToken.EncodedToken) is null)
+                        var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDbContext>();
+                        var sessionExists = await dbContext.Session
+                            .AsNoTracking()
+                            .AnyAsync(s => s.Token == jwtToken.EncodedToken,
+                                context.HttpContext.RequestAborted);
+
+                        if (!sessionExists)
                         {
                             context.Fail("Unauthorized");
                         }
                     }
                 };
             });
+
         services.AddAuthorization();
         return services;
     }

@@ -3,7 +3,7 @@ using Shared.Enums;
 
 namespace Catalog.API.Features.Products.Shared;
 
-public abstract class ProductFilter
+public record ProductFilter
 {
     public string? TitleLike { get; set; }
     public double? PriceMin { get; set; }

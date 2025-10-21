@@ -1,4 +1,5 @@
-﻿using Identity.API.Entities;
+﻿using Identity.API.Features.Sessions.Domain;
+using Identity.API.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
@@ -7,12 +8,9 @@ namespace Identity.API.Data;
 
 public class IdentityDbContext : DbContext
 {
-    private readonly IConfiguration configuration;
-
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options, IConfiguration config)
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
         : base(options)
     {
-        configuration = config;
     }
 
     public DbSet<SystemUser> SystemUser { get; set; } = default!;

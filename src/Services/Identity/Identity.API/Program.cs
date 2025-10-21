@@ -1,155 +1,53 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json.Serialization;
-using Identity.API.Data;
-using Identity.API.Endpoints;
-using Identity.API.Entities;
-using Identity.API.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using SharedProject.Profiles;
+using Identity.API.Extensions;
+using Microsoft.AspNetCore.Routing;
+using Shared.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory()
+});
 
-// Add the Identity database connection
-builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDbContext") ??
-                         throw new InvalidOperationException("Connection string 'IdentityDbContext' not found.")));
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+        reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-// Add the AutoMapper service
-builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
-    AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddProblemDetails();
+builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
 
-// Add the PasswordHasher service
-builder.Services.AddScoped<IPasswordHasher<SystemUser>, PasswordHasher<SystemUser>>();
+builder.Services.ConfigureAuthentication(builder.Configuration);
+builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureRepositories();
 
-// Configure the service controllers and JSON serialization options
-builder.Services
-    .AddControllers(setup => setup.ReturnHttpNotAcceptable = true)
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.ConfigureMapper();
+builder.Services.ConfigureJsonOptions();
 
-// Add repositories
-builder.Services.AddScoped<ISystemUserRepository, SystemUserRepository>();
-builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-
-// Configure ApiExplorer endpoints
+builder.Services.AddEndpoints();
 builder.Services.AddEndpointsApiExplorer();
 
-// Add the Swagger generator
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Scheme = "bearer",
-        Description = "Please insert JWT token into field"
-    });
+builder.Services.ConfigureOpenApi();
+builder.Services.ConfigureApiVersioning();
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+builder.Services.AddValidation();
+builder.Services.ConfigureCors();
 
-// Add authentication and authorization configurations
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        //ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        //ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnTokenValidated = async context =>
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            // Get the system user ID from the token
-            if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-                context.Fail("Unauthorized");
-
-            // Get the token from the context
-            var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
-
-            if (token == null) context.Fail("Unauthorized");
-
-            // Get the session from the database based on the user ID and token
-            var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDbContext>();
-            var session =
-                await dbContext.Session.FirstOrDefaultAsync(s => s.SystemUserId == systemUserId && s.Token == token);
-
-            if (session == null) context.Fail("Unauthorized");
-        }
-    };
-});
-
-// Configure the CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
-            .AllowAnyMethod()
-            .AllowAnyHeader().AllowCredentials();
-    });
-});
-
-// Add the authorization service
-builder.Services.AddAuthorization();
-
-// Add the ProblemDetails service
-builder.Services.AddProblemDetails();
-
-// Build the application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 app.UseStatusCodePages();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-// Map the endpoints
-app.MapSystemUserEndpoints();
-app.MapSessionEndpoints();
-
-// Enable CORS
 app.UseCors();
 
-// Run the application
+app.UseAuthentication();
+app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.ApplyOpenApi();
+    app.ApplyScalar();
+}
+
+app.ApplyEndpoints();
+
 app.Run();
