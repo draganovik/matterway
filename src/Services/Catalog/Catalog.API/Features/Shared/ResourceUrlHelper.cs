@@ -1,6 +1,4 @@
-﻿using Asp.Versioning;
-
-namespace Catalog.API.Features.Shared;
+﻿namespace Catalog.API.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

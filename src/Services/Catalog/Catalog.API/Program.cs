@@ -1,10 +1,21 @@
 ﻿using Catalog.API.Extensions;
 using Shared.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory()
+});
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+        reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Add Problem Details middleware
 builder.Services.AddProblemDetails();
+builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
 
 // Add Authentication, Database, and Repositories
 builder.Services.ConfigureAuthentication(builder.Configuration);

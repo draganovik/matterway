@@ -2,8 +2,8 @@ version: '3.4'
 
 services:
   webstore.web:
-    container_name: webstore_web
-    image: ${DOCKER_REGISTRY-}webstoreweb
+    container_name: webstore-web
+    image: ${DOCKER_REGISTRY-}webstore-web
     environment:
       NUXT_APP_VERSION: "1.0.0"
     command: node /app/.output/server/index.mjs
@@ -13,47 +13,47 @@ services:
       dockerfile: Dockerfile
 
   catalog.api:
-    container_name: catalog_api
-    #image: ${DOCKER_REGISTRY-}catalogapi
+    container_name: catalog-api
+    image: ${DOCKER_REGISTRY-}catalog-api
     build:
       context: .
       dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
 
   customers.api:
-    container_name: customers_api
-    image: ${DOCKER_REGISTRY-}customersapi
+    container_name: customers-api
+    image: ${DOCKER_REGISTRY-}customers-api
     build:
       context: .
       dockerfile: src/Services/Customers/Customers.API/Dockerfile
 
 
   identity.api:
-    container_name: identity_api
-    image: ${DOCKER_REGISTRY-}identityapi
+    container_name: identity-api
+    image: ${DOCKER_REGISTRY-}identity-api
     build:
       context: .
       dockerfile: src/Services/Identity/Identity.API/Dockerfile
 
 
   inventory.api:
-    container_name: inventory_api
-    image: ${DOCKER_REGISTRY-}inventoryapi
+    container_name: inventory-api
+    image: ${DOCKER_REGISTRY-}inventory-api
     build:
       context: .
       dockerfile: src/Services/Inventory/Inventory.API/Dockerfile
 
 
   ordering.api:
-    container_name: ordering_api
-    image: ${DOCKER_REGISTRY-}orderingapi
+    container_name: ordering-api
+    image: ${DOCKER_REGISTRY-}ordering-api
     build:
       context: .
       dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
 
 
   payment.api:
-    container_name: payment_api
-    image: ${DOCKER_REGISTRY-}paymentapi
+    container_name: payment-api
+    image: ${DOCKER_REGISTRY-}payment-api
     build:
       context: .
       dockerfile: src/Services/Payments/Payments.API/Dockerfile
