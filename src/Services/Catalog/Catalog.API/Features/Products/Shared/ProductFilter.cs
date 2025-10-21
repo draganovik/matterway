@@ -3,7 +3,7 @@ using Shared.Enums;
 
 namespace Catalog.API.Features.Products.Shared;
 
-public class ProductFilter
+public abstract class ProductFilter
 {
     public string? TitleLike { get; set; }
     public double? PriceMin { get; set; }
@@ -21,14 +21,13 @@ public class ProductFilter
         if (CategoryLike != null)
             query = query.Where(p => p.ProductDetails != null && p.ProductDetails.Any(pd =>
                 pd.Type == DetailType.Category && pd.Value != null &&
-                pd.Value.ToLower().Contains(CategoryLike.ToLower())));
+                pd.Value.Contains(CategoryLike, StringComparison.CurrentCultureIgnoreCase)));
         if (ProductDetailsLike?.Length > 0)
         {
-            foreach (var productDetailLike in ProductDetailsLike)
-            {
-                query = query.Where(p => p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                    pd.Value != null && pd.Value.ToLower().Contains(productDetailLike.ToLower())));
-            }
+            query = ProductDetailsLike.Aggregate(query,
+                (current, productDetailLike) => current.Where(p =>
+                    p.ProductDetails != null && p.ProductDetails.Any(pd =>
+                        pd.Value != null && pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
         }
 
         if (IsAvailable.HasValue) query = query.Where(p => p.IsAvailable == IsAvailable);
