@@ -19,7 +19,7 @@ public class CatalogServiceBroker : ICatalogServiceBroker
         // call a Get endpoint on Catalog.API to get Product by Id
         // if Product is found, return it
         // if Product is not found, return null
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/Products/{id}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/Products/{id}");
         var response = await _httpClient.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {

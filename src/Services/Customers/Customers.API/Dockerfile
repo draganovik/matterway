@@ -3,7 +3,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
@@ -18,5 +17,8 @@ RUN dotnet publish "Customers.API.csproj" -c Release -o /app/publish /p:UseAppHo
 
 FROM base AS final
 WORKDIR /app
+ARG ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
+COPY Properties/ ./Properties/
 ENTRYPOINT ["dotnet", "Customers.API.dll"]

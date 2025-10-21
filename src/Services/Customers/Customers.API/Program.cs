@@ -1,136 +1,53 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Customers.API.Data;
-using Customers.API.Endpoints;
-using Customers.API.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Shared.ServiceBrokers;
-using SharedProject.Profiles;
+﻿using Customers.API.Extensions;
+using Microsoft.AspNetCore.Routing;
+using Shared.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<CustomersDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CustomersDbContext") ??
-                         throw new InvalidOperationException("Connection string 'CustomersDbContext' not found.")));
-
-builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
-
-builder.Services.AddScoped<ICatalogServiceBroker, CatalogServiceBroker>();
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
-
-builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
-    AppDomain.CurrentDomain.GetAssemblies());
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Scheme = "bearer",
-        Description = "Please insert JWT token into field"
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory()
 });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        //ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        //ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-    };
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+        reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-    options.Events = new JwtBearerEvents
-    {
-        OnTokenValidated = async context =>
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            // Get the system user ID from the token
-            if (!Guid.TryParse(context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-                context.Fail("Unauthorized");
-
-            // Get the token from the context
-            var token = (context.SecurityToken as JwtSecurityToken)?.RawData;
-
-            if (token == null) context.Fail("Unauthorized");
-
-            // Get the session from the database based on the user ID and token
-            // TODO: make a call to the Identity API to validate the token
-
-            var identityServiceBroker =
-                context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
-            var claimsPrincipal = await identityServiceBroker.ValidateTokenAsync(token!);
-            if (claimsPrincipal == null) context.Fail("Unauthorized");
-        }
-    };
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
-            .AllowAnyMethod()
-            .AllowAnyHeader().AllowCredentials();
-    });
-});
-
-builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
+builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
+
+builder.Services.ConfigureAuthentication(builder.Configuration);
+builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureRepositories();
+
+builder.Services.ConfigureMapper();
+builder.Services.ConfigureJsonOptions();
+
+builder.Services.AddEndpoints();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.ConfigureOpenApi();
+builder.Services.ConfigureApiVersioning();
+
+builder.Services.AddValidation();
+builder.Services.ConfigureCors();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+app.UseCors();
 
-// Configure the HTTP request pipeline.
+app.UseAuthentication();
+app.UseAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.ApplyOpenApi();
+    app.ApplyScalar();
 }
 
-app.MapCustomerEndpoints();
-
-app.MapCartItemEndpoints();
-
-app.UseCors();
+app.ApplyEndpoints();
 
 app.Run();

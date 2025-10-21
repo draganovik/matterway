@@ -1,4 +1,5 @@
-﻿using Customers.API.Entities;
+﻿using Customers.API.Features.CartItems.Domain;
+using Customers.API.Features.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Customers.API.Data;
