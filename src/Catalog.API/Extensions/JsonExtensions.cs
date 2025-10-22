@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class JsonExtensions
 {

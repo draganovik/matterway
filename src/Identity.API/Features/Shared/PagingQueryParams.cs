@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Features.Shared;
+namespace Identity.Api.Features.Shared;
 
 public class PagingQueryParams
 {

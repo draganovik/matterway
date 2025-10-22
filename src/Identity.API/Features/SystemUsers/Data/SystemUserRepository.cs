@@ -1,10 +1,10 @@
-using Identity.API.Data;
-using Identity.API.Features.SystemUsers.Contracts;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Data;
+using Identity.Api.Features.SystemUsers.Contracts;
+using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.API.Features.SystemUsers.Data;
+namespace Identity.Api.Features.SystemUsers.Data;
 
 public class SystemUserRepository : ISystemUserRepository
 {

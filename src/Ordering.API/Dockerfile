@@ -7,19 +7,19 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Ordering.API/Ordering.API.csproj", "src/Ordering.API/"]
-RUN dotnet restore "src/Ordering.API/Ordering.API.csproj"
+COPY ["src/Ordering.Api/Ordering.Api.csproj", "src/Ordering.Api/"]
+RUN dotnet restore "src/Ordering.Api/Ordering.Api.csproj"
 COPY . .
-WORKDIR "/src/src/Ordering.API"
-RUN dotnet build "Ordering.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Ordering.Api"
+RUN dotnet build "Ordering.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Ordering.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Ordering.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY src/Ordering.API/Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Ordering.API.dll"]
+COPY src/Ordering.Api/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Ordering.Api.dll"]

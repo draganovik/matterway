@@ -1,4 +1,4 @@
-using Identity.API.Extensions;
+using Identity.Api.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Common.Infrastructure.Extensions;
 

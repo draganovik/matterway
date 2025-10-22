@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class AuthenticationExtensions
 {

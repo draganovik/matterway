@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Catalog.API.Features.Products.Contracts;
+namespace Catalog.Api.Features.Products.Contracts;
 
 public class ProductBaseRequest
 {

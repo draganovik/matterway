@@ -1,17 +1,17 @@
 using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
-using Customers.API.Features.CartItems.Contracts;
-using Customers.API.Features.CartItems.Data;
-using Customers.API.Features.CartItems.Domain;
-using Customers.API.Features.Shared;
+using Customers.Api.Features.CartItems.Contracts;
+using Customers.Api.Features.CartItems.Data;
+using Customers.Api.Features.CartItems.Domain;
+using Customers.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ModelTemplates;
 
-namespace Customers.API.Features.CartItems.Endpoints;
+namespace Customers.Api.Features.CartItems.Endpoints;
 
 public class QueryCartItems : IEndpoint
 {

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Ordering.API.Data;
-using Ordering.API.Features.Orders.Contracts;
-using Ordering.API.Features.Orders.Domain;
+using Ordering.Api.Data;
+using Ordering.Api.Features.Orders.Contracts;
+using Ordering.Api.Features.Orders.Domain;
 
-namespace Ordering.API.Features.Orders.Data;
+namespace Ordering.Api.Features.Orders.Data;
 
 public class OrderRepository : IOrderRepository
 {

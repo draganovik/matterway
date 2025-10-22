@@ -1,10 +1,10 @@
 using Asp.Versioning;
-using Identity.API.Features.SystemUsers.Data;
+using Identity.Api.Features.SystemUsers.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Identity.API.Features.SystemUsers.Endpoints;
+namespace Identity.Api.Features.SystemUsers.Endpoints;
 
 public class DeleteSystemUser : IEndpoint
 {

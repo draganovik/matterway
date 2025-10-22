@@ -16,7 +16,7 @@ public class CatalogServiceBroker : ICatalogServiceBroker
 
     public async Task<Product?> GetProductById(Guid id)
     {
-        // call a Get endpoint on Catalog.API to get Product by Id
+        // call a Get endpoint on Catalog.Api to get Product by Id
         // if Product is found, return it
         // if Product is not found, return null
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/Products/{id}");

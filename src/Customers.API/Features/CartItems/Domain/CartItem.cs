@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Customers.API.Features.Customers.Domain;
+using Customers.Api.Features.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Features.CartItems.Domain;
+namespace Customers.Api.Features.CartItems.Domain;
 
 [PrimaryKey(nameof(CustomerId), nameof(ProductId))]
 public class CartItem

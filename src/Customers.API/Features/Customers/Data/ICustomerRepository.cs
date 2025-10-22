@@ -1,7 +1,7 @@
-using Customers.API.Features.Customers.Contracts;
-using Customers.API.Features.Customers.Domain;
+using Customers.Api.Features.Customers.Contracts;
+using Customers.Api.Features.Customers.Domain;
 
-namespace Customers.API.Features.Customers.Data;
+namespace Customers.Api.Features.Customers.Data;
 
 public interface ICustomerRepository
 {

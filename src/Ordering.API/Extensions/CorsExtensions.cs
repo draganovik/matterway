@@ -1,4 +1,4 @@
-namespace Ordering.API.Extensions;
+namespace Ordering.Api.Extensions;
 
 public static class CorsExtensions
 {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Ordering.API.Features.Addresses.Domain;
-using Ordering.API.Features.OrderHistories.Domain;
-using Ordering.API.Features.OrderItems.Domain;
-using Ordering.API.Features.Orders.Domain;
+using Ordering.Api.Features.Addresses.Domain;
+using Ordering.Api.Features.OrderHistories.Domain;
+using Ordering.Api.Features.OrderItems.Domain;
+using Ordering.Api.Features.Orders.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Ordering.API.Data;
+namespace Ordering.Api.Data;
 
 public class OrderingDbContext : DbContext
 {

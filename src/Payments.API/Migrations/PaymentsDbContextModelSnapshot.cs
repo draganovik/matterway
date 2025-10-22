@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Payments.API.Data;
+using Payments.Api.Data;
 
 #nullable disable
 
-namespace Payments.API.Migrations
+namespace Payments.Api.Migrations
 {
     [DbContext(typeof(PaymentsDbContext))]
     partial class PaymentsDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace Payments.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Payments.API.Features.Payments.Domain.Payment", b =>
+            modelBuilder.Entity("Payments.Api.Features.Payments.Domain.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

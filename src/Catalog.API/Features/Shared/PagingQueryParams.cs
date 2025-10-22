@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Catalog.API.Features.Shared;
+namespace Catalog.Api.Features.Shared;
 
 public class PagingQueryParams
 {

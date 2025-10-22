@@ -1,10 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Identity.API.Features.Sessions.Services;
+namespace Identity.Api.Features.Sessions.Services;
 
 public static class JwtOperations
 {

@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using Asp.Versioning;
-using Identity.API.Features.Sessions.Data;
+using Identity.Api.Features.Sessions.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Interfaces;
 
-namespace Identity.API.Features.Sessions.Endpoints;
+namespace Identity.Api.Features.Sessions.Endpoints;
 
 public class RevokeSession : IEndpoint
 {

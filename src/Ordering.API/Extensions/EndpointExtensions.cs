@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Common.Infrastructure.Extensions;
 
-namespace Ordering.API.Extensions;
+namespace Ordering.Api.Extensions;
 
 public static class EndpointExtensions
 {

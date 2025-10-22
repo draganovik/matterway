@@ -1,7 +1,7 @@
-using Customers.API.Data;
+using Customers.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Extensions;
+namespace Customers.Api.Extensions;
 
 public static class DbContextExtensions
 {

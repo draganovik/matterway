@@ -1,10 +1,10 @@
-using Ordering.API.Features.Addresses.Data;
-using Ordering.API.Features.OrderHistories.Data;
-using Ordering.API.Features.OrderItems.Data;
-using Ordering.API.Features.Orders.Data;
+using Ordering.Api.Features.Addresses.Data;
+using Ordering.Api.Features.OrderHistories.Data;
+using Ordering.Api.Features.OrderItems.Data;
+using Ordering.Api.Features.Orders.Data;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Ordering.API.Extensions;
+namespace Ordering.Api.Extensions;
 
 public static class RepositoryExtensions
 {

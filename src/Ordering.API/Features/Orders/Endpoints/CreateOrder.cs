@@ -3,13 +3,13 @@ using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Ordering.API.Features.Orders.Contracts;
-using Ordering.API.Features.Orders.Data;
-using Ordering.API.Features.Orders.Domain;
-using Ordering.API.Features.Shared;
+using Ordering.Api.Features.Orders.Contracts;
+using Ordering.Api.Features.Orders.Data;
+using Ordering.Api.Features.Orders.Domain;
+using Ordering.Api.Features.Shared;
 using Common.Infrastructure.Interfaces;
 
-namespace Ordering.API.Features.Orders.Endpoints;
+namespace Ordering.Api.Features.Orders.Endpoints;
 
 public class CreateOrder : IEndpoint
 {

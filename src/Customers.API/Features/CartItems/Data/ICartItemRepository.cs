@@ -1,6 +1,6 @@
-using Customers.API.Features.CartItems.Domain;
+using Customers.Api.Features.CartItems.Domain;
 
-namespace Customers.API.Features.CartItems.Data;
+namespace Customers.Api.Features.CartItems.Data;
 
 public interface ICartItemRepository
 {

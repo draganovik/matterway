@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Ordering.API.Data;
+using Ordering.Api.Data;
 
-namespace Ordering.API.Extensions;
+namespace Ordering.Api.Extensions;
 
 public static class DbContextExtensions
 {

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Catalog.API.Features.ProductDetails.Contracts;
-using Catalog.API.Features.ProductImages.Contracts;
+using Catalog.Api.Features.ProductDetails.Contracts;
+using Catalog.Api.Features.ProductImages.Contracts;
 
-namespace Catalog.API.Features.Products.Contracts;
+namespace Catalog.Api.Features.Products.Contracts;
 
 public class ProductBaseResponse
 {

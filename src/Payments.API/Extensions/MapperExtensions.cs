@@ -1,6 +1,6 @@
 using Common.Infrastructure.Profiles;
 
-namespace Payments.API.Extensions;
+namespace Payments.Api.Extensions;
 
 public static class MapperExtensions
 {

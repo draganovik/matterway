@@ -1,12 +1,12 @@
 using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Features.ProductImages.Contracts;
-using Catalog.API.Features.ProductImages.Data;
-using Catalog.API.Features.ProductImages.Domain;
+using Catalog.Api.Features.ProductImages.Contracts;
+using Catalog.Api.Features.ProductImages.Data;
+using Catalog.Api.Features.ProductImages.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Interfaces;
 
-namespace Catalog.API.Features.ProductImages.Endpoints;
+namespace Catalog.Api.Features.ProductImages.Endpoints;
 
 public class GetProductImageById : IEndpoint
 {

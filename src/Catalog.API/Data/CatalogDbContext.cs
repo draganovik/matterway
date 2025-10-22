@@ -1,10 +1,10 @@
-﻿using Catalog.API.Features.ProductDetails.Domain;
-using Catalog.API.Features.ProductImages.Domain;
-using Catalog.API.Features.Products.Domain;
+﻿using Catalog.Api.Features.ProductDetails.Domain;
+using Catalog.Api.Features.ProductImages.Domain;
+using Catalog.Api.Features.Products.Domain;
 using Microsoft.EntityFrameworkCore;
 using Common.Infrastructure.Enums;
 
-namespace Catalog.API.Data;
+namespace Catalog.Api.Data;
 
 public class CatalogDbContext : DbContext
 {

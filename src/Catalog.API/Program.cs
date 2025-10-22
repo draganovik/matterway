@@ -1,4 +1,4 @@
-﻿using Catalog.API.Extensions;
+﻿using Catalog.Api.Extensions;
 using Common.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions

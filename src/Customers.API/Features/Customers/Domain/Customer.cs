@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Features.Customers.Domain;
+namespace Customers.Api.Features.Customers.Domain;
 
 [Index(nameof(SystemUserId), IsUnique = true)]
 public class Customer

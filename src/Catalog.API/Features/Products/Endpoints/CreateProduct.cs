@@ -1,16 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Features.Products.Contracts;
-using Catalog.API.Features.Products.Data;
-using Catalog.API.Features.Products.Domain;
-using Catalog.API.Features.Shared;
+using Catalog.Api.Features.Products.Contracts;
+using Catalog.Api.Features.Products.Data;
+using Catalog.Api.Features.Products.Domain;
+using Catalog.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Catalog.API.Features.Products.Endpoints;
+namespace Catalog.Api.Features.Products.Endpoints;
 
 public class CreateProduct : IEndpoint
 {

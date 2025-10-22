@@ -11,7 +11,7 @@ echo "Updating databases for all API projects..."
 failed_projects=()
 
 shopt -s nullglob
-for project_dir in "${API_ROOT}"/*.API; do
+for project_dir in "${API_ROOT}"/*.Api; do
   if [[ -d "${project_dir}" ]]; then
     project_name="$(basename "${project_dir}")"
     echo "Updating database for project: ${project_name}"

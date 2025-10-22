@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Catalog.API.Features.ProductDetails.Contracts;
-using Catalog.API.Features.ProductDetails.Domain;
+using Catalog.Api.Features.ProductDetails.Contracts;
+using Catalog.Api.Features.ProductDetails.Domain;
 
-namespace Catalog.API.Features.ProductDetails.Mapping;
+namespace Catalog.Api.Features.ProductDetails.Mapping;
 
 public class ProductDetailProfile : Profile
 {

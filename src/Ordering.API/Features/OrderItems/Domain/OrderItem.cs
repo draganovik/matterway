@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using Ordering.API.Features.Orders.Domain;
+using Ordering.Api.Features.Orders.Domain;
 
-namespace Ordering.API.Features.OrderItems.Domain;
+namespace Ordering.Api.Features.OrderItems.Domain;
 
 [PrimaryKey(nameof(OrderId), nameof(ProductId))]
 public class OrderItem

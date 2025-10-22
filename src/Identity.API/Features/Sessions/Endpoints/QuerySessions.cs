@@ -1,16 +1,16 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.API.Features.Shared;
-using Identity.API.Features.Sessions.Contracts;
-using Identity.API.Features.Sessions.Data;
-using Identity.API.Features.Sessions.Domain;
+using Identity.Api.Features.Shared;
+using Identity.Api.Features.Sessions.Contracts;
+using Identity.Api.Features.Sessions.Data;
+using Identity.Api.Features.Sessions.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ModelTemplates;
 
-namespace Identity.API.Features.Sessions.Endpoints;
+namespace Identity.Api.Features.Sessions.Endpoints;
 
 public class QuerySessions : IEndpoint
 {

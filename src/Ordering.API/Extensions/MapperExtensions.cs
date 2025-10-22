@@ -1,6 +1,6 @@
 using Common.Infrastructure.Profiles;
 
-namespace Ordering.API.Extensions;
+namespace Ordering.Api.Extensions;
 
 public static class MapperExtensions
 {

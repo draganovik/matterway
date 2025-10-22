@@ -1,17 +1,17 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.API.Features.Sessions.Contracts;
-using Identity.API.Features.Sessions.Data;
-using Identity.API.Features.Sessions.Domain;
-using Identity.API.Features.Sessions.Services;
-using Identity.API.Features.SystemUsers.Data;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Features.Sessions.Contracts;
+using Identity.Api.Features.Sessions.Data;
+using Identity.Api.Features.Sessions.Domain;
+using Identity.Api.Features.Sessions.Services;
+using Identity.Api.Features.SystemUsers.Data;
+using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Interfaces;
 
-namespace Identity.API.Features.Sessions.Endpoints;
+namespace Identity.Api.Features.Sessions.Endpoints;
 
 public class CreateSession : IEndpoint
 {

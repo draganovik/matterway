@@ -3,14 +3,14 @@ using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Ordering.API.Features.OrderHistories.Contracts;
-using Ordering.API.Features.OrderHistories.Data;
-using Ordering.API.Features.OrderHistories.Domain;
-using Ordering.API.Features.Shared;
+using Ordering.Api.Features.OrderHistories.Contracts;
+using Ordering.Api.Features.OrderHistories.Data;
+using Ordering.Api.Features.OrderHistories.Domain;
+using Ordering.Api.Features.Shared;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Ordering.API.Features.OrderHistories.Endpoints;
+namespace Ordering.Api.Features.OrderHistories.Endpoints;
 
 public class CreateOrderHistory : IEndpoint
 {

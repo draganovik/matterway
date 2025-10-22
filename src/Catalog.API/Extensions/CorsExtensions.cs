@@ -1,4 +1,4 @@
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class CorsExtensions
 {

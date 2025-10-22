@@ -1,4 +1,4 @@
-﻿using Customers.API.Extensions;
+﻿using Customers.Api.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Common.Infrastructure.Extensions;
 

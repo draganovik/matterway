@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Inventory.API/Inventory.API.csproj", "src/Inventory.API/"]
-RUN dotnet restore "src/Inventory.API/Inventory.API.csproj"
+COPY ["src/Inventory.Api/Inventory.Api.csproj", "src/Inventory.Api/"]
+RUN dotnet restore "src/Inventory.Api/Inventory.Api.csproj"
 COPY . .
-WORKDIR "/src/src/Inventory.API"
-RUN dotnet build "Inventory.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Inventory.Api"
+RUN dotnet build "Inventory.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Inventory.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Inventory.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Inventory.API.dll"]
+ENTRYPOINT ["dotnet", "Inventory.Api.dll"]

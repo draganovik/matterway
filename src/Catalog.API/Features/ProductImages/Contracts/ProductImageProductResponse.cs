@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Catalog.API.Features.ProductImages.Contracts;
+namespace Catalog.Api.Features.ProductImages.Contracts;
 
 public class ProductImageProductResponse
 {

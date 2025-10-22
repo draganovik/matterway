@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 
-namespace Customers.API.Extensions;
+namespace Customers.Api.Extensions;
 
 public static class OpenApiExtensions
 {

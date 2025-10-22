@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 
-namespace Identity.API.Extensions;
+namespace Identity.Api.Extensions;
 
 public static class JsonExtensions
 {

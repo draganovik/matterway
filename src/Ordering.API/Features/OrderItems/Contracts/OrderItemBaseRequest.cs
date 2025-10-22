@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ordering.API.Features.OrderItems.Contracts;
+namespace Ordering.Api.Features.OrderItems.Contracts;
 
 public class OrderItemBaseRequest
 {

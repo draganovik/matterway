@@ -1,8 +1,8 @@
 using AutoMapper;
-using Identity.API.Features.Sessions.Contracts;
-using Identity.API.Features.Sessions.Domain;
+using Identity.Api.Features.Sessions.Contracts;
+using Identity.Api.Features.Sessions.Domain;
 
-namespace Identity.API.Features.Sessions.Mapping;
+namespace Identity.Api.Features.Sessions.Mapping;
 
 public class SessionProfile : Profile
 {

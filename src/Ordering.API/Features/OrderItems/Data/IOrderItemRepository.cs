@@ -1,6 +1,6 @@
-using Ordering.API.Features.OrderItems.Domain;
+using Ordering.Api.Features.OrderItems.Domain;
 
-namespace Ordering.API.Features.OrderItems.Data;
+namespace Ordering.Api.Features.OrderItems.Data;
 
 public interface IOrderItemRepository
 {

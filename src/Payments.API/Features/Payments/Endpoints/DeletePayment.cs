@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Payments.API.Features.Payments.Data;
-using Payments.API.Features.Payments.Domain;
+using Payments.Api.Features.Payments.Data;
+using Payments.Api.Features.Payments.Domain;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Payments.API.Features.Payments.Endpoints;
+namespace Payments.Api.Features.Payments.Endpoints;
 
 public class DeletePayment : IEndpoint
 {

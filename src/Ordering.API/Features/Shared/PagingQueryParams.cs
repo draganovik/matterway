@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ordering.API.Features.Shared;
+namespace Ordering.Api.Features.Shared;
 
 public class PagingQueryParams
 {

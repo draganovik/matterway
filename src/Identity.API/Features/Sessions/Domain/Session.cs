@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Features.SystemUsers.Domain;
 
-namespace Identity.API.Features.Sessions.Domain;
+namespace Identity.Api.Features.Sessions.Domain;
 
 public class Session
 {

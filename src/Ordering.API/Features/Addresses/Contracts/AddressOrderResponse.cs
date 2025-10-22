@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ordering.API.Features.Addresses.Contracts;
+namespace Ordering.Api.Features.Addresses.Contracts;
 
 public class AddressOrderResponse
 {

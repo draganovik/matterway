@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Customers.API.Features.CartItems.Contracts;
+namespace Customers.Api.Features.CartItems.Contracts;
 
 public class CartItemBaseResponse
 {

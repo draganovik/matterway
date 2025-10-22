@@ -1,4 +1,4 @@
-﻿namespace Catalog.API.Features.Shared;
+﻿namespace Catalog.Api.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

@@ -1,8 +1,8 @@
-using Customers.API.Features.CartItems.Data;
-using Customers.API.Features.Customers.Data;
+using Customers.Api.Features.CartItems.Data;
+using Customers.Api.Features.Customers.Data;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Customers.API.Extensions;
+namespace Customers.Api.Extensions;
 
 public static class RepositoryExtensions
 {

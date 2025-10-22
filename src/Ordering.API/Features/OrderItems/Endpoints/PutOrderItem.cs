@@ -3,13 +3,13 @@ using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Ordering.API.Features.OrderItems.Contracts;
-using Ordering.API.Features.OrderItems.Data;
-using Ordering.API.Features.OrderItems.Domain;
+using Ordering.Api.Features.OrderItems.Contracts;
+using Ordering.Api.Features.OrderItems.Data;
+using Ordering.Api.Features.OrderItems.Domain;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Ordering.API.Features.OrderItems.Endpoints;
+namespace Ordering.Api.Features.OrderItems.Endpoints;
 
 public class PutOrderItem : IEndpoint
 {

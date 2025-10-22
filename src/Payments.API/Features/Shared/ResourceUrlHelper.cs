@@ -1,4 +1,4 @@
-namespace Payments.API.Features.Shared;
+namespace Payments.Api.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

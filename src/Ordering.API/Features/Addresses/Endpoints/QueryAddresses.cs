@@ -1,16 +1,16 @@
 using Asp.Versioning;
 using AutoMapper;
-using Ordering.API.Features.Addresses.Contracts;
-using Ordering.API.Features.Addresses.Data;
-using Ordering.API.Features.Addresses.Domain;
-using Ordering.API.Features.Shared;
+using Ordering.Api.Features.Addresses.Contracts;
+using Ordering.Api.Features.Addresses.Data;
+using Ordering.Api.Features.Addresses.Domain;
+using Ordering.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ModelTemplates;
 
-namespace Ordering.API.Features.Addresses.Endpoints;
+namespace Ordering.Api.Features.Addresses.Endpoints;
 
 public class QueryAddresses : IEndpoint
 {

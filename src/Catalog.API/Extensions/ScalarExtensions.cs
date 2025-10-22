@@ -1,6 +1,6 @@
 using Scalar.AspNetCore;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class ScalarExtensions
 {

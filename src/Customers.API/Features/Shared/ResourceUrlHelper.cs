@@ -1,4 +1,4 @@
-namespace Customers.API.Features.Shared;
+namespace Customers.Api.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

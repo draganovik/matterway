@@ -1,8 +1,8 @@
-using Identity.API.Data;
-using Identity.API.Features.Sessions.Domain;
+using Identity.Api.Data;
+using Identity.Api.Features.Sessions.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.API.Features.Sessions.Data;
+namespace Identity.Api.Features.Sessions.Data;
 
 public class SessionRepository : ISessionRepository
 {

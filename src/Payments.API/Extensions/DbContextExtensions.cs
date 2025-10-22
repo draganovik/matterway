@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Payments.API.Data;
+using Payments.Api.Data;
 
-namespace Payments.API.Extensions;
+namespace Payments.Api.Extensions;
 
 public static class DbContextExtensions
 {

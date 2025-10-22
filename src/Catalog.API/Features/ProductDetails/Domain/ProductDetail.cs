@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Catalog.API.Features.Products.Domain;
+using Catalog.Api.Features.Products.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Catalog.API.Features.ProductDetails.Domain;
+namespace Catalog.Api.Features.ProductDetails.Domain;
 
 public class ProductDetail
 {

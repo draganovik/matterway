@@ -1,8 +1,8 @@
 using AutoMapper;
-using Ordering.API.Features.OrderHistories.Contracts;
-using Ordering.API.Features.OrderHistories.Domain;
+using Ordering.Api.Features.OrderHistories.Contracts;
+using Ordering.Api.Features.OrderHistories.Domain;
 
-namespace Ordering.API.Features.OrderHistories.Mapping;
+namespace Ordering.Api.Features.OrderHistories.Mapping;
 
 public class OrderHistoryProfile : Profile
 {

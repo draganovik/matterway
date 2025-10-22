@@ -1,4 +1,4 @@
-namespace Ordering.API.Features.Shared;
+namespace Ordering.Api.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

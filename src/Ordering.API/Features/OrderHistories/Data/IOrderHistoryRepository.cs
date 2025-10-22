@@ -1,7 +1,7 @@
-using Ordering.API.Features.OrderHistories.Contracts;
-using Ordering.API.Features.OrderHistories.Domain;
+using Ordering.Api.Features.OrderHistories.Contracts;
+using Ordering.Api.Features.OrderHistories.Domain;
 
-namespace Ordering.API.Features.OrderHistories.Data;
+namespace Ordering.Api.Features.OrderHistories.Data;
 
 public interface IOrderHistoryRepository
 {

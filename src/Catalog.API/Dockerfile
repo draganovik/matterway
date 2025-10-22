@@ -6,19 +6,19 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Catalog.API/Catalog.API.csproj", "src/Catalog.API/"]
-RUN dotnet restore "src/Catalog.API/Catalog.API.csproj"
+COPY ["src/Catalog.Api/Catalog.Api.csproj", "src/Catalog.Api/"]
+RUN dotnet restore "src/Catalog.Api/Catalog.Api.csproj"
 COPY . .
-WORKDIR "/src/src/Catalog.API"
-RUN dotnet build "Catalog.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Catalog.Api"
+RUN dotnet build "Catalog.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Catalog.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Catalog.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY src/Catalog.API/Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Catalog.API.dll"]
+COPY src/Catalog.Api/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Catalog.Api.dll"]

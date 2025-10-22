@@ -1,7 +1,7 @@
-using Catalog.API.Data;
+using Catalog.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class DbContextExtensions
 {

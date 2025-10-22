@@ -1,8 +1,8 @@
-﻿using Customers.API.Features.CartItems.Domain;
-using Customers.API.Features.Customers.Domain;
+﻿using Customers.Api.Features.CartItems.Domain;
+using Customers.Api.Features.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Data;
+namespace Customers.Api.Data;
 
 public class CustomersDbContext : DbContext
 {

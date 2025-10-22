@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Ordering.API.Data;
+using Ordering.Api.Data;
 
 #nullable disable
 
-namespace Ordering.API.Migrations
+namespace Ordering.Api.Migrations
 {
     [DbContext(typeof(OrderingDbContext))]
     partial class OrderingDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace Ordering.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Ordering.API.Features.Addresses.Domain.Address", b =>
+            modelBuilder.Entity("Ordering.Api.Features.Addresses.Domain.Address", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -82,7 +82,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
+            modelBuilder.Entity("Ordering.Api.Features.OrderHistories.Domain.OrderHistory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,7 +125,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.OrderItems.Domain.OrderItem", b =>
+            modelBuilder.Entity("Ordering.Api.Features.OrderItems.Domain.OrderItem", b =>
                 {
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -166,7 +166,7 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
+            modelBuilder.Entity("Ordering.Api.Features.Orders.Domain.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -205,9 +205,9 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
+            modelBuilder.Entity("Ordering.Api.Features.OrderHistories.Domain.OrderHistory", b =>
                 {
-                    b.HasOne("Ordering.API.Features.Orders.Domain.Order", "Order")
+                    b.HasOne("Ordering.Api.Features.Orders.Domain.Order", "Order")
                         .WithMany("OrderHistory")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -216,9 +216,9 @@ namespace Ordering.API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.OrderItems.Domain.OrderItem", b =>
+            modelBuilder.Entity("Ordering.Api.Features.OrderItems.Domain.OrderItem", b =>
                 {
-                    b.HasOne("Ordering.API.Features.Orders.Domain.Order", "Order")
+                    b.HasOne("Ordering.Api.Features.Orders.Domain.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -227,9 +227,9 @@ namespace Ordering.API.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
+            modelBuilder.Entity("Ordering.Api.Features.Orders.Domain.Order", b =>
                 {
-                    b.HasOne("Ordering.API.Features.Addresses.Domain.Address", "Address")
+                    b.HasOne("Ordering.Api.Features.Addresses.Domain.Address", "Address")
                         .WithMany()
                         .HasForeignKey("DeliveryAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,7 +238,7 @@ namespace Ordering.API.Migrations
                     b.Navigation("Address");
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
+            modelBuilder.Entity("Ordering.Api.Features.Orders.Domain.Order", b =>
                 {
                     b.Navigation("OrderHistory");
 

@@ -1,8 +1,8 @@
 using AutoMapper;
-using Payments.API.Features.Payments.Contracts;
-using Payments.API.Features.Payments.Domain;
+using Payments.Api.Features.Payments.Contracts;
+using Payments.Api.Features.Payments.Domain;
 
-namespace Payments.API.Features.Payments.Mapping;
+namespace Payments.Api.Features.Payments.Mapping;
 
 public class PaymentProfile : Profile
 {

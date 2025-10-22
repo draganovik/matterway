@@ -1,4 +1,4 @@
-﻿namespace Identity.API.Features.Sessions.Contracts;
+﻿namespace Identity.Api.Features.Sessions.Contracts;
 
 public class SessionBaseResponse
 {

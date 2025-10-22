@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Ordering.API.Features.OrderHistories.Data;
-using Ordering.API.Features.OrderHistories.Domain;
+using Ordering.Api.Features.OrderHistories.Data;
+using Ordering.Api.Features.OrderHistories.Domain;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Ordering.API.Features.OrderHistories.Endpoints;
+namespace Ordering.Api.Features.OrderHistories.Endpoints;
 
 public class DeleteOrderHistory : IEndpoint
 {

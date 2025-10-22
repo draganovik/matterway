@@ -1,8 +1,8 @@
 using AutoMapper;
-using Identity.API.Features.SystemUsers.Contracts;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Features.SystemUsers.Contracts;
+using Identity.Api.Features.SystemUsers.Domain;
 
-namespace Identity.API.Features.SystemUsers.Mapping;
+namespace Identity.Api.Features.SystemUsers.Mapping;
 
 public class SystemUserProfile : Profile
 {

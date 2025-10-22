@@ -1,16 +1,16 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.API.Features.Shared;
-using Identity.API.Features.SystemUsers.Contracts;
-using Identity.API.Features.SystemUsers.Data;
-using Identity.API.Features.SystemUsers.Domain;
+using Identity.Api.Features.Shared;
+using Identity.Api.Features.SystemUsers.Contracts;
+using Identity.Api.Features.SystemUsers.Data;
+using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ModelTemplates;
 
-namespace Identity.API.Features.SystemUsers.Endpoints;
+namespace Identity.Api.Features.SystemUsers.Endpoints;
 
 public class QuerySystemUsers : IEndpoint
 {

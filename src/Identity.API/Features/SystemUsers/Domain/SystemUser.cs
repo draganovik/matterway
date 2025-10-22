@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Identity.API.Features.Sessions.Domain;
+using Identity.Api.Features.Sessions.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Identity.API.Features.SystemUsers.Domain;
+namespace Identity.Api.Features.SystemUsers.Domain;
 
 public class SystemUser
 {

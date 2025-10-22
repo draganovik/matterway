@@ -1,4 +1,4 @@
-﻿using Payments.API.Extensions;
+﻿using Payments.Api.Extensions;
 using Common.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions

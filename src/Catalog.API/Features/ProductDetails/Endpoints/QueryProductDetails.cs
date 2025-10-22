@@ -1,17 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Features.ProductDetails.Contracts;
-using Catalog.API.Features.ProductDetails.Data;
-using Catalog.API.Features.ProductDetails.Domain;
-using Catalog.API.Features.Shared;
+using Catalog.Api.Features.ProductDetails.Contracts;
+using Catalog.Api.Features.ProductDetails.Data;
+using Catalog.Api.Features.ProductDetails.Domain;
+using Catalog.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 using Common.Infrastructure.ModelTemplates;
 
-namespace Catalog.API.Features.ProductDetails.Endpoints;
+namespace Catalog.Api.Features.ProductDetails.Endpoints;
 
 public class QueryProductDetails : IEndpoint
 {

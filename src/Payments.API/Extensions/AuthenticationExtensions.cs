@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Payments.API.Extensions;
+namespace Payments.Api.Extensions;
 
 public static class AuthenticationExtensions
 {

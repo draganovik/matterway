@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Common.Infrastructure.Enums;
 
-namespace Catalog.API.Features.ProductDetails.Contracts;
+namespace Catalog.Api.Features.ProductDetails.Contracts;
 
 public class ProductDetailBaseResponse
 {

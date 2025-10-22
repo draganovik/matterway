@@ -1,8 +1,8 @@
-using Customers.API.Data;
-using Customers.API.Features.CartItems.Domain;
+using Customers.Api.Data;
+using Customers.Api.Features.CartItems.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Features.CartItems.Data;
+namespace Customers.Api.Features.CartItems.Data;
 
 public class CartItemRepository : ICartItemRepository
 {

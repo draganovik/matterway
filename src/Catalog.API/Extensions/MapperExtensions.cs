@@ -1,6 +1,6 @@
 using Common.Infrastructure.Profiles;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class MapperExtensions
 {

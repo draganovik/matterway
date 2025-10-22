@@ -3,22 +3,20 @@ setlocal enabledelayedexpansion
 set "HAS_ERRORS=0"
 
 pushd "%~dp0\.."
-set "SERVICES_DIR=src\Services"
+set "SERVICES_DIR=src"
 
 echo Removing migrations for all API projects...
 
-for /d %%d in ("%SERVICES_DIR%\*") do (
+for /d %%d in ("%SERVICES_DIR%\*.Api") do (
   set "SERVICE_NAME=%%~nxd"
-  if exist "%%d\!SERVICE_NAME!.API" (
-    echo Removing migration for project: !SERVICE_NAME!
-    pushd "%%d\!SERVICE_NAME!.API"
-    dotnet ef migrations remove
-    if errorlevel 1 (
-      echo Failed to remove migration for project: !SERVICE_NAME!
-      set "HAS_ERRORS=1"
-    )
-    popd
+  echo Removing migration for project: !SERVICE_NAME!
+  pushd "%%d"
+  dotnet ef migrations remove
+  if errorlevel 1 (
+    echo Failed to remove migration for project: !SERVICE_NAME!
+    set "HAS_ERRORS=1"
   )
+  popd
 )
 
 if "!HAS_ERRORS!"=="1" (

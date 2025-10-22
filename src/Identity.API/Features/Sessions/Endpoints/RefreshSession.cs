@@ -1,13 +1,13 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.API.Features.Sessions.Contracts;
-using Identity.API.Features.Sessions.Data;
-using Identity.API.Features.Sessions.Services;
+using Identity.Api.Features.Sessions.Contracts;
+using Identity.Api.Features.Sessions.Data;
+using Identity.Api.Features.Sessions.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Interfaces;
 
-namespace Identity.API.Features.Sessions.Endpoints;
+namespace Identity.Api.Features.Sessions.Endpoints;
 
 public class RefreshSession : IEndpoint
 {

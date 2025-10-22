@@ -1,7 +1,7 @@
-using Payments.API.Features.Payments.Contracts;
-using Payments.API.Features.Payments.Domain;
+using Payments.Api.Features.Payments.Contracts;
+using Payments.Api.Features.Payments.Domain;
 
-namespace Payments.API.Features.Payments.Data;
+namespace Payments.Api.Features.Payments.Data;
 
 public interface IPaymentRepository
 {

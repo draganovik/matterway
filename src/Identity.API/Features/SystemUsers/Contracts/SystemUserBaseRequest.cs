@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Common.Infrastructure.Enums;
 
-namespace Identity.API.Features.SystemUsers.Contracts;
+namespace Identity.Api.Features.SystemUsers.Contracts;
 
 public class SystemUserBaseRequest
 {

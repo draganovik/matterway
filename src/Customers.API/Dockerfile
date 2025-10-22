@@ -6,19 +6,19 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Customers.API/Customers.API.csproj", "src/Customers.API/"]
-RUN dotnet restore "src/Customers.API/Customers.API.csproj"
+COPY ["src/Customers.Api/Customers.Api.csproj", "src/Customers.Api/"]
+RUN dotnet restore "src/Customers.Api/Customers.Api.csproj"
 COPY . .
-WORKDIR "/src/src/Customers.API"
-RUN dotnet build "Customers.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Customers.Api"
+RUN dotnet build "Customers.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Customers.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Customers.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY src/Customers.API/Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Customers.API.dll"]
+COPY src/Customers.Api/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Customers.Api.dll"]

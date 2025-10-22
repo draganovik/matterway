@@ -1,14 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Identity.API.Data;
+using Identity.Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol;
 
-namespace Identity.API.Extensions;
+namespace Identity.Api.Extensions;
 
 public static class AuthenticationExtensions
 {

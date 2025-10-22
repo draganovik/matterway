@@ -1,6 +1,6 @@
 using Asp.Versioning;
 
-namespace Identity.API.Features.Shared;
+namespace Identity.Api.Features.Shared;
 
 internal static class ResourceUrlHelper
 {

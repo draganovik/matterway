@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using Ordering.API.Features.Addresses.Contracts;
-using Ordering.API.Features.OrderHistories.Contracts;
-using Ordering.API.Features.OrderItems.Contracts;
+using Ordering.Api.Features.Addresses.Contracts;
+using Ordering.Api.Features.OrderHistories.Contracts;
+using Ordering.Api.Features.OrderItems.Contracts;
 
-namespace Ordering.API.Features.Orders.Contracts;
+namespace Ordering.Api.Features.Orders.Contracts;
 
 public class OrderBaseResponse
 {

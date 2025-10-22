@@ -1,10 +1,10 @@
-﻿using Identity.API.Features.Sessions.Domain;
-using Identity.API.Features.SystemUsers.Domain;
+﻿using Identity.Api.Features.Sessions.Domain;
+using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Common.Infrastructure.Enums;
 
-namespace Identity.API.Data;
+namespace Identity.Api.Data;
 
 public class IdentityDbContext : DbContext
 {

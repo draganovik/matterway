@@ -1,8 +1,8 @@
 using AutoMapper;
-using Ordering.API.Features.OrderItems.Contracts;
-using Ordering.API.Features.OrderItems.Domain;
+using Ordering.Api.Features.OrderItems.Contracts;
+using Ordering.Api.Features.OrderItems.Domain;
 
-namespace Ordering.API.Features.OrderItems.Mapping;
+namespace Ordering.Api.Features.OrderItems.Mapping;
 
 public class OrderItemProfile : Profile
 {

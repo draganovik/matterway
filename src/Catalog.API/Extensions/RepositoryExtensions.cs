@@ -1,9 +1,9 @@
-using Catalog.API.Features.ProductDetails.Data;
-using Catalog.API.Features.ProductImages.Data;
-using Catalog.API.Features.Products.Data;
+using Catalog.Api.Features.ProductDetails.Data;
+using Catalog.Api.Features.ProductImages.Data;
+using Catalog.Api.Features.Products.Data;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class RepositoryExtensions
 {

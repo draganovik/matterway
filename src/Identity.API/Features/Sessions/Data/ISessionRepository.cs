@@ -1,6 +1,6 @@
-using Identity.API.Features.Sessions.Domain;
+using Identity.Api.Features.Sessions.Domain;
 
-namespace Identity.API.Features.Sessions.Data;
+namespace Identity.Api.Features.Sessions.Data;
 
 public interface ISessionRepository
 {

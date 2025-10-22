@@ -1,9 +1,9 @@
-﻿using Catalog.API.Data;
-using Catalog.API.Features.ProductImages.Contracts;
-using Catalog.API.Features.ProductImages.Domain;
+﻿using Catalog.Api.Data;
+using Catalog.Api.Features.ProductImages.Contracts;
+using Catalog.Api.Features.ProductImages.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.API.Features.ProductImages.Data;
+namespace Catalog.Api.Features.ProductImages.Data;
 
 public class ProductImageRepository : IProductImageRepository
 {

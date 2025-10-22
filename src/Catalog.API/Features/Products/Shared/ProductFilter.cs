@@ -1,7 +1,7 @@
-﻿using Catalog.API.Features.Products.Domain;
+﻿using Catalog.Api.Features.Products.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Catalog.API.Features.Products.Shared;
+namespace Catalog.Api.Features.Products.Shared;
 
 public record ProductFilter
 {

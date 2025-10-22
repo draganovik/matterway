@@ -1,7 +1,7 @@
-using Identity.API.Data;
+using Identity.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Identity.API.Extensions;
+namespace Identity.Api.Extensions;
 
 public static class DbContextExtensions
 {

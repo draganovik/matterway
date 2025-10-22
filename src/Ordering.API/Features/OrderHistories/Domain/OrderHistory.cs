@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Ordering.API.Features.Orders.Domain;
+using Ordering.Api.Features.Orders.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Ordering.API.Features.OrderHistories.Domain;
+namespace Ordering.Api.Features.OrderHistories.Domain;
 
 public class OrderHistory
 {

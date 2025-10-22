@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Common.Infrastructure.Enums;
 
-namespace Ordering.API.Features.OrderHistories.Contracts;
+namespace Ordering.Api.Features.OrderHistories.Contracts;
 
 public class OrderHistoryBaseRequest
 {

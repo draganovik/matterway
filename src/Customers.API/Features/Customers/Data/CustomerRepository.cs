@@ -1,9 +1,9 @@
-using Customers.API.Data;
-using Customers.API.Features.Customers.Contracts;
-using Customers.API.Features.Customers.Domain;
+using Customers.Api.Data;
+using Customers.Api.Features.Customers.Contracts;
+using Customers.Api.Features.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Customers.API.Features.Customers.Data;
+namespace Customers.Api.Features.Customers.Data;
 
 public class CustomerRepository : ICustomerRepository
 {

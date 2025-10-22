@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ordering.API.Features.Addresses.Domain;
+namespace Ordering.Api.Features.Addresses.Domain;
 
 public class Address
 {

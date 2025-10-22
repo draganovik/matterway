@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Common.Infrastructure.Extensions;
 
-namespace Catalog.API.Extensions;
+namespace Catalog.Api.Extensions;
 
 public static class EndpointExtensions
 {

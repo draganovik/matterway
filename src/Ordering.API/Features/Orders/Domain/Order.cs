@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Ordering.API.Features.Addresses.Domain;
-using Ordering.API.Features.OrderHistories.Domain;
-using Ordering.API.Features.OrderItems.Domain;
+using Ordering.Api.Features.Addresses.Domain;
+using Ordering.Api.Features.OrderHistories.Domain;
+using Ordering.Api.Features.OrderItems.Domain;
 
-namespace Ordering.API.Features.Orders.Domain;
+namespace Ordering.Api.Features.Orders.Domain;
 
 public class Order
 {

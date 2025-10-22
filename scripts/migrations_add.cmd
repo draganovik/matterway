@@ -3,22 +3,20 @@ setlocal enabledelayedexpansion
 set "HAS_ERRORS=0"
 
 pushd "%~dp0\.."
-set "SERVICES_DIR=src\Services"
+set "SERVICES_DIR=src"
 
 echo Adding migrations for all API projects...
 
-for /d %%d in ("%SERVICES_DIR%\*") do (
+for /d %%d in ("%SERVICES_DIR%\*.Api") do (
   set "SERVICE_NAME=%%~nxd"
-  if exist "%%d\!SERVICE_NAME!.API" (
-    echo Adding migration for project: !SERVICE_NAME!
-    pushd "%%d\!SERVICE_NAME!.API"
-    dotnet ef migrations add "Initialize"
-    if errorlevel 1 (
-      echo Failed to add migration for project: !SERVICE_NAME!
-      set "HAS_ERRORS=1"
-    )
-    popd
+  echo Adding migration for project: !SERVICE_NAME!
+  pushd "%%d"
+  dotnet ef migrations add "Initialize"
+  if errorlevel 1 (
+    echo Failed to add migration for project: !SERVICE_NAME!
+    set "HAS_ERRORS=1"
   )
+  popd
 )
 
 if "!HAS_ERRORS!"=="1" (

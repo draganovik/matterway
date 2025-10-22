@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Common.Infrastructure.Enums;
 
-namespace Payments.API.Features.Payments.Contracts;
+namespace Payments.Api.Features.Payments.Contracts;
 
 public class PaymentBaseRequest
 {

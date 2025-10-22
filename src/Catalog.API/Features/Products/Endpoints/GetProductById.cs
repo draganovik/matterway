@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using AutoMapper;
-using Catalog.API.Features.Products.Contracts;
-using Catalog.API.Features.Products.Data;
+using Catalog.Api.Features.Products.Contracts;
+using Catalog.Api.Features.Products.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Interfaces;
 
-namespace Catalog.API.Features.Products.Endpoints;
+namespace Catalog.Api.Features.Products.Endpoints;
 
 public class GetProductById : IEndpoint
 {

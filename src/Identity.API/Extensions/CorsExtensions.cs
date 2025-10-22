@@ -1,4 +1,4 @@
-namespace Identity.API.Extensions;
+namespace Identity.Api.Extensions;
 
 public static class CorsExtensions
 {

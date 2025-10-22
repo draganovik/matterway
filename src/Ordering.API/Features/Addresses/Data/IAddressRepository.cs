@@ -1,7 +1,7 @@
-using Ordering.API.Features.Addresses.Contracts;
-using Ordering.API.Features.Addresses.Domain;
+using Ordering.Api.Features.Addresses.Contracts;
+using Ordering.Api.Features.Addresses.Domain;
 
-namespace Ordering.API.Features.Addresses.Data;
+namespace Ordering.Api.Features.Addresses.Data;
 
 public interface IAddressRepository
 {

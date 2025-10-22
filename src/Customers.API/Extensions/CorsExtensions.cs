@@ -1,4 +1,4 @@
-namespace Customers.API.Extensions;
+namespace Customers.Api.Extensions;
 
 public static class CorsExtensions
 {

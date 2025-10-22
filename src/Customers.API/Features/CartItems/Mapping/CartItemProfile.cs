@@ -1,8 +1,8 @@
 using AutoMapper;
-using Customers.API.Features.CartItems.Contracts;
-using Customers.API.Features.CartItems.Domain;
+using Customers.Api.Features.CartItems.Contracts;
+using Customers.Api.Features.CartItems.Domain;
 
-namespace Customers.API.Features.CartItems.Mapping;
+namespace Customers.Api.Features.CartItems.Mapping;
 
 public class CartItemProfile : Profile
 {

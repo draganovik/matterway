@@ -1,7 +1,7 @@
-using Payments.API.Features.Payments.Data;
+using Payments.Api.Features.Payments.Data;
 using Common.Infrastructure.ServiceBrokers;
 
-namespace Payments.API.Extensions;
+namespace Payments.Api.Extensions;
 
 public static class RepositoryExtensions
 {

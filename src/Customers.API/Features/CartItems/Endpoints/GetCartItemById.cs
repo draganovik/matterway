@@ -1,13 +1,13 @@
 using Asp.Versioning;
 using AutoMapper;
-using Customers.API.Features.CartItems.Contracts;
-using Customers.API.Features.CartItems.Data;
-using Customers.API.Features.CartItems.Domain;
+using Customers.Api.Features.CartItems.Contracts;
+using Customers.Api.Features.CartItems.Data;
+using Customers.Api.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Interfaces;
 
-namespace Customers.API.Features.CartItems.Endpoints;
+namespace Customers.Api.Features.CartItems.Endpoints;
 
 public class GetCartItemById : IEndpoint
 {

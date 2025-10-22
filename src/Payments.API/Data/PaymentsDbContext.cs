@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Payments.API.Features.Payments.Domain;
+using Payments.Api.Features.Payments.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Payments.API.Data;
+namespace Payments.Api.Data;
 
 public class PaymentsDbContext : DbContext
 {

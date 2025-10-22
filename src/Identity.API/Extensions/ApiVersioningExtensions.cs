@@ -1,6 +1,6 @@
 using Asp.Versioning;
 
-namespace Identity.API.Extensions;
+namespace Identity.Api.Extensions;
 
 public static class ApiVersioningExtensions
 {

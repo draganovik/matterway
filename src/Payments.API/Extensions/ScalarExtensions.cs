@@ -1,6 +1,6 @@
 using Scalar.AspNetCore;
 
-namespace Payments.API.Extensions;
+namespace Payments.Api.Extensions;
 
 public static class ScalarExtensions
 {

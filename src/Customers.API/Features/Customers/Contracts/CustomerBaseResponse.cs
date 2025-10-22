@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Customers.API.Features.Customers.Contracts;
+namespace Customers.Api.Features.Customers.Contracts;
 
 public class CustomerBaseResponse
 {

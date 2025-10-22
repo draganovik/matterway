@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Catalog.API.Features.ProductImages.Contracts;
-using Catalog.API.Features.ProductImages.Domain;
+using Catalog.Api.Features.ProductImages.Contracts;
+using Catalog.Api.Features.ProductImages.Domain;
 
-namespace Catalog.API.Features.ProductImages.Mapping;
+namespace Catalog.Api.Features.ProductImages.Mapping;
 
 public class ProductImageProfile : Profile
 {
