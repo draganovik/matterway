@@ -4,7 +4,7 @@ using Catalog.API.Features.ProductImages.Contracts;
 using Catalog.API.Features.ProductImages.Data;
 using Catalog.API.Features.ProductImages.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Catalog.API.Features.ProductImages.Endpoints;
 

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Ordering.API.Features.Orders.Domain;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Ordering.API.Features.OrderHistories.Domain;
 

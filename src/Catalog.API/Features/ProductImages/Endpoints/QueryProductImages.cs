@@ -7,9 +7,9 @@ using Catalog.API.Features.ProductImages.Domain;
 using Catalog.API.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Enums;
-using Shared.Iterfaces;
-using SharedProject.ModelTemplates;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.ModelTemplates;
 
 namespace Catalog.API.Features.ProductImages.Endpoints;
 

@@ -1,4 +1,4 @@
-﻿namespace Shared.Models;
+﻿namespace Common.Infrastructure.Models;
 
 public class Product
 {

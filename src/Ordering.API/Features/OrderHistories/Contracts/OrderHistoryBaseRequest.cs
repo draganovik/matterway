@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Ordering.API.Features.OrderHistories.Contracts;
 

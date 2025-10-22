@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
-namespace SharedProject.Profiles;
+namespace Common.Infrastructure.Profiles;
 
 public class ValidationProfile : Profile
 {

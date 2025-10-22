@@ -1,4 +1,4 @@
-namespace Shared.Enums;
+namespace Common.Infrastructure.Enums;
 
 public enum DetailType
 {

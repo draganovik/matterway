@@ -2,7 +2,7 @@
 using Identity.API.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Identity.API.Data;
 

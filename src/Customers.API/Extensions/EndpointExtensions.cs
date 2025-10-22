@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Shared.Extensions;
+using Common.Infrastructure.Extensions;
 
 namespace Customers.API.Extensions;
 

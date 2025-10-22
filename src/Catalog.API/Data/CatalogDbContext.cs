@@ -2,7 +2,7 @@
 using Catalog.API.Features.ProductImages.Domain;
 using Catalog.API.Features.Products.Domain;
 using Microsoft.EntityFrameworkCore;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Catalog.API.Data;
 

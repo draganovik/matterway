@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Shared.ServiceBrokers;
+using Common.Infrastructure.ServiceBrokers;
 
 namespace Catalog.API.Extensions;
 

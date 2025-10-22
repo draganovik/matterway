@@ -1,4 +1,4 @@
-using SharedProject.Profiles;
+using Common.Infrastructure.Profiles;
 
 namespace Catalog.API.Extensions;
 

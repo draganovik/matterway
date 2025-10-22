@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Identity.API.Features.Sessions.Domain;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Identity.API.Features.SystemUsers.Domain;
 

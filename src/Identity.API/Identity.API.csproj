@@ -26,6 +26,6 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.9.0"/>
     </ItemGroup>
 
-    <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared"/>
+    <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
 
 </Project>

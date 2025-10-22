@@ -7,7 +7,7 @@ using Payments.API.Features.Payments.Contracts;
 using Payments.API.Features.Payments.Data;
 using Payments.API.Features.Payments.Domain;
 using Payments.API.Features.Shared;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Payments.API.Features.Payments.Endpoints;
 

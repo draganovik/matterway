@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Ordering.API.Extensions;
-using Shared.Extensions;
+using Common.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {

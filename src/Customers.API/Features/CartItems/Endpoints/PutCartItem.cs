@@ -7,9 +7,9 @@ using Customers.API.Features.CartItems.Data;
 using Customers.API.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Enums;
-using Shared.Iterfaces;
-using Shared.ServiceBrokers;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.ServiceBrokers;
 
 namespace Customers.API.Features.CartItems.Endpoints;
 

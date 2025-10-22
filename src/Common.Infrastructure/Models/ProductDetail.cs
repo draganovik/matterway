@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
-namespace Shared.Models;
+namespace Common.Infrastructure.Models;
 
 public class ProductDetail
 {

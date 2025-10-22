@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Payments.API.Features.Payments.Contracts;
 using Payments.API.Features.Payments.Data;
 using Payments.API.Features.Payments.Domain;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Payments.API.Features.Payments.Endpoints;
 

@@ -1,7 +1,7 @@
 using Catalog.API.Features.ProductDetails.Data;
 using Catalog.API.Features.ProductImages.Data;
 using Catalog.API.Features.Products.Data;
-using Shared.ServiceBrokers;
+using Common.Infrastructure.ServiceBrokers;
 
 namespace Catalog.API.Extensions;
 

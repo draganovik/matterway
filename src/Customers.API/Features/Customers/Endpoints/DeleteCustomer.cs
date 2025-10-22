@@ -2,8 +2,8 @@ using Asp.Versioning;
 using Customers.API.Features.Customers.Data;
 using Customers.API.Features.Customers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Customers.API.Features.Customers.Endpoints;
 

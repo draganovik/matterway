@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using Shared.Models;
+using Common.Infrastructure.Models;
 
-namespace Shared.ServiceBrokers;
+namespace Common.Infrastructure.ServiceBrokers;
 
 public class CatalogServiceBroker : ICatalogServiceBroker
 {

@@ -3,7 +3,7 @@ using AutoMapper;
 using Catalog.API.Features.Products.Contracts;
 using Catalog.API.Features.Products.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Catalog.API.Features.Products.Endpoints;
 

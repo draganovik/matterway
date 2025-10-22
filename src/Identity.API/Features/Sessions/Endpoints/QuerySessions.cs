@@ -6,9 +6,9 @@ using Identity.API.Features.Sessions.Data;
 using Identity.API.Features.Sessions.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Enums;
-using Shared.Iterfaces;
-using SharedProject.ModelTemplates;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.ModelTemplates;
 
 namespace Identity.API.Features.Sessions.Endpoints;
 

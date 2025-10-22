@@ -4,8 +4,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Shared.ServiceBrokers;
-using SharedProject.Profiles;
+using Common.Infrastructure.ServiceBrokers;
+using Common.Infrastructure.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 

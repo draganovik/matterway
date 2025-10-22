@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web;
 
-namespace SharedProject.ModelTemplates;
+namespace Common.Infrastructure.ModelTemplates;
 
 public class PaginationResponse<T>
 {

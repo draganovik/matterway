@@ -2,8 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.API.Features.OrderHistories.Data;
 using Ordering.API.Features.OrderHistories.Domain;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Ordering.API.Features.OrderHistories.Endpoints;
 

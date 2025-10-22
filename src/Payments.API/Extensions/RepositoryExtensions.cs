@@ -1,5 +1,5 @@
 using Payments.API.Features.Payments.Data;
-using Shared.ServiceBrokers;
+using Common.Infrastructure.ServiceBrokers;
 
 namespace Payments.API.Extensions;
 

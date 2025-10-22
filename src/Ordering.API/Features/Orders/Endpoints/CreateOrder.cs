@@ -7,7 +7,7 @@ using Ordering.API.Features.Orders.Contracts;
 using Ordering.API.Features.Orders.Data;
 using Ordering.API.Features.Orders.Domain;
 using Ordering.API.Features.Shared;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Ordering.API.Features.Orders.Endpoints;
 

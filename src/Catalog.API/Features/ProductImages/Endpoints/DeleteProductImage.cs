@@ -2,8 +2,8 @@ using Asp.Versioning;
 using Catalog.API.Features.ProductImages.Data;
 using Catalog.API.Features.ProductImages.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Catalog.API.Features.ProductImages.Endpoints;
 

@@ -1,5 +1,5 @@
 ﻿using Catalog.API.Features.Products.Domain;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Catalog.API.Features.Products.Shared;
 

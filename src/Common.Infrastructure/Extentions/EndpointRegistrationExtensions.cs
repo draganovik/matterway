@@ -1,8 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
-namespace Shared.Extensions;
+namespace Common.Infrastructure.Extensions;
 
 public static class EndpointRegistrationExtensions
 {

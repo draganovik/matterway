@@ -1,4 +1,4 @@
-﻿namespace Shared.ServiceBrokers;
+﻿namespace Common.Infrastructure.ServiceBrokers;
 
 public interface ICustomersServiceBroker
 {

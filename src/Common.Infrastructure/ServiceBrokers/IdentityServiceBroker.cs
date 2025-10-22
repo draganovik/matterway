@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Shared.ServiceBrokers;
+namespace Common.Infrastructure.ServiceBrokers;
 
 public class IdentityServiceBroker : IIdentityServiceBroker
 {

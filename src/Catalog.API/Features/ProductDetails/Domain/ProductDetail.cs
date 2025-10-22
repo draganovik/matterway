@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Catalog.API.Features.Products.Domain;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Catalog.API.Features.ProductDetails.Domain;
 

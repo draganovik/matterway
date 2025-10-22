@@ -2,8 +2,8 @@ using Asp.Versioning;
 using Ordering.API.Features.Addresses.Data;
 using Ordering.API.Features.Addresses.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Ordering.API.Features.Addresses.Endpoints;
 

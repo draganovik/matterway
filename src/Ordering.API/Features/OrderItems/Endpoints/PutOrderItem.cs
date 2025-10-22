@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Features.OrderItems.Contracts;
 using Ordering.API.Features.OrderItems.Data;
 using Ordering.API.Features.OrderItems.Domain;
-using Shared.Iterfaces;
-using Shared.ServiceBrokers;
+using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.ServiceBrokers;
 
 namespace Ordering.API.Features.OrderItems.Endpoints;
 

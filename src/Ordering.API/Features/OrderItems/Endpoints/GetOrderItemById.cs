@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.API.Features.OrderItems.Contracts;
 using Ordering.API.Features.OrderItems.Data;
 using Ordering.API.Features.OrderItems.Domain;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Ordering.API.Features.OrderItems.Endpoints;
 

@@ -6,9 +6,9 @@ using Payments.API.Features.Payments.Contracts;
 using Payments.API.Features.Payments.Data;
 using Payments.API.Features.Payments.Domain;
 using Payments.API.Features.Shared;
-using Shared.Enums;
-using Shared.Iterfaces;
-using SharedProject.ModelTemplates;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.ModelTemplates;
 
 namespace Payments.API.Features.Payments.Endpoints;
 

@@ -4,8 +4,8 @@ using Customers.API.Features.CartItems.Contracts;
 using Customers.API.Features.CartItems.Data;
 using Customers.API.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Enums;
-using Shared.Iterfaces;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Interfaces;
 
 namespace Customers.API.Features.CartItems.Endpoints;
 

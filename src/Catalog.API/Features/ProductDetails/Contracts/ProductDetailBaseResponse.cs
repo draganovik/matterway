@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Catalog.API.Features.ProductDetails.Contracts;
 

@@ -5,7 +5,7 @@ using Identity.API.Features.Sessions.Data;
 using Identity.API.Features.Sessions.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Identity.API.Features.Sessions.Endpoints;
 

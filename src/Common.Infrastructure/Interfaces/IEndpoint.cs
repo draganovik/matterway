@@ -1,4 +1,4 @@
-namespace Shared.Iterfaces;
+namespace Common.Infrastructure.Interfaces;
 
 public interface IEndpoint
 {

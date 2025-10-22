@@ -9,7 +9,7 @@ using Identity.API.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Identity.API.Features.Sessions.Endpoints;
 

@@ -3,7 +3,7 @@ using Ordering.API.Features.Addresses.Domain;
 using Ordering.API.Features.OrderHistories.Domain;
 using Ordering.API.Features.OrderItems.Domain;
 using Ordering.API.Features.Orders.Domain;
-using Shared.Enums;
+using Common.Infrastructure.Enums;
 
 namespace Ordering.API.Data;
 

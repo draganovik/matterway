@@ -4,7 +4,7 @@ using Catalog.API.Features.ProductDetails.Contracts;
 using Catalog.API.Features.ProductDetails.Data;
 using Catalog.API.Features.ProductDetails.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Shared.Iterfaces;
+using Common.Infrastructure.Interfaces;
 
 namespace Catalog.API.Features.ProductDetails.Endpoints;
 
