@@ -7,7 +7,7 @@ using Catalog.Api.Features.ProductDetails.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Catalog.Api.Features.ProductDetails.Endpoints;
 

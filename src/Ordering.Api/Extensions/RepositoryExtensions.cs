@@ -2,7 +2,7 @@ using Ordering.Api.Features.Addresses.Data;
 using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderItems.Data;
 using Ordering.Api.Features.Orders.Data;
-using Common.Infrastructure.ServiceBrokers;
+using Common.Infrastructure.Services.Brokers;
 
 namespace Ordering.Api.Extensions;
 

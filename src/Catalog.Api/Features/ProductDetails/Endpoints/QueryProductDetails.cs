@@ -5,11 +5,11 @@ using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Domain;
 using Catalog.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
 
 namespace Catalog.Api.Features.ProductDetails.Endpoints;
 

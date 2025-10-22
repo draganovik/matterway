@@ -1,6 +1,6 @@
-﻿using Common.Infrastructure.Models;
+using Common.Infrastructure.Models;
 
-namespace Common.Infrastructure.ServiceBrokers;
+namespace Common.Infrastructure.Services.Brokers;
 
 public interface ICatalogServiceBroker
 {

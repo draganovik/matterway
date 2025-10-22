@@ -7,7 +7,7 @@ using Ordering.Api.Features.Addresses.Domain;
 using Ordering.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Ordering.Api.Features.Addresses.Endpoints;
 

@@ -1,4 +1,4 @@
-using Common.Infrastructure.Profiles;
+using Common.Infrastructure.Mapping;
 
 namespace Ordering.Api.Extensions;
 

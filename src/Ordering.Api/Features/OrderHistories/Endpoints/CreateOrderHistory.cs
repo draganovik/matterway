@@ -8,7 +8,7 @@ using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderHistories.Domain;
 using Ordering.Api.Features.Shared;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Ordering.Api.Features.OrderHistories.Endpoints;
 

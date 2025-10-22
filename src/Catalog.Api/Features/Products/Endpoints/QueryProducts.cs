@@ -7,8 +7,8 @@ using Catalog.Api.Features.Products.Shared;
 using Catalog.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Pagination;
 
 namespace Catalog.Api.Features.Products.Endpoints;
 

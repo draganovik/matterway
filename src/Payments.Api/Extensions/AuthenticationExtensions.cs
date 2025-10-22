@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Common.Infrastructure.ServiceBrokers;
+using Common.Infrastructure.Services.Brokers;
 
 namespace Payments.Api.Extensions;
 

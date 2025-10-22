@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Common.Infrastructure.Models;
 
-namespace Common.Infrastructure.ServiceBrokers;
+namespace Common.Infrastructure.Services.Brokers;
 
 public class CustomersServiceBroker : ICustomersServiceBroker
 {

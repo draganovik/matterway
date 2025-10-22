@@ -3,12 +3,12 @@ using AutoMapper;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.Addresses.Data;
 using Ordering.Api.Features.Addresses.Domain;
-using Ordering.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Ordering.Api.Features.Shared;
 
 namespace Ordering.Api.Features.Addresses.Endpoints;
 

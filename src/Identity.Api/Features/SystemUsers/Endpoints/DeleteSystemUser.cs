@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Identity.Api.Features.SystemUsers.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Identity.Api.Features.SystemUsers.Endpoints;
 

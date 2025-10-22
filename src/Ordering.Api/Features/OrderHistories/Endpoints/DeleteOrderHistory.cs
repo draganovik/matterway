@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderHistories.Domain;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Ordering.Api.Features.OrderHistories.Endpoints;
 

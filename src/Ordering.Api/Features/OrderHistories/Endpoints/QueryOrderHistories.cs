@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.OrderHistories.Contracts;
 using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderHistories.Domain;
-using Ordering.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Common.Infrastructure.Pagination;
+using Ordering.Api.Features.Shared;
 
 namespace Ordering.Api.Features.OrderHistories.Endpoints;
 

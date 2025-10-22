@@ -13,19 +13,20 @@
         <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\PaymentState.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Extentions\EndpointRegistrationExtensions.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IEndpoint.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Extensions\EndpointRegistrationExtensions.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IEndpoint.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Customer.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ModelTemplates\PaginationResponse.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Profiles\ValidationProfile.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\CatalogServiceBroker.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\CustomersServiceBroker.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\ICustomersServiceBroker.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\ICatalogServiceBroker.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IdentityServiceBroker.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)ServiceBrokers\IIdentityServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Pagination\PaginationResponse.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Pagination\PagingQueryParams.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CatalogServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CustomersServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\ICatalogServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\ICustomersServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\IdentityServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\IIdentityServiceBroker.cs"/>
     </ItemGroup>
 </Project>

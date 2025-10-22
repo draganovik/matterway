@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Payments.Api.Features.Payments.Contracts;
 using Payments.Api.Features.Payments.Data;
 using Payments.Api.Features.Payments.Domain;
-using Payments.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Common.Infrastructure.Pagination;
+using Payments.Api.Features.Shared;
 
 namespace Payments.Api.Features.Payments.Endpoints;
 

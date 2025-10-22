@@ -7,7 +7,7 @@ using Catalog.Api.Features.ProductImages.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;
 

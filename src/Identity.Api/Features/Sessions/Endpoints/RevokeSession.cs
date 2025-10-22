@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Identity.Api.Features.Sessions.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Identity.Api.Features.Sessions.Endpoints;
 

@@ -1,6 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Common.Infrastructure.Extensions;
 
@@ -16,7 +16,6 @@ public static class EndpointRegistrationExtensions
         this IServiceCollection services,
         params Assembly[] assemblies)
     {
-        var assembly = typeof(IEndpoint).Assembly;
         var uniqueTypes = new HashSet<Type>();
 
         var serviceDescriptors = assemblies

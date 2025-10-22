@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Payments.Api.Features.Payments.Contracts;
 using Payments.Api.Features.Payments.Data;
 using Payments.Api.Features.Payments.Domain;
-using Common.Infrastructure.Interfaces;
+using Common.Infrastructure.Abstractions;
 
 namespace Payments.Api.Features.Payments.Endpoints;
 

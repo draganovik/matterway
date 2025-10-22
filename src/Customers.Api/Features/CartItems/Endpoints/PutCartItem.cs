@@ -8,8 +8,8 @@ using Customers.Api.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ServiceBrokers;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Services.Brokers;
 
 namespace Customers.Api.Features.CartItems.Endpoints;
 

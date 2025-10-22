@@ -6,9 +6,9 @@ using Identity.Api.Features.SystemUsers.Data;
 using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Common.Infrastructure.Pagination;
 
 namespace Identity.Api.Features.SystemUsers.Endpoints;
 

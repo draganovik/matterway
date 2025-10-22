@@ -4,12 +4,12 @@ using AutoMapper;
 using Customers.Api.Features.CartItems.Contracts;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.CartItems.Domain;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Pagination;
 using Customers.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
 
 namespace Customers.Api.Features.CartItems.Endpoints;
 

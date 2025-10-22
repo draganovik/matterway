@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Orders.Contracts;
 using Ordering.Api.Features.Orders.Data;
 using Ordering.Api.Features.Orders.Domain;
-using Ordering.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ModelTemplates;
+using Common.Infrastructure.Pagination;
+using Ordering.Api.Features.Shared;
 
 namespace Ordering.Api.Features.Orders.Endpoints;
 

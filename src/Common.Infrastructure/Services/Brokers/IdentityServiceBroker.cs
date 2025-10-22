@@ -1,8 +1,8 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Common.Infrastructure.ServiceBrokers;
+namespace Common.Infrastructure.Services.Brokers;
 
 public class IdentityServiceBroker : IIdentityServiceBroker
 {

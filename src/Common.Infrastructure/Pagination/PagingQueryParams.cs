@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Payments.Api.Features.Shared;
+namespace Common.Infrastructure.Pagination;
 
 public class PagingQueryParams
 {

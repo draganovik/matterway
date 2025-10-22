@@ -8,8 +8,8 @@ using Ordering.Api.Features.Orders.Contracts;
 using Ordering.Api.Features.Orders.Data;
 using Ordering.Api.Features.Orders.Domain;
 using Common.Infrastructure.Enums;
-using Common.Infrastructure.Interfaces;
-using Common.Infrastructure.ServiceBrokers;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Services.Brokers;
 
 namespace Ordering.Api.Features.Orders.Endpoints;
 

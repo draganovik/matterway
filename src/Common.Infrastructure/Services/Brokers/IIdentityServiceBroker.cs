@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
-namespace Common.Infrastructure.ServiceBrokers;
+namespace Common.Infrastructure.Services.Brokers;
 
 public interface IIdentityServiceBroker
 {
