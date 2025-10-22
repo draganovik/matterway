@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -36,8 +37,8 @@ namespace Payments.API.Migrations
                 columns: new[] { "Id", "CardHolder", "CardNumber", "ExpirationDate", "PaymentAmount", "PaymentDate", "PaymentState", "ReferenceNumber", "SecurityCode" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), "Mara Jakov", "1234-5678-1234-5678", "12/26", 39998.0, new DateTime(2023, 5, 19, 19, 14, 46, 798, DateTimeKind.Local).AddTicks(9572), 1, "5655-6666-7877", "1234" },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), "Stefan Stefanov", "8856-5678-1234-3366", "06/24", 4999.0, new DateTime(2023, 5, 19, 22, 14, 46, 798, DateTimeKind.Local).AddTicks(9582), 1, "6666-8888-6588", "6658" }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), "Mara Jakov", "1234-5678-1234-5678", "12/26", 39998.0, new DateTime(2024, 6, 1, 10, 0, 0, 0, DateTimeKind.Unspecified), 1, "5655-6666-7877", "1234" },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), "Stefan Stefanov", "8856-5678-1234-3366", "06/24", 4999.0, new DateTime(2024, 6, 2, 11, 30, 0, 0, DateTimeKind.Unspecified), 1, "6666-8888-6588", "6658" }
                 });
         }
 

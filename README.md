@@ -9,7 +9,7 @@ Projekat Matterway predstavlja inovativno rešenje za prevazilaženje prethodno 
 ## Database and Migration setup
 
 ```bash
-  cd Matterway\src\Services
+  cd Matterway\scripts
 ```
 
 than run the cmd executables in next order:
@@ -18,6 +18,8 @@ than run the cmd executables in next order:
 2. migrations_remove.cmd
 3. migrations_add.cmd
 4. databases_update.cmd
+
+On macOS/Linux run the matching `.sh` scripts from the same directory.
 
 ## Tech Stack
 

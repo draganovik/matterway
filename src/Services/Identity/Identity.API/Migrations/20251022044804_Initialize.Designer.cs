@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.API.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20230519201423_Initialize")]
+    [Migration("20251022044804_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Identity.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -34,20 +34,17 @@ namespace Identity.API.Migrations
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Expires")
-                        .IsRequired()
+                    b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RefreshExpires")
-                        .IsRequired()
+                    b.Property<DateTime>("RefreshExpires")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SystemUserId")
-                        .IsRequired()
+                    b.Property<Guid>("SystemUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Token")
@@ -89,33 +86,33 @@ namespace Identity.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 462, DateTimeKind.Local).AddTicks(4361),
+                            Created = new DateTime(2021, 9, 9, 12, 10, 10, 0, DateTimeKind.Local),
                             Email = "mladen@matterway.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEqMsFNFhWyMQXEN0rB6Mp4cFGB5GmXQgH2ZCqOkmm0oGKVRSWgbFy47iIEP++tMGA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw==",
                             Role = 0
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 525, DateTimeKind.Local).AddTicks(5091),
+                            Created = new DateTime(2022, 10, 10, 13, 11, 11, 0, DateTimeKind.Local),
                             Email = "jelena@matterway.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ5gC972Ja2WkjhcvANz+CoARvsoWoO4zUQyq27YOvD6jKx1nyv91Ks1YuhHeV65RA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg==",
                             Role = 1
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 598, DateTimeKind.Local).AddTicks(9885),
+                            Created = new DateTime(2023, 4, 12, 14, 10, 0, 0, DateTimeKind.Local),
                             Email = "stefan999@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO5rXg/F4umM8Ij0848OWgklsQeGJiANCcElu+/hJjOulHtbTDlmQGNnVharzfAyPA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==",
                             Role = 2
                         },
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            Created = new DateTime(2023, 5, 19, 22, 14, 23, 692, DateTimeKind.Local).AddTicks(9253),
+                            Created = new DateTime(2024, 2, 20, 10, 30, 0, 0, DateTimeKind.Local),
                             Email = "marag2@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAENpnbURk+8JmVcACvRb4P/hDHnPd4xkjo3BfGzR/GEFuJeCJ1uzmzMtstphFHh42GA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q==",
                             Role = 2
                         });
                 });

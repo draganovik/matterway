@@ -25,43 +25,44 @@ public class IdentityDbContext : DbContext
             .HasForeignKey(s => s.SystemUserId)
             .IsRequired();
 
-        var adminUser = new SystemUser
-        {
-            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-            Email = "mladen@matterway.com",
-            Role = SystemUserRole.Admin
-        };
-
-        adminUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(adminUser, "sifr45");
-
-        var managerUser = new SystemUser
-        {
-            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-            Email = "jelena@matterway.com",
-            Role = SystemUserRole.Manager
-        };
-
-        managerUser.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(managerUser, "sifr56");
-
-        var customer1User = new SystemUser
-        {
-            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-            Email = "stefan999@gmail.com",
-            Role = SystemUserRole.Customer
-        };
-
-        customer1User.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(customer1User, "sifr67");
-
-        var customer2User = new SystemUser
-        {
-            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-            Email = "marag2@gmail.com",
-            Role = SystemUserRole.Customer
-        };
-
-        customer2User.PasswordHash = new PasswordHasher<SystemUser>().HashPassword(customer2User, "sifr78");
-
-        modelBuilder.Entity<SystemUser>().HasData(adminUser, managerUser, customer1User, customer2User);
+        modelBuilder.Entity<SystemUser>().HasData(
+            new SystemUser
+            {
+                Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
+                Email = "mladen@matterway.com",
+                Role = SystemUserRole.Admin,
+                Created = DateTime.Parse("2021-09-09T10:10:10Z"),
+                //sifr45
+                PasswordHash = "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw=="
+            },
+            new SystemUser
+            {
+                Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
+                Email = "jelena@matterway.com",
+                Role = SystemUserRole.Manager,
+                Created = DateTime.Parse("2022-10-10T11:11:11Z"),
+                //sifr56
+                PasswordHash = "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg=="
+            },
+            new SystemUser
+            {
+                Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                Email = "stefan999@gmail.com",
+                Role = SystemUserRole.Customer,
+                Created = DateTime.Parse("2023-04-12T12:10:00Z"),
+                //sifr67
+                PasswordHash = "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug=="
+            },
+            new SystemUser
+            {
+                Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                Email = "marag2@gmail.com",
+                Role = SystemUserRole.Customer,
+                Created = DateTime.Parse("2024-02-20T09:30:00Z"),
+                //sifr78
+                PasswordHash = "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q=="
+            }
+        );
 
         base.OnModelCreating(modelBuilder);
     }

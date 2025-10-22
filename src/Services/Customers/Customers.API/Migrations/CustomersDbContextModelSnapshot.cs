@@ -17,12 +17,12 @@ namespace Customers.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Customers.API.Entities.CartItem", b =>
+            modelBuilder.Entity("Customers.API.Features.CartItems.Domain.CartItem", b =>
                 {
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
@@ -63,7 +63,7 @@ namespace Customers.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Customers.API.Entities.Customer", b =>
+            modelBuilder.Entity("Customers.API.Features.Customers.Domain.Customer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -112,9 +112,9 @@ namespace Customers.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Customers.API.Entities.CartItem", b =>
+            modelBuilder.Entity("Customers.API.Features.CartItems.Domain.CartItem", b =>
                 {
-                    b.HasOne("Customers.API.Entities.Customer", "Customer")
+                    b.HasOne("Customers.API.Features.Customers.Domain.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -17,7 +17,7 @@ namespace Ordering.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -82,45 +82,6 @@ namespace Ordering.API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DeliveryAddressId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ReferenceNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeliveryAddressId");
-
-                    b.ToTable("Order");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
-                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                            ReferenceNumber = "5655-6666-7877"
-                        },
-                        new
-                        {
-                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            ReferenceNumber = "6666-8888-6588"
-                        });
-                });
-
             modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -149,7 +110,7 @@ namespace Ordering.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            CreatedDate = new DateTime(2023, 5, 19, 22, 14, 38, 723, DateTimeKind.Local).AddTicks(6554),
+                            CreatedDate = new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Order Ready",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                             OrderStatus = 1
@@ -157,7 +118,7 @@ namespace Ordering.API.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
-                            CreatedDate = new DateTime(2023, 5, 19, 22, 14, 38, 723, DateTimeKind.Local).AddTicks(6560),
+                            CreatedDate = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             Description = "Order Canceled",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
                             OrderStatus = 5
@@ -207,13 +168,41 @@ namespace Ordering.API.Migrations
 
             modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
                 {
-                    b.HasOne("Ordering.API.Features.Addresses.Domain.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("DeliveryAddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("Address");
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DeliveryAddressId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReferenceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeliveryAddressId");
+
+                    b.ToTable("Order");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            ReferenceNumber = "5655-6666-7877"
+                        },
+                        new
+                        {
+                            Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                            CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                            DeliveryAddressId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                            ReferenceNumber = "6666-8888-6588"
+                        });
                 });
 
             modelBuilder.Entity("Ordering.API.Features.OrderHistories.Domain.OrderHistory", b =>
@@ -236,6 +225,17 @@ namespace Ordering.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>
+                {
+                    b.HasOne("Ordering.API.Features.Addresses.Domain.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("DeliveryAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Ordering.API.Features.Orders.Domain.Order", b =>

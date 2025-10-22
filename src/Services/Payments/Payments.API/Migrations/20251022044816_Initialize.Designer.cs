@@ -12,7 +12,7 @@ using Payments.API.Data;
 namespace Payments.API.Migrations
 {
     [DbContext(typeof(PaymentsDbContext))]
-    [Migration("20230519201446_Initialize")]
+    [Migration("20251022044816_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Payments.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -72,7 +72,7 @@ namespace Payments.API.Migrations
                             CardNumber = "1234-5678-1234-5678",
                             ExpirationDate = "12/26",
                             PaymentAmount = 39998.0,
-                            PaymentDate = new DateTime(2023, 5, 19, 19, 14, 46, 798, DateTimeKind.Local).AddTicks(9572),
+                            PaymentDate = new DateTime(2024, 6, 1, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             PaymentState = 1,
                             ReferenceNumber = "5655-6666-7877",
                             SecurityCode = "1234"
@@ -84,7 +84,7 @@ namespace Payments.API.Migrations
                             CardNumber = "8856-5678-1234-3366",
                             ExpirationDate = "06/24",
                             PaymentAmount = 4999.0,
-                            PaymentDate = new DateTime(2023, 5, 19, 22, 14, 46, 798, DateTimeKind.Local).AddTicks(9582),
+                            PaymentDate = new DateTime(2024, 6, 2, 11, 30, 0, 0, DateTimeKind.Unspecified),
                             PaymentState = 1,
                             ReferenceNumber = "6666-8888-6588",
                             SecurityCode = "6658"
