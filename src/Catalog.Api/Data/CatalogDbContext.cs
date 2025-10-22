@@ -1,8 +1,8 @@
 ﻿using Catalog.Api.Features.ProductDetails.Domain;
 using Catalog.Api.Features.ProductImages.Domain;
 using Catalog.Api.Features.Products.Domain;
-using Microsoft.EntityFrameworkCore;
 using Common.Infrastructure.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Data;
 

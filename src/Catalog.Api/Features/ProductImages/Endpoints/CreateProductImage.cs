@@ -1,14 +1,13 @@
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Data;
 using Catalog.Api.Features.ProductImages.Domain;
+using Catalog.Api.Features.ProductImages.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;
 
@@ -30,28 +29,11 @@ public class CreateProductImage : IEndpoint
     private static async Task<Results<Created<ProductImageBaseResponse>, BadRequest<ProblemDetails>>> Handler(
         ProductImageBaseRequest request,
         HttpContext httpContext,
-        IProductImageRepository productImageRepository,
-        IMapper mapper)
+        IProductImageRepository productImageRepository)
     {
-        var results = new List<ValidationResult>();
-        var context = new ValidationContext(request);
-        var isValid = Validator.TryValidateObject(request, context, results, true);
-
-        if (!isValid)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred."
-            };
-            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
-            return TypedResults.BadRequest(problemDetails);
-        }
-
-        var productImageModel = mapper.Map<ProductImage>(request);
-        var createdProductImage = await productImageRepository.Create(productImageModel);
-        if (createdProductImage is null)
+        var productImageModel = ProductImage.FromContract(request);
+        var created = await productImageRepository.Create(productImageModel);
+        if (created is null)
         {
             var problemDetails = new ProblemDetails
             {
@@ -63,9 +45,9 @@ public class CreateProductImage : IEndpoint
         }
 
         var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductImages/{createdProductImage.ProductId}/{createdProductImage.Id}");
+            $"ProductImages/{created.ProductId}/{created.Id}");
 
         return TypedResults.Created(location,
-            mapper.Map<ProductImageBaseResponse>(createdProductImage));
+            created.ToContract<ProductImageBaseResponse>());
     }
 }

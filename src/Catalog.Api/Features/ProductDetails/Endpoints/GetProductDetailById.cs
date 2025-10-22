@@ -1,8 +1,8 @@
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Domain;
+using Catalog.Api.Features.ProductDetails.Mapping;
 using Common.Infrastructure.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -15,19 +15,18 @@ public class GetProductDetailById : IEndpoint
         app.MapGet("ProductDetails/{id:guid}", Handler)
             .WithName("GetProductDetailById").WithSummary("Get a ProductDetail by id.")
             .WithTags(nameof(ProductDetail))
-            .Produces<ProductDetailBaseResponse>(StatusCodes.Status200OK)
+            .Produces<ProductDetailBaseResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<ProductDetailBaseResponse>, NotFound>> Handler(
         Guid id,
-        IProductDetailRepository productDetailRepository,
-        IMapper mapper)
+        IProductDetailRepository productDetailRepository)
     {
         return await productDetailRepository.GetById(id)
-            is ProductDetail value
-            ? TypedResults.Ok(mapper.Map<ProductDetailBaseResponse>(value))
+            is { } value
+            ? TypedResults.Ok(value.ToContract<ProductDetailBaseResponse>())
             : TypedResults.NotFound();
     }
 }

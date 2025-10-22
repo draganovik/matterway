@@ -1,8 +1,8 @@
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
 using Catalog.Api.Features.Products.Domain;
+using Catalog.Api.Features.Products.Mapping;
 using Catalog.Api.Features.Products.Shared;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Http;
@@ -19,7 +19,7 @@ public class QueryProducts : IEndpoint
         app.MapGet("Products", Handler)
             .WithName("QueryProducts").WithSummary("Query Products.")
             .WithTags("Products")
-            .Produces<PaginationResponse<ProductBaseResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<ProductBaseResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
@@ -33,8 +33,7 @@ public class QueryProducts : IEndpoint
             [AsParameters]
             ProductFilter productFilter,
             HttpContext httpContext,
-            IProductRepository productRepository,
-            IMapper mapper)
+            IProductRepository productRepository)
     {
         var total = await productRepository.GetTotalEntities(productFilter);
         var entities =
@@ -43,7 +42,10 @@ public class QueryProducts : IEndpoint
 
         var paginationResponse = new PaginationResponse<ProductBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<ProductBaseResponse>>(entities).ToList(), baseUri);
+            entities.Select(
+                entity => entity.ToContract<ProductBaseResponse>()
+            ).ToList()
+            , baseUri);
 
         return entities is IEnumerable<Product> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

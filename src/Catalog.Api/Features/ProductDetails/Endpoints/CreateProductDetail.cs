@@ -1,14 +1,14 @@
+using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Domain;
+using Catalog.Api.Features.ProductDetails.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.ProductDetails.Endpoints;
 
@@ -30,28 +30,11 @@ public class CreateProductDetail : IEndpoint
     private static async Task<Results<Created<ProductDetailBaseResponse>, BadRequest<ProblemDetails>>> Handler(
         ProductDetailBaseRequest request,
         HttpContext httpContext,
-        IProductDetailRepository productDetailRepository,
-        IMapper mapper)
+        IProductDetailRepository productDetailRepository)
     {
-        var results = new List<ValidationResult>();
-        var context = new ValidationContext(request);
-        var isValid = Validator.TryValidateObject(request, context, results, true);
-
-        if (!isValid)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred."
-            };
-            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
-            return TypedResults.BadRequest(problemDetails);
-        }
-
-        var productDetailModel = mapper.Map<ProductDetail>(request);
-        var createdProductDetail = await productDetailRepository.Create(productDetailModel);
-        if (createdProductDetail is null)
+        var productDetailModel = ProductDetail.FromContract(request);
+        var created = await productDetailRepository.Create(productDetailModel);
+        if (created is null)
         {
             var problemDetails = new ProblemDetails
             {
@@ -63,9 +46,9 @@ public class CreateProductDetail : IEndpoint
         }
 
         var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductDetails/{createdProductDetail.Id}");
+            $"ProductDetails/{created.Id}");
 
         return TypedResults.Created(location,
-            mapper.Map<ProductDetailBaseResponse>(createdProductDetail));
+            created.ToContract<ProductDetailBaseResponse>());
     }
 }

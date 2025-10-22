@@ -14,7 +14,7 @@ public class GetProductById : IEndpoint
         app.MapGet("Products/{id:guid}", Handler)
             .WithName("GetProductById").WithSummary("Get a Product by id.")
             .WithTags("Products")
-            .Produces<ProductBaseResponse>(StatusCodes.Status200OK)
+            .Produces<ProductBaseResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(new ApiVersion(1, 0));
     }

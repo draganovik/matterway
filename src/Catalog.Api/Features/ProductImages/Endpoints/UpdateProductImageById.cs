@@ -1,13 +1,12 @@
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Data;
 using Catalog.Api.Features.ProductImages.Domain;
+using Catalog.Api.Features.ProductImages.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;
 
@@ -18,7 +17,7 @@ public class UpdateProductImageById : IEndpoint
         app.MapPatch("ProductImages/{productId:guid}/{id:int}", Handler)
             .WithName("UpdateProductImageById").WithSummary("Update a ProductImage by id.")
             .WithTags(nameof(ProductImage))
-            .Produces<ProductImageBaseResponse>(StatusCodes.Status200OK)
+            .Produces<ProductImageBaseResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -31,28 +30,11 @@ public class UpdateProductImageById : IEndpoint
         Guid productId,
         int id,
         ProductImageBaseRequest request,
-        IProductImageRepository productImageRepository,
-        IMapper mapper)
+        IProductImageRepository productImageRepository)
     {
-        var results = new List<ValidationResult>();
-        var context = new ValidationContext(request);
-        var isValid = Validator.TryValidateObject(request, context, results, true);
-
-        if (!isValid)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "One or more validation errors occurred."
-            };
-            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
-            return TypedResults.BadRequest(problemDetails);
-        }
-
         var updatedProductImage = await productImageRepository.Update(productId, id, request);
         return updatedProductImage is not null
-            ? TypedResults.Ok(mapper.Map<ProductImageBaseResponse>(updatedProductImage))
+            ? TypedResults.Ok(updatedProductImage.ToContract<ProductImageBaseResponse>())
             : TypedResults.NotFound();
     }
 }

@@ -17,13 +17,10 @@ builder.Configuration
 builder.Services.AddProblemDetails();
 builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
 
-// Add Authentication, Database, and Repositories
+// Add Authentication, Database, Repositories and JSON options
 builder.Services.ConfigureAuthentication(builder.Configuration);
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureRepositories();
-
-// Add Mapping and JSON options
-builder.Services.ConfigureMapper();
 builder.Services.ConfigureJsonOptions();
 
 // Register endpoints and API explorer
