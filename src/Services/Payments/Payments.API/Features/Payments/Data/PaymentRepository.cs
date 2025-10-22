@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Payments.API.Data;
-using Payments.API.Entities;
-using Payments.API.Models.PaymentModels;
+using Payments.API.Features.Payments.Contracts;
+using Payments.API.Features.Payments.Domain;
 
-namespace Payments.API.Repository;
+namespace Payments.API.Features.Payments.Data;
 
 public class PaymentRepository : IPaymentRepository
 {
@@ -48,7 +48,7 @@ public class PaymentRepository : IPaymentRepository
             .ToListAsync();
     }
 
-    public async Task<Payment?> Update(Guid id, PaymentBaseRequestModel requestModel)
+    public async Task<Payment?> Update(Guid id, PaymentBaseRequest requestModel)
     {
         var currentPaymentModel = await context.Payment.FindAsync(id);
         if (currentPaymentModel is null) return null;

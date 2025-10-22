@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Payments.API.Entities;
+using Payments.API.Features.Payments.Domain;
 using Shared.Enums;
 
 namespace Payments.API.Data;

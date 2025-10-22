@@ -4,11 +4,12 @@ services:
   webstore.web:
     environment:
       - NUXT_PUBLIC_APP_DOMAIN=localhost
-      - NUXT_PUBLIC_AUTH_API_BASE_URI=http://localhost:2003
-      - NUXT_PUBLIC_CATALOG_API_BASE_URI=http://localhost:2001
-      - NUXT_PUBLIC_CUSTOMERS_API_BASE_URI=http://localhost:2002
-      - NUXT_PUBLIC_ORDERING_API_BASE_URI=http://localhost:2005
-      - NUXT_PUBLIC_PAYMENT_API_BASE_URI=http://localhost:2006
+      - NUXT_PUBLIC_AUTH_API_BASE_URL=http://localhost:2003
+      - NUXT_PUBLIC_CATALOG_API_BASE_URL=http://localhost:2001
+      - NUXT_PUBLIC_CUSTOMERS_API_BASE_URL=http://localhost:2002
+      - NUXT_PUBLIC_ORDERING_API_BASE_URL=http://localhost:2005
+      - NUXT_ORDERING_API_SERVER_BASE_URL=http://ordering-api:80
+      - NUXT_PAYMENTS_API_SERVER_BASE_URL=http://payments-api:80
     ports:
       - '3001:3000'
   catalog.api:
@@ -98,7 +99,7 @@ services:
       - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
       - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
 
-  payment.api:
+  payments.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80

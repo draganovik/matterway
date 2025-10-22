@@ -8,7 +8,7 @@ const cart = useCartStore();
 const session = useSessionStore();
 
 const paymentData: Ref<CardPaymentModel> = ref(
-  new CardPaymentModel("4242424242424242", 12, 2024, "123", cart.getTotalPrice),
+  new CardPaymentModel("4242424242424242", 12, 2029, "123", cart.getTotalPrice),
 );
 
 const addressData: Ref<AddressModel> = ref(
@@ -16,7 +16,7 @@ const addressData: Ref<AddressModel> = ref(
 );
 
 const pay = async () => {
-  const response = await fetch("/api/v1.0/payments", {
+  const response = await fetch("/api/payments", {
     method: "POST",
     body: JSON.stringify({
       ...paymentData.value,

@@ -8,31 +8,33 @@ export default defineEventHandler(async (event) => {
   const stripeEvent: StripeEventWebhookModel = await readBody(event);
   const stripeAddress = stripeEvent.data?.object.shipping.address;
   console.log(stripeAddress);
-  const address: AddressModel = new AddressModel(
-    stripeEvent.data?.object.shipping.name!,
-    stripeAddress?.line2!,
-    stripeAddress?.line1!,
-    stripeAddress?.city!,
-    stripeAddress?.postal_code!,
-  );
+  const address: AddressModel = new AddressModel();
+  address.receiverName = stripeEvent.data?.object.shipping.name!;
+  address.residence = stripeAddress?.line2!;
+  address.street = stripeAddress?.line1!;
+  address.city = stripeAddress?.city!;
+  address.zipCode = stripeAddress?.postal_code!;
 
   switch (stripeEvent.type) {
     case "payment_intent.created":
       console.log("created");
-      break;
+      return { success: true, message: "Payment created" };
     case "payment_intent.succeeded":
       console.log("succeeded");
-      break;
+      return { success: true, message: "Payment succeeded" };
     case "charge.succeeded":
       const createdAddress: any = await postAddress(address);
+      console.log("address: ", createdAddress);
       const createdOrder = await postOrder(
         stripeEvent.data?.object.metadata.client_id!,
         createdAddress.id,
       );
-      await postPayment(stripeEvent, createdOrder);
+      console.log("order: ", createdOrder);
+      let payment = await postPayment(stripeEvent, createdOrder);
+      console.log("payment created");
       await postOrderItems(stripeEvent, createdOrder);
       console.log("chargeed");
-      break;
+      return { success: true, message: "Data received", data: { payment } };
     default:
       throw createError({
         statusCode: 400,
@@ -43,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
 const postAddress = async (address: AddressModel) => {
   const response = await fetch(
-    `${config.public.orderingApiBaseUrl}/api/Addresses`,
+    `${config.orderingApiServerBaseUrl}/api/v1/Addresses`,
     {
       method: "POST",
       headers: {
@@ -67,7 +69,7 @@ const postAddress = async (address: AddressModel) => {
 const postOrder = async (userId: string, addressId: string) => {
   console.log("ADDRESS", userId, addressId);
   const response = await fetch(
-    `${config.public.orderingApiBaseUrl}/api/Orders`,
+    `${config.orderingApiServerBaseUrl}/api/v1/Orders`,
     {
       method: "POST",
       headers: {
@@ -92,7 +94,7 @@ const postOrder = async (userId: string, addressId: string) => {
 
 const postPayment = async (event: StripeEventWebhookModel, order: any) => {
   const response = await fetch(
-    `${config.public.paymentsApiBaseUrl}/api/Payments`,
+    `${config.paymentsApiServerBaseUrl}/api/v1/Payments`,
     {
       method: "POST",
       headers: {
@@ -100,14 +102,14 @@ const postPayment = async (event: StripeEventWebhookModel, order: any) => {
         accept: "application/json",
       },
       body: JSON.stringify({
-        referenceNumber: order.referenceNumber,
+        referenceNumber: order.referenceNumber + "-0000",
         paymentDate: new Date(event.data?.object.created! * 1000),
         paymentAmount: event.data?.object.amount! / 100,
         cardNumber: "0000-0000-0000-0000",
         cardHolder: "string",
-        expirationDate: "00/00",
+        expirationDate: "12/30",
         securityCode: "000",
-        paymentState: "Completed",
+        paymentState: "Processed",
       }),
     },
   );
@@ -130,7 +132,7 @@ const postOrderItems = async (event: StripeEventWebhookModel, order: any) => {
   console.log(items);
   items.forEach(async (item) => {
     const response = await fetch(
-      `${config.public.orderingApiBaseUrl}/api/Orders/${order.id}/Items/${item.id}`,
+      `${config.orderingApiServerBaseUrl}/api/v1/Orders/${order.id}/Items/${item.id}`,
       {
         method: "PUT",
         headers: {

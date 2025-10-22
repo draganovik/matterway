@@ -22,7 +22,7 @@ namespace Payments.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Payments.API.Entities.Payment", b =>
+            modelBuilder.Entity("Payments.API.Features.Payments.Domain.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

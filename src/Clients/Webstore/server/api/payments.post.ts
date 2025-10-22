@@ -34,14 +34,12 @@ export default defineEventHandler(async (event) => {
     cvc,
     amount,
   );
-  const address = new AddressModel(
-    receiverName,
-    residence,
-    street,
-    city,
-    zipCode,
-    note,
-  );
+  const address = new AddressModel();
+  address.receiverName = receiverName;
+  address.residence = residence;
+  address.street = street;
+  address.city = city;
+  address.zipCode = zipCode;
 
   if (!address.validate())
     throw createError({

@@ -22,7 +22,8 @@
       </thead>
       <tbody>
         <tr
-          v-for="order in orders.reverse()"
+          v-for="order in orders"
+          :key="order.referenceNumber"
           class="border-b border-gray-200 dark:border-gray-700"
         >
           <th
@@ -91,6 +92,7 @@ class Address {
 
 <script setup lang="ts">
 import { useSessionStore } from "~/store/session";
+import { formatMoney } from "~/composables/formatMoney";
 const orders: Ref<Order[]> = ref([]);
 const sessionStore = useSessionStore();
 
@@ -99,11 +101,10 @@ const config = useRuntimeConfig();
 const getOrders = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const response = await request(
-    `${config.public.orderingApiBaseUrl}/api/v1.0/Orders?page=1&pageSize=100`,
+    `${config.public.orderingApiBaseUrl}/api/v1/Orders?page=1&pageSize=10`,
     {},
   );
-  orders.value = (await response.json()).data;
-  console.log(orders.value);
+  orders.value = (await response.json()).data.reverse();
 };
 onMounted(() => {
   getOrders();

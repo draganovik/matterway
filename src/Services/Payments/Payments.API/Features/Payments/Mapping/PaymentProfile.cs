@@ -1,15 +1,14 @@
-﻿using AutoMapper;
-using Payments.API.Entities;
-using Payments.API.Models.PaymentModels;
+using AutoMapper;
+using Payments.API.Features.Payments.Contracts;
+using Payments.API.Features.Payments.Domain;
 
-namespace Payments.API.Profiles;
+namespace Payments.API.Features.Payments.Mapping;
 
 public class PaymentProfile : Profile
 {
     public PaymentProfile()
     {
-        // map CardNumber string to a format where all but the last 4 digits are replaced with asterisks
-        CreateMap<Payment, PaymentBaseResponseModel>()
+        CreateMap<Payment, PaymentBaseResponse>()
             .ForMember(dest => dest.CardNumber,
                 opt => opt.MapFrom(src =>
                     src.CardNumber != null
@@ -17,6 +16,6 @@ public class PaymentProfile : Profile
                             "****-****-****-")
                         : null));
 
-        CreateMap<PaymentBaseRequestModel, Payment>();
+        CreateMap<PaymentBaseRequest, Payment>();
     }
 }

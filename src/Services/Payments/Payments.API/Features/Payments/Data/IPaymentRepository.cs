@@ -1,7 +1,7 @@
-﻿using Payments.API.Entities;
-using Payments.API.Models.PaymentModels;
+using Payments.API.Features.Payments.Contracts;
+using Payments.API.Features.Payments.Domain;
 
-namespace Payments.API.Repository;
+namespace Payments.API.Features.Payments.Data;
 
 public interface IPaymentRepository
 {
@@ -11,7 +11,7 @@ public interface IPaymentRepository
 
     Task<Payment?> Create(Payment requestModel);
 
-    Task<Payment?> Update(Guid id, PaymentBaseRequestModel requestModel);
+    Task<Payment?> Update(Guid id, PaymentBaseRequest requestModel);
 
     Task<bool> Delete(Guid id);
 
