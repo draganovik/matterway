@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
 using Customers.Api.Features.Customers.Contracts;
 using Customers.Api.Features.Customers.Data;
 using Customers.Api.Features.Customers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
 
 namespace Customers.Api.Features.Customers.Endpoints;
 

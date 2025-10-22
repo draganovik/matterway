@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using Identity.Api.Features.SystemUsers.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace Identity.Api.Features.Sessions.Domain;
 

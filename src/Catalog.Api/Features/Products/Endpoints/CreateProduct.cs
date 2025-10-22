@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
 using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
 using Catalog.Api.Features.Products.Domain;
-using Catalog.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.Products.Endpoints;
 
@@ -62,7 +62,7 @@ public class CreateProduct : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Products/{createdProduct.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Products/{createdProduct.Id}");
 
         return TypedResults.Created(location,
             mapper.Map<ProductBaseResponse>(createdProduct));

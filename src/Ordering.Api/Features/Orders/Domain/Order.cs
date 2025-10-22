@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Ordering.Api.Features.Addresses.Domain;
 using Ordering.Api.Features.OrderHistories.Domain;
 using Ordering.Api.Features.OrderItems.Domain;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.Orders.Domain;
 

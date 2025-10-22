@@ -1,6 +1,5 @@
 ﻿using Identity.Api.Features.Sessions.Domain;
 using Identity.Api.Features.SystemUsers.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Common.Infrastructure.Enums;
 

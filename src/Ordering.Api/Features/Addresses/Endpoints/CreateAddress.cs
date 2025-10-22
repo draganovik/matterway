@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.Addresses.Data;
 using Ordering.Api.Features.Addresses.Domain;
-using Ordering.Api.Features.Shared;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.Addresses.Endpoints;
 
@@ -60,7 +60,7 @@ public class CreateAddress : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Addresses/{newEntity.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Addresses/{newEntity.Id}");
 
         return TypedResults.Created(location, mapper.Map<AddressBaseResponse>(newEntity));
     }

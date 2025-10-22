@@ -4,11 +4,11 @@ using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
 using Catalog.Api.Features.Products.Domain;
 using Catalog.Api.Features.Products.Shared;
-using Catalog.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Pagination;
 
 namespace Catalog.Api.Features.Products.Endpoints;
 
@@ -39,7 +39,7 @@ public class QueryProducts : IEndpoint
         var total = await productRepository.GetTotalEntities(productFilter);
         var entities =
             await productRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value, productFilter);
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Products");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Products");
 
         var paginationResponse = new PaginationResponse<ProductBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

@@ -1,6 +1,6 @@
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Common.Infrastructure.Abstractions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Reflection;
 
 namespace Common.Infrastructure.Extensions;
 

@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using Common.Infrastructure.Enums;
+using System.Text.Json.Serialization;
 
 namespace Ordering.Api.Features.OrderHistories.Contracts;
 

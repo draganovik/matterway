@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.OrderHistories.Contracts;
 using Ordering.Api.Features.OrderItems.Contracts;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.Orders.Contracts;
 

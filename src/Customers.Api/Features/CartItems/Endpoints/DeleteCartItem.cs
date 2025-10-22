@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using Asp.Versioning;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.Security.Claims;
 
 namespace Customers.Api.Features.CartItems.Endpoints;
 

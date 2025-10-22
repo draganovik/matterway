@@ -1,6 +1,6 @@
+using Common.Infrastructure.Services.Brokers;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.Customers.Data;
-using Common.Infrastructure.Services.Brokers;
 
 namespace Customers.Api.Extensions;
 

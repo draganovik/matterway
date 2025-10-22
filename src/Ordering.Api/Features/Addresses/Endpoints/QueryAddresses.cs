@@ -1,14 +1,13 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.Addresses.Data;
 using Ordering.Api.Features.Addresses.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Ordering.Api.Features.Shared;
 
 namespace Ordering.Api.Features.Addresses.Endpoints;
 
@@ -42,7 +41,7 @@ public class QueryAddresses : IEndpoint
 
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Addresses");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Addresses");
         var paginationResponse = new PaginationResponse<AddressBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<AddressBaseResponse>>(entities).ToList(), baseUri);

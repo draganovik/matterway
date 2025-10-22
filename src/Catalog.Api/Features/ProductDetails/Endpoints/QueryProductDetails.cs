@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Domain;
-using Catalog.Api.Features.Shared;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
 using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.ProductDetails.Endpoints;
 
@@ -57,7 +57,7 @@ public class QueryProductDetails : IEndpoint
 
         var total = await productDetailRepository.GetTotalEntities();
         var entities = await productDetailRepository.Query(page, pageSize);
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "ProductDetails");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "ProductDetails");
 
         var paginationResponse = new PaginationResponse<ProductDetailBaseResponse>(total, page, pageSize,
             mapper.Map<IEnumerable<ProductDetailBaseResponse>>(entities).ToList(), baseUri);

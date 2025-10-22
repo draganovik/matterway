@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using Asp.Versioning;
+using Common.Infrastructure.Abstractions;
 using Identity.Api.Features.Sessions.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Abstractions;
+using System.Security.Claims;
 
 namespace Identity.Api.Features.Sessions.Endpoints;
 

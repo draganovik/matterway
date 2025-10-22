@@ -1,9 +1,9 @@
 using Asp.Versioning;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.Api.Features.OrderItems.Data;
 using Ordering.Api.Features.OrderItems.Domain;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
 
 namespace Ordering.Api.Features.OrderItems.Endpoints;
 

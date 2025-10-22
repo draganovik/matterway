@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Services.Brokers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.OrderItems.Contracts;
 using Ordering.Api.Features.OrderItems.Data;
 using Ordering.Api.Features.OrderItems.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Services.Brokers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.OrderItems.Endpoints;
 

@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
 using Identity.Api.Features.Sessions.Contracts;
 using Identity.Api.Features.Sessions.Data;
 using Identity.Api.Features.Sessions.Domain;
@@ -9,7 +10,6 @@ using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
 
 namespace Identity.Api.Features.Sessions.Endpoints;
 

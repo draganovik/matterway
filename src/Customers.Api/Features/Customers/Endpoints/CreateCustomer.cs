@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
 using Customers.Api.Features.Customers.Contracts;
 using Customers.Api.Features.Customers.Data;
 using Customers.Api.Features.Customers.Domain;
-using Customers.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Customers.Api.Features.Customers.Endpoints;
 
@@ -78,7 +78,7 @@ public class CreateCustomer : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Customers/{createdCustomer.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Customers/{createdCustomer.Id}");
 
         return TypedResults.Created(location,
             mapper.Map<CustomerBaseResponse>(createdCustomer));

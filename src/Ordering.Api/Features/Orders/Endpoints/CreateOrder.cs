@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Orders.Contracts;
 using Ordering.Api.Features.Orders.Data;
 using Ordering.Api.Features.Orders.Domain;
-using Ordering.Api.Features.Shared;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.Orders.Endpoints;
 
@@ -59,7 +59,7 @@ public class CreateOrder : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Orders/{newEntity.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Orders/{newEntity.Id}");
 
         return TypedResults.Created(location, mapper.Map<OrderBaseResponse>(newEntity));
     }

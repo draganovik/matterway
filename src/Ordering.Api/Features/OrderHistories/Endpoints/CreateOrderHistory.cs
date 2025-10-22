@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.OrderHistories.Contracts;
 using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderHistories.Domain;
-using Ordering.Api.Features.Shared;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.OrderHistories.Endpoints;
 
@@ -63,7 +63,7 @@ public class CreateOrderHistory : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"OrderHistories/{newEntity.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"OrderHistories/{newEntity.Id}");
 
         return TypedResults.Created(location, mapper.Map<OrderHistoryBaseResponse>(newEntity));
     }

@@ -1,15 +1,14 @@
-using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Orders.Contracts;
 using Ordering.Api.Features.Orders.Data;
 using Ordering.Api.Features.Orders.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
-using Ordering.Api.Features.Shared;
+using System.Security.Claims;
 
 namespace Ordering.Api.Features.Orders.Endpoints;
 
@@ -59,7 +58,7 @@ public class QueryOrders : IEndpoint
 
         if (entities is not { } value || !value.Any()) return TypedResults.NoContent();
 
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Orders");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Orders");
         var paginationResponse = new PaginationResponse<OrderBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<OrderBaseResponse>>(value).ToList(), baseUri);

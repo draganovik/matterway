@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Domain;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Enums;
 using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.ProductDetails.Endpoints;
 

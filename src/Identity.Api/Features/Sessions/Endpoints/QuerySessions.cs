@@ -1,14 +1,14 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Identity.Api.Features.Sessions.Contracts;
 using Identity.Api.Features.Sessions.Data;
 using Identity.Api.Features.Sessions.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
 
 namespace Identity.Api.Features.Sessions.Endpoints;
 
@@ -38,7 +38,7 @@ public class QuerySessions : IEndpoint
     {
         var total = await sessionRepository.GetTotalEntities();
         var entities = await sessionRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Sessions");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Sessions");
 
         var paginationResponse = new PaginationResponse<SessionBaseResponse>(
             total,

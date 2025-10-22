@@ -1,11 +1,10 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
 using Identity.Api.Features.SystemUsers.Contracts;
 using Identity.Api.Features.SystemUsers.Data;
-using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
 
 namespace Identity.Api.Features.SystemUsers.Endpoints;
 

@@ -1,15 +1,14 @@
-using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Customers.Api.Features.CartItems.Contracts;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.CartItems.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
-using Customers.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Customers.Api.Features.CartItems.Endpoints;
 
@@ -57,7 +56,7 @@ public class QueryCartItems : IEndpoint
             entities = await cartItemRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         }
 
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Customers/CartItems");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Customers/CartItems");
         var paginationResponse = new PaginationResponse<CartItemBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<CartItemBaseResponse>>(entities).ToList(), baseUri);

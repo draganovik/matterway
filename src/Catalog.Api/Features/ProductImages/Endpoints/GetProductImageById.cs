@@ -3,8 +3,8 @@ using AutoMapper;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Data;
 using Catalog.Api.Features.ProductImages.Domain;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Common.Infrastructure.Abstractions;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;
 

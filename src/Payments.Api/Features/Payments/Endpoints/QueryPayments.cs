@@ -1,14 +1,13 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Payments.Api.Features.Payments.Contracts;
 using Payments.Api.Features.Payments.Data;
 using Payments.Api.Features.Payments.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
-using Payments.Api.Features.Shared;
 
 namespace Payments.Api.Features.Payments.Endpoints;
 
@@ -40,7 +39,7 @@ public class QueryPayments : IEndpoint
         var entities = await paymentRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Payments");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Payments");
         var paginationResponse = new PaginationResponse<PaymentBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<PaymentBaseResponse>>(entities).ToList(), baseUri);

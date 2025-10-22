@@ -1,4 +1,4 @@
-using Common.Infrastructure.Models;
+﻿using Common.Infrastructure.Models;
 
 namespace Common.Infrastructure.Services.Brokers;
 

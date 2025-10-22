@@ -1,15 +1,15 @@
-using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
-using Identity.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
 using Identity.Api.Features.SystemUsers.Contracts;
 using Identity.Api.Features.SystemUsers.Data;
 using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.Security.Claims;
 
 namespace Identity.Api.Features.SystemUsers.Endpoints;
 
@@ -76,7 +76,7 @@ public class CreateSystemUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails("User is not created"));
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"SystemUsers/{createdSystemUser.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"SystemUsers/{createdSystemUser.Id}");
 
         return TypedResults.Created(location, mapper.Map<SystemUserBaseResponse>(createdSystemUser));
     }

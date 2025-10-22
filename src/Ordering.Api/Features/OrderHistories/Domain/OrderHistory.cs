@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-using Ordering.Api.Features.Orders.Domain;
 using Common.Infrastructure.Enums;
+using Ordering.Api.Features.Orders.Domain;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Ordering.Api.Features.OrderHistories.Domain;
 

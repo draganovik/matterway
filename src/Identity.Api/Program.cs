@@ -1,6 +1,5 @@
-using Identity.Api.Extensions;
-using Microsoft.AspNetCore.Routing;
 using Common.Infrastructure.Extensions;
+using Identity.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {

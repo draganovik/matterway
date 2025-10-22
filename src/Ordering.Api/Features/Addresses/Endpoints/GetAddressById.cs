@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.Addresses.Data;
 using Ordering.Api.Features.Addresses.Domain;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
 
 namespace Ordering.Api.Features.Addresses.Endpoints;
 

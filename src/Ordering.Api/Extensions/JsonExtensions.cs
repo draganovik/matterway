@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace Ordering.Api.Extensions;
 

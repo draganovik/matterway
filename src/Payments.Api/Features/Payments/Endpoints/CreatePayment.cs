@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Payments.Api.Features.Payments.Contracts;
 using Payments.Api.Features.Payments.Data;
 using Payments.Api.Features.Payments.Domain;
-using Payments.Api.Features.Shared;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Payments.Api.Features.Payments.Endpoints;
 
@@ -59,7 +59,7 @@ public class CreatePayment : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ResourceUrlHelper.BuildResourceLocation(httpContext, $"Payments/{newEntity.Id}");
+        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Payments/{newEntity.Id}");
 
         return TypedResults.Created(location, mapper.Map<PaymentBaseResponse>(newEntity));
     }

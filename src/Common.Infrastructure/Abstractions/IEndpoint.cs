@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Routing;
-
 namespace Common.Infrastructure.Abstractions;
 
 public interface IEndpoint

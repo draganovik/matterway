@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Services.Brokers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Orders.Contracts;
 using Ordering.Api.Features.Orders.Data;
 using Ordering.Api.Features.Orders.Domain;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Services.Brokers;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Ordering.Api.Features.Orders.Endpoints;
 

@@ -1,5 +1,4 @@
 ﻿using Customers.Api.Extensions;
-using Microsoft.AspNetCore.Routing;
 using Common.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions

@@ -1,14 +1,14 @@
 using Asp.Versioning;
 using AutoMapper;
-using Identity.Api.Features.Shared;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Identity.Api.Features.SystemUsers.Contracts;
 using Identity.Api.Features.SystemUsers.Data;
 using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
 
 namespace Identity.Api.Features.SystemUsers.Endpoints;
 
@@ -38,7 +38,7 @@ public class QuerySystemUsers : IEndpoint
     {
         var total = await systemUserRepository.GetTotalEntities();
         var entities = await systemUserRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "SystemUsers");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "SystemUsers");
 
         var paginationResponse = new PaginationResponse<SystemUserBaseResponse>(
             total,

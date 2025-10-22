@@ -1,13 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.OrderHistories.Contracts;
 using Ordering.Api.Features.OrderHistories.Data;
 using Ordering.Api.Features.OrderHistories.Domain;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ordering.Api.Features.OrderHistories.Endpoints;
 

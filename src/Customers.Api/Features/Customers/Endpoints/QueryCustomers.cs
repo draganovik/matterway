@@ -1,14 +1,13 @@
 using Asp.Versioning;
 using AutoMapper;
+using Common.Infrastructure.Abstractions;
+using Common.Infrastructure.Enums;
+using Common.Infrastructure.Http;
+using Common.Infrastructure.Pagination;
 using Customers.Api.Features.Customers.Contracts;
 using Customers.Api.Features.Customers.Data;
 using Customers.Api.Features.Customers.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Pagination;
-using Customers.Api.Features.Shared;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Customers.Api.Features.Customers.Endpoints;
 
@@ -36,7 +35,7 @@ public class QueryCustomers : IEndpoint
     {
         var total = await customerRepository.GetTotalEntities();
         var entities = await customerRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = ResourceUrlHelper.CreateBaseUri(httpContext, "Customers");
+        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Customers");
 
         var paginationResponse = new PaginationResponse<CustomerBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
