@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  webstore.web:
+  storefront.web:
     environment:
       - NUXT_PUBLIC_APP_DOMAIN=localhost
       - NUXT_PUBLIC_AUTH_API_BASE_URL=http://localhost:2003

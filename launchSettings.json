@@ -4,7 +4,7 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "webstore.web": "StartWithoutDebugging",
+        "storefront.web": "StartWithoutDebugging",
         "catalog.api": "StartDebugging",
         "customers.api": "StartDebugging",
         "identity.api": "StartDebugging",

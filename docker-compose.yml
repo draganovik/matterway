@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-  webstore.web:
-    container_name: webstore-web
-    image: ${DOCKER_REGISTRY-}webstore-web
+  storefront.web:
+    container_name: storefront-web
+    image: ${DOCKER_REGISTRY-}storefront-web
     environment:
       NUXT_APP_VERSION: '1.0.0'
     command: node /app/.output/server/index.mjs
     tty: true
     build:
-      context: src/Clients/Webstore
+      context: src/Storefront.Web
       dockerfile: Dockerfile
 
   catalog.api:

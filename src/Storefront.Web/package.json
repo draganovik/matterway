@@ -1,5 +1,5 @@
 {
-  "name": "matterway-webstore",
+  "name": "matterway-storefront",
   "private": true,
   "scripts": {
     "build": "nuxt build",
