@@ -49,6 +49,7 @@ public class ProductImageRepository : IProductImageRepository
     public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductImage.AsNoTracking()
+            .Include(x => x.Product)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
