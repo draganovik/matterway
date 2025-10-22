@@ -3,23 +3,22 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Services/Payments/Payments.API/Payments.API.csproj", "src/Services/Payments/Payments.API/"]
-RUN dotnet restore "src/Services/Payments/Payments.API/Payments.API.csproj"
+COPY ["src/Customers.API/Customers.API.csproj", "src/Customers.API/"]
+RUN dotnet restore "src/Customers.API/Customers.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Payments/Payments.API"
-RUN dotnet build "Payments.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Customers.API"
+RUN dotnet build "Customers.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Payments.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Customers.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Payments.API.dll"]
+COPY src/Customers.API/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Customers.API.dll"]

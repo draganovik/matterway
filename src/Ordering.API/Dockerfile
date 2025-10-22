@@ -3,22 +3,23 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 80
+EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Services/Catalog/Catalog.API/Catalog.API.csproj", "src/Services/Catalog/Catalog.API/"]
-RUN dotnet restore "src/Services/Catalog/Catalog.API/Catalog.API.csproj"
+COPY ["src/Ordering.API/Ordering.API.csproj", "src/Ordering.API/"]
+RUN dotnet restore "src/Ordering.API/Ordering.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Catalog/Catalog.API"
-RUN dotnet build "Catalog.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Ordering.API"
+RUN dotnet build "Ordering.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Catalog.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Ordering.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Catalog.API.dll"]
+COPY src/Ordering.API/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Ordering.API.dll"]

@@ -4,10 +4,10 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>6c49f25f-2062-449d-821c-6ab77d7ccf50</UserSecretsId>
+        <UserSecretsId>7c5deb9e-8d57-45b5-a073-e8669e0432ad</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <DockerfileContext>..\..\..\..</DockerfileContext>
-        <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerfileContext>..\..\</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,10 +26,6 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.9.0"/>
     </ItemGroup>
 
-    <PropertyGroup>
-        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
-    </PropertyGroup>
-
-    <Import Project="..\..\..\SharedProject\SharedProject.projitems" Label="Shared"/>
+    <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared"/>
 
 </Project>

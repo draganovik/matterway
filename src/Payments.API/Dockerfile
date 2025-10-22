@@ -7,19 +7,19 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Services/Ordering/Ordering.API/Ordering.API.csproj", "src/Services/Ordering/Ordering.API/"]
-RUN dotnet restore "src/Services/Ordering/Ordering.API/Ordering.API.csproj"
+COPY ["src/Payments.API/Payments.API.csproj", "src/Payments.API/"]
+RUN dotnet restore "src/Payments.API/Payments.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Ordering/Ordering.API"
-RUN dotnet build "Ordering.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Payments.API"
+RUN dotnet build "Payments.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Ordering.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Payments.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 ARG ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
 COPY --from=publish /app/publish .
-COPY Properties/ ./Properties/
-ENTRYPOINT ["dotnet", "Ordering.API.dll"]
+COPY src/Payments.API/Properties/ ./Properties/
+ENTRYPOINT ["dotnet", "Payments.API.dll"]

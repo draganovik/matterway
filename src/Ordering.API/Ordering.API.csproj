@@ -6,8 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>a22d088e-5979-4a34-a83e-4ae591259707</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <DockerfileContext>..\..\..\..</DockerfileContext>
-        <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerfileContext>..\..\</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,6 +30,6 @@
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
     </PropertyGroup>
 
-    <Import Project="..\..\..\SharedProject\SharedProject.projitems" Label="Shared"/>
+    <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared"/>
 
 </Project>

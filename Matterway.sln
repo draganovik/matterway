@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.API", "src\Services\Identity\Identity.API\Identity.API.csproj", "{3B1B1FB7-7B20-4D3D-8A91-065516A4C961}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.API", "src\Identity.API\Identity.API.csproj", "{3B1B1FB7-7B20-4D3D-8A91-065516A4C961}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers.API", "src\Services\Customers\Customers.API\Customers.API.csproj", "{E33ABBB8-19FA-451E-A7CA-3F4B8DD731B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers.API", "src\Customers.API\Customers.API.csproj", "{E33ABBB8-19FA-451E-A7CA-3F4B8DD731B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Catalog.API", "src\Services\Catalog\Catalog.API\Catalog.API.csproj", "{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Catalog.API", "src\Catalog.API\Catalog.API.csproj", "{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.API", "src\Services\Ordering\Ordering.API\Ordering.API.csproj", "{ABE2B1D2-06D6-4D42-8163-0E83190B60DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ordering.API", "src\Ordering.API\Ordering.API.csproj", "{ABE2B1D2-06D6-4D42-8163-0E83190B60DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.API", "src\Services\Inventory\Inventory.API\Inventory.API.csproj", "{466FC858-72D2-463D-A28F-821975CAAADB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.API", "src\Inventory.API\Inventory.API.csproj", "{466FC858-72D2-463D-A28F-821975CAAADB}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{03617130-C538-43DA-8788-FD527FD8A7B2}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{D0
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedProject", "src\SharedProject\SharedProject.shproj", "{4549DB7E-893D-4010-BC0E-C7D3F01923B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payments.API", "src\Services\Payments\Payments.API\Payments.API.csproj", "{07F5FEB4-69A7-4937-9189-EDCB7AA5A607}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payments.API", "src\Payments.API\Payments.API.csproj", "{07F5FEB4-69A7-4937-9189-EDCB7AA5A607}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

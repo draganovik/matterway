@@ -4,25 +4,24 @@ set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-SERVICES_DIR="${ROOT_DIR}/src/Services"
+API_ROOT="${ROOT_DIR}/src"
 
 echo "Adding migrations for all API projects..."
 
 failed_projects=()
 
-for dir in "${SERVICES_DIR}"/*; do
-  if [[ -d "${dir}" ]]; then
-    service_name="$(basename "${dir}")"
-    service_project="${dir}/${service_name}.API"
-    if [[ -d "${service_project}" ]]; then
-      echo "Adding migration for project: ${service_name}"
-      if ! (cd "${service_project}" && dotnet ef migrations add "Initialize"); then
-        echo "Failed to add migration for project: ${service_name}" >&2
-        failed_projects+=("${service_name}")
-      fi
+shopt -s nullglob
+for project_dir in "${API_ROOT}"/*.API; do
+  if [[ -d "${project_dir}" ]]; then
+    project_name="$(basename "${project_dir}")"
+    echo "Adding migration for project: ${project_name}"
+    if ! (cd "${project_dir}" && dotnet ef migrations add "Initialize"); then
+      echo "Failed to add migration for project: ${project_name}" >&2
+      failed_projects+=("${project_name}")
     fi
   fi
 done
+shopt -u nullglob
 
 if ((${#failed_projects[@]})); then
   echo "Completed with errors for: ${failed_projects[*]}" >&2

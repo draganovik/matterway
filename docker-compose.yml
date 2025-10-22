@@ -17,39 +17,39 @@ services:
     image: ${DOCKER_REGISTRY-}catalog-api
     build:
       context: .
-      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
+      dockerfile: src/Catalog.API/Dockerfile
 
   customers.api:
     container_name: customers-api
     image: ${DOCKER_REGISTRY-}customers-api
     build:
       context: .
-      dockerfile: src/Services/Customers/Customers.API/Dockerfile
+      dockerfile: src/Customers.API/Dockerfile
 
   identity.api:
     container_name: identity-api
     image: ${DOCKER_REGISTRY-}identity-api
     build:
       context: .
-      dockerfile: src/Services/Identity/Identity.API/Dockerfile
+      dockerfile: src/Identity.API/Dockerfile
 
   inventory.api:
     container_name: inventory-api
     image: ${DOCKER_REGISTRY-}inventory-api
     build:
       context: .
-      dockerfile: src/Services/Inventory/Inventory.API/Dockerfile
+      dockerfile: src/Inventory.API/Dockerfile
 
   ordering.api:
     container_name: ordering-api
     image: ${DOCKER_REGISTRY-}ordering-api
     build:
       context: .
-      dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
+      dockerfile: src/Ordering.API/Dockerfile
 
   payments.api:
     container_name: payments-api
     image: ${DOCKER_REGISTRY-}payments-api
     build:
       context: .
-      dockerfile: src/Services/Payments/Payments.API/Dockerfile
+      dockerfile: src/Payments.API/Dockerfile

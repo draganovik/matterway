@@ -6,8 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>b729ab1f-4771-4e7e-be8d-4f99f4ab8e37</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <DockerfileContext>..\..\..\..</DockerfileContext>
-        <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerfileContext>..\..\</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,6 +18,6 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
     </ItemGroup>
 
-    <Import Project="..\..\..\SharedProject\SharedProject.projitems" Label="Shared"/>
+    <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared"/>
 
 </Project>

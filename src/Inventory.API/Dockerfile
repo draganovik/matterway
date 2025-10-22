@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Services/Inventory/Inventory.API/Inventory.API.csproj", "src/Services/Inventory/Inventory.API/"]
-RUN dotnet restore "src/Services/Inventory/Inventory.API/Inventory.API.csproj"
+COPY ["src/Inventory.API/Inventory.API.csproj", "src/Inventory.API/"]
+RUN dotnet restore "src/Inventory.API/Inventory.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Inventory/Inventory.API"
+WORKDIR "/src/src/Inventory.API"
 RUN dotnet build "Inventory.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
