@@ -26,28 +26,28 @@ public class QueryProducts : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async
-        Task<Results<Ok<PaginationResponse<ProductBaseResponse>>, NoContent, BadRequest<ProblemDetails>,
-            ValidationProblem>>
-        Handler([AsParameters] PagingQueryParams pagingQuery,
-            [AsParameters]
-            ProductFilter productFilter,
-            HttpContext httpContext,
-            IProductRepository productRepository)
+    private static async Task<Results<Ok<PaginationResponse<ProductBaseResponse>>, NoContent>>
+        Handler([AsParameters] PagingQueryParams pagingQuery, [AsParameters] ProductFilter productFilter,
+            HttpContext httpContext, IProductRepository productRepository, CancellationToken cancellationToken)
     {
         var total = await productRepository.GetTotalEntities(productFilter);
-        var entities =
-            await productRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value, productFilter);
+        if (total == 0)
+            return TypedResults.NoContent();
+
+        var entities = await productRepository.Query(
+            pagingQuery.Page!.Value,
+            pagingQuery.PageSize!.Value,
+            productFilter);
+
         var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Products");
 
-        var paginationResponse = new PaginationResponse<ProductBaseResponse>(total, pagingQuery.Page!.Value,
+        var paginationResponse = new PaginationResponse<ProductBaseResponse>(
+            total,
+            pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            entities.Select(entity => entity.ToContract<ProductBaseResponse>()
-            ).ToList()
-            , baseUri);
+            entities.Select(entity => entity.ToContract<ProductBaseResponse>()).ToList(),
+            baseUri);
 
-        return entities is IEnumerable<Product> value && value.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        return TypedResults.Ok(paginationResponse);
     }
 }

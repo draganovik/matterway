@@ -1,7 +1,7 @@
 using Asp.Versioning;
-using AutoMapper;
 using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
+using Catalog.Api.Features.Products.Mapping;
 using Common.Infrastructure.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -21,12 +21,11 @@ public class GetProductById : IEndpoint
 
     private static async Task<Results<Ok<ProductBaseResponse>, NotFound>> Handler(
         Guid id,
-        IProductRepository productRepository,
-        IMapper mapper)
+        IProductRepository productRepository)
     {
         return await productRepository.GetById(id)
             is { } value
-            ? TypedResults.Ok(mapper.Map<ProductBaseResponse>(value))
+            ? TypedResults.Ok(value.ToContract<ProductBaseResponse>())
             : TypedResults.NotFound();
     }
 }
