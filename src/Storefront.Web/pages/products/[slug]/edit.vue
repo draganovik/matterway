@@ -1,13 +1,61 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/store/catalog";
-import { initCarousels } from "flowbite";
-import ProductModel from "~/utils/ProductModel";
-import { ProductDetails } from "~/utils/ProductModel";
+import { useCatalogStore } from "~/stores/catalog";
+import ProductModel, { type ProductDetails } from "~/models/ProductModel";
 
 const catalogStore = useCatalogStore();
 const route = useRoute();
 const router = useRouter();
-let product: Ref<ProductModel> | Ref<null> = ref(null);
+
+const product = ref<ProductModel | null>(null);
+
+const formatDate = (value?: string | Date | null) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  return new Intl.DateTimeFormat("sr-RS", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+};
+
+const galleryImages = computed(() => {
+  if (!product.value) {
+    return [];
+  }
+
+  const images: {
+    id?: number | string;
+    imageUrl?: string;
+    imageAlt?: string;
+  }[] = [];
+
+  if (product.value.thumbnailImage?.imageUrl) {
+    images.push({
+      id: `thumbnail-${product.value.id}`,
+      imageUrl: product.value.thumbnailImage.imageUrl,
+      imageAlt: product.value.thumbnailImage.imageAlt ?? product.value.title,
+    });
+  }
+
+  product.value.productImages
+    ?.filter((image) => Boolean(image?.imageUrl))
+    .forEach((image) => {
+      images.push({
+        id: image.id,
+        imageUrl: image.imageUrl,
+        imageAlt: image.imageAlt ?? product.value?.title,
+      });
+    });
+
+  const uniqueByUrl = new Map<string, (typeof images)[number]>();
+  images.forEach((image) => {
+    if (image.imageUrl && !uniqueByUrl.has(image.imageUrl)) {
+      uniqueByUrl.set(image.imageUrl, image);
+    }
+  });
+
+  return Array.from(uniqueByUrl.values());
+});
 
 const inputSpecs = ref({
   title: "",
@@ -21,7 +69,7 @@ const inputImage = ref({
 });
 
 const addSpec = async () => {
-  if (product.value == null) {
+  if (!product.value || !inputSpecs.value.title || !inputSpecs.value.value) {
     return;
   }
   const response = await catalogStore.createProductSpec(
@@ -32,39 +80,39 @@ const addSpec = async () => {
   if (response.ok) {
     inputSpecs.value.title = "";
     inputSpecs.value.value = "";
-    loadProduct();
+    await loadProduct();
   }
 };
 
 const removeSpec = async (detailId: string) => {
-  if (product.value == null) {
+  if (!product.value) {
     return;
   }
   const response = await catalogStore.deleteProductSpec(detailId);
   if (response.ok) {
-    loadProduct();
+    await loadProduct();
   }
 };
 
 const updateSpec = async (detail: ProductDetails) => {
-  if (product.value == null) {
+  if (!product.value) {
     return;
   }
   const response = await catalogStore.updateProductSpec(
-    detail.id,
+    detail.id!,
     product.value.id,
-    detail.title,
-    detail.value,
+    detail.title ?? "",
+    detail.value ?? "",
     detail.type ?? "Specification",
     detail.unit ?? null,
   );
   if (response.ok) {
-    loadProduct();
+    await loadProduct();
   }
 };
 
 const addImage = async () => {
-  if (product.value == null) {
+  if (!product.value || !inputImage.value.imageUrl) {
     return;
   }
   const response = await catalogStore.createProductImage(
@@ -76,12 +124,13 @@ const addImage = async () => {
   if (response.ok) {
     inputImage.value.imageId = 0;
     inputImage.value.imageUrl = "";
-    loadProduct();
+    inputImage.value.imageAlt = "product image";
+    await loadProduct();
   }
 };
 
 const deleteImage = async (imageId: number) => {
-  if (product.value == null) {
+  if (!product.value) {
     return;
   }
   const response = await catalogStore.deleteProductImage(
@@ -89,12 +138,12 @@ const deleteImage = async (imageId: number) => {
     imageId,
   );
   if (response.ok) {
-    loadProduct();
+    await loadProduct();
   }
 };
 
 const deleteProduct = async () => {
-  if (product.value == null) {
+  if (!product.value) {
     return;
   }
   if (!confirm("Da li ste sigurni da želite da obrišete proizvod?")) {
@@ -110,7 +159,6 @@ const loadProduct = async () => {
   product.value = await catalogStore.fetchProductById(
     route.params.slug.toString(),
   );
-  //initCarousels();
 };
 
 useHead({
@@ -118,17 +166,8 @@ useHead({
 });
 
 onMounted(async () => {
-  loadProduct();
+  await loadProduct();
 });
-watch(
-  () => product.value,
-  () => {
-    //wait for dom to update
-    setTimeout(() => {
-      initCarousels();
-    }, 1000);
-  },
-);
 </script>
 
 <template>
@@ -179,369 +218,279 @@ watch(
     <span class="sr-only">Loading...</span>
   </section>
 
-  <section
-    v-if="product != null"
-    class="flex flex-col gap-8 md:grid md:grid-cols-5"
-  >
-    <div
-      id="default-carousel"
-      class="relative col-span-2 aspect-video w-full md:aspect-[4/3]"
-      data-carousel="static"
-    >
-      <!-- Carousel wrapper -->
-      <div class="relative h-full w-full overflow-hidden rounded-lg">
+  <section v-else class="grid gap-10 lg:grid-cols-[minmax(280px,36%)_1fr]">
+    <div class="space-y-6">
+      <ProductImageCarousel
+        :images="galleryImages"
+        :fallback-alt="product?.title"
+      />
+
+      <div
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Fotografije
+          </h2>
+          <span class="text-xs uppercase text-slate-400">
+            {{ product.productImages?.length || 0 }} postojeće
+          </span>
+        </div>
+
+        <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+          <li
+            v-for="image in product.productImages"
+            :key="image.id"
+            class="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold text-slate-400"
+                >#{{ image.id }}</span
+              >
+              <span class="max-w-[16rem] truncate font-medium">
+                {{ image.imageUrl }}
+              </span>
+            </div>
+            <button
+              type="button"
+              class="text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+              @click="deleteImage(image.id!)"
+            >
+              Ukloni
+            </button>
+          </li>
+        </ul>
+
         <div
-          data-carousel-item="true"
-          :key="index"
-          v-for="(image, index) in product?.productImages"
-          class="hidden h-full w-full duration-700 ease-in-out"
+          class="space-y-3 rounded-xl border border-dashed border-slate-300 p-4 dark:border-slate-600"
         >
-          <img
-            :src="image.imageUrl"
-            class="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 object-cover"
-            :alt="image.imageAlt"
-          />
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Dodaj novu fotografiju
+          </h3>
+          <div class="grid gap-3 sm:grid-cols-[90px_1fr_1fr]">
+            <input
+              v-model.number="inputImage.imageId"
+              type="number"
+              min="0"
+              placeholder="ID"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+            <input
+              v-model="inputImage.imageUrl"
+              type="url"
+              placeholder="https://..."
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+            <input
+              v-model="inputImage.imageAlt"
+              type="text"
+              placeholder="Alt tekst"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+          </div>
+          <button
+            type="button"
+            class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            @click="addImage()"
+          >
+            Dodaj sliku
+          </button>
         </div>
       </div>
-      <!-- Slider indicators -->
+    </div>
+
+    <div class="space-y-6">
       <div
-        class="indicators absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 space-x-3"
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
       >
-        <button
-          v-for="(_, index) in product?.productImages"
-          type="button"
-          class="pill h-3 w-3 rounded-full"
-          :aria-current="index == 0 ? 'true' : 'false'"
-          :aria-label="'Slide' + index.toString()"
-          :data-carousel-slide-to="index"
-        ></button>
-      </div>
-      <!-- Slider controls -->
-      <button
-        type="button"
-        class="group absolute left-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-        data-carousel-prev
-      >
-        <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
-        >
-          <svg
-            aria-hidden="true"
-            class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            ></path>
-          </svg>
-          <span class="sr-only">Previous</span>
-        </span>
-      </button>
-      <button
-        type="button"
-        class="group absolute right-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-        data-carousel-next
-      >
-        <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
-        >
-          <svg
-            aria-hidden="true"
-            class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            ></path>
-          </svg>
-          <span class="sr-only">Next</span>
-        </span>
-      </button>
-    </div>
-
-    <div class="col-span-2 col-start-1 overflow-x-auto">
-      <table
-        class="w-full overflow-hidden rounded text-left text-sm text-gray-500 dark:text-gray-400"
-      >
-        <tbody>
-          <tr
-            v-for="image in product.productImages"
-            class="bg-white dark:bg-gray-800"
-          >
-            <th>
-              <div class="grid place-items-center">{{ image.id }}</div>
-            </th>
-            <th
-              scope="row"
-              class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white"
-            >
-              {{
-                image.imageUrl.length > 30
-                  ? `...${image.imageUrl
-                      .substring(image.imageUrl.lastIndexOf("/") + 1)
-                      .slice(-30)}`
-                  : image.imageUrl
-              }}
-            </th>
-            <td class="px-6 py-4 text-right">
-              <button
-                @click="deleteImage(image.id)"
-                type="button"
-                class="font-medium text-red-600 hover:underline dark:text-red-500"
-              >
-                Ukloni
-              </button>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr
-            class="bg-slate-50 text-xs font-semibold uppercase text-slate-700 dark:bg-slate-700 dark:text-slate-400"
-          >
-            <td class="w-min">
-              <input
-                placeholder="ID"
-                type="number"
-                v-model="inputImage.imageId"
-                id="small-input"
-                class="m-1 w-16 rounded-lg border border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
-              />
-            </td>
-            <td class="w-full">
-              <input
-                placeholder="Add image url..."
-                type="text"
-                v-model="inputImage.imageUrl"
-                id="small-input"
-                class="m-1 block w-full rounded-lg border border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
-              />
-            </td>
-            <td>
-              <div class="flex w-max p-2">
-                <button
-                  type="button"
-                  @click="addImage()"
-                  class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-                >
-                  Dodaj sliku
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-
-    <div
-      class="col-span-3 col-start-3 row-span-3 row-start-1 flex flex-col gap-4"
-    >
-      <div>
-        <label
-          for="large-input"
-          class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-          >Product title</label
-        >
-        <input
-          v-model="product.title"
-          type="text"
-          id="large-input"
-          class="sm:text-md block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-        />
-      </div>
-
-      <div class="items-center">
-        <label
-          for="default-input"
-          class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-          >Jedinstveni broj:</label
-        >
-        <input
-          pattern="[A-Z0-9]{5,10}"
-          v-model="product.productCode"
-          type="text"
-          id="default-input"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-        />
-      </div>
-
-      <div class="mb-6 items-center">
-        <label
-          for="default-input"
-          class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-          >Cena proizvoda:</label
-        >
-        <input
-          v-model="product.price"
-          type="number"
-          id="default-input"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label
-          for="message"
-          class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-          >Description</label
-        >
-        <textarea
-          v-model="product.description"
-          id="message"
-          rows="4"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-          placeholder="Write your thoughts here..."
-        ></textarea>
-      </div>
-
-      <div class="flex flex-col justify-between gap-3">
-        <h2 class="text-lg font-medium text-slate-900 dark:text-slate-200">
-          Detalji
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          Osnovne informacije
         </h2>
-
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table
-              class="w-full text-left text-sm text-slate-500 dark:text-slate-400"
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2 text-sm">
+            <span class="font-medium text-slate-700 dark:text-slate-200"
+              >Naziv proizvoda</span
             >
-              <thead
-                class="bg-slate-50 text-xs uppercase text-slate-700 dark:bg-slate-700 dark:text-slate-400"
-              >
-                <tr>
-                  <th scope="col" class="px-6 py-3">Naziv</th>
-                  <th scope="col" class="px-6 py-3">Vrednost</th>
-                  <th scope="col" class="px-6 py-3">Operacije</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="detail in product?.productDetails"
-                  class="border-b bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-600"
-                >
-                  <th
-                    scope="row"
-                    class="whitespace-nowrap px-4 py-4 font-medium text-slate-900 dark:text-white"
-                  >
-                    <input
-                      v-model="detail.title"
-                      type="text"
-                      id="small-input"
-                      class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
-                    />
-                  </th>
-                  <td class="px-6 py-4">
-                    <textarea
-                      v-model="detail.value"
-                      id="message"
-                      rows="4"
-                      class="block w-full resize-none rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                      placeholder="Vrednost opisa proizvoda"
-                    ></textarea>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="flex gap-4">
-                      <button
-                        @click="updateSpec(detail)"
-                        type="button"
-                        class="w-full font-medium text-green-600 hover:underline dark:text-green-500"
-                      >
-                        Sačuvaj
-                      </button>
-                      <button
-                        @click="removeSpec(detail.id)"
-                        type="button"
-                        class="w-full font-medium text-red-600 hover:underline dark:text-red-500"
-                      >
-                        Ukloni
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr
-                  class="bg-slate-50 text-xs font-semibold uppercase text-slate-700 dark:bg-slate-700 dark:text-slate-400"
-                >
-                  <th
-                    scope="row"
-                    class="whitespace-nowrap px-4 py-4 font-medium text-slate-900 dark:text-white"
-                  >
-                    <input
-                      type="text"
-                      id="small-input"
-                      class="w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-xs"
-                      placeholder="Naziv opisa proizvoda"
-                      v-model="inputSpecs.title"
-                    />
-                  </th>
-                  <td class="px-6 py-4">
-                    <textarea
-                      id="message"
-                      rows="4"
-                      class="block w-full resize-none rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                      placeholder="Vrednost opisa proizvoda"
-                      v-model="inputSpecs.value"
-                    ></textarea>
-                  </td>
-                  <td class="px-6 py-4">
-                    <button
-                      type="button"
-                      @click="addSpec()"
-                      class="w-full rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-                    >
-                      Dodaj opis
-                    </button>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+            <input
+              v-model="product.title"
+              type="text"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+          </label>
+          <label class="grid gap-2 text-sm">
+            <span class="font-medium text-slate-700 dark:text-slate-200"
+              >Jedinstveni broj</span
+            >
+            <input
+              v-model="product.productCode"
+              pattern="[A-Z0-9]{5,10}"
+              type="text"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+          </label>
+          <label class="grid gap-2 text-sm">
+            <span class="font-medium text-slate-700 dark:text-slate-200"
+              >Cena (RSD)</span
+            >
+            <input
+              v-model.number="product.price"
+              type="number"
+              min="0"
+              step="0.01"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+          </label>
+          <label
+            class="flex items-center gap-3 self-end text-sm font-medium text-slate-700 dark:text-slate-200"
+          >
+            <input
+              v-model="product.isAvailable"
+              type="checkbox"
+              class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+            />
+            Dostupan za kupovinu
+          </label>
+        </div>
+        <label class="grid gap-2 text-sm">
+          <span class="font-medium text-slate-700 dark:text-slate-200"
+            >Opis proizvoda</span
+          >
+          <textarea
+            v-model="product.description"
+            rows="4"
+            class="rounded-lg border border-slate-300 bg-slate-50 p-3 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          ></textarea>
+        </label>
+        <div
+          class="grid gap-3 text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500 sm:grid-cols-2"
+        >
+          <div>
+            Kreiran:
+            <time class="font-medium text-slate-900 dark:text-slate-100">
+              {{ formatDate(product.createdAt) }}
+            </time>
+          </div>
+          <div>
+            Poslednja izmena:
+            <time class="font-medium text-slate-900 dark:text-slate-100">
+              {{ formatDate(product.updatedAt) }}
+            </time>
           </div>
         </div>
       </div>
+
+      <div
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Specifikacije
+          </h2>
+          <span class="text-xs uppercase text-slate-400">
+            {{ product.productDetails?.length || 0 }} unosa
+          </span>
+        </div>
+
+        <div class="space-y-4">
+          <div
+            v-for="detail in product.productDetails"
+            :key="detail.id"
+            class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
+          >
+            <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+              <input
+                v-model="detail.title"
+                type="text"
+                placeholder="Naziv"
+                class="rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              />
+              <textarea
+                v-model="detail.value"
+                rows="2"
+                placeholder="Vrednost"
+                class="rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              ></textarea>
+              <div class="flex flex-col gap-2 md:items-end">
+                <button
+                  type="button"
+                  class="rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  @click="updateSpec(detail)"
+                >
+                  Sačuvaj
+                </button>
+                <button
+                  type="button"
+                  class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
+                  @click="removeSpec(detail.id!)"
+                >
+                  Ukloni
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="space-y-3 rounded-xl border border-dashed border-slate-300 p-4 dark:border-slate-600"
+        >
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Dodaj novu specifikaciju
+          </h3>
+          <div class="grid gap-3 md:grid-cols-2">
+            <input
+              v-model="inputSpecs.title"
+              type="text"
+              placeholder="Naziv"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+            <input
+              v-model="inputSpecs.value"
+              type="text"
+              placeholder="Vrednost"
+              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            />
+          </div>
+          <button
+            type="button"
+            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            @click="addSpec()"
+          >
+            Dodaj specifikaciju
+          </button>
+        </div>
+      </div>
+
+      <footer
+        class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="space-y-1 text-sm text-slate-500 dark:text-slate-400">
+          <p>Sačuvajte izmene kako bi bile dostupne u katalogu.</p>
+          <p>Brisanje je trajna akcija.</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            @click="router.push('/products')"
+          >
+            Otkaži
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            @click="catalogStore.updateProduct(product!)"
+          >
+            Sačuvaj izmene
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
+            @click="deleteProduct()"
+          >
+            Obriši proizvod
+          </button>
+        </div>
+      </footer>
     </div>
   </section>
-
-  <aside
-    v-if="product != null"
-    class="sticky bottom-4 mt-8 h-min w-full rounded-lg border border-slate-200/90 bg-white p-4 backdrop-blur-md backdrop-filter dark:border-slate-700 dark:bg-slate-800/90"
-  >
-    <div class="flex justify-between gap-4">
-      <button
-        @click="deleteProduct()"
-        type="button"
-        class="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-      >
-        Izbriši proizvod
-      </button>
-      <div class="flex gap-4">
-        <button
-          @click="router.push('/products')"
-          type="button"
-          class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-        >
-          Otkaži izmene
-        </button>
-        <button
-          @click="catalogStore.updateProduct(product)"
-          type="button"
-          class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Sačuvaj izmene
-        </button>
-      </div>
-    </div>
-  </aside>
 </template>
-
-<style scoped></style>

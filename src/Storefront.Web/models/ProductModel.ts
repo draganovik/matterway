@@ -17,10 +17,12 @@ export default class ProductModel {
     this.title = initial?.title ?? "";
     this.price = initial?.price ?? 0;
     this.description = initial?.description ?? "";
-    this.productDetails = initial?.productDetails?.map((detail) => ({
-      ...detail,
-    })) ?? [];
-    this.productImages = initial?.productImages?.map((image) => ({ ...image })) ?? [];
+    this.productDetails =
+      initial?.productDetails?.map((detail) => ({
+        ...detail,
+      })) ?? [];
+    this.productImages =
+      initial?.productImages?.map((image) => ({ ...image })) ?? [];
     this.thumbnailImage = initial?.thumbnailImage
       ? { ...initial.thumbnailImage }
       : null;
@@ -62,11 +64,11 @@ export default class ProductModel {
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
         : primaryImage
-          ? {
-              imageUrl: primaryImage.imageUrl,
-              imageAlt: primaryImage.imageAlt,
-            }
-          : null,
+        ? {
+            imageUrl: primaryImage.imageUrl,
+            imageAlt: primaryImage.imageAlt,
+          }
+        : null,
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
       isAvailable: response.isAvailable ?? false,

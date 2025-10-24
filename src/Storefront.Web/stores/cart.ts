@@ -1,9 +1,9 @@
-// store/cart.ts
+// stores/cart.ts
 
 import { defineStore } from "pinia";
-import CartItemModel from "~/utils/CartItemModel";
+import CartItemModel from "~/models/CartItemModel";
 import { useSessionStore } from "./session";
-import ProductModel from "~/utils/ProductModel";
+import ProductModel from "~/models/ProductModel";
 
 interface CartState {
   cartItems: CartItemModel[];
@@ -52,16 +52,13 @@ export const useCartStore = defineStore("cart", {
       );
       if (findItem && findItem.quantity > 1) {
         findItem.quantity--;
-        const response = await request(
+        await request(
           `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${findItem?.productId}`,
           {
             method: "PUT",
             body: JSON.stringify({ quantity: findItem.quantity }),
           },
         );
-        if (response.ok) {
-          console.log(await response.json());
-        }
       } else {
         this.cartItems = this.cartItems.filter(
           (item) => item.productId !== product.id,
@@ -90,16 +87,13 @@ export const useCartStore = defineStore("cart", {
         (item) => item.productId === product.id,
       );
 
-      const response = await request(
+      await request(
         `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${currentItem?.productId}`,
         {
           method: "PUT",
           body: JSON.stringify({ quantity: currentItem?.quantity }),
         },
       );
-      if (response.ok) {
-        console.log(await response.json());
-      }
     },
     async clearCart() {
       const config = useRuntimeConfig();

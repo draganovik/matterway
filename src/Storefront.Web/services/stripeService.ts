@@ -1,8 +1,8 @@
 // Import necessary dependencies
 import Stripe from "stripe";
-import AddressModel from "~/utils/AddressModel";
-import CardPaymentModel from "~/utils/CardPaymentModel";
-import CartItemModel from "~/utils/CartItemModel";
+import AddressModel from "~/models/AddressModel";
+import CardPaymentModel from "~/models/CardPaymentModel";
+import CartItemModel from "~/models/CartItemModel";
 
 // Create a function to handle the payment
 export async function payWithStripe(

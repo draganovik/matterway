@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { initTabs } from "flowbite";
-import { useSessionStore } from "~/store/session";
-import { useCatalogStore } from "~/store/catalog";
+import { useSessionStore } from "~/stores/session";
+import { useCatalogStore } from "~/stores/catalog";
 
 const catalogStore = useCatalogStore();
 
@@ -14,7 +14,6 @@ useHead({
 // initialize components based on data attribute selectors
 onMounted(() => {
   initTabs();
-  console.log(sessionStore.getSessionData);
   catalogStore.fetchCatalog(1, 3, "", 0, 0);
 });
 </script>

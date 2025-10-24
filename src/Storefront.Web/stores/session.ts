@@ -1,10 +1,10 @@
-// store/session.ts
+// stores/session.ts
 
 import { defineStore } from "pinia";
 import { Buffer } from "buffer";
-import LoginModel from "~/utils/LoginModel";
-import SessionModel from "~/utils/SessionModel";
-import JwtModel from "~/utils/JwtModel";
+import LoginModel from "~/models/LoginModel";
+import SessionModel from "~/models/SessionModel";
+import JwtModel from "~/models/JwtModel";
 import { useCartStore } from "./cart";
 
 interface SessionState {

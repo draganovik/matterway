@@ -8,7 +8,7 @@ class Summary {
 </script>
 
 <script setup lang="ts">
-import CartItemModel from "~/utils/CartItemModel";
+import CartItemModel from "~/models/CartItemModel";
 
 const props = defineProps({
   products: {

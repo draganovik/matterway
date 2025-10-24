@@ -1,7 +1,7 @@
-// store/catalog.ts
+// stores/catalog.ts
 
 import { defineStore } from "pinia";
-import ProductModel from "~/utils/ProductModel";
+import ProductModel from "~/models/ProductModel";
 
 interface CatalogState {
   catalog: ProductModel[] | null;
@@ -164,7 +164,6 @@ export const useCatalogStore = defineStore("catalog", {
           method: "DELETE",
         },
       );
-      console.log(response);
       if (response.ok) {
         if (this.catalog) {
           const index = this.catalog.findIndex((p) => p.id == product.id);
@@ -231,7 +230,6 @@ export const useCatalogStore = defineStore("catalog", {
           }),
         },
       );
-      console.log(response);
       return response;
     },
     async deleteProductSpec(specId: string): Promise<Response> {
@@ -242,7 +240,6 @@ export const useCatalogStore = defineStore("catalog", {
           method: "DELETE",
         },
       );
-      console.log(response);
       return response;
     },
     async updateProductSpec(
@@ -270,7 +267,6 @@ export const useCatalogStore = defineStore("catalog", {
           body: JSON.stringify(payload),
         },
       );
-      console.log(response);
       return response;
     },
 
@@ -294,7 +290,6 @@ export const useCatalogStore = defineStore("catalog", {
           }),
         },
       );
-      console.log(response);
       return response;
     },
     async deleteProductImage(
@@ -308,7 +303,6 @@ export const useCatalogStore = defineStore("catalog", {
           method: "DELETE",
         },
       );
-      console.log(response);
       return response;
     },
   },

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/store/catalog";
-import ProductModel from "~/utils/ProductModel";
-import { useSessionStore } from "~/store/session";
+import { useCatalogStore } from "~/stores/catalog";
+import ProductModel from "~/models/ProductModel";
+import { useSessionStore } from "~/stores/session";
 
 const catalogStore = useCatalogStore();
 const sessionStore = useSessionStore();

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useCartStore } from "~/store/cart";
+import { useCartStore } from "~/stores/cart";
 const cart = useCartStore();
 const tableSummary = {
   title: "Vaša korpa",

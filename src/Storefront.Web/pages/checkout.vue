@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useCartStore } from "~/store/cart";
-import { useSessionStore } from "~/store/session";
-import AddressModel from "~/utils/AddressModel";
-import CardPaymentModel from "~/utils/CardPaymentModel";
+import { useCartStore } from "~/stores/cart";
+import { useSessionStore } from "~/stores/session";
+import AddressModel from "~/models/AddressModel";
+import CardPaymentModel from "~/models/CardPaymentModel";
 
 const cart = useCartStore();
 const session = useSessionStore();

@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { initFlowbite } from "flowbite";
-import { useCartStore } from "~/store/cart";
-import { useSessionStore } from "~/store/session";
+import { useCartStore } from "~/stores/cart";
+import { useSessionStore } from "~/stores/session";
+
+import logoUrl from "~/assets/brand/logo.svg?url";
 
 const router = useRouter();
 
@@ -45,11 +47,7 @@ onMounted(() => {
       class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4"
     >
       <NuxtLink to="/" class="flex items-center">
-        <img
-          src="../assets/brand/logo.svg"
-          class="mr-3 h-9"
-          alt="Matterway Logo"
-        />
+        <img :src="logoUrl" class="mr-3 h-9" alt="Matterway Logo" />
         <span
           class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
           >Matterway</span

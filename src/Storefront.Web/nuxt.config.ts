@@ -5,6 +5,12 @@ export default defineNuxtConfig({
       titleTemplate: "%s - Matterway Web Store",
     },
   },
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false,
+    },
+  ],
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     orderingApiServerBaseUrl:

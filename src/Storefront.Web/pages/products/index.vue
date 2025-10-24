@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/store/catalog";
-import { useSessionStore } from "~/store/session";
+import { useCatalogStore } from "~/stores/catalog";
+import { useSessionStore } from "~/stores/session";
 
 const route = useRoute();
 const router = useRouter();
@@ -52,7 +52,6 @@ const search = () => {
       maxPrice: queryParams.value.maxPrice || undefined,
     },
   });
-  console.log(catalogStore.getCatalogMeta?.totalPages);
 };
 
 useHead({

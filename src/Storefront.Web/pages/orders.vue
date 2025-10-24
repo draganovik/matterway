@@ -91,7 +91,7 @@ class Address {
 </script>
 
 <script setup lang="ts">
-import { useSessionStore } from "~/store/session";
+import { useSessionStore } from "~/stores/session";
 import { formatMoney } from "~/composables/formatMoney";
 const orders: Ref<Order[]> = ref([]);
 const sessionStore = useSessionStore();
