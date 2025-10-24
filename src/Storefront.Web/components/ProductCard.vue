@@ -1,15 +1,35 @@
 <script lang="ts" setup>
+import { computed } from "vue";
+import type ProductModel from "~/utils/ProductModel";
 import { useCartStore } from "~/store/cart";
 import { useSessionStore } from "~/store/session";
 
 const session = useSessionStore();
 
 const userCartStore = useCartStore();
-defineProps({
-  product: {
-    type: ProductModel,
-    required: true,
-  },
+const props = defineProps<{
+  product: ProductModel;
+}>();
+
+const heroImage = computed(() => {
+  if (props.product.thumbnailImage?.imageUrl) {
+    return props.product.thumbnailImage;
+  }
+  const images = props.product.productImages ?? [];
+  if (!images.length) {
+    return null;
+  }
+  const sortedImages = [...images].sort(
+    (a, b) => Number(b.isMain) - Number(a.isMain),
+  );
+  const candidate = sortedImages[0];
+  if (!candidate?.imageUrl) {
+    return null;
+  }
+  return {
+    imageUrl: candidate.imageUrl,
+    imageAlt: candidate.imageAlt ?? props.product.title,
+  };
 });
 </script>
 <template>
@@ -19,20 +39,18 @@ defineProps({
     <NuxtLink
       :to="'/products/' + product.id"
       class="h-60 w-full"
-      v-if="product.productImages != null && product.productImages?.length > 0"
+      v-if="heroImage"
     >
       <img
         class="h-full w-full rounded-t-lg object-cover"
-        :src="
-          product.productImages.sort((a, b) => +!!a.isMain - +!!b.isMain)[0]
-            .imageUrl
-        "
-        :alt="
-          product.productImages.sort((a, b) => +!!a.isMain - +!!b.isMain)[0]
-            .imageAlt
-        "
+        :src="heroImage?.imageUrl"
+        :alt="heroImage?.imageAlt || product.title"
       />
     </NuxtLink>
+    <div
+      v-else
+      class="h-60 w-full rounded-t-lg bg-slate-100 dark:bg-slate-700/60"
+    ></div>
     <div class="flex w-full flex-col justify-between gap-8 p-5 pt-3">
       <NuxtLink :to="'/products/' + product.id">
         <h5

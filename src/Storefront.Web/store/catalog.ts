@@ -41,9 +41,13 @@ export const useCatalogStore = defineStore("catalog", {
           },
         },
       );
-      const responseObject = await response.json();
       if (response.ok) {
-        return responseObject;
+        try {
+          const responseObject = await response.json();
+          return ProductModel.fromDetailResponse(responseObject);
+        } catch (error) {
+          console.error("Failed to parse product detail response", error);
+        }
       }
       return null;
     },
@@ -86,7 +90,13 @@ export const useCatalogStore = defineStore("catalog", {
       const responseObject = await response.json();
 
       if (response.ok) {
-        this.setCatalog(responseObject.data);
+        const catalogItems: ProductModel[] = (responseObject.data ?? []).map(
+          (item: any) =>
+            ProductModel.fromCatalogResponse({
+              ...item,
+            }),
+        );
+        this.setCatalog(catalogItems);
         this.setCatalogMeta(responseObject.meta);
         this.setCatalogLinks(responseObject.links);
         return;
@@ -109,16 +119,39 @@ export const useCatalogStore = defineStore("catalog", {
         `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${product.id}`,
         {
           method: "PATCH",
-          body: JSON.stringify(product),
+          body: JSON.stringify({
+            productCode: product.productCode,
+            title: product.title,
+            price: product.price,
+            description: product.description,
+            isAvailable: product.isAvailable,
+          }),
         },
       );
-      console.log(response);
       if (response.ok) {
-        if (this.catalog) {
-          const index = this.catalog.findIndex((p) => p.id == product.id);
-          if (index > -1) {
-            this.catalog[index] = product;
+        try {
+          const payload = await response.clone().json();
+          product.productCode = payload.productCode ?? product.productCode;
+          product.title = payload.title ?? product.title;
+          product.price = payload.price ?? product.price;
+          product.description = payload.description ?? product.description;
+          product.createdAt = payload.createdAt ?? product.createdAt;
+          product.updatedAt = payload.updatedAt ?? product.updatedAt;
+          product.isAvailable = payload.isAvailable ?? product.isAvailable;
+
+          const mergedCatalogItem = ProductModel.fromCatalogResponse({
+            ...payload,
+            thumbnailImage: product.thumbnailImage ?? payload.thumbnailImage,
+          });
+
+          if (this.catalog) {
+            const index = this.catalog.findIndex((p) => p.id == product.id);
+            if (index > -1) {
+              this.catalog[index] = mergedCatalogItem;
+            }
           }
+        } catch (error) {
+          console.error("Failed to update catalog item cache", error);
         }
       }
       return response;
@@ -157,10 +190,24 @@ export const useCatalogStore = defineStore("catalog", {
           }),
         },
       );
-      console.log(response);
       if (response.ok) {
-        if (this.catalog) {
-          this.catalog.push(product);
+        try {
+          const payload = await response.clone().json();
+          if (this.catalog) {
+            this.catalog.push(
+              ProductModel.fromCatalogResponse({
+                ...payload,
+                thumbnailImage:
+                  payload.thumbnailImage ?? product.thumbnailImage ?? null,
+              }),
+            );
+          }
+          product.id = payload.id ?? product.id;
+          product.createdAt = payload.createdAt ?? product.createdAt;
+          product.updatedAt = payload.updatedAt ?? product.updatedAt;
+          product.isAvailable = payload.isAvailable ?? product.isAvailable;
+        } catch (error) {
+          console.error("Failed to parse product create response", error);
         }
       }
       return response;
@@ -203,18 +250,24 @@ export const useCatalogStore = defineStore("catalog", {
       productId: string,
       title: string,
       value: string,
+      type: string | number = "Specification",
+      unit?: string | null,
     ): Promise<Response> {
       const config = useRuntimeConfig();
+      const payload: Record<string, unknown> = {
+        productId: productId,
+        type: type,
+        title: title,
+        value: value,
+      };
+      if (unit !== undefined) {
+        payload.unit = unit;
+      }
       const response = await request(
         `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails/${specId}`,
         {
           method: "PATCH",
-          body: JSON.stringify({
-            productId: productId,
-            type: "Specification",
-            title: title,
-            value: value,
-          }),
+          body: JSON.stringify(payload),
         },
       );
       console.log(response);
@@ -237,6 +290,7 @@ export const useCatalogStore = defineStore("catalog", {
             productId: productId,
             imageUrl: imageUrl,
             imageAlt: imageAlt,
+            isMain: false,
           }),
         },
       );

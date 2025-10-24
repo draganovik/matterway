@@ -55,6 +55,8 @@ const updateSpec = async (detail: ProductDetails) => {
     product.value.id,
     detail.title,
     detail.value,
+    detail.type ?? "Specification",
+    detail.unit ?? null,
   );
   if (response.ok) {
     loadProduct();

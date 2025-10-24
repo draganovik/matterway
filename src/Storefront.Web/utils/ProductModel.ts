@@ -1,27 +1,95 @@
 export default class ProductModel {
-  id!: string;
-  productCode!: string;
-  title!: string;
-  price!: number;
-  description!: string;
-  productDetails!: ProductDetails[];
-  productImages!: ProductImages[];
-  createdAt!: string;
-  updatedAt!: string;
-  isAvailable!: boolean;
+  id: string;
+  productCode: string;
+  title: string;
+  price: number;
+  description: string;
+  productDetails: ProductDetails[];
+  productImages: ProductImages[];
+  thumbnailImage: ProductThumbnail | null;
+  createdAt?: string;
+  updatedAt?: string;
+  isAvailable: boolean;
+
+  constructor(initial?: Partial<ProductModel>) {
+    this.id = initial?.id ?? "";
+    this.productCode = initial?.productCode ?? "";
+    this.title = initial?.title ?? "";
+    this.price = initial?.price ?? 0;
+    this.description = initial?.description ?? "";
+    this.productDetails = initial?.productDetails?.map((detail) => ({
+      ...detail,
+    })) ?? [];
+    this.productImages = initial?.productImages?.map((image) => ({ ...image })) ?? [];
+    this.thumbnailImage = initial?.thumbnailImage
+      ? { ...initial.thumbnailImage }
+      : null;
+    this.createdAt = initial?.createdAt;
+    this.updatedAt = initial?.updatedAt;
+    this.isAvailable = initial?.isAvailable ?? false;
+  }
+
+  static fromCatalogResponse(response: any): ProductModel {
+    return new ProductModel({
+      id: response.id,
+      productCode: response.productCode,
+      title: response.title,
+      price: response.price,
+      description: response.description,
+      thumbnailImage: response.thumbnailImage
+        ? { ...response.thumbnailImage }
+        : null,
+      isAvailable: response.isAvailable ?? false,
+      productDetails: [],
+      productImages: [],
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
+    });
+  }
+
+  static fromDetailResponse(response: any): ProductModel {
+    const primaryImage =
+      response.productImages?.find((image: any) => image.isMain) ??
+      response.productImages?.[0];
+    return new ProductModel({
+      id: response.id,
+      productCode: response.productCode,
+      title: response.title,
+      price: response.price,
+      description: response.description,
+      productDetails: response.productDetails ?? [],
+      productImages: response.productImages ?? [],
+      thumbnailImage: response.thumbnailImage
+        ? { ...response.thumbnailImage }
+        : primaryImage
+          ? {
+              imageUrl: primaryImage.imageUrl,
+              imageAlt: primaryImage.imageAlt,
+            }
+          : null,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
+      isAvailable: response.isAvailable ?? false,
+    });
+  }
 }
 
 export class ProductDetails {
-  id!: string;
-  type!: string;
-  title!: string;
-  value!: string;
-  unit!: string;
+  id?: string;
+  type?: string | number;
+  title?: string;
+  value?: string;
+  unit?: string;
 }
 
 export class ProductImages {
-  id!: number;
-  imageUrl!: string;
-  imageAlt!: string;
-  isMain!: boolean;
+  id?: number;
+  imageUrl?: string;
+  imageAlt?: string;
+  isMain?: boolean;
+}
+
+export class ProductThumbnail {
+  imageUrl?: string;
+  imageAlt?: string;
 }
