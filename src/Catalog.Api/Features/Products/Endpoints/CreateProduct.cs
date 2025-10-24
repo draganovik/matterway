@@ -1,7 +1,7 @@
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
-using Catalog.Api.Features.Products.Domain;
 using Catalog.Api.Features.Products.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
@@ -31,7 +31,6 @@ public class CreateProduct : IEndpoint
         HttpContext httpContext,
         IProductRepository productRepository)
     {
-
         var productModel = Product.FromContract(request);
         var created = await productRepository.Create(productModel);
         if (created is null)

@@ -1,19 +1,12 @@
-﻿using Catalog.Api.Data;
+﻿using Catalog.Api.Domain;
+using Catalog.Api.Infrastructure;
 using Catalog.Api.Features.ProductImages.Contracts;
-using Catalog.Api.Features.ProductImages.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Features.ProductImages.Data;
 
-public class ProductImageRepository : IProductImageRepository
+public class ProductImageRepository(CatalogDbContext context) : IProductImageRepository
 {
-    private readonly CatalogDbContext context;
-
-    public ProductImageRepository(CatalogDbContext context)
-    {
-        this.context = context;
-    }
-
     public async Task<ProductImage?> Create(ProductImage requestModel)
     {
         context.ProductImage.Add(requestModel);

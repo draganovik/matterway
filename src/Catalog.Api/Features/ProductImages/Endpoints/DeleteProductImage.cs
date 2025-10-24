@@ -1,6 +1,6 @@
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Data;
-using Catalog.Api.Features.ProductImages.Domain;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;

@@ -7,21 +7,14 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
-        reloadOnChange: true)
-    .AddEnvironmentVariables();
+// Configure services
+builder.ConfigureServices();
+builder.ConfigureAuthentication();
 
-// Add Problem Details middleware
+// Add validation and problem details
+builder.Services.AddValidation();
 builder.Services.AddProblemDetails();
 builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
-
-// Add Authentication, Database, Repositories and JSON options
-builder.Services.ConfigureAuthentication(builder.Configuration);
-builder.Services.ConfigureDatabase(builder.Configuration);
-builder.Services.ConfigureRepositories();
-builder.Services.ConfigureJsonOptions();
 
 // Register endpoints and API explorer
 builder.Services.AddEndpoints();
@@ -30,12 +23,6 @@ builder.Services.AddEndpointsApiExplorer();
 // Add OpenAPI and API versioning
 builder.Services.ConfigureOpenApi();
 builder.Services.ConfigureApiVersioning();
-
-// Add Validation services
-builder.Services.AddValidation();
-
-// Add CORS policy
-builder.Services.ConfigureCors();
 
 var app = builder.Build();
 

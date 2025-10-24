@@ -1,5 +1,5 @@
-﻿using Catalog.Api.Features.ProductDetails.Contracts;
-using Catalog.Api.Features.ProductDetails.Domain;
+﻿using Catalog.Api.Domain;
+using Catalog.Api.Features.ProductDetails.Contracts;
 
 namespace Catalog.Api.Features.ProductDetails.Data;
 

@@ -1,18 +1,11 @@
-﻿using Catalog.Api.Features.ProductDetails.Domain;
-using Catalog.Api.Features.ProductImages.Domain;
-using Catalog.Api.Features.Products.Domain;
+﻿using Catalog.Api.Domain;
 using Common.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Api.Data;
+namespace Catalog.Api.Infrastructure;
 
-public class CatalogDbContext : DbContext
+public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {
-    public CatalogDbContext(DbContextOptions<CatalogDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<ProductDetail> ProductDetail { get; set; } = default!;
 
     public DbSet<ProductImage> ProductImage { get; set; } = default!;

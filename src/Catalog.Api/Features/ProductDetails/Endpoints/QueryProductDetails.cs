@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
-using Catalog.Api.Features.ProductDetails.Domain;
 using Catalog.Api.Features.ProductDetails.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
@@ -42,9 +42,8 @@ public class QueryProductDetails : IEndpoint
         var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "ProductDetails");
 
         var paginationResponse = new PaginationResponse<ProductDetailBaseResponse>(total, page, pageSize,
-            entities.Select(
-                entity => entity.ToContract<ProductDetailBaseResponse>()
-                ).ToList()
+            entities.Select(entity => entity.ToContract<ProductDetailBaseResponse>()
+            ).ToList()
             , baseUri);
 
         return entities is IEnumerable<ProductDetail> value && value.Any()

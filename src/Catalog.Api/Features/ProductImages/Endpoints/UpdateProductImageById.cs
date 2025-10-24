@@ -1,7 +1,7 @@
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Data;
-using Catalog.Api.Features.ProductImages.Domain;
 using Catalog.Api.Features.ProductImages.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;

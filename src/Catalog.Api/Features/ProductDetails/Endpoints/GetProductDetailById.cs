@@ -1,7 +1,7 @@
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Data;
-using Catalog.Api.Features.ProductDetails.Domain;
 using Catalog.Api.Features.ProductDetails.Mapping;
 using Common.Infrastructure.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;

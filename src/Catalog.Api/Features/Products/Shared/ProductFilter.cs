@@ -1,4 +1,4 @@
-﻿using Catalog.Api.Features.Products.Domain;
+﻿using Catalog.Api.Domain;
 using Common.Infrastructure.Enums;
 
 namespace Catalog.Api.Features.Products.Shared;

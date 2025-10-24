@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Data;
-using Catalog.Api.Features.ProductImages.Domain;
 using Catalog.Api.Features.ProductImages.Mapping;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
@@ -37,15 +37,13 @@ public class QueryProductImages : IEndpoint
             HttpContext httpContext,
             IProductImageRepository productImageRepository)
     {
-
         var total = await productImageRepository.GetTotalEntities();
         var entities = await productImageRepository.Query(page, pageSize);
         var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "ProductImages");
 
         var paginationResponse = new PaginationResponse<ProductImageBaseResponse>(total, page, pageSize,
-            entities.Select(
-                entity => entity.ToContract<ProductImageBaseResponse>()
-                ).ToList(), baseUri);
+            entities.Select(entity => entity.ToContract<ProductImageBaseResponse>()
+            ).ToList(), baseUri);
 
         return entities is IEnumerable<ProductImage> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

@@ -1,5 +1,5 @@
-﻿using Catalog.Api.Features.ProductImages.Contracts;
-using Catalog.Api.Features.ProductImages.Domain;
+﻿using Catalog.Api.Domain;
+using Catalog.Api.Features.ProductImages.Contracts;
 
 namespace Catalog.Api.Features.ProductImages.Data;
 

@@ -1,0 +1,48 @@
+using System.Text.Json.Serialization;
+using Catalog.Api.Infrastructure;
+using Catalog.Api.Features.ProductDetails.Data;
+using Catalog.Api.Features.ProductImages.Data;
+using Catalog.Api.Features.Products.Data;
+using Common.Infrastructure.Services.Brokers;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
+
+namespace Catalog.Api.Extensions;
+
+public static class Extensions
+{
+    public static void ConfigureServices(this IHostApplicationBuilder builder)
+    {
+        builder.Configuration
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+                reloadOnChange: true)
+            .AddEnvironmentVariables();
+
+        builder.Services.AddDbContext<CatalogDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext")
+                                 ?? throw new InvalidOperationException(
+                                     "Connection string 'CatalogDbContext' not found.")));
+
+        builder.Services.Configure<JsonOptions>(options =>
+        {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
+        });
+
+        builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
+        builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
+        builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+    }
+}

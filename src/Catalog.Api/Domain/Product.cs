@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Catalog.Api.Features.ProductDetails.Domain;
-using Catalog.Api.Features.ProductImages.Domain;
 
-namespace Catalog.Api.Features.Products.Domain;
+namespace Catalog.Api.Domain;
 
 public class Product
 {

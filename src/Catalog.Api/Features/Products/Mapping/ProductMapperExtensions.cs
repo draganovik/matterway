@@ -1,9 +1,9 @@
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductDetails.Contracts;
 using Catalog.Api.Features.ProductDetails.Mapping;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Mapping;
 using Catalog.Api.Features.Products.Contracts;
-using Catalog.Api.Features.Products.Domain;
 
 namespace Catalog.Api.Features.Products.Mapping;
 

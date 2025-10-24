@@ -1,19 +1,12 @@
-﻿using Catalog.Api.Data;
+﻿using Catalog.Api.Domain;
+using Catalog.Api.Infrastructure;
 using Catalog.Api.Features.ProductDetails.Contracts;
-using Catalog.Api.Features.ProductDetails.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Features.ProductDetails.Data;
 
-public class ProductDetailRepository : IProductDetailRepository
+public class ProductDetailRepository(CatalogDbContext context) : IProductDetailRepository
 {
-    private readonly CatalogDbContext context;
-
-    public ProductDetailRepository(CatalogDbContext context)
-    {
-        this.context = context;
-    }
-
     public async Task<ProductDetail?> Create(ProductDetail requestModel)
     {
         context.ProductDetail.Add(requestModel);

@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Catalog.Api.Features.Products.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Api.Features.ProductImages.Domain;
+namespace Catalog.Api.Domain;
 
 [PrimaryKey(nameof(Id), nameof(ProductId))]
 public class ProductImage

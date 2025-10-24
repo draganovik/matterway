@@ -1,7 +1,7 @@
 using Asp.Versioning;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.Products.Contracts;
 using Catalog.Api.Features.Products.Data;
-using Catalog.Api.Features.Products.Domain;
 using Catalog.Api.Features.Products.Mapping;
 using Catalog.Api.Features.Products.Shared;
 using Common.Infrastructure.Abstractions;
@@ -42,8 +42,7 @@ public class QueryProducts : IEndpoint
 
         var paginationResponse = new PaginationResponse<ProductBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            entities.Select(
-                entity => entity.ToContract<ProductBaseResponse>()
+            entities.Select(entity => entity.ToContract<ProductBaseResponse>()
             ).ToList()
             , baseUri);
 
