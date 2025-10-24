@@ -2,7 +2,7 @@
 using Common.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Api.Infrastructure;
+namespace Catalog.Api.Infrastructure.Persistence;
 
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
 {

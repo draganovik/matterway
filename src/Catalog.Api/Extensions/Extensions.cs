@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
-using Catalog.Api.Infrastructure;
-using Catalog.Api.Features.ProductDetails.Data;
-using Catalog.Api.Features.ProductImages.Data;
-using Catalog.Api.Features.Products.Data;
+using Catalog.Api.Infrastructure.Abstractions;
+using Catalog.Api.Infrastructure.Persistence;
+using Catalog.Api.Infrastructure.Repositories;
 using Common.Infrastructure.Services.Brokers;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;

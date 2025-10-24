@@ -1,9 +1,10 @@
 ﻿using Catalog.Api.Domain;
-using Catalog.Api.Infrastructure;
 using Catalog.Api.Features.ProductImages.Contracts;
+using Catalog.Api.Infrastructure.Abstractions;
+using Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Catalog.Api.Features.ProductImages.Data;
+namespace Catalog.Api.Infrastructure.Repositories;
 
 public class ProductImageRepository(CatalogDbContext context) : IProductImageRepository
 {

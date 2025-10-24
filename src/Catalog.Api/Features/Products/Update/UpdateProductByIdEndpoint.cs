@@ -1,22 +1,20 @@
 using Asp.Versioning;
-using Catalog.Api.Features.Products.Contracts;
-using Catalog.Api.Features.Products.Data;
-using Catalog.Api.Features.Products.Mapping;
+using Catalog.Api.Infrastructure.Abstractions;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Catalog.Api.Features.Products.Endpoints;
+namespace Catalog.Api.Features.Products.Update;
 
-public class UpdateProductById : IEndpoint
+public class UpdateProductByIdEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPatch("Products/{id:guid}", Handler)
             .WithName("UpdateProductById").WithSummary("Update a Product by id.")
             .WithTags("Products")
-            .Produces<ProductBaseResponse>()
+            .Produces<UpdateProductByIdResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -25,14 +23,20 @@ public class UpdateProductById : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductBaseResponse>, NotFound, BadRequest<ProblemDetails>>> Handler(
+    private static async Task<Results<Ok<UpdateProductByIdResponse>, NotFound, BadRequest<ProblemDetails>>> Handler(
         Guid id,
-        ProductBaseRequest request,
+        UpdateProductByIdRequest request,
         IProductRepository productRepository)
     {
-        var updatedProduct = await productRepository.Update(id, request);
-        return updatedProduct is not null
-            ? TypedResults.Ok(updatedProduct.ToContract<ProductBaseResponse>())
-            : TypedResults.NotFound();
+        var entity = await productRepository.GetById(id);
+        if (entity is null) return TypedResults.NotFound();
+
+        entity.ApplyUpdate(request);
+
+        var updated = await productRepository.UpdateAsync(entity);
+
+        if (updated is null) return TypedResults.NotFound();
+
+        return TypedResults.Ok(updated.ToResponse());
     }
 }

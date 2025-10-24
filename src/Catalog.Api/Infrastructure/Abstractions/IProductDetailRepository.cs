@@ -1,7 +1,7 @@
 ﻿using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductDetails.Contracts;
 
-namespace Catalog.Api.Features.ProductDetails.Data;
+namespace Catalog.Api.Infrastructure.Abstractions;
 
 public interface IProductDetailRepository
 {

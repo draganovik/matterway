@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Catalog.Api.Features.ProductDetails.Contracts;
-using Catalog.Api.Features.ProductImages.Contracts;
 
-namespace Catalog.Api.Features.Products.Contracts;
+namespace Catalog.Api.Features.Products.Create;
 
-public class ProductBaseResponse
+public record CreateProductResponse
 {
     public Guid Id { get; set; }
 
@@ -18,8 +16,6 @@ public class ProductBaseResponse
     public double? Price { get; set; }
 
     public string? Description { get; set; }
-    public ICollection<ProductDetailProductResponse>? ProductDetails { get; set; }
-    public ICollection<ProductImageProductResponse>? ProductImages { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsAvailable { get; set; }

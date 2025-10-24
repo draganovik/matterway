@@ -1,9 +1,9 @@
 ﻿using Catalog.Api.Domain;
 using Common.Infrastructure.Enums;
 
-namespace Catalog.Api.Features.Products.Shared;
+namespace Catalog.Api.Features.Products.Query;
 
-public record ProductFilter
+public record QueryProductFilter
 {
     public string? TitleLike { get; set; }
     public double? PriceMin { get; set; }

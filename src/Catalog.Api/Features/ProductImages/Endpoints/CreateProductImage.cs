@@ -1,8 +1,8 @@
 using Asp.Versioning;
 using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Contracts;
-using Catalog.Api.Features.ProductImages.Data;
 using Catalog.Api.Features.ProductImages.Mapping;
+using Catalog.Api.Infrastructure.Abstractions;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Http;
@@ -28,12 +28,10 @@ public class CreateProductImage : IEndpoint
 
     private static async Task<Results<Created<ProductImageBaseResponse>, BadRequest<ProblemDetails>>> Handler(
         ProductImageBaseRequest request,
-        HttpContext httpContext,
-        IProductImageRepository productImageRepository)
+        HttpContext httpContext, IProductImageRepository productImageRepository)
     {
-        var productImageModel = ProductImage.FromContract(request);
-        var created = await productImageRepository.Create(productImageModel);
-        if (created is null)
+        var productImageModel = await ExecuteAsync(request, productImageRepository);
+        if (productImageModel is null)
         {
             var problemDetails = new ProblemDetails
             {
@@ -45,9 +43,18 @@ public class CreateProductImage : IEndpoint
         }
 
         var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductImages/{created.ProductId}/{created.Id}");
+            $"ProductImages/{productImageModel.ProductId}/{productImageModel.Id}");
 
         return TypedResults.Created(location,
-            created.ToContract<ProductImageBaseResponse>());
+            productImageModel);
+    }
+    
+    private static async Task<ProductImageBaseResponse?> ExecuteAsync(
+        ProductImageBaseRequest request,
+        IProductImageRepository productImageRepository)
+    {
+        var productImageModel = ProductImage.FromContract(request);
+        var created = await productImageRepository.Create(productImageModel);
+        return created?.ToContract<ProductImageBaseResponse>();
     }
 }

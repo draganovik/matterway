@@ -1,8 +1,8 @@
 using Asp.Versioning;
 using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductDetails.Contracts;
-using Catalog.Api.Features.ProductDetails.Data;
 using Catalog.Api.Features.ProductDetails.Mapping;
+using Catalog.Api.Infrastructure.Abstractions;
 using Common.Infrastructure.Abstractions;
 using Common.Infrastructure.Enums;
 using Common.Infrastructure.Http;
