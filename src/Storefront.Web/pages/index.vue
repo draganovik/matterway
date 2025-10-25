@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted } from "vue";
 import { useCatalogStore } from "~/stores/catalog";
+import { featuredCollections } from "~/composables/collections";
 
 const router = useRouter();
 const catalogStore = useCatalogStore();
@@ -30,29 +31,7 @@ const heroStats = computed(() => {
   ];
 });
 
-const categories = [
-  {
-    name: "Pametna rasveta",
-    description:
-      "Ambijentalna i radna rasveta koja menja temperaturu i intenzitet prema vašem raspoloženju.",
-    query: "rasveta",
-    accent: "from-indigo-500/10 via-blue-500/10 to-sky-500/10",
-  },
-  {
-    name: "Energetska efikasnost",
-    description:
-      "Termostati, senzori i analitika potrošnje koji optimizuju grejanje i hlađenje.",
-    query: "energija",
-    accent: "from-emerald-500/10 via-green-500/10 to-lime-500/10",
-  },
-  {
-    name: "Sigurnost doma",
-    description:
-      "Pametne brave, kamere i senzori pokreta koji štite prostor i šalju obaveštenja u realnom vremenu.",
-    query: "sigurnost",
-    accent: "from-amber-500/10 via-orange-500/10 to-rose-500/10",
-  },
-];
+const collections = featuredCollections;
 
 const handleCategoryClick = (category: { query?: string }) => {
   router.push({
@@ -151,85 +130,15 @@ const goToProducts = () => router.push("/products");
         </div>
       </div>
       <div class="mt-6 grid gap-5 md:grid-cols-3">
-        <button
-          v-for="category in categories"
-          :key="category.name"
-          type="button"
-          class="group flex h-full flex-col gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br p-6 text-left transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800/60"
-          :class="category.accent"
-          @click="handleCategoryClick(category)"
-        >
-          <div
-            class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-blue-600 shadow-sm dark:bg-slate-900/80 dark:text-blue-300"
-          >
-            <svg
-              v-if="category.query === 'rasveta'"
-              class="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 3v9m0 0l3.5 3.5M12 12L8.5 15.5M6 21h12"
-              />
-            </svg>
-            <svg
-              v-else-if="category.query === 'energija'"
-              class="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
-              />
-            </svg>
-            <svg
-              v-else
-              class="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 0v9m-4 0h8"
-              />
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            {{ category.name }}
-          </h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300">
-            {{ category.description }}
-          </p>
-          <span
-            class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 transition group-hover:translate-x-1 dark:text-blue-300"
-          >
-            Istraži ponudu
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5L21 12m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </span>
-        </button>
+        <CollectionCard
+          v-for="collection in collections"
+          :key="collection.name"
+          :title="collection.name"
+          :description="collection.description"
+          :accent="collection.accent"
+          :icon="collection.icon"
+          @click="handleCategoryClick(collection)"
+        />
       </div>
     </section>
 
