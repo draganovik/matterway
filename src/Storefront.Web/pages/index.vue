@@ -91,7 +91,8 @@ const goToProducts = () => router.push("/products");
           </h1>
           <p class="text-lg text-white/80">
             Matterway povezuje vaše uređaje u jedinstven sistem, omogućavajući
-            vam da upravljate Vašim domom ili kancelarijom sa lakoćom i efikasnošću.
+            vam da upravljate Vašim domom ili kancelarijom sa lakoćom i
+            efikasnošću.
           </p>
           <div class="flex flex-wrap gap-3">
             <button
