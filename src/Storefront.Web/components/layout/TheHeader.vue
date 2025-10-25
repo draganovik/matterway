@@ -1,38 +1,93 @@
 <script lang="ts" setup>
-import { initFlowbite } from "flowbite";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useCartStore } from "~/stores/cart";
 import { useSessionStore } from "~/stores/session";
-
 import logoUrl from "~/assets/brand/logo.svg?url";
 
 const router = useRouter();
+const route = useRoute();
 
 const cart = useCartStore();
 const session = useSessionStore();
 
-const logout = () => {
-  session.logout();
-  router.push("/");
+const searchTerm = ref("");
+const showMobileMenu = ref(false);
+const showMobileSearch = ref(false);
+const searchInput = ref<HTMLInputElement | null>(null);
+
+const navLinks = [
+  { label: "Proizvodi", to: "/products" },
+  { label: "Kolekcije", to: "/#kolekcije" },
+  { label: "Najnovije", to: "/#najnovije" },
+];
+
+const cartItemCount = computed(() => cart.getTotalItemCount);
+const isLoggedIn = computed(() => session.isLoggedIn);
+
+const isActiveLink = (target: string) => {
+  const [path, hash] = target.split("#");
+  if (hash) {
+    return route.path === (path || "/") && route.hash === `#${hash}`;
+  }
+
+  return route.path === target || route.path.startsWith(`${target}/`);
 };
 
-const search = () => {
-  if (searchTerm.value == undefined || searchTerm.value == "") {
-    return;
-  }
+const submitSearch = () => {
+  const value = (searchTerm.value ?? "").toString().trim();
+  if (!value) return;
+
   router.push({
     path: "/products",
     query: {
-      productName: searchTerm.value,
+      productName: value,
     },
   });
-  searchTerm.value = undefined;
+
+  searchTerm.value = "";
+  showMobileSearch.value = false;
+  showMobileMenu.value = false;
 };
 
-let searchTerm = ref(undefined);
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value;
+  if (!showMobileMenu.value) {
+    showMobileSearch.value = false;
+  }
+};
 
-// initialize components based on data attribute selectors
+const toggleMobileSearch = () => {
+  showMobileSearch.value = !showMobileSearch.value;
+  if (showMobileSearch.value) {
+    showMobileMenu.value = true;
+  }
+};
+
+const goToCart = () => {
+  router.push("/cart");
+};
+
+const logout = () => {
+  session.logout();
+  router.push("/");
+  showMobileMenu.value = false;
+};
+
+watch(showMobileSearch, (visible) => {
+  if (visible) {
+    nextTick(() => searchInput.value?.focus());
+  }
+});
+
+watch(
+  () => route.fullPath,
+  () => {
+    showMobileMenu.value = false;
+    showMobileSearch.value = false;
+  },
+);
+
 onMounted(() => {
-  initFlowbite();
   if (session.isLoggedIn) {
     cart.fetchCartItems();
   }
@@ -40,266 +95,318 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav
-    class="fixed z-40 m-4 w-[calc(100%-2rem)] rounded-lg border border-slate-200/90 bg-white backdrop-blur-md backdrop-filter dark:border-slate-700 dark:bg-slate-800/90"
+  <header
+    class="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:border-slate-700 dark:bg-slate-900/70"
   >
     <div
-      class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4"
+      class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6"
     >
-      <NuxtLink to="/" class="flex items-center">
-        <img :src="logoUrl" class="mr-3 h-9" alt="Matterway Logo" />
-        <span
-          class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white"
+      <NuxtLink
+        to="/"
+        class="flex items-center gap-3 transition hover:opacity-90"
+      >
+        <img :src="logoUrl" alt="Matterway logo" class="h-9 w-9" />
+        <span class="text-xl font-semibold text-slate-900 dark:text-white"
           >Matterway</span
         >
       </NuxtLink>
-      <div class="flex md:order-1">
+
+      <nav
+        class="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex"
+      >
+        <NuxtLink
+          v-for="link in navLinks"
+          :key="link.to"
+          :to="link.to"
+          class="rounded-full px-3 py-2 transition hover:text-blue-600 dark:hover:text-blue-300"
+          :class="
+            isActiveLink(link.to)
+              ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200'
+              : ''
+          "
+        >
+          {{ link.label }}
+        </NuxtLink>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <form class="hidden md:block" @submit.prevent="submitSearch">
+          <label class="group relative flex items-center">
+            <span
+              class="pointer-events-none absolute left-3 text-slate-400 group-focus-within:text-blue-600"
+            >
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <line
+                  x1="16.65"
+                  y1="16.65"
+                  x2="21"
+                  y2="21"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            <input
+              v-model="searchTerm"
+              type="search"
+              placeholder="Pretraži proizvode"
+              class="w-56 rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 transition focus:border-blue-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:bg-slate-800 dark:text-slate-200 dark:focus:bg-slate-900"
+            />
+          </label>
+        </form>
+
         <button
           type="button"
-          data-collapse-toggle="navbar-search"
-          aria-controls="navbar-search"
-          aria-expanded="false"
-          class="mr-1 rounded-lg p-2.5 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:hidden"
+          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          @click="toggleMobileSearch"
         >
+          <span class="sr-only">Pretraga</span>
           <svg
             class="h-5 w-5"
-            aria-hidden="true"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
           >
-            <path
-              fill-rule="evenodd"
-              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clip-rule="evenodd"
-            ></path>
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <line
+              x1="16.65"
+              y1="16.65"
+              x2="21"
+              y2="21"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <span class="sr-only">Search</span>
         </button>
-        <div class="w-58 relative hidden md:block lg:w-64">
-          <div
-            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-          >
-            <svg
-              class="h-5 w-5 text-slate-500"
-              aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            <span class="sr-only">Search icon</span>
-          </div>
-          <input
-            v-model="searchTerm"
-            v-on:keyup.enter="search()"
-            type="text"
-            id="search-navbar"
-            class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-            placeholder="Search..."
-          />
-        </div>
+
         <button
-          data-collapse-toggle="navbar-search"
           type="button"
-          class="inline-flex items-center rounded-lg p-2 text-sm text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-600 md:hidden"
-          aria-controls="navbar-search"
-          aria-expanded="false"
+          class="relative rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800"
+          @click="goToCart"
         >
-          <span class="sr-only">Open menu</span>
+          <span class="sr-only">Korpa</span>
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            viewBox="0 0 24 24"
+          >
+            <g fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                stroke-linecap="round"
+                d="M8 12V8a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v4"
+              />
+              <path
+                d="M3.694 12.668c.145-1.741.218-2.611.792-3.14S5.934 9 7.681 9h8.639c1.746 0 2.62 0 3.194.528s.647 1.399.792 3.14l.514 6.166c.084 1.013.126 1.52-.17 1.843c-.298.323-.806.323-1.824.323H5.174c-1.017 0-1.526 0-1.823-.323s-.255-.83-.17-1.843z"
+              />
+            </g>
+          </svg>
+          <span
+            v-if="cartItemCount"
+            class="absolute bottom-0 right-0 inline-flex items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-semibold text-white"
+          >
+            {{ cartItemCount }}
+          </span>
+        </button>
+
+        <NuxtLink
+          v-if="!isLoggedIn"
+          to="/login"
+          class="hidden rounded-full border border-blue-200 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30 md:inline-flex"
+        >
+          Prijava
+        </NuxtLink>
+
+        <div v-else class="hidden items-center gap-3 md:flex">
+          <NuxtLink
+            to="/orders"
+            class="text-sm font-medium text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-300"
+          >
+            Porudžbine
+          </NuxtLink>
+          <button
+            type="button"
+            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            @click="logout"
+          >
+            Odjava
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          @click="toggleMobileMenu"
+        >
+          <span class="sr-only">Navigacija</span>
           <svg
             class="h-6 w-6"
-            aria-hidden="true"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            viewBox="0 0 24 24"
           >
             <path
-              fill-rule="evenodd"
-              d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-              clip-rule="evenodd"
-            ></path>
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
       </div>
+    </div>
+
+    <transition name="fade">
       <div
-        class="hidden w-full items-center justify-between md:order-2 md:flex md:w-auto"
-        id="navbar-search"
+        v-if="showMobileSearch"
+        class="border-t border-slate-200 bg-white/95 px-4 py-3 dark:border-slate-700 dark:bg-slate-900 md:hidden"
       >
-        <div class="relative mt-3 md:hidden">
-          <div
-            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+        <form @submit.prevent="submitSearch" class="flex items-center gap-2">
+          <label
+            class="flex flex-1 items-center gap-2 rounded-full bg-slate-100 px-4 py-2 dark:bg-slate-800"
           >
             <svg
               class="h-5 w-5 text-slate-500"
-              aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
             >
-              <path
-                fill-rule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clip-rule="evenodd"
-              ></path>
+              <circle
+                cx="11"
+                cy="11"
+                r="7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <line
+                x1="16.65"
+                y1="16.65"
+                x2="21"
+                y2="21"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
-          </div>
-          <input
-            v-model="searchTerm"
-            v-on:keyup.enter="search()"
-            type="text"
-            id="search-navbar-mini"
-            class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-10 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-            placeholder="Search..."
-          />
-        </div>
-        <ul
-          class="mt-4 flex flex-col rounded-lg border border-slate-100 bg-slate-50 p-4 font-medium dark:border-slate-700 dark:bg-slate-800 md:mt-0 md:flex-row md:items-center md:gap-5 md:border-0 md:bg-transparent md:p-0 lg:gap-8"
-        >
-          <li>
-            <NuxtLink
-              to="/"
-              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-              >Naslovna</NuxtLink
-            >
-          </li>
-          <li>
-            <NuxtLink
-              to="/products"
-              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-              >Proizvodi</NuxtLink
-            >
-          </li>
-          <li v-if="!session.isLoggedIn">
-            <NuxtLink
-              to="/login"
-              class="block rounded py-2 pl-3 pr-4 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700 dark:hover:text-white md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-              >Prijava</NuxtLink
-            >
-          </li>
-          <div class="flex flex-col md:flex-row">
-            <li v-show="session.isLoggedIn">
-              <button
-                type="button"
-                data-dropdown-toggle="dropdownNavbar"
-                aria-expanded="false"
-                class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
-              >
-                <svg
-                  class="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                  ></path>
-                </svg>
-                <span class="text-slate-900 dark:text-white md:sr-only"
-                  >Nalog</span
-                >
-              </button>
-              <!-- Dropdown menu -->
-              <div
-                id="dropdownNavbar"
-                class="z-10 hidden w-44 divide-y divide-slate-100 overflow-hidden rounded-lg bg-white font-normal shadow dark:divide-slate-600 dark:bg-slate-700"
-              >
-                <ul
-                  class="py-2 text-sm text-slate-700 dark:text-slate-400"
-                  aria-labelledby="dropdownLargeButton"
-                >
-                  <li>
-                    <NuxtLink
-                      to="/profile"
-                      class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
-                      >Profil</NuxtLink
-                    >
-                  </li>
-                  <li>
-                    <NuxtLink
-                      to="/orders"
-                      v-if="session.getSessionData"
-                      aria-controls="navbar-search"
-                      aria-expanded="true"
-                      class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
-                      >Istorija kupovine</NuxtLink
-                    >
-                  </li>
-                </ul>
-                <div class="py-1">
-                  <button
-                    type="button"
-                    aria-controls="navbar-search"
-                    aria-expanded="true"
-                    @click="logout()"
-                    class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-600 dark:hover:text-white"
-                  >
-                    Odjava
-                  </button>
-                </div>
-              </div>
-            </li>
-            <li>
-              <NuxtLink
-                v-if="
-                  session.getTokenData?.role != 'Admin' &&
-                  session.getTokenData?.role != 'Manager'
-                "
-                to="/cart"
-                data-collapse-toggle="navbar-search"
-                aria-controls="navbar-search"
-                aria-expanded="false"
-                class="relative mr-1 flex w-full flex-row gap-2 rounded p-2.5 text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:focus:ring-slate-700 md:w-auto"
-              >
-                <svg
-                  class="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                  ></path>
-                </svg>
-                <span
-                  class="text-base text-slate-900 dark:text-white md:sr-only"
-                  >Korpa</span
-                >
-                <div
-                  v-if="cart.getCartItems.length > 0"
-                  class="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-md border border-blue-400/40 border-white bg-blue-600/70 text-[8pt] font-bold text-white dark:border-blue-700/50 md:bottom-0 md:right-0"
-                >
-                  {{ cart.getCartItems.length }}
-                </div>
-              </NuxtLink>
-            </li>
-          </div>
-        </ul>
+            <input
+              ref="searchInput"
+              v-model="searchTerm"
+              type="search"
+              placeholder="Pretraži proizvode"
+              class="flex-1 border-0 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-none dark:text-slate-200"
+            />
+          </label>
+          <button
+            type="submit"
+            class="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+          >
+            Traži
+          </button>
+        </form>
       </div>
-    </div>
-  </nav>
+    </transition>
+
+    <transition name="slide-fade">
+      <div
+        v-if="showMobileMenu"
+        class="border-t border-slate-200 bg-white/95 px-4 py-4 dark:border-slate-700 dark:bg-slate-900 md:hidden"
+      >
+        <nav class="flex flex-col gap-2">
+          <NuxtLink
+            v-for="link in navLinks"
+            :key="link.to"
+            :to="link.to"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+            :class="
+              isActiveLink(link.to)
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200'
+                : ''
+            "
+            @click="showMobileMenu = false"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </nav>
+        <div class="mt-4 flex flex-col gap-2">
+          <NuxtLink
+            to="/cart"
+            class="flex items-center justify-between rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-200"
+            @click="showMobileMenu = false"
+          >
+            <span>Korpa</span>
+            <span
+              class="text-xs font-semibold text-blue-600 dark:text-blue-300"
+            >
+              {{ cartItemCount }}
+            </span>
+          </NuxtLink>
+          <NuxtLink
+            v-if="isLoggedIn"
+            to="/orders"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+            @click="showMobileMenu = false"
+          >
+            Porudžbine
+          </NuxtLink>
+          <button
+            v-if="isLoggedIn"
+            type="button"
+            class="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
+            @click="logout"
+          >
+            Odjava
+          </button>
+          <NuxtLink
+            v-else
+            to="/login"
+            class="rounded-lg bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
+            @click="showMobileMenu = false"
+          >
+            Prijava
+          </NuxtLink>
+        </div>
+      </div>
+    </transition>
+  </header>
 </template>
 
 <style scoped>
-.router-link-exact-active:not([href="/"]):not([href="/cart"]) {
-  @apply bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
 }
-.router-link-exact-active[href="/cart"] {
-  @apply bg-blue-700 md:bg-transparent;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>

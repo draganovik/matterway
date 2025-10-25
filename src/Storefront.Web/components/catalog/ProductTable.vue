@@ -27,7 +27,7 @@ const props = defineProps({
   >
     <caption
       v-if="summary"
-      class="bg-white p-5 text-left text-lg font-semibold text-slate-900 dark:bg-slate-800 dark:text-white"
+      class=" p-5 text-left text-lg font-semibold text-slate-900  dark:text-white"
     >
       {{
         summary.title

@@ -1,57 +1,118 @@
 <script lang="ts" setup>
+import { computed, onMounted, reactive, watch } from "vue";
 import { useCatalogStore } from "~/stores/catalog";
 import { useSessionStore } from "~/stores/session";
 
 const route = useRoute();
 const router = useRouter();
 const catalogStore = useCatalogStore();
-const session = useSessionStore();
-const pageSize = 6;
+const sessionStore = useSessionStore();
 
-const queryParams = ref({
-  page: route.query.page || 1,
-  pageSize: route.query.pageSize || pageSize,
-  productName: route.query.productName || undefined,
-  minPrice: route.query.minPrice || undefined,
-  maxPrice: route.query.maxPrice || undefined,
+const DEFAULT_PAGE_SIZE = 9;
+
+const filters = reactive({
+  search: (route.query.productName as string) ?? "",
+  minPrice: route.query.minPrice ? Number(route.query.minPrice) : undefined,
+  maxPrice: route.query.maxPrice ? Number(route.query.maxPrice) : undefined,
 });
 
-const pageLoad = () => {
-  queryParams.value.productName = (route.query.productName || "") as string;
-  queryParams.value.minPrice = route.query.minPrice || undefined;
-  queryParams.value.maxPrice = route.query.maxPrice || undefined;
+const pagination = reactive({
+  page: Number(route.query.page ?? 1),
+  pageSize: Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE),
+});
+
+const catalogMeta = computed(() => catalogStore.getCatalogMeta);
+const totalPages = computed(() => catalogMeta.value?.totalPages ?? 0);
+const totalCount = computed(() => catalogMeta.value?.totalCount ?? 0);
+const products = computed(() => catalogStore.catalog ?? []);
+const isLoading = computed(() => catalogStore.catalog === null);
+const canManage = computed(() => {
+  const role = sessionStore.getTokenData?.role;
+  return role === "Admin" || role === "Manager";
+});
+const pageOptions = [9, 12, 18];
+
+const pages = computed(() =>
+  totalPages.value
+    ? Array.from({ length: totalPages.value }, (_, index) => index + 1)
+    : [],
+);
+
+const applyRouteState = () => {
+  filters.search = (route.query.productName as string) ?? "";
+  filters.minPrice = route.query.minPrice
+    ? Number(route.query.minPrice)
+    : undefined;
+  filters.maxPrice = route.query.maxPrice
+    ? Number(route.query.maxPrice)
+    : undefined;
+  pagination.page = Number(route.query.page ?? 1) || 1;
+  pagination.pageSize =
+    Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
+};
+
+const sanitizeNumericFilters = () => {
+  if (typeof filters.minPrice === "number" && Number.isNaN(filters.minPrice)) {
+    filters.minPrice = undefined;
+  }
+  if (typeof filters.maxPrice === "number" && Number.isNaN(filters.maxPrice)) {
+    filters.maxPrice = undefined;
+  }
+};
+
+const fetchProducts = () => {
+  sanitizeNumericFilters();
   catalogStore.fetchCatalog(
-    (route.query.page || 1) as number,
-    (route.query.pageSize || pageSize) as number,
-    (route.query.productName || "") as string,
-    (route.query.minPrice || 0) as number,
-    (route.query.maxPrice || 0) as number,
+    pagination.page,
+    pagination.pageSize,
+    filters.search,
+    filters.minPrice ?? 0,
+    filters.maxPrice ?? 0,
   );
 };
 
-const paginate = (page: number = 1) => {
-  queryParams.value.page = page;
+const updateRoute = () => {
+  sanitizeNumericFilters();
   router.push({
     query: {
-      page: queryParams.value.page || 1,
-      pageSize: queryParams.value.pageSize || pageSize,
-      productName: queryParams.value.productName || undefined,
-      minPrice: queryParams.value.minPrice || undefined,
-      maxPrice: queryParams.value.maxPrice || undefined,
+      page: pagination.page !== 1 ? pagination.page : undefined,
+      pageSize:
+        pagination.pageSize !== DEFAULT_PAGE_SIZE
+          ? pagination.pageSize
+          : undefined,
+      productName: filters.search || undefined,
+      minPrice: filters.minPrice !== undefined ? filters.minPrice : undefined,
+      maxPrice: filters.maxPrice !== undefined ? filters.maxPrice : undefined,
     },
   });
 };
 
-const search = () => {
-  router.push({
-    query: {
-      page: 1,
-      pageSize: pageSize,
-      productName: queryParams.value.productName || undefined,
-      minPrice: queryParams.value.minPrice || undefined,
-      maxPrice: queryParams.value.maxPrice || undefined,
-    },
-  });
+const submitFilters = () => {
+  sanitizeNumericFilters();
+  pagination.page = 1;
+  updateRoute();
+};
+
+const resetFilters = () => {
+  filters.search = "";
+  filters.minPrice = undefined;
+  filters.maxPrice = undefined;
+  pagination.page = 1;
+  updateRoute();
+};
+
+const goToPage = (page: number) => {
+  if (page === pagination.page) return;
+  if (page < 1 || (totalPages.value && page > totalPages.value)) return;
+  pagination.page = page;
+  updateRoute();
+};
+
+const changePageSize = (size: number) => {
+  if (size === pagination.pageSize) return;
+  pagination.pageSize = size;
+  pagination.page = 1;
+  updateRoute();
 };
 
 useHead({
@@ -59,199 +120,264 @@ useHead({
 });
 
 onMounted(() => {
-  pageLoad();
+  applyRouteState();
+  fetchProducts();
 });
 
 watch(
   () => route.query,
-  () => pageLoad(),
+  () => {
+    applyRouteState();
+    fetchProducts();
+  },
 );
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 md:flex-row md:gap-4">
-    <aside class="w-80">
-      <form @submit.prevent="search()">
-        <div class="mb-6 grid gap-6">
-          <div>
+  <div class="mx-auto space-y-12 lg:space-y-16">
+    <section class="grid gap-8 lg:grid-cols-[320px_1fr]">
+      <aside
+        class="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      >
+        <header class="space-y-1">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Filteri
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Kombinujte nazive i cene kako biste brže došli do željenog
+            proizvoda.
+          </p>
+        </header>
+
+        <form class="space-y-5" @submit.prevent="submitFilters">
+          <div class="grid gap-2">
             <label
-              for="productName"
-              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
-              >Product name</label
+              class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400"
             >
+              Naziv proizvoda
+            </label>
             <input
+              v-model="filters.search"
               type="text"
-              id="productName"
-              v-model="queryParams.productName"
-              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Search for a product"
+              placeholder="npr. Philips Hue"
+              class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:text-slate-800 dark:focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label
-              for="minPrice"
-              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
-              >Najniža cena</label
-            >
-            <input
-              type="number"
-              id="minPrice"
-              :max="queryParams.maxPrice?.toString()"
-              v-model="queryParams.minPrice"
-              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="1000"
-            />
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid gap-2">
+              <label
+                class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400"
+              >
+                Minimalna cena
+              </label>
+              <input
+                v-model.number="filters.minPrice"
+                type="number"
+                min="0"
+                placeholder="0"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:text-slate-800 dark:focus:ring-blue-500"
+              />
+            </div>
+            <div class="grid gap-2">
+              <label
+                class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400"
+              >
+                Maksimalna cena
+              </label>
+              <input
+                v-model.number="filters.maxPrice"
+                type="number"
+                min="0"
+                placeholder="10000"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:text-slate-800 dark:focus:ring-blue-500"
+              />
+            </div>
           </div>
-          <div>
-            <label
-              for="maxPrice"
-              class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
-              >Najviša cena</label
+
+          <div class="flex flex-col gap-6 text-sm">
+            <div class="flex flex-col items-center gap-2 sm:flex-row">
+              <label
+                for="page-size"
+                class="w-full text-center text-slate-500 dark:text-slate-400 sm:pl-4 sm:text-left"
+              >
+                Prikaži po stranici:
+              </label>
+              <select
+                id="page-size"
+                :value="pagination.pageSize"
+                class="hidden rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-500 sm:flex"
+                @change="
+                  changePageSize(
+                    Number(($event.target as HTMLSelectElement).value),
+                  )
+                "
+              >
+                <option
+                  v-for="option in pageOptions"
+                  :key="`page-size-${option}`"
+                  :value="option"
+                >
+                  {{ option }}
+                </option>
+              </select>
+              <div class="flex items-center gap-2 sm:hidden">
+                <button
+                  v-for="option in pageOptions"
+                  :key="`mobile-page-size-${option}`"
+                  type="button"
+                  class="rounded-full border px-3 py-1.5 font-medium transition focus:outline-none"
+                  :class="
+                    option === pagination.pageSize
+                      ? 'border-blue-200 bg-blue-100 text-blue-600 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
+                      : 'border-slate-200 text-slate-500 hover:border-blue-200 dark:border-slate-700 dark:text-slate-300'
+                  "
+                  @click="changePageSize(option)"
+                >
+                  {{ option }}
+                </button>
+              </div>
+            </div>
+            <div
+              class="rounded-full bg-slate-100 px-4 py-2 font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-200"
             >
-            <input
-              type="number"
-              id="maxPrice"
-              :min="queryParams.minPrice?.toString()"
-              v-model="queryParams.maxPrice"
-              class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="1200"
-            />
+              Ukupno rezultata: {{ totalCount }}
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/40"
+            >
+              Primeni filtere
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-slate-600/60"
+              @click="resetFilters"
+            >
+              Resetuj
+            </button>
+          </div>
+
+          <NuxtLink
+            v-if="canManage"
+            to="/products/create"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-dashed border-blue-300 bg-blue-50 px-5 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-900/40"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6v12m6-6H6"
+              />
+            </svg>
+            Dodaj novi proizvod
+          </NuxtLink>
+        </form>
+      </aside>
+
+      <section class="space-y-6">
+        <div v-if="isLoading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ProductCartSkeleton
+            v-for="n in pagination.pageSize"
+            :key="`product-skeleton-${n}`"
+          />
+        </div>
+
+        <div
+          v-else-if="products.length === 0"
+          class="grid min-h-[16rem] place-items-center rounded-3xl border border-slate-200 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-800"
+        >
+          <div class="space-y-4 text-slate-500 dark:text-slate-300">
+            <svg
+              class="mx-auto h-12 w-12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.813 15.904A6.5 6.5 0 018.25 4.5 6.5 6.5 0 1115.5 11a6.46 6.46 0 01-.904 3.313L21 20.719 20.281 21l-4.407-4.407A6.46 6.46 0 0112 17.5a6.46 6.46 0 01-2.187-.407"
+              />
+            </svg>
+            <h2
+              class="text-lg font-semibold text-slate-700 dark:text-slate-100"
+            >
+              Nismo pronašli proizvode za izabrane filtere
+            </h2>
+            <p class="text-sm">
+              Probajte da proširite kriterijume pretrage ili resetujte filtere
+              da biste videli kompletnu ponudu.
+            </p>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              @click="resetFilters"
+            >
+              Resetuj filtere
+            </button>
           </div>
         </div>
-        <button
-          type="submit"
-          class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Pretraži
-        </button>
-        <NuxtLink
-          v-if="
-            session.getTokenData?.role == 'Admin' ||
-            session.getTokenData?.role == 'Manager'
-          "
-          to="/products/create"
-          class="mt-4 grid w-full place-items-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-          >Dodaj novi proizvod</NuxtLink
-        >
-      </form>
-    </aside>
-    <section class="w-full">
-      <div
-        v-if="catalogStore.catalog?.length == 0"
-        class="grid w-full place-items-center gap-4 text-center text-slate-500"
-      >
-        <svg
-          class="w-40"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            clip-rule="evenodd"
-            fill-rule="evenodd"
-            d="M5.965 4.904l9.131 9.131a6.5 6.5 0 00-9.131-9.131zm8.07 10.192L4.904 5.965a6.5 6.5 0 009.131 9.131zM4.343 4.343a8 8 0 1111.314 11.314A8 8 0 014.343 4.343z"
-          ></path>
-        </svg>
-        <h1 class="text-2xl">Traženi proizvodi trenutno nisu dostupni</h1>
-      </div>
-      <div v-else class="grid w-full grid-cols-2 gap-4 lg:grid-cols-3">
-        <ProductCartSkeleton
-          v-if="catalogStore.catalog == null"
-          v-for="product in [...Array(3).keys()]"
-          :key="product"
-        />
-        <ProductCard
-          v-for="product in catalogStore.catalog"
-          :key="product.id"
-          :product="product"
-        />
-      </div>
 
-      <nav
-        v-if="catalogStore.getCatalogMeta?.totalPages"
-        class="mt-8 grid place-items-center"
-        aria-label="Catalog pagination"
-      >
-        <ul class="inline-flex items-center -space-x-px">
-          <li>
+        <div v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ProductCard
+            v-for="product in products"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+
+        <nav
+          v-if="totalPages > 1"
+          class="flex flex-wrap items-center justify-between gap-4"
+        >
+          <div class="text-sm text-slate-500 dark:text-slate-400">
+            Strana {{ pagination.page }} od {{ totalPages }}
+          </div>
+          <div class="flex items-center gap-2">
             <button
-              :disabled="queryParams.page == 1"
               type="button"
-              @click="paginate(1)"
-              class="ml-0 block rounded-l-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+              class="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-200 dark:focus:ring-blue-500"
+              :disabled="pagination.page === 1"
+              @click="goToPage(pagination.page - 1)"
             >
-              <span class="sr-only">Previous</span>
-              <svg
-                aria-hidden="true"
-                class="h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
+              Prethodna
             </button>
-          </li>
-          <li
-            v-for="page in [
-              ...Array(catalogStore.getCatalogMeta?.totalPages || 1).keys(),
-            ]"
-          >
             <button
+              v-for="page in pages"
+              :key="`page-${page}`"
               type="button"
-              @click="paginate(page + 1)"
-              :current-page="
-                (route.query.page?.valueOf() == null && page == 0) ||
-                page + 1 == route.query.page?.valueOf()
-                  ? true
-                  : false
+              class="rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-500"
+              :class="
+                page === pagination.page
+                  ? 'border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-500 dark:bg-blue-900/50 dark:text-blue-200'
+                  : 'border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-200'
               "
-              class="border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+              @click="goToPage(page)"
             >
-              {{ page + 1 }}
+              {{ page }}
             </button>
-          </li>
-          <li>
             <button
-              :disabled="
-                queryParams.page == catalogStore.getCatalogMeta?.totalPages
-              "
               type="button"
-              @click="paginate(catalogStore.getCatalogMeta?.totalPages)"
-              class="block rounded-r-lg border border-slate-300 bg-white px-3 py-2 leading-tight text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+              class="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 dark:border-slate-700 dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-200 dark:focus:ring-blue-500"
+              :disabled="pagination.page === totalPages"
+              @click="goToPage(pagination.page + 1)"
             >
-              <span class="sr-only">Next</span>
-              <svg
-                aria-hidden="true"
-                class="h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
+              Sledeća
             </button>
-          </li>
-        </ul>
-      </nav>
+          </div>
+        </nav>
+      </section>
     </section>
   </div>
 </template>
-
-<style scoped>
-[aria-label="Catalog pagination"] ul li {
-  display: flex;
-}
-button[current-page="true"] {
-  @apply bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-white;
-}
-</style>

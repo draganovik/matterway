@@ -63,7 +63,7 @@ const productLink = computed(() => `/products/${props.product.id}`);
       </span>
       <img
         v-if="heroImage"
-        class="h-full w-full object-cover transition duration-300 hover:scale-105"
+        class="h-full w-full object-cover transition duration-300"
         :src="heroImage.imageUrl"
         :alt="heroImage.imageAlt || product.title"
       />
