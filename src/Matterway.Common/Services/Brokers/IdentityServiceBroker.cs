@@ -13,7 +13,7 @@ public class IdentityServiceBroker : IIdentityServiceBroker
 
     public async Task<ClaimsPrincipal?> ValidateTokenAsync(string token)
     {
-        // call an Introspect endpoint on Identity.Api to check if Token is valid
+        // call an Introspect endpoint on Matterway.Identity.Api to check if Token is valid
         // token should be passed in as Bearer token
         // if token is valid, user claims should be returned
         // if token is invalid, Unauthorized should be thrown

@@ -33,7 +33,7 @@ var paymentsDb = sqlServer.AddDatabase("PaymentsDb");
 var orderingDb = sqlServer.AddDatabase("OrderingDb");
 
 // Setup Identity API
-var identityApi = builder.AddProject<Identity_Api>("identity-api")
+var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")
     .WithReference(identityDb)
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
@@ -50,7 +50,7 @@ identityApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Catalog API
-var catalogApi = builder.AddProject<Catalog_Api>("catalog-api")
+var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
     .WithReference(catalogDb)
     .WithReference(identityApi)
     .WithExternalHttpEndpoints()
@@ -66,7 +66,7 @@ catalogApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Customers API
-var customersApi = builder.AddProject<Customers_Api>("customers-api")
+var customersApi = builder.AddProject<Matterway_Customers_Api>("customers-api")
     .WithReference(customersDb)
     .WithReference(identityApi)
     .WithReference(catalogApi)
@@ -83,7 +83,7 @@ customersApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Inventory API
-var inventoryApi = builder.AddProject<Inventory_Api>("inventory-api")
+var inventoryApi = builder.AddProject<Matterway_Inventory_Api>("inventory-api")
     .WithReference(identityApi)
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
@@ -98,7 +98,7 @@ inventoryApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Ordering API
-var orderingApi = builder.AddProject<Ordering_Api>("ordering-api")
+var orderingApi = builder.AddProject<Matterway_Ordering_Api>("ordering-api")
     .WithReference(orderingDb)
     .WithReference(identityApi)
     .WithReference(catalogApi)
@@ -116,7 +116,7 @@ orderingApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Payments API
-var paymentsApi = builder.AddProject<Payments_Api>("payments-api")
+var paymentsApi = builder.AddProject<Matterway_Payments_Api>("payments-api")
     .WithReference(paymentsDb)
     .WithReference(identityApi)
     .WithExternalHttpEndpoints()
@@ -132,7 +132,7 @@ paymentsApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Storefront Web Application
-var storefront = builder.AddNpmApp("storefront-web", "../Storefront.Web")
+var storefront = builder.AddNpmApp("storefront-web", "../Matterway.Storefront.Web")
     // server-only URLS, called from server-side code (inside the docker network)
     .WithEnvironment("NUXT_SERVER_ORDERING_API_BASE_URL", orderingApi.GetEndpoint("http"))
     .WithEnvironment("NUXT_SERVER_PAYMENTS_API_BASE_URL", paymentsApi.GetEndpoint("http"))

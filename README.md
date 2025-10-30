@@ -91,7 +91,7 @@ cd Matterway
 dotnet restore Matterway.sln
 
 # install frontend dependencies
-cd src/Storefront.Web
+cd src/Matterway.Storefront.Web
 npm install
 cd ../..
 ```
@@ -119,7 +119,7 @@ src/
 ├─ Ordering.Api/       # Order orchestration
 ├─ Payments.Api/       # Payments & Stripe integration
 ├─ Matterway.Common/  # Shared contracts, brokers, helpers
-└─ Storefront.Web/     # Nuxt storefront
+└─ Matterway.Storefront.Web/     # Nuxt storefront
 scripts/               # Migration & database automation (sh/cmd)
 docker-compose.yml     # Multi-service orchestration
 ```
@@ -136,7 +136,7 @@ docker-compose.yml     # Multi-service orchestration
 | Inventory.Api    | 2004 | Stock levels, warehouse sync (stub for expansion) |
 | Ordering.Api     | 2005 | Order processing, order history, addresses |
 | Payments.Api     | 2006 | Payment intents, Stripe webhook processing |
-| Storefront.Web   | 3001 | Nuxt storefront (SSR build) |
+| Matterway.Storefront.Web   | 3001 | Nuxt storefront (SSR build) |
 
 Each service ships with dedicated features (endpoints, mapping profiles, repositories) following a consistent folder structure.
 

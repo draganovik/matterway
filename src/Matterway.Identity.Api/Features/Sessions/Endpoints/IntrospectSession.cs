@@ -1,0 +1,51 @@
+using Asp.Versioning;
+using AutoMapper;
+using Matterway.Common.Abstractions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Security.Claims;
+using Matterway.Identity.Api.Features.Sessions.Contracts;
+using Matterway.Identity.Api.Features.Sessions.Data;
+
+namespace Matterway.Identity.Api.Features.Sessions.Endpoints;
+
+public class IntrospectSession : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("Sessions/introspect", Handler)
+            .WithName("IntrospectSession").WithSummary("Introspect session token.")
+            .WithTags("Sessions")
+            .Produces<SessionBaseResponse>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization()
+            .MapToApiVersion(new ApiVersion(1, 0));
+    }
+
+    private static async Task<Results<Ok<SessionBaseResponse>, UnauthorizedHttpResult>> Handler(
+        HttpContext context,
+        ISessionRepository sessionRepository,
+        IMapper mapper)
+    {
+        var identity = context.User.Identity as ClaimsIdentity;
+
+        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var token = await context.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(token))
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        var currentSession = await sessionRepository.GetByToken(token);
+        if (currentSession is null || currentSession.SystemUserId != systemUserId)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        return TypedResults.Ok(mapper.Map<SessionBaseResponse>(currentSession));
+    }
+}
