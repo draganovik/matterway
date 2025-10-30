@@ -3,7 +3,7 @@ using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Contracts;
 using Catalog.Api.Features.ProductImages.Mapping;
 using Catalog.Api.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;

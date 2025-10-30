@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Common.Infrastructure.Extensions;
+using Matterway.Common.Extensions;
 using Scalar.AspNetCore;
 
 namespace Catalog.Api.Extensions;

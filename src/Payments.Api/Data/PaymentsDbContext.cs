@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Payments.Api.Features.Payments.Domain;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Payments.Api.Data;
 

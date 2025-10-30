@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Http;
-using Common.Infrastructure.Pagination;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
+using Matterway.Common.Http;
+using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Ordering.Api.Features.Addresses.Contracts;
 using Ordering.Api.Features.Addresses.Data;

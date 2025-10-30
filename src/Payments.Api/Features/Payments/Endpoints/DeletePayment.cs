@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Payments.Api.Features.Payments.Data;
 using Payments.Api.Features.Payments.Domain;

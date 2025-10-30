@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Catalog.Api.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Pagination;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.Products.Query;

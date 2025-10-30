@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Catalog.Api.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.Products.Delete;

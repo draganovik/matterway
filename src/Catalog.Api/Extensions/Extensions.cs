@@ -2,8 +2,8 @@ using System.Text.Json.Serialization;
 using Catalog.Api.Infrastructure.Abstractions;
 using Catalog.Api.Infrastructure.Persistence;
 using Catalog.Api.Infrastructure.Repositories;
-using Common.Infrastructure.Extensions;
-using Common.Infrastructure.Services.Brokers;
+using Matterway.Common.Extensions;
+using Matterway.Common.Services.Brokers;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 

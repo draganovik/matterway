@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Api", "src\Invent
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{D0CF30CA-7702-4469-BA16-595A8775BE13}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.Infrastructure", "src\Common.Infrastructure\Common.Infrastructure.shproj", "{4549DB7E-893D-4010-BC0E-C7D3F01923B5}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Matterway.Common", "src\Matterway.Common\Matterway.Common.shproj", "{4549DB7E-893D-4010-BC0E-C7D3F01923B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payments.Api", "src\Payments.Api\Payments.Api.csproj", "{07F5FEB4-69A7-4937-9189-EDCB7AA5A607}"
 EndProject
@@ -77,12 +77,12 @@ Global
 		SolutionGuid = {8816C948-94CF-491F-B427-7E5018A97F68}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{07f5feb4-69a7-4937-9189-edcb7aa5a607}*SharedItemsImports = 5
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{3b1b1fb7-7b20-4d3d-8a91-065516a4c961}*SharedItemsImports = 5
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{4549db7e-893d-4010-bc0e-c7d3f01923b5}*SharedItemsImports = 13
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{466fc858-72d2-463d-a28f-821975caaadb}*SharedItemsImports = 5
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{abe2b1d2-06d6-4d42-8163-0e83190b60de}*SharedItemsImports = 5
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{e33abbb8-19fa-451e-a7ca-3f4b8dd731b8}*SharedItemsImports = 5
-		src\Common.Infrastructure\Common.Infrastructure.projitems*{e3c3541a-6e43-4f14-ab8b-b8db33f7b73f}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{07f5feb4-69a7-4937-9189-edcb7aa5a607}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{3b1b1fb7-7b20-4d3d-8a91-065516a4c961}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{4549db7e-893d-4010-bc0e-c7d3f01923b5}*SharedItemsImports = 13
+		src\Matterway.Common\Matterway.Common.projitems*{466fc858-72d2-463d-a28f-821975caaadb}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{abe2b1d2-06d6-4d42-8163-0e83190b60de}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{e33abbb8-19fa-451e-a7ca-3f4b8dd731b8}*SharedItemsImports = 5
+		src\Matterway.Common\Matterway.Common.projitems*{e3c3541a-6e43-4f14-ab8b-b8db33f7b73f}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

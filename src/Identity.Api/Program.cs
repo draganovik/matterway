@@ -1,4 +1,4 @@
-using Common.Infrastructure.Extensions;
+using Matterway.Common.Extensions;
 using Identity.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions

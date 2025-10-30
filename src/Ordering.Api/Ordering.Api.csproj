@@ -33,6 +33,6 @@
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
     </PropertyGroup>
 
-    <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
+    <Import Project="..\Matterway.Common\Matterway.Common.projitems" Label="Shared"/>
 
 </Project>

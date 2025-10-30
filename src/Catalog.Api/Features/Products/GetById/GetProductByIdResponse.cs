@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Catalog.Api.Features.Products.GetById;
 

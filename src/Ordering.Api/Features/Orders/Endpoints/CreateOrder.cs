@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Http;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Api.Features.Orders.Contracts;

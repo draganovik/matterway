@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using Catalog.Api.Infrastructure.Abstractions;
-using Common.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Catalog.Api.Features.Products.GetById;

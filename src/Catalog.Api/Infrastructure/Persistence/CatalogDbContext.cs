@@ -1,5 +1,5 @@
 ﻿using Catalog.Api.Domain;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Infrastructure.Persistence;

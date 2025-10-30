@@ -1,5 +1,5 @@
 ﻿using Catalog.Api.Extensions;
-using Common.Infrastructure.Extensions;
+using Matterway.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {

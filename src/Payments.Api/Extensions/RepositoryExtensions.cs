@@ -1,5 +1,5 @@
-using Common.Infrastructure.Extensions;
-using Common.Infrastructure.Services.Brokers;
+using Matterway.Common.Extensions;
+using Matterway.Common.Services.Brokers;
 using Payments.Api.Features.Payments.Data;
 
 namespace Payments.Api.Extensions;

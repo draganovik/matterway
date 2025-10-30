@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Catalog.Api.Domain;
 

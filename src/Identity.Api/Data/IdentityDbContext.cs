@@ -1,7 +1,7 @@
 ﻿using Identity.Api.Features.Sessions.Domain;
 using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.EntityFrameworkCore;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Identity.Api.Data;
 

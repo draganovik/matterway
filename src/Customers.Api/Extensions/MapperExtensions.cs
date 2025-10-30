@@ -1,4 +1,4 @@
-using Common.Infrastructure.Mapping;
+using Matterway.Common.Mapping;
 
 namespace Customers.Api.Extensions;
 

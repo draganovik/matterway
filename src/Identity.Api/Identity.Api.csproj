@@ -29,6 +29,6 @@
         <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
     </ItemGroup>
 
-    <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
+    <Import Project="..\Matterway.Common\Matterway.Common.projitems" Label="Shared"/>
 
 </Project>

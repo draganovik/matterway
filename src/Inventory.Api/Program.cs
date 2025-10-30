@@ -1,6 +1,6 @@
-using Common.Infrastructure.Mapping;
-using Common.Infrastructure.Extensions;
-using Common.Infrastructure.Services.Brokers;
+using Matterway.Common.Mapping;
+using Matterway.Common.Extensions;
+using Matterway.Common.Services.Brokers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
