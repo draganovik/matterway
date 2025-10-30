@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Payments.Api.Features.Payments.Contracts;
 using Payments.Api.Features.Payments.Data;

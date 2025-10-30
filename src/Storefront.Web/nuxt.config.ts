@@ -5,13 +5,19 @@ export default defineNuxtConfig({
       titleTemplate: "%s - Matterway Web Store",
     },
   },
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false,
+    },
+  ],
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    orderingApiServerBaseUrl:
-      process.env.ORDERING_API_SERVER_BASE_URL ??
+    serverOrderingApiBaseUrl:
+      process.env.SERVER_ORDERING_API_BASE_URL ??
       process.env.ORDERING_API_BASE_URL,
-    paymentsApiServerBaseUrl:
-      process.env.PAYMENTS_API_SERVER_BASE_URL ??
+    serverPaymentsApiBaseUrl:
+      process.env.SERVER_PAYMENTS_API_BASE_URL ??
       process.env.PAYMENTS_API_BASE_URL,
     public: {
       appDomain: "localhost",

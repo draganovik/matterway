@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.CartItems.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;

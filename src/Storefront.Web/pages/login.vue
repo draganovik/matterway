@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { useSessionStore } from "~/store/session";
+import { useSessionStore } from "~/stores/session";
+import LoginModel from "~/models/LoginModel";
 
 useHead({
   title: "Prijava",

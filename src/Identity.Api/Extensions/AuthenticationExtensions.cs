@@ -50,7 +50,7 @@ public static class AuthenticationExtensions
                             return;
                         }
 
-                        var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDbContext>();
+                        var dbContext = context.HttpContext.RequestServices.GetRequiredService<IdentityDb>();
                         var sessionExists = await dbContext.Session
                             .AsNoTracking()
                             .AnyAsync(s => s.Token == jwtToken.EncodedToken,

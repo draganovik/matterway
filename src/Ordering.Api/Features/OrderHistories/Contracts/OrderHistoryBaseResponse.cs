@@ -1,4 +1,4 @@
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 using System.Text.Json.Serialization;
 
 namespace Ordering.Api.Features.OrderHistories.Contracts;

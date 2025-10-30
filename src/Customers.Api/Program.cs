@@ -1,11 +1,13 @@
 ﻿using Customers.Api.Extensions;
-using Common.Infrastructure.Extensions;
+using Matterway.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
     ContentRootPath = Directory.GetCurrentDirectory()
 });
+
+builder.AddServiceDefaults();
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -33,6 +35,8 @@ builder.Services.AddValidation();
 builder.Services.ConfigureCors();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();

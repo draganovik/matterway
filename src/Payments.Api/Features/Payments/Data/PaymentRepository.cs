@@ -7,9 +7,9 @@ namespace Payments.Api.Features.Payments.Data;
 
 public class PaymentRepository : IPaymentRepository
 {
-    private readonly PaymentsDbContext context;
+    private readonly PaymentsDb context;
 
-    public PaymentRepository(PaymentsDbContext context)
+    public PaymentRepository(PaymentsDb context)
     {
         this.context = context;
     }

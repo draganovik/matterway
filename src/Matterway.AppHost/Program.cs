@@ -1,0 +1,154 @@
+using Projects;
+
+var builder = DistributedApplication.CreateBuilder(args);
+
+builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options =>
+{
+    options.WithHostPort(18888);
+    options.WithContainerName("aspire-dashboard");
+});
+
+var sqlServerPassword = builder.AddParameter("SqlServerPassword", secret: true);
+var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
+
+
+// Setup SQL Server container with databases
+#pragma warning disable ASPIREPROXYENDPOINTS001
+var sqlServer = builder.AddSqlServer("sql-server")
+    .WithEndpointProxySupport(false)
+    .WithHostPort(1401)
+#pragma warning restore ASPIREPROXYENDPOINTS001
+    .WithPassword(sqlServerPassword)
+    .WithDataVolume()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["1401:1433"];
+    });
+
+var catalogDb = sqlServer.AddDatabase("CatalogDb");
+var customersDb = sqlServer.AddDatabase("CustomersDb");
+var identityDb = sqlServer.AddDatabase("IdentityDb");
+var paymentsDb = sqlServer.AddDatabase("PaymentsDb");
+var orderingDb = sqlServer.AddDatabase("OrderingDb");
+
+// Setup Identity API
+var identityApi = builder.AddProject<Identity_Api>("identity-api")
+    .WithReference(identityDb)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2003:8080"];
+    });
+
+var identityEndpoint = identityApi.GetEndpoint("http");
+
+identityApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Catalog API
+var catalogApi = builder.AddProject<Catalog_Api>("catalog-api")
+    .WithReference(catalogDb)
+    .WithReference(identityApi)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2001:8080"];
+    });
+
+catalogApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Customers API
+var customersApi = builder.AddProject<Customers_Api>("customers-api")
+    .WithReference(customersDb)
+    .WithReference(identityApi)
+    .WithReference(catalogApi)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2002:8080"];
+    });
+
+customersApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Inventory API
+var inventoryApi = builder.AddProject<Inventory_Api>("inventory-api")
+    .WithReference(identityApi)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2004:8080"];
+    });
+
+inventoryApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Ordering API
+var orderingApi = builder.AddProject<Ordering_Api>("ordering-api")
+    .WithReference(orderingDb)
+    .WithReference(identityApi)
+    .WithReference(catalogApi)
+    .WithReference(customersApi)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2005:8080"];
+    });
+
+orderingApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Payments API
+var paymentsApi = builder.AddProject<Payments_Api>("payments-api")
+    .WithReference(paymentsDb)
+    .WithReference(identityApi)
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["2006:8080"];
+    });
+
+paymentsApi
+    .WithEnvironment("Jwt__Key", jwtSigningKey)
+    .WithEnvironment("Jwt__Issuer", identityEndpoint)
+    .WithEnvironment("Jwt__Audience", identityEndpoint);
+
+// Setup Storefront Web Application
+var storefront = builder.AddNpmApp("storefront-web", "../Storefront.Web")
+    // server-only URLS, called from server-side code (inside the docker network)
+    .WithEnvironment("NUXT_SERVER_ORDERING_API_BASE_URL", orderingApi.GetEndpoint("http"))
+    .WithEnvironment("NUXT_SERVER_PAYMENTS_API_BASE_URL", paymentsApi.GetEndpoint("http"))
+    .WaitFor(catalogApi)
+    .WithHttpEndpoint(port: 3001, targetPort: 3000, name: "http")
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerFile()
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+
+// Reference storefront in apis for CORS setup
+catalogApi.WithReference(storefront);
+customersApi.WithReference(storefront);
+identityApi.WithReference(storefront);
+orderingApi.WithReference(storefront);
+paymentsApi.WithReference(storefront);
+inventoryApi.WithReference(storefront);
+
+// Run the application
+builder.Build().Run();

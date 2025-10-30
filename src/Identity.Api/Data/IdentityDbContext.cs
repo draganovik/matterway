@@ -1,13 +1,13 @@
 ﻿using Identity.Api.Features.Sessions.Domain;
 using Identity.Api.Features.SystemUsers.Domain;
 using Microsoft.EntityFrameworkCore;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Identity.Api.Data;
 
-public class IdentityDbContext : DbContext
+public class IdentityDb : DbContext
 {
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
+    public IdentityDb(DbContextOptions<IdentityDb> options)
         : base(options)
     {
     }

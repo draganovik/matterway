@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+        <HasSharedItems>true</HasSharedItems>
+        <SharedGUID>4549db7e-893d-4010-bc0e-c7d3f01923b5</SharedGUID>
+    </PropertyGroup>
+    <PropertyGroup Label="Configuration">
+        <Import_RootNamespace>Matterway.Common</Import_RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="$(MSBuildThisFileDirectory)Enums\DetailType.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Enums\PaymentState.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Extensions\EndpointRegistrationExtensions.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Extensions\ServiceDiscoveryExtensions.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IEndpoint.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Models\Customer.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Http\ApiResourceUriBuilder.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Pagination\PaginationResponse.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Pagination\PagingQueryParams.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CatalogServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CustomersServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\ICatalogServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\ICustomersServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\IdentityServiceBroker.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\IIdentityServiceBroker.cs"/>
+    </ItemGroup>
+</Project>

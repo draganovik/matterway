@@ -6,9 +6,9 @@ namespace Customers.Api.Features.CartItems.Data;
 
 public class CartItemRepository : ICartItemRepository
 {
-    private readonly CustomersDbContext context;
+    private readonly CustomersDb context;
 
-    public CartItemRepository(CustomersDbContext context)
+    public CartItemRepository(CustomersDb context)
     {
         this.context = context;
     }

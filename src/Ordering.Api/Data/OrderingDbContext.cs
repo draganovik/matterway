@@ -3,13 +3,13 @@ using Ordering.Api.Features.Addresses.Domain;
 using Ordering.Api.Features.OrderHistories.Domain;
 using Ordering.Api.Features.OrderItems.Domain;
 using Ordering.Api.Features.Orders.Domain;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Ordering.Api.Data;
 
-public class OrderingDbContext : DbContext
+public class OrderingDb : DbContext
 {
-    public OrderingDbContext(DbContextOptions<OrderingDbContext> options)
+    public OrderingDb(DbContextOptions<OrderingDb> options)
         : base(options)
     {
     }

@@ -7,7 +7,6 @@
         <UserSecretsId>5d200810-08b7-4aab-bfca-0d7f6584f6fb</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..\</DockerfileContext>
-        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,10 +25,14 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.9.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
+    </ItemGroup>
+
     <PropertyGroup>
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
     </PropertyGroup>
 
-    <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
+    <Import Project="..\Matterway.Common\Matterway.Common.projitems" Label="Shared"/>
 
 </Project>

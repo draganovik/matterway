@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
 using Identity.Api.Features.Sessions.Contracts;
 using Identity.Api.Features.Sessions.Data;
 using Identity.Api.Features.Sessions.Domain;

@@ -8,10 +8,10 @@ namespace Identity.Api.Features.SystemUsers.Data;
 
 public class SystemUserRepository : ISystemUserRepository
 {
-    private readonly IdentityDbContext _context;
+    private readonly IdentityDb _context;
     private readonly IPasswordHasher<SystemUser> _passwordHasher;
 
-    public SystemUserRepository(IdentityDbContext context, IPasswordHasher<SystemUser> passwordHasher)
+    public SystemUserRepository(IdentityDb context, IPasswordHasher<SystemUser> passwordHasher)
     {
         _context = context;
         _passwordHasher = passwordHasher;

@@ -11,16 +11,16 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
 
 ## Table of Contents
 
-1. [Highlights](#highlights)  
-2. [System Architecture](#system-architecture)  
-3. [Technology Stack](#technology-stack)  
-4. [Getting Started](#getting-started)  
-5. [Project Structure](#project-structure)  
-6. [Service Catalog](#service-catalog)  
-7. [Database & Migrations](#database--migrations)  
-8. [Developer Tooling](#developer-tooling)  
-9. [Contributing](#contributing)  
-10. [License](#license)  
+1. [Highlights](#highlights)
+2. [System Architecture](#system-architecture)
+3. [Technology Stack](#technology-stack)
+4. [Getting Started](#getting-started)
+5. [Project Structure](#project-structure)
+6. [Service Catalog](#service-catalog)
+7. [Database & Migrations](#database--migrations)
+8. [Developer Tooling](#developer-tooling)
+9. [Contributing](#contributing)
+10. [License](#license)
 
 ---
 
@@ -29,7 +29,7 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
 - **Composable Storefront** – Built with Nuxt 3, Pinia, Tailwind, and Flowbite for a fast, responsive shopping experience.
 - **Domain-Driven Services** – Each core capability (catalog, customers, ordering, identity, payments, inventory) is isolated in its own .NET service.
 - **Modern API Surface** – ASP.NET Minimal APIs, versioned endpoints, Swagger/Scalar documentation, and structured pagination utilities.
-- **Secure & Extensible** – Centralized identity service with JWT auth, shared infrastructure SDK (`Common.Infrastructure`), and Stripe checkout integration.
+- **Secure & Extensible** – Centralized identity service with JWT auth, shared infrastructure SDK (`Matterway.Common`), and Stripe checkout integration.
 - **Developer-Friendly** – Docker-first workflow, database provisioning scripts, and consistent naming conventions across the stack.
 
 ---
@@ -52,7 +52,7 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
                               SQL Server (dockerized)
 ```
 
-Shared cross-cutting concerns are packaged inside `Common.Infrastructure` and imported by each service.
+Shared cross-cutting concerns are packaged inside `Matterway.Common` and imported by each service.
 
 ---
 
@@ -118,7 +118,7 @@ src/
 ├─ Inventory.Api/      # Inventory tracking
 ├─ Ordering.Api/       # Order orchestration
 ├─ Payments.Api/       # Payments & Stripe integration
-├─ Common.Infrastructure/  # Shared contracts, brokers, helpers
+├─ Matterway.Common/  # Shared contracts, brokers, helpers
 └─ Storefront.Web/     # Nuxt storefront
 scripts/               # Migration & database automation (sh/cmd)
 docker-compose.yml     # Multi-service orchestration
@@ -170,7 +170,7 @@ On Windows run the matching `.cmd` files. Each script iterates over `src/*.Api` 
 - **Code Quality**: Prettier for the frontend, dotnet format recommended for APIs.
 - **API Documentation**: Swagger/Scalar is auto-registered; run any service and browse `/swagger`.
 - **Testing (roadmap)**: Unit/integration test harnesses will be staged as the domain stabilizes.
-- **Conventions**: Services share DTOs/helpers via `Common.Infrastructure`. Keep shared logic in that library to avoid duplication.
+- **Conventions**: Services share DTOs/helpers via `Matterway.Common`. Keep shared logic in that library to avoid duplication.
 
 ---
 

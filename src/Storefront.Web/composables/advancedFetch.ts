@@ -1,4 +1,4 @@
-import { useSessionStore } from "~/store/session";
+import { useSessionStore } from "~/stores/session";
 
 function baseOptions(token: string): RequestInit {
   return {
@@ -28,7 +28,6 @@ export async function request(
     currentSession.refreshToken();
   }
 
-  console.log(options);
   const response = await fetch(url, options);
 
   if (response.ok) {

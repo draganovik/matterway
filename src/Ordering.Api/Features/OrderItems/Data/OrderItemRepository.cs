@@ -6,9 +6,9 @@ namespace Ordering.Api.Features.OrderItems.Data;
 
 public class OrderItemRepository : IOrderItemRepository
 {
-    private readonly OrderingDbContext context;
+    private readonly OrderingDb context;
 
-    public OrderItemRepository(OrderingDbContext context)
+    public OrderItemRepository(OrderingDb context)
     {
         this.context = context;
     }

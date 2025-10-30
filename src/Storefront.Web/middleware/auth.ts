@@ -1,4 +1,4 @@
-import { useSessionStore } from "~/store/session";
+import { useSessionStore } from "~/stores/session";
 
 export default defineNuxtRouteMiddleware((to, from) => {
   const sessionData = useSessionStore();

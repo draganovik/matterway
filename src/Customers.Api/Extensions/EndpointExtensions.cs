@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Common.Infrastructure.Extensions;
+using Matterway.Common.Extensions;
 
 namespace Customers.Api.Extensions;
 

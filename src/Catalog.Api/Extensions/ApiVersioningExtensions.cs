@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using Matterway.Common.Extensions;
+using Scalar.AspNetCore;
 
 namespace Catalog.Api.Extensions;
 
@@ -20,5 +22,33 @@ public static class ApiVersioningExtensions
             });
 
         return services;
+    }
+
+    public static WebApplication ApplyEndpoints(this WebApplication app)
+    {
+        var versionSet = app.NewApiVersionSet()
+            .HasApiVersion(new ApiVersion(1, 0))
+            .ReportApiVersions()
+            .Build();
+
+        var apiGroup = app.MapGroup("/api");
+        var versionedGroup = apiGroup
+            .MapGroup("/v{version:apiVersion}")
+            .WithApiVersionSet(versionSet);
+
+        app.MapEndpoints(versionedGroup);
+
+        return app;
+    }
+
+    public static WebApplication ApplyScalar(this WebApplication app)
+    {
+        app.MapScalarApiReference("/", options =>
+        {
+            options.WithOpenApiRoutePattern("/openapi/{documentName}.yaml");
+            options.WithTitle("Matterway Catalog API");
+        });
+
+        return app;
     }
 }

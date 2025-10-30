@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Customers.Api.Data;
 
-public class CustomersDbContext : DbContext
+public class CustomersDb : DbContext
 {
-    public CustomersDbContext(DbContextOptions<CustomersDbContext> options)
+    public CustomersDb(DbContextOptions<CustomersDb> options)
         : base(options)
     {
     }

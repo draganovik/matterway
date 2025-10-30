@@ -7,9 +7,9 @@ namespace Customers.Api.Features.Customers.Data;
 
 public class CustomerRepository : ICustomerRepository
 {
-    private readonly CustomersDbContext context;
+    private readonly CustomersDb context;
 
-    public CustomerRepository(CustomersDbContext context)
+    public CustomerRepository(CustomersDb context)
     {
         this.context = context;
     }

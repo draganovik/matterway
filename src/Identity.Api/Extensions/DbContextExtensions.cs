@@ -7,10 +7,10 @@ public static class DbContextExtensions
 {
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<IdentityDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("IdentityDbContext")
+        services.AddDbContext<IdentityDb>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("IdentityDb")
                                  ?? throw new InvalidOperationException(
-                                     "Connection string 'IdentityDbContext' not found.")));
+                                     "Connection string 'IdentityDb' not found.")));
 
         return services;
     }

@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
 using Customers.Api.Features.Customers.Contracts;
 using Customers.Api.Features.Customers.Data;
 using Customers.Api.Features.Customers.Domain;

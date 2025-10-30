@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Common.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
 using Identity.Api.Features.Sessions.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;

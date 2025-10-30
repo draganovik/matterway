@@ -1,18 +1,17 @@
-using Common.Infrastructure.Services.Brokers;
+using System.Security.Claims;
+using System.Text;
+using Matterway.Common.Services.Brokers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
 
 namespace Catalog.Api.Extensions;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services,
-        IConfiguration configuration)
+    public static void ConfigureAuthentication(this IHostApplicationBuilder builder)
     {
-        services.AddAuthentication(options =>
+        builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -22,7 +21,7 @@ public static class AuthenticationExtensions
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                var signingKey = configuration["Jwt:Key"]
+                var signingKey = builder.Configuration["Jwt:Key"]
                                  ?? throw new InvalidOperationException("JWT signing key not configured.");
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -52,7 +51,6 @@ public static class AuthenticationExtensions
                     }
                 };
             });
-        services.AddAuthorization();
-        return services;
+        builder.Services.AddAuthorization();
     }
 }

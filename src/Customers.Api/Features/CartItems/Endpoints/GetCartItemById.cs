@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using AutoMapper;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
 using Customers.Api.Features.CartItems.Contracts;
 using Customers.Api.Features.CartItems.Data;
 using Customers.Api.Features.CartItems.Domain;

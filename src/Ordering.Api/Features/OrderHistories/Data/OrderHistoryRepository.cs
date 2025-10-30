@@ -7,9 +7,9 @@ namespace Ordering.Api.Features.OrderHistories.Data;
 
 public class OrderHistoryRepository : IOrderHistoryRepository
 {
-    private readonly OrderingDbContext context;
+    private readonly OrderingDb context;
 
-    public OrderHistoryRepository(OrderingDbContext context)
+    public OrderHistoryRepository(OrderingDb context)
     {
         this.context = context;
     }

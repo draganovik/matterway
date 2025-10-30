@@ -1,15 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using AutoMapper;
+using Catalog.Api.Domain;
 using Catalog.Api.Features.ProductImages.Contracts;
-using Catalog.Api.Features.ProductImages.Data;
-using Catalog.Api.Features.ProductImages.Domain;
-using Common.Infrastructure.Abstractions;
-using Common.Infrastructure.Enums;
-using Common.Infrastructure.Http;
-using Common.Infrastructure.Pagination;
+using Catalog.Api.Features.ProductImages.Mapping;
+using Catalog.Api.Infrastructure.Abstractions;
+using Matterway.Common.Abstractions;
+using Matterway.Common.Enums;
+using Matterway.Common.Http;
+using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Api.Features.ProductImages.Endpoints;
 
@@ -20,7 +20,7 @@ public class QueryProductImages : IEndpoint
         app.MapGet("ProductImages", Handler)
             .WithName("QueryProductImages").WithSummary("Query ProductImages.")
             .WithTags(nameof(ProductImage))
-            .Produces<PaginationResponse<ProductImageBaseResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<ProductImageBaseResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -35,32 +35,15 @@ public class QueryProductImages : IEndpoint
             [FromQuery] [Range(1, int.MaxValue)]
             int pageSize,
             HttpContext httpContext,
-            IProductImageRepository productImageRepository,
-            IMapper mapper)
+            IProductImageRepository productImageRepository)
     {
-        if (page < 1 || pageSize < 1)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Invalid page or pageSize.",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Page and pageSize must be greater than zero."
-            };
-            var results = new List<ValidationResult>();
-            if (page < 1) results.Add(new ValidationResult("Page must be greater than zero.", [nameof(page)]));
-            if (pageSize < 1)
-                results.Add(new ValidationResult("PageSize must be greater than zero.", [nameof(pageSize)]));
-
-            problemDetails.Extensions.Add("errors", mapper.Map<Dictionary<string, string>>(results));
-            return TypedResults.BadRequest(problemDetails);
-        }
-
         var total = await productImageRepository.GetTotalEntities();
         var entities = await productImageRepository.Query(page, pageSize);
         var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "ProductImages");
 
         var paginationResponse = new PaginationResponse<ProductImageBaseResponse>(total, page, pageSize,
-            mapper.Map<IEnumerable<ProductImageBaseResponse>>(entities).ToList(), baseUri);
+            entities.Select(entity => entity.ToContract<ProductImageBaseResponse>()
+            ).ToList(), baseUri);
 
         return entities is IEnumerable<ProductImage> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

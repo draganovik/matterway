@@ -1,4 +1,4 @@
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 using Ordering.Api.Features.Orders.Domain;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;

@@ -1,7 +1,7 @@
 import { payWithStripe } from "@/services/stripeService";
 import { Console } from "console";
-import AddressModel from "~/utils/AddressModel";
-import CardPaymentModel from "~/utils/CardPaymentModel";
+import AddressModel from "~/models/AddressModel";
+import CardPaymentModel from "~/models/CardPaymentModel";
 
 const config = useRuntimeConfig();
 

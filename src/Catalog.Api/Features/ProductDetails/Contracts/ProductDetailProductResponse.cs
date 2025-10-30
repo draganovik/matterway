@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Common.Infrastructure.Enums;
+using Matterway.Common.Enums;
 
 namespace Catalog.Api.Features.ProductDetails.Contracts;
 

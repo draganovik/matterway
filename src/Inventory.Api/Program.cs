@@ -1,5 +1,6 @@
-using Common.Infrastructure.Mapping;
-using Common.Infrastructure.Services.Brokers;
+using Matterway.Common.Mapping;
+using Matterway.Common.Extensions;
+using Matterway.Common.Services.Brokers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,6 +9,8 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ValidationProfile>(); },
     AppDomain.CurrentDomain.GetAssemblies());
@@ -89,8 +92,15 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
+builder.Services.AddHttpClient<IIdentityServiceBroker, IdentityServiceBroker>((sp, client) =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    client.BaseAddress = configuration.ResolveServiceUri("identity-api", "Services:Identity:Url");
+});
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
