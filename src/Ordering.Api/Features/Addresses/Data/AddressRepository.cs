@@ -7,9 +7,9 @@ namespace Ordering.Api.Features.Addresses.Data;
 
 public class AddressRepository : IAddressRepository
 {
-    private readonly OrderingDbContext context;
+    private readonly OrderingDb context;
 
-    public AddressRepository(OrderingDbContext context)
+    public AddressRepository(OrderingDb context)
     {
         this.context = context;
     }

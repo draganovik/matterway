@@ -8,12 +8,8 @@ public class IdentityServiceBroker : IIdentityServiceBroker
 {
     private readonly HttpClient _httpClient;
 
-    public IdentityServiceBroker(IConfiguration configuration)
-    {
-        var serviceUrl = configuration["Services:Identity:Url"] ??
-                         throw new ArgumentNullException(nameof(configuration));
-        _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
-    }
+    public IdentityServiceBroker(HttpClient httpClient) =>
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public async Task<ClaimsPrincipal?> ValidateTokenAsync(string token)
     {

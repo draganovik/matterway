@@ -7,9 +7,9 @@ namespace Ordering.Api.Features.Orders.Data;
 
 public class OrderRepository : IOrderRepository
 {
-    private readonly OrderingDbContext context;
+    private readonly OrderingDb context;
 
-    public OrderRepository(OrderingDbContext context)
+    public OrderRepository(OrderingDb context)
     {
         this.context = context;
     }

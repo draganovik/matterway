@@ -4,9 +4,9 @@ using Common.Infrastructure.Enums;
 
 namespace Payments.Api.Data;
 
-public class PaymentsDbContext : DbContext
+public class PaymentsDb : DbContext
 {
-    public PaymentsDbContext(DbContextOptions<PaymentsDbContext> options)
+    public PaymentsDb(DbContextOptions<PaymentsDb> options)
         : base(options)
     {
     }

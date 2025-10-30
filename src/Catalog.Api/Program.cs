@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
+builder.AddServiceDefaults();
+
 // Configure services
 builder.ConfigureServices();
 builder.ConfigureAuthentication();
@@ -25,6 +27,8 @@ builder.Services.ConfigureOpenApi();
 builder.Services.ConfigureApiVersioning();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();

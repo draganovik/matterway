@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
+builder.AddServiceDefaults();
+
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
@@ -33,6 +35,8 @@ builder.Services.AddValidation();
 builder.Services.ConfigureCors();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();

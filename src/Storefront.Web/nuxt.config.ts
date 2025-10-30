@@ -13,10 +13,10 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    orderingApiServerBaseUrl:
+    serverOrderingApiBaseUrl:
       process.env.SERVER_ORDERING_API_BASE_URL ??
       process.env.ORDERING_API_BASE_URL,
-    paymentsApiServerBaseUrl:
+    serverPaymentsApiBaseUrl:
       process.env.SERVER_PAYMENTS_API_BASE_URL ??
       process.env.PAYMENTS_API_BASE_URL,
     public: {

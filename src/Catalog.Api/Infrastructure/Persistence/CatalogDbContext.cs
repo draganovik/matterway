@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Infrastructure.Persistence;
 
-public class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : DbContext(options)
+public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
 {
     public DbSet<ProductDetail> ProductDetail { get; set; } = default!;
 

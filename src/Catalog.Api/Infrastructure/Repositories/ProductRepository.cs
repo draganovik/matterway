@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api.Infrastructure.Repositories;
 
-public class ProductRepository(CatalogDbContext context) : IProductRepository
+public class ProductRepository(CatalogDb context) : IProductRepository
 {
     public async Task<Product?> Create(Product requestModel)
     {

@@ -7,12 +7,8 @@ public class CustomersServiceBroker : ICustomersServiceBroker
 {
     private readonly HttpClient _httpClient;
 
-    public CustomersServiceBroker(IConfiguration configuration)
-    {
-        var serviceUrl = configuration["Services:Customers:Url"] ??
-                         throw new ArgumentNullException(nameof(configuration));
-        _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
-    }
+    public CustomersServiceBroker(HttpClient httpClient) =>
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public async Task<Guid?> VerifyBySystemUserId(Guid systemUserId)
     {

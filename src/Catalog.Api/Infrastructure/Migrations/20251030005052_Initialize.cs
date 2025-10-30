@@ -1,10 +1,11 @@
-﻿#nullable disable
-
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Catalog.Api.Infrastructure.Persistence.Migrations
+namespace Catalog.Api.Migrations
 {
     /// <inheritdoc />
     public partial class Initialize : Migration

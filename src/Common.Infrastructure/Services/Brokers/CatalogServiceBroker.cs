@@ -7,12 +7,8 @@ public class CatalogServiceBroker : ICatalogServiceBroker
 {
     private readonly HttpClient _httpClient;
 
-    public CatalogServiceBroker(IConfiguration configuration)
-    {
-        var serviceUrl = configuration["Services:Catalog:Url"] ??
-                         throw new ArgumentNullException(nameof(configuration));
-        _httpClient = new HttpClient { BaseAddress = new Uri(serviceUrl) };
-    }
+    public CatalogServiceBroker(HttpClient httpClient) =>
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public async Task<Product?> GetProductById(Guid id)
     {

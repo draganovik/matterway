@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Catalog.Api.Infrastructure.Abstractions;
 using Catalog.Api.Infrastructure.Persistence;
 using Catalog.Api.Infrastructure.Repositories;
+using Common.Infrastructure.Extensions;
 using Common.Infrastructure.Services.Brokers;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,10 @@ public static class Extensions
                 reloadOnChange: true)
             .AddEnvironmentVariables();
 
-        builder.Services.AddDbContext<CatalogDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDbContext")
+        builder.Services.AddDbContext<CatalogDb>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("CatalogDb")
                                  ?? throw new InvalidOperationException(
-                                     "Connection string 'CatalogDbContext' not found.")));
+                                     "Connection string 'CatalogDb' not found.")));
 
         builder.Services.Configure<JsonOptions>(options =>
         {
@@ -39,7 +40,11 @@ public static class Extensions
             });
         });
 
-        builder.Services.AddScoped<IIdentityServiceBroker, IdentityServiceBroker>();
+        builder.Services.AddHttpClient<IIdentityServiceBroker, IdentityServiceBroker>((sp, client) =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            client.BaseAddress = configuration.ResolveServiceUri("identity-api", "Services:Identity:Url");
+        });
         builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
         builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();

@@ -26,6 +26,10 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.9.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
+    </ItemGroup>
+
     <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
 
 </Project>

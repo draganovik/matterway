@@ -5,9 +5,9 @@ using Common.Infrastructure.Enums;
 
 namespace Identity.Api.Data;
 
-public class IdentityDbContext : DbContext
+public class IdentityDb : DbContext
 {
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
+    public IdentityDb(DbContextOptions<IdentityDb> options)
         : base(options)
     {
     }

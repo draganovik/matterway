@@ -6,9 +6,9 @@ namespace Identity.Api.Features.Sessions.Data;
 
 public class SessionRepository : ISessionRepository
 {
-    private readonly IdentityDbContext _context;
+    private readonly IdentityDb _context;
 
-    public SessionRepository(IdentityDbContext context)
+    public SessionRepository(IdentityDb context)
     {
         _context = context;
     }

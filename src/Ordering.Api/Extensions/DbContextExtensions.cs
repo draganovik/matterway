@@ -7,10 +7,10 @@ public static class DbContextExtensions
 {
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<OrderingDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("OrderingDbContext") ??
+        services.AddDbContext<OrderingDb>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("OrderingDb") ??
                                  throw new InvalidOperationException(
-                                     "Connection string 'OrderingDbContext' not found.")));
+                                     "Connection string 'OrderingDb' not found.")));
 
         return services;
     }

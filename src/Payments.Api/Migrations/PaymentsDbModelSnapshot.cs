@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Payments.Api.Data;
 
@@ -11,12 +10,10 @@ using Payments.Api.Data;
 
 namespace Payments.Api.Migrations
 {
-    [DbContext(typeof(PaymentsDbContext))]
-    [Migration("20251022044816_Initialize")]
-    partial class Initialize
+    [DbContext(typeof(PaymentsDb))]
+    partial class PaymentsDbModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

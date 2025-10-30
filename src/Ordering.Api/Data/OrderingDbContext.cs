@@ -7,9 +7,9 @@ using Common.Infrastructure.Enums;
 
 namespace Ordering.Api.Data;
 
-public class OrderingDbContext : DbContext
+public class OrderingDb : DbContext
 {
-    public OrderingDbContext(DbContextOptions<OrderingDbContext> options)
+    public OrderingDb(DbContextOptions<OrderingDb> options)
         : base(options)
     {
     }

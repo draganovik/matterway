@@ -48,7 +48,7 @@ public class CreateProductImage : IEndpoint
         return TypedResults.Created(location,
             productImageModel);
     }
-    
+
     private static async Task<ProductImageBaseResponse?> ExecuteAsync(
         ProductImageBaseRequest request,
         IProductImageRepository productImageRepository)

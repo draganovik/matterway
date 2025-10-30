@@ -7,10 +7,10 @@ public static class DbContextExtensions
 {
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<PaymentsDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("PaymentsDbContext") ??
+        services.AddDbContext<PaymentsDb>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("PaymentsDb") ??
                                  throw new InvalidOperationException(
-                                     "Connection string 'PaymentsDbContext' not found.")));
+                                     "Connection string 'PaymentsDb' not found.")));
 
         return services;
     }
