@@ -12,7 +12,7 @@ public class UpdateProductByIdEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPatch("Products/{id:guid}", Handler)
-            .WithName("UpdateProductById").WithSummary("Update a Product by id.")
+            .WithName("UpdateProduct").WithSummary("Update a Product.")
             .WithTags("Products")
             .Produces<UpdateProductByIdResponse>()
             .Produces(StatusCodes.Status404NotFound)
@@ -31,7 +31,7 @@ public class UpdateProductByIdEndpoint : IEndpoint
         var entity = await productRepository.GetById(id);
         if (entity is null) return TypedResults.NotFound();
 
-        entity.ApplyUpdate(request);
+        entity.MapUpdate(request);
 
         var updated = await productRepository.UpdateAsync(entity);
 

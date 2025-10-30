@@ -5,16 +5,16 @@ using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Matterway.Catalog.Api.Features.ProductDetails.Endpoints;
+namespace Matterway.Catalog.Api.Features.ProductDetails.Remove;
 
-public class DeleteProductDetail : IEndpoint
+public class DeleteProductDetailEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("ProductDetails/{id:guid}", Handler)
-            .WithName("DeleteProductDetail").WithSummary("Delete a ProductDetail by id.")
+            .WithName("DeleteProductDetail").WithSummary("Delete a ProductDetail.")
             .WithTags(nameof(ProductDetail))
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
@@ -22,11 +22,19 @@ public class DeleteProductDetail : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<NoContent, NotFound>> Handler(
+    private static async Task<Results<Ok<RemoveProductDetailResponse>, NotFound>> Handler(
         Guid id,
         IProductDetailRepository productDetailRepository)
     {
+        var entity = await productDetailRepository.GetById(id);
+
+        if (entity is null)
+        {
+            return TypedResults.NotFound();
+        }
+
         var isDeleted = await productDetailRepository.Delete(id);
-        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
+
+        return isDeleted ? TypedResults.Ok(entity.ToResponse()) : TypedResults.NotFound();
     }
 }

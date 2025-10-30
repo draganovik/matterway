@@ -1,5 +1,4 @@
 ﻿using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductImages.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Abstractions;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -49,22 +48,16 @@ public class ProductImageRepository(CatalogDb context) : IProductImageRepository
             .ToListAsync();
     }
 
-    public async Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequest request)
+    public async Task<ProductImage?> UpdateAsync(ProductImage request)
     {
-        var currentProductImageModel = await context.ProductImage.Include(x => x.Product)
-            .FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
-        if (currentProductImageModel is null) return null;
-        var affected = await context.ProductImage
-            .Where(model => model.ProductId == parentId)
-            .Where(model => model.Id == id)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(m => m.Id, request.Id)
-                .SetProperty(m => m.ProductId, request.ProductId)
-                .SetProperty(m => m.ImageUrl, request.ImageUrl)
-                .SetProperty(m => m.ImageAlt, request.ImageAlt)
-                .SetProperty(m => m.IsMain, request.IsMain)
-            );
-        await context.Entry(currentProductImageModel).ReloadAsync();
-        return affected == 1 ? currentProductImageModel : null;
+        context.ProductImage.Update(request);
+        var affected = await context.SaveChangesAsync();
+        if (affected == 1)
+        {
+            return await context.ProductImage.Include(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.ProductId == request.ProductId);
+        }
+
+        return null;
     }
 }

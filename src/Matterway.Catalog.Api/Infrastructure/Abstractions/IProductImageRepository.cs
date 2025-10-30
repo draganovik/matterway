@@ -1,5 +1,4 @@
 ﻿using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductImages.Contracts;
 
 namespace Matterway.Catalog.Api.Infrastructure.Abstractions;
 
@@ -11,7 +10,7 @@ public interface IProductImageRepository
 
     Task<ProductImage?> Create(ProductImage requestModel);
 
-    Task<ProductImage?> Update(Guid parentId, int id, ProductImageBaseRequest request);
+    Task<ProductImage?> UpdateAsync(ProductImage request);
 
     Task<bool> Delete(Guid parentId, int id);
 

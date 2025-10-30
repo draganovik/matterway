@@ -1,3 +1,4 @@
+name: "matterway-erp-stack"
 services:
   matterway-platform-dashboard:
     image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest"

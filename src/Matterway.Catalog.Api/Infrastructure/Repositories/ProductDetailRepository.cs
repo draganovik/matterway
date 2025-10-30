@@ -1,5 +1,4 @@
 ﻿using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductDetails.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Abstractions;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -47,21 +46,15 @@ public class ProductDetailRepository(CatalogDb context) : IProductDetailReposito
             .ToListAsync();
     }
 
-    public async Task<ProductDetail?> Update(Guid id, ProductDetailBaseRequest request)
+    public async Task<ProductDetail?> UpdateAsync(ProductDetail request)
     {
-        var currentProductDetailModel =
-            await context.ProductDetail.Include(pd => pd.Product).FirstOrDefaultAsync(pd => pd.Id == id);
-        if (currentProductDetailModel is null) return null;
-        var affected = await context.ProductDetail
-            .Where(model => model.Id == id)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(m => m.Type, request.Type)
-                .SetProperty(m => m.ProductId, request.ProductId)
-                .SetProperty(m => m.Title, request.Title)
-                .SetProperty(m => m.Value, request.Value)
-                .SetProperty(m => m.Unit, request.Unit)
-            );
-        await context.Entry(currentProductDetailModel).ReloadAsync();
-        return affected == 1 ? currentProductDetailModel : null;
+        context.ProductDetail.Update(request);
+        var affected = await context.SaveChangesAsync();
+        if (affected == 1)
+        {
+            return await context.ProductDetail.Include(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == request.Id);
+        }
+        return null;
     }
 }

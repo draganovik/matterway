@@ -6,6 +6,9 @@ builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options 
 {
     options.WithHostPort(18888);
     options.WithContainerName("aspire-dashboard");
+}).ConfigureComposeFile(compose =>
+{
+    compose.Name = "matterway-erp-stack";
 });
 
 var sqlServerPassword = builder.AddParameter("SqlServerPassword", secret: true);

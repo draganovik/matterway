@@ -23,7 +23,7 @@
         <Compile Include="$(MSBuildThisFileDirectory)Http\ApiResourceUriBuilder.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Pagination\PaginationResponse.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Pagination\PagingQueryParams.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs"/>
+    <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs" />
         <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CatalogServiceBroker.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CustomersServiceBroker.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\ICatalogServiceBroker.cs"/>

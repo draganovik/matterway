@@ -6,7 +6,7 @@ public static class UpdateProductExtensions
 {
     extension(Product entity)
     {
-        public void ApplyUpdate(UpdateProductByIdRequest request)
+        public void MapUpdate(UpdateProductByIdRequest request)
         {
             entity.ProductCode = request.ProductCode ?? entity.ProductCode;
             entity.Title = request.Title ?? entity.Title;

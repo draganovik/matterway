@@ -1,6 +1,3 @@
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-
 namespace Matterway.Common.Extensions;
 
 public static class ServiceDiscoveryExtensions

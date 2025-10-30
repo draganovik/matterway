@@ -5,41 +5,31 @@ namespace Matterway.Catalog.Api.Features.Products.GetById;
 
 public record GetProductByIdResponse
 {
-    public Guid Id { get; set; }
-
-    [RegularExpression(@"^[A-Z0-9]{5,10}$",
-        ErrorMessage = "Product code must be 5-10 characters and only contain uppercase letters and numbers.")]
-    public string? ProductCode { get; set; }
-
-    public string? Title { get; set; }
-
-    [Range(0.01, double.MaxValue)]
-    public double? Price { get; set; }
-
-    public string? Description { get; set; }
-    public ICollection<ProductDetailProperty>? ProductDetails { get; set; } = [];
-    public ICollection<ProductImageProperty>? ProductImages { get; set; } = [];
-    public DateTime? CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public bool IsAvailable { get; set; }
+    public Guid Id { get; init; }
+    public string? ProductCode { get; init; }
+    public string? Title { get; init; }
+    public double? Price { get; init; }
+    public string? Description { get; init; }
+    public ICollection<ProductDetailProperty>? ProductDetails { get; init; } = [];
+    public ICollection<ProductImageProperty>? ProductImages { get; init; } = [];
+    public DateTime? CreatedAt { get; init; }
+    public DateTime? UpdatedAt { get; init; }
+    public bool IsAvailable { get; init; }
 }
 
 public record ProductDetailProperty
 {
-    public Guid Id { get; set; }
-    public DetailType Type { get; set; }
-    public string? Title { get; set; }
-    public string? Value { get; set; }
-    public string? Unit { get; set; }
+    public Guid Id { get; init; }
+    public DetailType Type { get; init; }
+    public string? Title { get; init; }
+    public string? Value { get; init; }
+    public string? Unit { get; init; }
 }
 
 public record ProductImageProperty
 {
-    public int Id { get; set; }
-
-    [Url]
-    public string? ImageUrl { get; set; }
-
-    public string? ImageAlt { get; set; }
-    public bool IsMain { get; set; }
+    public int Id { get; init; }
+    public string? ImageUrl { get; init; }
+    public string? ImageAlt { get; init; }
+    public bool IsMain { get; init; }
 }

@@ -10,7 +10,7 @@ public class GetProductByIdEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("Products/{id:guid}", Handler)
-            .WithName("GetProductById").WithSummary("Get a Product by id.")
+            .WithName("GetProductById").WithSummary("Get a Product.")
             .WithTags("Products")
             .Produces<GetProductByIdResponse>()
             .Produces(StatusCodes.Status404NotFound)

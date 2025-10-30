@@ -1,23 +1,21 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Features.ProductDetails.Mapping;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductDetails.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Abstractions;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Matterway.Catalog.Api.Features.ProductDetails.Endpoints;
+namespace Matterway.Catalog.Api.Features.ProductDetails.Update;
 
-public class UpdateProductDetailById : IEndpoint
+public class UpdateProductDetailEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPatch("ProductDetails/{id:guid}", Handler)
-            .WithName("UpdateProductDetailById").WithSummary("Update a ProductDetail by id.")
+            .WithName("UpdateProductDetail").WithSummary("Update a ProductDetail.")
             .WithTags(nameof(ProductDetail))
-            .Produces<ProductDetailBaseResponse>()
+            .Produces<UpdateProductDetailResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -26,15 +24,21 @@ public class UpdateProductDetailById : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<ProductDetailBaseResponse>, NotFound, BadRequest<ProblemDetails>>>
+    private static async Task<Results<Ok<UpdateProductDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handler(
             Guid id,
-            ProductDetailBaseRequest request,
+            UpdateProductDetailRequest request,
             IProductDetailRepository productDetailRepository)
     {
-        var updatedProductDetail = await productDetailRepository.Update(id, request);
-        return updatedProductDetail is not null
-            ? TypedResults.Ok(updatedProductDetail.ToContract<ProductDetailBaseResponse>())
-            : TypedResults.NotFound();
+        var entity = await productDetailRepository.GetById(id);
+        if (entity is null) return TypedResults.NotFound();
+
+        entity.MapUpdates(request);
+
+        var updated = await productDetailRepository.UpdateAsync(entity);
+
+        if (updated is null) return TypedResults.NotFound();
+
+        return TypedResults.Ok(updated.ToResponse());
     }
 }

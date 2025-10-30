@@ -1,7 +1,5 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Features.ProductDetails.Mapping;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductDetails.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Abstractions;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
@@ -9,16 +7,16 @@ using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Matterway.Catalog.Api.Features.ProductDetails.Endpoints;
+namespace Matterway.Catalog.Api.Features.ProductDetails.Add;
 
-public class CreateProductDetail : IEndpoint
+public class AddProductDetailEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("ProductDetails", Handler)
-            .WithName("CreateProductDetail").WithSummary("Create a new ProductDetail.")
+            .WithName("AddProductDetail").WithSummary("Add a new ProductDetail.")
             .WithTags(nameof(ProductDetail))
-            .Produces<ProductDetailBaseResponse>(StatusCodes.Status201Created)
+            .Produces<AddProductDetailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
@@ -26,12 +24,12 @@ public class CreateProductDetail : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Created<ProductDetailBaseResponse>, BadRequest<ProblemDetails>>> Handler(
-        ProductDetailBaseRequest request,
+    private static async Task<Results<Created<AddProductDetailResponse>, BadRequest<ProblemDetails>>> Handler(
+        AddProductDetailRequest request,
         HttpContext httpContext,
         IProductDetailRepository productDetailRepository)
     {
-        var productDetailModel = ProductDetail.FromContract(request);
+        var productDetailModel = ProductDetail.FromRequest(request);
         var created = await productDetailRepository.Create(productDetailModel);
         if (created is null)
         {
@@ -48,6 +46,6 @@ public class CreateProductDetail : IEndpoint
             $"ProductDetails/{created.Id}");
 
         return TypedResults.Created(location,
-            created.ToContract<ProductDetailBaseResponse>());
+            created.ToResponse());
     }
 }
