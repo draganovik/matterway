@@ -19,12 +19,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\src\Catalog.Api\Catalog.Api.csproj"/>
-        <ProjectReference Include="..\src\Customers.Api\Customers.Api.csproj"/>
-        <ProjectReference Include="..\src\Identity.Api\Identity.Api.csproj"/>
-        <ProjectReference Include="..\src\Inventory.Api\Inventory.Api.csproj"/>
-        <ProjectReference Include="..\src\Ordering.Api\Ordering.Api.csproj"/>
-        <ProjectReference Include="..\src\Payments.Api\Payments.Api.csproj"/>
+        <ProjectReference Include="..\Catalog.Api\Catalog.Api.csproj"/>
+        <ProjectReference Include="..\Customers.Api\Customers.Api.csproj"/>
+        <ProjectReference Include="..\Identity.Api\Identity.Api.csproj"/>
+        <ProjectReference Include="..\Inventory.Api\Inventory.Api.csproj"/>
+        <ProjectReference Include="..\Ordering.Api\Ordering.Api.csproj"/>
+        <ProjectReference Include="..\Payments.Api\Payments.Api.csproj"/>
     </ItemGroup>
 
 </Project>

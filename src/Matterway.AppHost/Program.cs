@@ -13,7 +13,11 @@ var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
 
 
 // Setup SQL Server container with databases
+#pragma warning disable ASPIREPROXYENDPOINTS001
 var sqlServer = builder.AddSqlServer("sql-server")
+    .WithEndpointProxySupport(false)
+    .WithHostPort(1401)
+#pragma warning restore ASPIREPROXYENDPOINTS001
     .WithPassword(sqlServerPassword)
     .WithDataVolume()
     .PublishAsDockerComposeService((_, service) =>
@@ -128,7 +132,7 @@ paymentsApi
     .WithEnvironment("Jwt__Audience", identityEndpoint);
 
 // Setup Storefront Web Application
-var storefront = builder.AddNpmApp("storefront-web", "../src/Storefront.Web")
+var storefront = builder.AddNpmApp("storefront-web", "../Storefront.Web")
     // server-only URLS, called from server-side code (inside the docker network)
     .WithEnvironment("NUXT_SERVER_ORDERING_API_BASE_URL", orderingApi.GetEndpoint("http"))
     .WithEnvironment("NUXT_SERVER_PAYMENTS_API_BASE_URL", paymentsApi.GetEndpoint("http"))

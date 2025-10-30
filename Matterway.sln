@@ -19,9 +19,9 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.Infrastructure", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payments.Api", "src\Payments.Api\Payments.Api.csproj", "{07F5FEB4-69A7-4937-9189-EDCB7AA5A607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matterway.AppHost", "Matterway.AppHost\Matterway.AppHost.csproj", "{B1352B8F-5F52-4398-8F78-4D745D6FC0AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matterway.AppHost", "src\Matterway.AppHost\Matterway.AppHost.csproj", "{B1352B8F-5F52-4398-8F78-4D745D6FC0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matterway.ServiceDefaults", "Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj", "{2BE575D4-474A-467F-91B5-1ECF524CB263}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matterway.ServiceDefaults", "src\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj", "{2BE575D4-474A-467F-91B5-1ECF524CB263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

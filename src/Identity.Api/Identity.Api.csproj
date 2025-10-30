@@ -7,7 +7,6 @@
         <UserSecretsId>7c5deb9e-8d57-45b5-a073-e8669e0432ad</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..\</DockerfileContext>
-        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
     </ItemGroup>
 
     <Import Project="..\Common.Infrastructure\Common.Infrastructure.projitems" Label="Shared"/>
