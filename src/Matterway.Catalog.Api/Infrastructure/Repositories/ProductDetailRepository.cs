@@ -1,5 +1,5 @@
-﻿using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Abstractions;
+﻿using Matterway.Catalog.Api.Application.Repositories;
+using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,6 +55,7 @@ public class ProductDetailRepository(CatalogDb context) : IProductDetailReposito
             return await context.ProductDetail.Include(x => x.Product)
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
         }
+
         return null;
     }
 }

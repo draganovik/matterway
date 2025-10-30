@@ -1,5 +1,7 @@
-﻿using Matterway.Catalog.Api.Extensions;
+﻿using System.Text.Json.Serialization;
+using Matterway.Catalog.Api.Extensions;
 using Matterway.Common.Extensions;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -9,8 +11,34 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 
 builder.AddServiceDefaults();
 
+// Configure environment-specific settings
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+        reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+// Configure JSON options
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 // Configure services
-builder.ConfigureServices();
+builder.ConfigurePersistence();
+builder.ConfigureProxyServices();
 builder.ConfigureAuthentication();
 
 // Add validation and problem details

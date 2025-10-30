@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Infrastructure.Abstractions;
+using Matterway.Catalog.Api.Application.Repositories;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;

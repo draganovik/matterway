@@ -1,7 +1,7 @@
 ﻿using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Features.Products.Query;
 
-namespace Matterway.Catalog.Api.Infrastructure.Abstractions;
+namespace Matterway.Catalog.Api.Application.Repositories;
 
 public interface IProductRepository
 {

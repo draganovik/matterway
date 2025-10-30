@@ -1,6 +1,6 @@
-﻿using Matterway.Catalog.Api.Domain;
+﻿using Matterway.Catalog.Api.Application.Repositories;
+using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Features.Products.Query;
-using Matterway.Catalog.Api.Infrastructure.Abstractions;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

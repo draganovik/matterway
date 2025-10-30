@@ -1,6 +1,6 @@
 ﻿using Matterway.Catalog.Api.Domain;
 
-namespace Matterway.Catalog.Api.Infrastructure.Abstractions;
+namespace Matterway.Catalog.Api.Application.Repositories;
 
 public interface IProductImageRepository
 {
