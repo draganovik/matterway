@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Matterway.Catalog.Api.Features.Products.Create;
+﻿namespace Matterway.Catalog.Api.Features.Products.Create;
 
 public record CreateProductResponse
 {

@@ -1,13 +1,11 @@
-﻿using Matterway.Catalog.Api.Application.Repositories;
-using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using DomainProductImage = Matterway.Catalog.Api.Domain.ProductImage;
 
-namespace Matterway.Catalog.Api.Infrastructure.Repositories;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 
-public class ProductImageRepository(CatalogDb context) : IProductImageRepository
+public sealed class ProductImageRepository(CatalogDb context) : IProductImageRepository
 {
-    public async Task<ProductImage?> Create(ProductImage requestModel)
+    public async Task<DomainProductImage?> Create(DomainProductImage requestModel)
     {
         context.ProductImage.Add(requestModel);
         var affected = await context.SaveChangesAsync();
@@ -29,7 +27,7 @@ public class ProductImageRepository(CatalogDb context) : IProductImageRepository
         return affected == 1;
     }
 
-    public async Task<ProductImage?> GetById(Guid parentId, int id)
+    public async Task<DomainProductImage?> GetById(Guid parentId, int id)
     {
         return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
     }
@@ -39,7 +37,7 @@ public class ProductImageRepository(CatalogDb context) : IProductImageRepository
         return await context.ProductImage.CountAsync();
     }
 
-    public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize)
+    public async Task<ICollection<DomainProductImage>> Query(int pageIndex, int pageSize)
     {
         return await context.ProductImage.AsNoTracking()
             .Include(x => x.Product)
@@ -48,7 +46,7 @@ public class ProductImageRepository(CatalogDb context) : IProductImageRepository
             .ToListAsync();
     }
 
-    public async Task<ProductImage?> UpdateAsync(ProductImage request)
+    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request)
     {
         context.ProductImage.Update(request);
         var affected = await context.SaveChangesAsync();

@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application.Repositories;
 using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Matterway.Common.Http;
@@ -28,7 +28,10 @@ public class AddProductImageEndpoint : IEndpoint
         AddProductImageRequest request,
         HttpContext httpContext, IProductImageRepository productImageRepository)
     {
-        var productImageModel = await ExecuteAsync(request, productImageRepository);
+        var entity = ProductImage.FromRequest(request);
+        var created = await productImageRepository.Create(entity);
+        var productImageModel = created?.ToResponse();
+
         if (productImageModel is null)
         {
             var problemDetails = new ProblemDetails
@@ -45,14 +48,5 @@ public class AddProductImageEndpoint : IEndpoint
 
         return TypedResults.Created(location,
             productImageModel);
-    }
-
-    private static async Task<AddProductImageResponse?> ExecuteAsync(
-        AddProductImageRequest request,
-        IProductImageRepository productImageRepository)
-    {
-        var productImageModel = ProductImage.FromRequest(request);
-        var created = await productImageRepository.Create(productImageModel);
-        return created?.ToResponse();
     }
 }

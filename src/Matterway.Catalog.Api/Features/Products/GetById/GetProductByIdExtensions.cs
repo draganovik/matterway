@@ -49,8 +49,7 @@ public static class GetProductByIdMapping
             {
                 Id = entity.Id,
                 ImageUrl = entity.ImageUrl,
-                ImageAlt = entity.ImageAlt,
-                IsMain = entity.IsMain
+                ImageAlt = entity.ImageAlt
             };
         }
     }

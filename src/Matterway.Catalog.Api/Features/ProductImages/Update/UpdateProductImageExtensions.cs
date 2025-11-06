@@ -10,7 +10,6 @@ public static class UpdateProductImageExtensions
         {
             entity.ImageUrl = request.ImageUrl ?? entity.ImageUrl;
             entity.ImageAlt = request.ImageAlt ?? entity.ImageAlt;
-            entity.IsMain = request.IsMain;
         }
 
         public UpdateProductImageResponse ToResponse()
@@ -22,7 +21,6 @@ public static class UpdateProductImageExtensions
                 ProductName = entity.Product?.Title,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
-                IsMain = entity.IsMain
             };
         }
     }

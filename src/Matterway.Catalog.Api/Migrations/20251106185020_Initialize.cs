@@ -14,68 +14,67 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "DomainProduct",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.PrimaryKey("PK_DomainProduct", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductDetail",
+                name: "DomainProductDetail",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Title = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductDetail", x => x.Id);
+                    table.PrimaryKey("PK_DomainProductDetail", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductDetail_Product_ProductId",
+                        name: "FK_DomainProductDetail_DomainProduct_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "DomainProduct",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImage",
+                name: "DomainProductImage",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageAlt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsMain = table.Column<bool>(type: "bit", nullable: false)
+                    ImageAlt = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImage", x => new { x.Id, x.ProductId });
+                    table.PrimaryKey("PK_DomainProductImage", x => new { x.Id, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_ProductImage_Product_ProductId",
+                        name: "FK_DomainProductImage_DomainProduct_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "DomainProduct",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "Product",
+                table: "DomainProduct",
                 columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "Price", "ProductCode", "Title", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -87,7 +86,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "ProductDetail",
+                table: "DomainProductDetail",
                 columns: new[] { "Id", "ProductId", "Title", "Type", "Unit", "Value" },
                 values: new object[,]
                 {
@@ -108,25 +107,25 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "ProductImage",
-                columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl", "IsMain" },
+                table: "DomainProductImage",
+                columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl" },
                 values: new object[,]
                 {
-                    { 0, new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", false },
-                    { 0, new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", false },
-                    { 0, new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg", false },
-                    { 0, new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", false },
-                    { 0, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", false }
+                    { 0, new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg" },
+                    { 0, new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg" },
+                    { 0, new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg" },
+                    { 0, new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg" },
+                    { 0, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg" }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductDetail_ProductId",
-                table: "ProductDetail",
+                name: "IX_DomainProductDetail_ProductId",
+                table: "DomainProductDetail",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId",
-                table: "ProductImage",
+                name: "IX_DomainProductImage_ProductId",
+                table: "DomainProductImage",
                 column: "ProductId");
         }
 
@@ -134,13 +133,13 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductDetail");
+                name: "DomainProductDetail");
 
             migrationBuilder.DropTable(
-                name: "ProductImage");
+                name: "DomainProductImage");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "DomainProduct");
         }
     }
 }

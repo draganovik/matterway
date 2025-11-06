@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Matterway.Common.Enums;
+﻿using Matterway.Common.Enums;
 
 namespace Matterway.Catalog.Api.Features.Products.GetById;
 

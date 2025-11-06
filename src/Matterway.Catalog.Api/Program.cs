@@ -42,9 +42,9 @@ builder.ConfigureProxyServices();
 builder.ConfigureAuthentication();
 
 // Add validation and problem details
+builder.ConfigureProblemDetails();
 builder.Services.AddValidation();
-builder.Services.AddProblemDetails();
-builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
+//builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
 
 // Register endpoints and API explorer
 builder.Services.AddEndpoints();

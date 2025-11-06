@@ -1,14 +1,13 @@
-﻿using Matterway.Catalog.Api.Application.Repositories;
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Features.Products.Query;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using DomainProduct = Matterway.Catalog.Api.Domain.Product;
 
-namespace Matterway.Catalog.Api.Infrastructure.Repositories;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 
-public class ProductRepository(CatalogDb context) : IProductRepository
+public sealed class ProductRepository(CatalogDb context)
+    : IProductRepository
 {
-    public async Task<Product?> Create(Product requestModel)
+    public async Task<DomainProduct?> Create(DomainProduct requestModel)
     {
         context.Product.Add(requestModel);
         var affected = await context.SaveChangesAsync();
@@ -29,7 +28,7 @@ public class ProductRepository(CatalogDb context) : IProductRepository
         return affected == 1;
     }
 
-    public async Task<Product?> GetById(Guid id)
+    public async Task<DomainProduct?> GetById(Guid id)
     {
         return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -41,7 +40,10 @@ public class ProductRepository(CatalogDb context) : IProductRepository
         return await productQuery.CountAsync();
     }
 
-    public async Task<ICollection<Product>> Query(int pageIndex, int pageSize, QueryProductFilter queryProductFilter)
+    public async Task<ICollection<DomainProduct>> Query(
+        int pageIndex,
+        int pageSize,
+        QueryProductFilter queryProductFilter)
     {
         var productQuery = queryProductFilter.GenerateQuery(context.Product.AsQueryable());
         return await productQuery.Include(x => x.ProductImages).AsNoTracking()
@@ -50,7 +52,7 @@ public class ProductRepository(CatalogDb context) : IProductRepository
             .ToListAsync();
     }
 
-    public async Task<Product?> UpdateAsync(Product request)
+    public async Task<DomainProduct?> UpdateAsync(DomainProduct request)
     {
         context.Product.Update(request);
         var affected = await context.SaveChangesAsync();

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Matterway.Catalog.Api.Features.Products.Query;
+﻿namespace Matterway.Catalog.Api.Features.Products.Query;
 
 public record QueryProductResponse
 {

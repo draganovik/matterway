@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application.Repositories;
 using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;

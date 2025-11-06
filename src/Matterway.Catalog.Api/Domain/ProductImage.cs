@@ -1,24 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿namespace Matterway.Catalog.Api.Domain;
 
-namespace Matterway.Catalog.Api.Domain;
-
-[PrimaryKey(nameof(Id), nameof(ProductId))]
 public class ProductImage
 {
-    public int Id { get; set; }
-    public Guid ProductId { get; set; }
-
-    [Required]
-    [Url]
-    public string? ImageUrl { get; set; }
-
-    [Required]
-    public string? ImageAlt { get; set; } = "Product Image";
-
-    public bool IsMain { get; set; } = false;
-
-    [ForeignKey(nameof(ProductId))]
+    public required int Id { get; set; }
+    public required Guid ProductId { get; set; }
     public Product? Product { get; set; }
+    public required string ImageUrl { get; set; }
+    public string? ImageAlt { get; set; }
 }

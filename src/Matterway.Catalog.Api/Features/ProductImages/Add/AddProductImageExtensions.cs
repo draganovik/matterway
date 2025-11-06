@@ -14,7 +14,6 @@ public static class AddProductImageExtensions
                 ProductId = request.ProductId,
                 ImageUrl = request.ImageUrl,
                 ImageAlt = request.ImageAlt,
-                IsMain = request.IsMain
             };
         }
     }
@@ -30,7 +29,6 @@ public static class AddProductImageExtensions
                 ProductName = entity.Product?.Title,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
-                IsMain = entity.IsMain
             };
         }
     }

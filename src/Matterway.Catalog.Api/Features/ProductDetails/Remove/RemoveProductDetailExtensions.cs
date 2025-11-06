@@ -1,5 +1,4 @@
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Features.ProductImages.Remove;
 
 namespace Matterway.Catalog.Api.Features.ProductDetails.Remove;
 

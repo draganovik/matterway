@@ -1,36 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Matterway.Catalog.Api.Domain;
+﻿namespace Matterway.Catalog.Api.Domain;
 
 public class Product
 {
-    [Key]
-    public Guid Id { get; set; }
-
-    [RegularExpression(@"^[A-Z0-9]{5,10}$",
-        ErrorMessage = "Product code must be 5-10 characters and only contain uppercase letters and numbers.")]
-    [Required]
-    public string? ProductCode { get; set; }
-
-    [Required]
-    public string? Title { get; set; }
-
-    [Required]
-    [Range(0.01, double.MaxValue)]
-    public double? Price { get; set; }
-
-    [Required]
-    public string? Description { get; set; }
-
-    public ICollection<ProductDetail>? ProductDetails { get; set; }
-    public ICollection<ProductImage>? ProductImages { get; set; }
-
-    [Required]
-    public DateTime? CreatedAt { get; set; } = DateTime.Now;
-
-    [Required]
-    public DateTime? UpdatedAt { get; set; } = DateTime.Now;
-
-    [Required]
-    public bool IsAvailable { get; set; } = false;
+    public Guid Id { get; init; } = Guid.CreateVersion7();
+    public required string ProductCode { get; set; }
+    public required string Title { get; set; }
+    public required double Price { get; set; }
+    public required string Description { get; set; }
+    public ICollection<ProductDetail>? ProductDetails { get; init; }
+    public ICollection<ProductImage>? ProductImages { get; init; }
+    public DateTime CreatedAt { get; init; } = DateTime.Now;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    public required bool IsAvailable { get; set; } = false;
 }

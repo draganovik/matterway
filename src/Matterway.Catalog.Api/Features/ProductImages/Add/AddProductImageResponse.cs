@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Matterway.Catalog.Api.Features.ProductImages.Add;
+﻿namespace Matterway.Catalog.Api.Features.ProductImages.Add;
 
 public record AddProductImageResponse
 {

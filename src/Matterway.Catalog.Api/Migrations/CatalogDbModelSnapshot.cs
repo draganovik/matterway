@@ -4,7 +4,6 @@ using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251030005052_Initialize")]
-    partial class Initialize
+    partial class CatalogDbModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +33,8 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
@@ -46,18 +44,20 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Product");
+                    b.ToTable("DomainProduct", (string)null);
 
                     b.HasData(
                         new
@@ -128,23 +128,26 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<string>("Unit")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductDetail");
+                    b.ToTable("DomainProductDetail", (string)null);
 
                     b.HasData(
                         new
@@ -279,14 +282,11 @@ namespace Matterway.Catalog.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsMain")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id", "ProductId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImage");
+                    b.ToTable("DomainProductImage", (string)null);
 
                     b.HasData(
                         new
@@ -294,40 +294,35 @@ namespace Matterway.Catalog.Api.Migrations
                             Id = 0,
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                             ImageAlt = "Amazon Echo Show 5",
-                            ImageUrl = "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg",
-                            IsMain = false
+                            ImageUrl = "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg"
                         },
                         new
                         {
                             Id = 0,
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                             ImageAlt = "Spotlight Cam Plus",
-                            ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg",
-                            IsMain = false
+                            ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
                         },
                         new
                         {
                             Id = 0,
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             ImageAlt = "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View",
-                            ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg",
-                            IsMain = false
+                            ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg"
                         },
                         new
                         {
                             Id = 0,
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                             ImageAlt = "Nest Learning Thermostat - Front View",
-                            ImageUrl = "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg",
-                            IsMain = false
+                            ImageUrl = "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg"
                         },
                         new
                         {
                             Id = 0,
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                             ImageAlt = "August Wi-Fi Smart Lock Pro - Front View",
-                            ImageUrl = "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg",
-                            IsMain = false
+                            ImageUrl = "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg"
                         });
                 });
 

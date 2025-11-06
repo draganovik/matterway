@@ -1,6 +1,7 @@
-using Matterway.Catalog.Api.Application.Repositories;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
-using Matterway.Catalog.Api.Infrastructure.Repositories;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Extensions;
