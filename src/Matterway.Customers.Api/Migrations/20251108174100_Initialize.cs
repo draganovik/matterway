@@ -17,12 +17,12 @@ namespace Matterway.Customers.Api.Migrations
                 name: "Customer",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SystemUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DefaultAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SystemUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    DefaultAddressId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -33,11 +33,11 @@ namespace Matterway.Customers.Api.Migrations
                 name: "CartItem",
                 columns: table => new
                 {
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<double>(type: "float", nullable: false),
-                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    UnitPrice = table.Column<double>(type: "double precision", nullable: false),
+                    ProductName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -55,8 +55,8 @@ namespace Matterway.Customers.Api.Migrations
                 columns: new[] { "Id", "BirthDate", "DefaultAddressId", "FirstName", "LastName", "SystemUserId" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Stefan", "Stefanov", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3") },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new DateTime(2000, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "Mara", "Jakov", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4") }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), new DateOnly(1980, 1, 1), null, "Stefan", "Stefanov", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3") },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new DateOnly(2000, 5, 5), null, "Mara", "Jakov", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4") }
                 });
 
             migrationBuilder.InsertData(

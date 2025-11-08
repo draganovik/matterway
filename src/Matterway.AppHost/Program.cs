@@ -8,29 +8,26 @@ builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options 
     options.WithContainerName("aspire-dashboard");
 }).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
 
-var sqlServerPassword = builder.AddParameter("SqlServerPassword", secret: true);
+var postgresPassword = builder.AddParameter("PostgresPassword", secret: true);
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
 
 
-// Setup SQL Server container with databases
-#pragma warning disable ASPIREPROXYENDPOINTS001
-var sqlServer = builder.AddSqlServer("sql-server")
-    .WithEndpointProxySupport(false)
-    .WithHostPort(1401)
-#pragma warning restore ASPIREPROXYENDPOINTS001
-    .WithPassword(sqlServerPassword)
+// Setup PostgreSQL container with databases
+var postgres = builder.AddPostgres("postgres")
+    .WithHostPort(15432)
+    .WithPassword(postgresPassword)
     .WithDataVolume()
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = ["1401:1433"];
+        service.Ports = ["15432:5432"];
     });
 
-var catalogDb = sqlServer.AddDatabase("CatalogDb");
-var customersDb = sqlServer.AddDatabase("CustomersDb");
-var identityDb = sqlServer.AddDatabase("IdentityDb");
-var paymentsDb = sqlServer.AddDatabase("PaymentsDb");
-var orderingDb = sqlServer.AddDatabase("OrderingDb");
+var catalogDb = postgres.AddDatabase("CatalogDb");
+var customersDb = postgres.AddDatabase("CustomersDb");
+var identityDb = postgres.AddDatabase("IdentityDb");
+var paymentsDb = postgres.AddDatabase("PaymentsDb");
+var orderingDb = postgres.AddDatabase("OrderingDb");
 
 // Setup Identity API
 var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")

@@ -3,16 +3,16 @@ using System;
 using Matterway.Ordering.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Matterway.Ordering.Api.Migrations
 {
     [DbContext(typeof(OrderingDb))]
-    [Migration("20251030005108_Initialize")]
+    [Migration("20251108174109_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -21,42 +21,42 @@ namespace Matterway.Ordering.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Matterway.Ordering.Api.Features.Addresses.Domain.Address", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ReceiverName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Residence")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Street")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -89,19 +89,19 @@ namespace Matterway.Ordering.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("OrderStatus")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -113,7 +113,7 @@ namespace Matterway.Ordering.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
-                            CreatedDate = new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedDate = new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Order Ready",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                             OrderStatus = 1
@@ -121,7 +121,7 @@ namespace Matterway.Ordering.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
-                            CreatedDate = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            CreatedDate = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc),
                             Description = "Order Canceled",
                             OrderId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
                             OrderStatus = 5
@@ -131,20 +131,20 @@ namespace Matterway.Ordering.Api.Migrations
             modelBuilder.Entity("Matterway.Ordering.Api.Features.OrderItems.Domain.OrderItem", b =>
                 {
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("UnitPrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.HasKey("OrderId", "ProductId");
 
@@ -173,17 +173,17 @@ namespace Matterway.Ordering.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("DeliveryAddressId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

@@ -10,16 +10,16 @@ public static class PersistenceExtensions
 {
     public static void ConfigurePersistence(this IHostApplicationBuilder builder)
     {
-        var sqlConnectionString = builder.Configuration.GetConnectionString("CatalogDb");
+        var postgresConnectionString = builder.Configuration.GetConnectionString("CatalogDb");
 
-        if (string.IsNullOrEmpty(sqlConnectionString))
+        if (string.IsNullOrEmpty(postgresConnectionString))
         {
             throw new InvalidOperationException("Connection string 'CatalogDb' not found.");
         }
 
         builder.Services.AddDbContext<CatalogDb>(options =>
-            options.UseSqlServer(sqlConnectionString,
-                sqlOptions => { sqlOptions.EnableRetryOnFailure(); })
+            options.UseNpgsql(postgresConnectionString,
+                npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
         );
 
         builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();

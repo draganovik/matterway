@@ -14,7 +14,7 @@ public class CustomerBaseRequest
     public string? LastName { get; set; }
 
     [Required]
-    public DateTime BirthDate { get; set; }
+    public DateOnly BirthDate { get; set; }
 
     public Guid? DefaultAddressId { get; set; }
 }

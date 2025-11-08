@@ -9,7 +9,7 @@ public class Product
     public required string Description { get; set; }
     public ICollection<ProductDetail>? ProductDetails { get; init; }
     public ICollection<ProductImage>? ProductImages { get; init; }
-    public DateTime CreatedAt { get; init; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public required bool IsAvailable { get; set; } = false;
 }

@@ -23,7 +23,7 @@ public class CustomersDb : DbContext
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                 FirstName = "Stefan",
                 LastName = "Stefanov",
-                BirthDate = new DateTime(1980, 1, 1),
+                BirthDate = new DateOnly(1980, 1, 1),
                 SystemUserId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3")
             },
             new Customer
@@ -31,7 +31,7 @@ public class CustomersDb : DbContext
                 Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                 FirstName = "Mara",
                 LastName = "Jakov",
-                BirthDate = new DateTime(2000, 5, 5),
+                BirthDate = new DateOnly(2000, 5, 5),
                 SystemUserId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4")
             }
         );

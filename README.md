@@ -49,7 +49,7 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
  │ Product data  │ Customer mesh│ Auth & JWT   │ Orders & cart│ Stripe, billing│ Stock control │
  └──────┬────────┴──────┬───────┴──────┬─────┴──────┬─────────────┴───────┬────────┘
         │               │              │            │                     │
-                              SQL Server (dockerized)
+                              PostgreSQL cluster (dockerized)
 ```
 
 Shared cross-cutting concerns are packaged inside `Matterway.Common` and imported by each service.
@@ -63,7 +63,7 @@ Shared cross-cutting concerns are packaged inside `Matterway.Common` and importe
 | Frontend         | Nuxt 3, Vue 3, Pinia, Tailwind CSS, Flowbite, Stripe |
 | APIs / Services  | ASP.NET 10 Minimal APIs, Entity Framework Core, Swashbuckle, Scalar |
 | Identity & Auth  | JWT Bearer, custom identity service |
-| Data Layer       | Microsoft SQL Server 2022 (containerized) |
+| Data Layer       | PostgreSQL (containerized via .NET Aspire) |
 | DevOps & Infra   | Docker Compose, .NET CLI, EF Core migrations |
 | Tooling          | Prettier, TypeScript, AutoMapper, Scalar UI |
 

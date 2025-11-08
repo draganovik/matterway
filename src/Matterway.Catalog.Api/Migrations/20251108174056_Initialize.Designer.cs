@@ -3,16 +3,16 @@ using System;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251106185020_Initialize")]
+    [Migration("20251108174056_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -21,42 +21,42 @@ namespace Matterway.Catalog.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<double>("Price")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -66,57 +66,57 @@ namespace Matterway.Catalog.Api.Migrations
                         new
                         {
                             Id = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            CreatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             Description = "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
                             IsAvailable = true,
                             Price = 4999.0,
                             ProductCode = "PH-002",
                             Title = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
-                            UpdatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            CreatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc),
                             Description = "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
                             IsAvailable = true,
                             Price = 24999.0,
                             ProductCode = "NT-003",
                             Title = "Nest Learning Thermostat",
-                            UpdatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            CreatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc),
                             Description = "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
                             IsAvailable = true,
                             Price = 27999.0,
                             ProductCode = "AL-001",
                             Title = "August Wi-Fi Smart Lock Pro",
-                            UpdatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            CreatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc),
                             Description = "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
                             IsAvailable = true,
                             Price = 9999.0,
                             ProductCode = "AE-004",
                             Title = "Amazon Echo (4th Gen)",
-                            UpdatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             Id = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            CreatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc),
                             Description = "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
                             IsAvailable = true,
                             Price = 19999.0,
                             ProductCode = "RS-001",
                             Title = "Ring Spotlight Cam",
-                            UpdatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Unspecified)
+                            UpdatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -124,27 +124,27 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Unit")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -272,18 +272,20 @@ namespace Matterway.Catalog.Api.Migrations
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductImage", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ImageAlt")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id", "ProductId");
 

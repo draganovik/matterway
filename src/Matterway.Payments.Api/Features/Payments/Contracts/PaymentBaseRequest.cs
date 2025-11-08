@@ -12,7 +12,7 @@ public class PaymentBaseRequest
     public string? ReferenceNumber { get; set; }
 
     [Required]
-    public DateTime PaymentDate { get; set; } = DateTime.Now;
+    public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
 
     [Required]
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than 0")]

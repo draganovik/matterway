@@ -12,7 +12,7 @@ public class PaymentBaseResponse
         ErrorMessage = "Invalid ReferenceNumber. ReferenceNumber format must be: 0000-0000-0000-0000")]
     public string? ReferenceNumber { get; set; }
 
-    public DateTime PaymentDate { get; set; } = DateTime.Now;
+    public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than 0")]
     public double PaymentAmount { get; set; }

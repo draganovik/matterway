@@ -25,7 +25,7 @@ public class PaymentsDb : DbContext
                 CardNumber = "1234-5678-1234-5678",
                 SecurityCode = "1234",
                 ExpirationDate = "12/26",
-                PaymentDate = DateTime.Parse("2024-06-01T10:00:00"),
+                PaymentDate = new DateTime(2024, 6, 1, 10, 0, 0, DateTimeKind.Utc),
                 PaymentState = PaymentState.Processed,
                 PaymentAmount = 39998
             },
@@ -37,7 +37,7 @@ public class PaymentsDb : DbContext
                 CardNumber = "8856-5678-1234-3366",
                 SecurityCode = "6658",
                 ExpirationDate = "06/24",
-                PaymentDate = DateTime.Parse("2024-06-02T11:30:00"),
+                PaymentDate = new DateTime(2024, 6, 2, 11, 30, 0, DateTimeKind.Utc),
                 PaymentState = PaymentState.Processed,
                 PaymentAmount = 4999
             }
