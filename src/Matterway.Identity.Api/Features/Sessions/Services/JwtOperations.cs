@@ -23,11 +23,13 @@ public static class JwtOperations
             new(ClaimTypes.Role, user.Role.ToString())
         };
 
+        var issuedAt = DateTime.UtcNow;
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            IssuedAt = DateTime.Now,
-            Expires = isRefresh ? DateTime.Now.AddDays(12) : DateTime.Now.AddMinutes(15),
+            IssuedAt = issuedAt,
+            Expires = isRefresh ? issuedAt.AddDays(12) : issuedAt.AddMinutes(15),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };

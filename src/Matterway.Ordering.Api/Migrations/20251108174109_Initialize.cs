@@ -17,14 +17,14 @@ namespace Matterway.Ordering.Api.Migrations
                 name: "Address",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReceiverName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Residence = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReceiverName = table.Column<string>(type: "text", nullable: false),
+                    Residence = table.Column<string>(type: "text", nullable: false),
+                    Street = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    ZipCode = table.Column<string>(type: "text", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -35,10 +35,10 @@ namespace Matterway.Ordering.Api.Migrations
                 name: "Order",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeliveryAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeliveryAddressId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -55,11 +55,11 @@ namespace Matterway.Ordering.Api.Migrations
                 name: "OrderHistory",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderStatus = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderStatus = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,11 +76,11 @@ namespace Matterway.Ordering.Api.Migrations
                 name: "OrderItem",
                 columns: table => new
                 {
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UnitPrice = table.Column<double>(type: "float", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductName = table.Column<string>(type: "text", nullable: false),
+                    UnitPrice = table.Column<double>(type: "double precision", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,8 +116,8 @@ namespace Matterway.Ordering.Api.Migrations
                 columns: new[] { "Id", "CreatedDate", "Description", "OrderId", "OrderStatus" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Unspecified), "Order Ready", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), 1 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Unspecified), "Order Canceled", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), 5 }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), new DateTime(2024, 6, 1, 12, 0, 0, 0, DateTimeKind.Utc), "Order Ready", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), 1 },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc), "Order Canceled", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), 5 }
                 });
 
             migrationBuilder.InsertData(

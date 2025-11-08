@@ -3,8 +3,8 @@ using System;
 using Matterway.Payments.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -18,44 +18,44 @@ namespace Matterway.Payments.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Matterway.Payments.Api.Features.Payments.Domain.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CardHolder")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("CardNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ExpirationDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<double>("PaymentAmount")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("PaymentState")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ReferenceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -69,7 +69,7 @@ namespace Matterway.Payments.Api.Migrations
                             CardNumber = "1234-5678-1234-5678",
                             ExpirationDate = "12/26",
                             PaymentAmount = 39998.0,
-                            PaymentDate = new DateTime(2024, 6, 1, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentDate = new DateTime(2024, 6, 1, 10, 0, 0, 0, DateTimeKind.Utc),
                             PaymentState = 1,
                             ReferenceNumber = "5655-6666-7877",
                             SecurityCode = "1234"
@@ -81,7 +81,7 @@ namespace Matterway.Payments.Api.Migrations
                             CardNumber = "8856-5678-1234-3366",
                             ExpirationDate = "06/24",
                             PaymentAmount = 4999.0,
-                            PaymentDate = new DateTime(2024, 6, 2, 11, 30, 0, 0, DateTimeKind.Unspecified),
+                            PaymentDate = new DateTime(2024, 6, 2, 11, 30, 0, 0, DateTimeKind.Utc),
                             PaymentState = 1,
                             ReferenceNumber = "6666-8888-6588",
                             SecurityCode = "6658"

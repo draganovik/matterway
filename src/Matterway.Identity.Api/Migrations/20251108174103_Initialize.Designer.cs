@@ -3,16 +3,16 @@ using System;
 using Matterway.Identity.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Matterway.Identity.Api.Migrations
 {
     [DbContext(typeof(IdentityDb))]
-    [Migration("20251030005101_Initialize")]
+    [Migration("20251108174103_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -21,35 +21,35 @@ namespace Matterway.Identity.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.0-rc.2.25502.107")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Matterway.Identity.Api.Features.Sessions.Domain.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Expires")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("RefreshExpires")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("SystemUserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -62,21 +62,21 @@ namespace Matterway.Identity.Api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Role")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -86,7 +86,7 @@ namespace Matterway.Identity.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                            Created = new DateTime(2021, 9, 9, 12, 10, 10, 0, DateTimeKind.Local),
+                            Created = new DateTime(2021, 9, 9, 10, 10, 10, 0, DateTimeKind.Utc),
                             Email = "mladen@matterway.com",
                             PasswordHash = "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw==",
                             Role = 0
@@ -94,7 +94,7 @@ namespace Matterway.Identity.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-                            Created = new DateTime(2022, 10, 10, 13, 11, 11, 0, DateTimeKind.Local),
+                            Created = new DateTime(2022, 10, 10, 11, 11, 11, 0, DateTimeKind.Utc),
                             Email = "jelena@matterway.com",
                             PasswordHash = "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg==",
                             Role = 1
@@ -102,7 +102,7 @@ namespace Matterway.Identity.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                            Created = new DateTime(2023, 4, 12, 14, 10, 0, 0, DateTimeKind.Local),
+                            Created = new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc),
                             Email = "stefan999@gmail.com",
                             PasswordHash = "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==",
                             Role = 2
@@ -110,7 +110,7 @@ namespace Matterway.Identity.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            Created = new DateTime(2024, 2, 20, 10, 30, 0, 0, DateTimeKind.Local),
+                            Created = new DateTime(2024, 2, 20, 9, 30, 0, 0, DateTimeKind.Utc),
                             Email = "marag2@gmail.com",
                             PasswordHash = "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q==",
                             Role = 2

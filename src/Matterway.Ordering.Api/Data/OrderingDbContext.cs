@@ -85,7 +85,7 @@ public class OrderingDb : DbContext
                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
                 OrderStatus = OrderStatus.Ready,
                 Description = "Order Ready",
-                CreatedDate = DateTime.Parse("2024-06-01T12:00:00")
+                CreatedDate = new DateTime(2024, 6, 1, 12, 0, 0, DateTimeKind.Utc)
             },
             new OrderHistory
             {
@@ -93,7 +93,7 @@ public class OrderingDb : DbContext
                 OrderId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
                 OrderStatus = OrderStatus.Canceled,
                 Description = "Order Canceled",
-                CreatedDate = DateTime.Parse("2024-06-02T14:30:00")
+                CreatedDate = new DateTime(2024, 6, 2, 14, 30, 0, DateTimeKind.Utc)
             }
         );
     }

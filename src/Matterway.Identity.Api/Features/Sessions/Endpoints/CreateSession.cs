@@ -50,9 +50,9 @@ public class CreateSession : IEndpoint
             SystemUserId = existingUser.Id,
             Token = token,
             RefreshToken = refreshToken,
-            Created = tokenDescriptor.IssuedAt ?? DateTime.Now,
-            Expires = tokenDescriptor.Expires ?? DateTime.Now,
-            RefreshExpires = refreshDescriptor.Expires ?? DateTime.Now
+            Created = tokenDescriptor.IssuedAt ?? DateTime.UtcNow,
+            Expires = tokenDescriptor.Expires ?? DateTime.UtcNow,
+            RefreshExpires = refreshDescriptor.Expires ?? DateTime.UtcNow
         };
 
         var createdSession = await sessionRepository.Create(session);

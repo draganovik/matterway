@@ -13,7 +13,7 @@ public static class UpdateProductExtensions
             entity.Price = request.Price ?? entity.Price;
             entity.Description = request.Description ?? entity.Description;
             entity.IsAvailable = request.IsAvailable;
-            entity.UpdatedAt = DateTime.Now;
+            entity.UpdatedAt = DateTime.UtcNow;
         }
 
         public UpdateProductByIdResponse ToResponse()
