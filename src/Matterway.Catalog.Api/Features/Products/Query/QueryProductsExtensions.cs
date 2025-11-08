@@ -31,7 +31,6 @@ public static class QueryProductsExtensions
             return new ProductImageProperty
             {
                 Id = entity.Id,
-                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt
             };

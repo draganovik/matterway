@@ -11,9 +11,16 @@ public static class ImageStorageExtensions
             .BindConfiguration(ImageStorageOptions.SectionName)
             .ValidateDataAnnotations()
             .Validate(options => !string.IsNullOrWhiteSpace(options.Bucket), "Image storage bucket must be provided.")
-            .Validate(options => !string.IsNullOrWhiteSpace(options.Endpoint), "Image storage endpoint must be provided.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.Endpoint),
+                "Image storage endpoint must be provided.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.AccessKey),
+                "Image storage access key must be provided.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.SecretKey),
+                "Image storage secret key must be provided.")
             .ValidateOnStart();
 
-        builder.Services.AddSingleton<IImageStorageService, MinioImageStorageService>();
+        builder.Services.AddSingleton<IMinioClientFactory, MinioClientFactory>();
+        builder.Services.AddScoped<IImageStorageService, MinioImageStorageService>();
+        builder.Services.AddHostedService<ImageStorageInitializer>();
     }
 }

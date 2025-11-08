@@ -19,8 +19,11 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
                 requestModel.Id = Math.Clamp(requestModel.Id, 0, existingCount);
 
-                await context.Database.ExecuteSqlInterpolatedAsync(
-                    $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" + 1 WHERE \"ProductId\" = {requestModel.ProductId} AND \"Id\" >= {requestModel.Id};");
+                await context.ProductImage
+                    .Where(pi => pi.ProductId == requestModel.ProductId)
+                    .Where(pi => pi.Id >= requestModel.Id)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(pi => pi.Id, pi => pi.Id + 1));
 
                 context.ProductImage.Add(requestModel);
                 var affected = await context.SaveChangesAsync();
@@ -62,8 +65,11 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                     return false;
                 }
 
-                await context.Database.ExecuteSqlInterpolatedAsync(
-                    $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" - 1 WHERE \"ProductId\" = {parentId} AND \"Id\" > {id};");
+                await context.ProductImage
+                    .Where(model => model.ProductId == parentId)
+                    .Where(model => model.Id > id)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(model => model.Id, model => model.Id - 1));
 
                 await transaction.CommitAsync();
                 return true;
@@ -129,19 +135,28 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
                 if (clampedTarget < existing.Id)
                 {
-                    await context.Database.ExecuteSqlInterpolatedAsync(
-                        $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" + 1 WHERE \"ProductId\" = {request.ProductId} AND \"Id\" >= {clampedTarget} AND \"Id\" < {existing.Id};");
+                    await context.ProductImage
+                        .Where(x => x.ProductId == request.ProductId)
+                        .Where(x => x.Id >= clampedTarget && x.Id < existing.Id)
+                        .ExecuteUpdateAsync(setters =>
+                            setters.SetProperty(x => x.Id, x => x.Id + 1));
                 }
                 else if (clampedTarget > existing.Id)
                 {
-                    await context.Database.ExecuteSqlInterpolatedAsync(
-                        $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" - 1 WHERE \"ProductId\" = {request.ProductId} AND \"Id\" > {existing.Id} AND \"Id\" <= {clampedTarget};");
+                    await context.ProductImage
+                        .Where(x => x.ProductId == request.ProductId)
+                        .Where(x => x.Id > existing.Id && x.Id <= clampedTarget)
+                        .ExecuteUpdateAsync(setters =>
+                            setters.SetProperty(x => x.Id, x => x.Id - 1));
                 }
 
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
 
-                var updatedRows = await context.Database.ExecuteSqlInterpolatedAsync(
-                    $"UPDATE \"DomainProductImage\" SET \"Id\" = {clampedTarget}, \"ImageAlt\" = {newAlt} WHERE \"ProductId\" = {request.ProductId} AND \"ImageRef\" = {request.ImageRef};");
+                var updatedRows = await context.ProductImage
+                    .Where(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(x => x.Id, x => clampedTarget)
+                            .SetProperty(x => x.ImageAlt, x => newAlt));
 
                 if (updatedRows != 1)
                 {

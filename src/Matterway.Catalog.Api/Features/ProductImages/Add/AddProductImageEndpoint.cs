@@ -23,12 +23,12 @@ public class AddProductImageEndpoint : IEndpoint
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(SystemUserRole.Admin),
                 nameof(SystemUserRole.Manager)))
-            .DisableAntiforgery()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Created<AddProductImageResponse>, BadRequest<ProblemDetails>>> Handler(
-        [FromForm] AddProductImageRequest request,
+        [FromForm]
+        AddProductImageRequest request,
         HttpContext httpContext,
         IProductImageRepository productImageRepository,
         IImageStorageService imageStorageService,
