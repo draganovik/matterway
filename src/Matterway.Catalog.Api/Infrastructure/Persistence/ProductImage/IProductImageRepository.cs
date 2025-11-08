@@ -10,7 +10,7 @@ public interface IProductImageRepository
 
     Task<DomainProductImage?> Create(DomainProductImage requestModel);
 
-    Task<DomainProductImage?> UpdateAsync(DomainProductImage request);
+    Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex);
 
     Task<bool> Delete(Guid parentId, int id);
 

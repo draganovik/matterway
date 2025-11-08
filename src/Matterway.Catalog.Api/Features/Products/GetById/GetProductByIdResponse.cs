@@ -28,7 +28,7 @@ public record ProductDetailProperty
 public record ProductImageProperty
 {
     public int Id { get; init; }
+    public string? ImageRef { get; init; }
     public string? ImageUrl { get; init; }
     public string? ImageAlt { get; init; }
-    public bool IsMain { get; init; }
 }

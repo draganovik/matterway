@@ -8,7 +8,6 @@ public static class UpdateProductImageExtensions
     {
         public void MapUpdates(UpdateProductImageRequest request)
         {
-            entity.ImageUrl = request.ImageUrl ?? entity.ImageUrl;
             entity.ImageAlt = request.ImageAlt ?? entity.ImageAlt;
         }
 
@@ -19,6 +18,7 @@ public static class UpdateProductImageExtensions
                 Id = entity.Id,
                 ProductId = entity.ProductId,
                 ProductName = entity.Product?.Title,
+                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
             };

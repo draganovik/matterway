@@ -40,6 +40,7 @@ builder.Services.AddCors(options =>
 builder.ConfigurePersistence();
 builder.ConfigureProxyServices();
 builder.ConfigureAuthentication();
+builder.ConfigureImageStorage();
 
 // Add validation and problem details
 builder.ConfigureProblemDetails();

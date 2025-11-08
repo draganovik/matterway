@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
+using Matterway.Catalog.Api.Infrastructure.Storage;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -25,7 +26,9 @@ public class RemoveProductImageEndpoint : IEndpoint
     private static async Task<Results<Ok<RemoveProductImageResponse>, NotFound>> Handler(
         Guid productId,
         int id,
-        IProductImageRepository productImageRepository)
+        IProductImageRepository productImageRepository,
+        IImageStorageService imageStorageService,
+        CancellationToken cancellationToken)
     {
         var entity = await productImageRepository.GetById(productId, id);
 
@@ -36,6 +39,12 @@ public class RemoveProductImageEndpoint : IEndpoint
 
         var isDeleted = await productImageRepository.Delete(productId, id);
 
-        return isDeleted ? TypedResults.Ok(entity.ToResponse()) : TypedResults.NotFound();
+        if (!isDeleted)
+        {
+            return TypedResults.NotFound();
+        }
+
+        await imageStorageService.DeleteAsync(entity.ImageRef, cancellationToken);
+        return TypedResults.Ok(entity.ToResponse());
     }
 }

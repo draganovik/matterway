@@ -16,6 +16,7 @@ public static class QueryProductsExtensions
                 Price = entity.Price,
                 Description = entity.Description,
                 ThumbnailImage = entity.ProductImages?
+                    .OrderBy(pi => pi.Id)
                     .Select(pi => pi.ToResponse())
                     .FirstOrDefault(),
                 IsAvailable = entity.IsAvailable
@@ -29,6 +30,8 @@ public static class QueryProductsExtensions
         {
             return new ProductImageProperty
             {
+                Id = entity.Id,
+                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt
             };

@@ -1,4 +1,5 @@
 using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Infrastructure.Storage;
 
 namespace Matterway.Catalog.Api.Features.ProductImages.Add;
 
@@ -6,14 +7,15 @@ public static class AddProductImageExtensions
 {
     extension(ProductImage)
     {
-        public static ProductImage FromRequest(AddProductImageRequest request)
+        public static ProductImage FromRequest(AddProductImageRequest request, ImageStorageUploadResult uploadResult)
         {
             return new ProductImage
             {
                 Id = request.Id,
                 ProductId = request.ProductId,
-                ImageUrl = request.ImageUrl,
-                ImageAlt = request.ImageAlt,
+                ImageRef = uploadResult.ImageRef,
+                ImageUrl = uploadResult.ImageUrl,
+                ImageAlt = request.ImageAlt ?? string.Empty,
             };
         }
     }
@@ -27,6 +29,7 @@ public static class AddProductImageExtensions
                 Id = entity.Id,
                 ProductId = entity.ProductId,
                 ProductName = entity.Product?.Title,
+                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
             };

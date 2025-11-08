@@ -7,24 +7,73 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 {
     public async Task<DomainProductImage?> Create(DomainProductImage requestModel)
     {
-        context.ProductImage.Add(requestModel);
-        var affected = await context.SaveChangesAsync();
-        if (affected == 1)
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            return await context.ProductImage.Include(x => x.Product)
-                .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId);
-        }
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var existingCount = await context.ProductImage
+                    .Where(pi => pi.ProductId == requestModel.ProductId)
+                    .CountAsync();
 
-        return null;
+                requestModel.Id = Math.Clamp(requestModel.Id, 0, existingCount);
+
+                await context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" + 1 WHERE \"ProductId\" = {requestModel.ProductId} AND \"Id\" >= {requestModel.Id};");
+
+                context.ProductImage.Add(requestModel);
+                var affected = await context.SaveChangesAsync();
+                if (affected != 1)
+                {
+                    await transaction.RollbackAsync();
+                    return null;
+                }
+
+                await transaction.CommitAsync();
+
+                return await context.ProductImage.Include(x => x.Product)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 
     public async Task<bool> Delete(Guid parentId, int id)
     {
-        var affected = await context.ProductImage
-            .Where(model => model.ProductId == parentId)
-            .Where(model => model.Id == id)
-            .ExecuteDeleteAsync();
-        return affected == 1;
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var affected = await context.ProductImage
+                    .Where(model => model.ProductId == parentId)
+                    .Where(model => model.Id == id)
+                    .ExecuteDeleteAsync();
+                if (affected != 1)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                await context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" - 1 WHERE \"ProductId\" = {parentId} AND \"Id\" > {id};");
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 
     public async Task<DomainProductImage?> GetById(Guid parentId, int id)
@@ -41,21 +90,76 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
     {
         return await context.ProductImage.AsNoTracking()
             .Include(x => x.Product)
+            .OrderBy(x => x.ProductId)
+            .ThenBy(x => x.Id)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
     }
 
-    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request)
+    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex)
     {
-        context.ProductImage.Update(request);
-        var affected = await context.SaveChangesAsync();
-        if (affected == 1)
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            return await context.ProductImage.Include(x => x.Product)
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.ProductId == request.ProductId);
-        }
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var existing = await context.ProductImage
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef);
 
-        return null;
+                if (existing is null)
+                {
+                    await transaction.RollbackAsync();
+                    return null;
+                }
+
+                var total = await context.ProductImage
+                    .Where(x => x.ProductId == request.ProductId)
+                    .CountAsync();
+
+                if (total == 0)
+                {
+                    await transaction.RollbackAsync();
+                    return null;
+                }
+
+                var clampedTarget = Math.Clamp(targetOrderIndex, 0, total - 1);
+
+                if (clampedTarget < existing.Id)
+                {
+                    await context.Database.ExecuteSqlInterpolatedAsync(
+                        $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" + 1 WHERE \"ProductId\" = {request.ProductId} AND \"Id\" >= {clampedTarget} AND \"Id\" < {existing.Id};");
+                }
+                else if (clampedTarget > existing.Id)
+                {
+                    await context.Database.ExecuteSqlInterpolatedAsync(
+                        $"UPDATE \"DomainProductImage\" SET \"Id\" = \"Id\" - 1 WHERE \"ProductId\" = {request.ProductId} AND \"Id\" > {existing.Id} AND \"Id\" <= {clampedTarget};");
+                }
+
+                var newAlt = request.ImageAlt ?? existing.ImageAlt;
+
+                var updatedRows = await context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE \"DomainProductImage\" SET \"Id\" = {clampedTarget}, \"ImageAlt\" = {newAlt} WHERE \"ProductId\" = {request.ProductId} AND \"ImageRef\" = {request.ImageRef};");
+
+                if (updatedRows != 1)
+                {
+                    await transaction.RollbackAsync();
+                    return null;
+                }
+
+                await transaction.CommitAsync();
+
+                return await context.ProductImage.Include(x => x.Product)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 }

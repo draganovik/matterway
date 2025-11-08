@@ -13,6 +13,8 @@ public record QueryProductResponse
 
 public record ProductImageProperty
 {
+    public int Id { get; set; }
+    public string? ImageRef { get; set; }
     public string? ImageUrl { get; set; }
     public string? ImageAlt { get; set; }
 }

@@ -18,6 +18,7 @@ public static class GetProductByIdMapping
                 ProductDetails = entity.ProductDetails?
                     .Select(pd => pd.ToResponse()).ToList(),
                 ProductImages = entity.ProductImages?
+                    .OrderBy(pi => pi.Id)
                     .Select(pi => pi.ToResponse()).ToList(),
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
@@ -48,6 +49,7 @@ public static class GetProductByIdMapping
             return new ProductImageProperty
             {
                 Id = entity.Id,
+                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt
             };

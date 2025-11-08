@@ -35,7 +35,14 @@ public class UpdateProductImageEndpoint : IEndpoint
 
         entity.MapUpdates(request);
 
-        var updated = await productImageRepository.UpdateAsync(entity);
+        var targetOrderIndex = request.OrderIndex ?? entity.Id;
+
+        if (targetOrderIndex < 0)
+        {
+            targetOrderIndex = 0;
+        }
+
+        var updated = await productImageRepository.UpdateAsync(entity, targetOrderIndex);
 
         if (updated is null) return TypedResults.NotFound();
 

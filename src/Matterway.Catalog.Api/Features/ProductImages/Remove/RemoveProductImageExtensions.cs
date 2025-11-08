@@ -10,8 +10,11 @@ public static class RemoveProductImageExtensions
         {
             return new RemoveProductImageResponse
             {
+                Id = entity.Id,
                 ProductId = entity.ProductId,
-                ImageUrl = entity.ImageUrl ?? string.Empty
+                ImageUrl = entity.ImageUrl,
+                ImageRef = entity.ImageRef,
+                ImageAlt = entity.ImageAlt
             };
         }
     }
