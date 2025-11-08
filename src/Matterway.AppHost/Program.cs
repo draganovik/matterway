@@ -1,3 +1,4 @@
+using Aspire.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -14,9 +15,10 @@ var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
 
 // Setup PostgreSQL container with databases
 var postgres = builder.AddPostgres("postgres")
+    .WithImageTag("18")
     .WithHostPort(15432)
     .WithPassword(postgresPassword)
-    .WithDataVolume()
+    .WithVolume("matterway-postgres-data", "/var/lib/postgresql")
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
