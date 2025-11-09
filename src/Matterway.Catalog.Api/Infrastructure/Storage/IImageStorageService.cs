@@ -2,10 +2,10 @@ namespace Matterway.Catalog.Api.Infrastructure.Storage;
 
 public interface IImageStorageService
 {
-    Task<ImageStorageUploadResult> UploadAsync(Guid productId, IFormFile file,
+    Task<ImageStorageUploadResult> UploadAsync(Guid productId, Guid imageId, IFormFile file,
         CancellationToken cancellationToken = default);
 
-    Task DeleteAsync(string imageRef, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Guid productId, Guid imageId, CancellationToken cancellationToken = default);
 }
 
-public sealed record ImageStorageUploadResult(string ImageRef, string ImageUrl);
+public sealed record ImageStorageUploadResult(Guid ImageId, string ImageUrl);

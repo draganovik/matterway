@@ -11,9 +11,9 @@ public static class AddProductImageExtensions
         {
             return new ProductImage
             {
-                Id = request.Id,
+                Id = uploadResult.ImageId,
                 ProductId = request.ProductId,
-                ImageRef = uploadResult.ImageRef,
+                OrderIndex = request.OrderIndex,
                 ImageUrl = uploadResult.ImageUrl,
                 ImageAlt = request.ImageAlt ?? string.Empty,
             };
@@ -27,9 +27,9 @@ public static class AddProductImageExtensions
             return new AddProductImageResponse
             {
                 Id = entity.Id,
+                OrderIndex = entity.OrderIndex,
                 ProductId = entity.ProductId,
                 ProductName = entity.Product?.Title,
-                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
             };

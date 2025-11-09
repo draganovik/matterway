@@ -44,10 +44,11 @@ public class AddProductImageEndpoint : IEndpoint
             });
         }
 
+        var imageId = Guid.CreateVersion7();
         ImageStorageUploadResult uploadResult;
         try
         {
-            uploadResult = await imageStorageService.UploadAsync(request.ProductId, request.File, cancellationToken);
+            uploadResult = await imageStorageService.UploadAsync(request.ProductId, imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -68,7 +69,7 @@ public class AddProductImageEndpoint : IEndpoint
         }
         catch
         {
-            await imageStorageService.DeleteAsync(uploadResult.ImageRef, cancellationToken);
+            await imageStorageService.DeleteAsync(request.ProductId, imageId, cancellationToken);
             throw;
         }
 
@@ -76,7 +77,7 @@ public class AddProductImageEndpoint : IEndpoint
 
         if (productImageModel is null)
         {
-            await imageStorageService.DeleteAsync(uploadResult.ImageRef, cancellationToken);
+            await imageStorageService.DeleteAsync(request.ProductId, imageId, cancellationToken);
             var problemDetails = new ProblemDetails
             {
                 Title = "Bad Request",
@@ -87,7 +88,7 @@ public class AddProductImageEndpoint : IEndpoint
         }
 
         var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductImages/{productImageModel.ProductId}/{productImageModel.Id}");
+            $"ProductImages/{productImageModel.ProductId}/{productImageModel.OrderIndex}");
 
         return TypedResults.Created(location,
             productImageModel);

@@ -40,8 +40,14 @@ const galleryImages = computed(() => {
     });
   }
 
-  product.value.productImages
-    ?.filter((image) => Boolean(image?.imageUrl))
+  const sortedImages = [...(product.value.productImages ?? [])].sort(
+    (a, b) =>
+      (a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+      (b.orderIndex ?? Number.MAX_SAFE_INTEGER),
+  );
+
+  sortedImages
+    .filter((image) => Boolean(image?.imageUrl))
     .forEach((image) => {
       images.push({
         id: image.id,

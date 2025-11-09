@@ -11,9 +11,9 @@ public static class RemoveProductImageExtensions
             return new RemoveProductImageResponse
             {
                 Id = entity.Id,
+                OrderIndex = entity.OrderIndex,
                 ProductId = entity.ProductId,
                 ImageUrl = entity.ImageUrl,
-                ImageRef = entity.ImageRef,
                 ImageAlt = entity.ImageAlt
             };
         }

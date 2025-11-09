@@ -6,7 +6,7 @@ public record AddProductImageRequest
 {
     [Required]
     [Range(0, int.MaxValue)]
-    public int Id { get; init; }
+    public int OrderIndex { get; init; }
 
     [Required]
     public Guid ProductId { get; init; }

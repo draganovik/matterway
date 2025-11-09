@@ -268,8 +268,8 @@ namespace Matterway.Catalog.Api.Migrations
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductImage", b =>
                 {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -279,65 +279,61 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("ImageRef")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id", "ProductId");
 
-                    b.HasIndex("ImageRef")
+                    b.HasIndex("ProductId", "OrderIndex")
                         .IsUnique();
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("DomainProductImage", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = 0,
+                            Id = new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"),
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                             ImageAlt = "Amazon Echo Show 5",
-                            ImageRef = "seed-20d76c1a-6d4e-4f22-9262-c20dc62f6f2c-0",
-                            ImageUrl = "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg"
+                            ImageUrl = "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg",
+                            OrderIndex = 0
                         },
                         new
                         {
-                            Id = 0,
+                            Id = new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"),
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                             ImageAlt = "Spotlight Cam Plus",
-                            ImageRef = "seed-853cb7f2-bd31-4627-9da5-17b32cc8c157-0",
-                            ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
+                            ImageUrl = "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg",
+                            OrderIndex = 0
                         },
                         new
                         {
-                            Id = 0,
+                            Id = new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"),
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             ImageAlt = "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View",
-                            ImageRef = "seed-a301b154-9867-431f-a9c9-0328b2ce350f-0",
-                            ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg"
+                            ImageUrl = "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg",
+                            OrderIndex = 0
                         },
                         new
                         {
-                            Id = 0,
+                            Id = new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"),
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                             ImageAlt = "Nest Learning Thermostat - Front View",
-                            ImageRef = "seed-8d9d9e68-6d44-49c7-8fcb-a6db28969e5a-0",
-                            ImageUrl = "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg"
+                            ImageUrl = "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg",
+                            OrderIndex = 0
                         },
                         new
                         {
-                            Id = 0,
+                            Id = new Guid("88423aa2-93bb-462c-9934-7e783e680b98"),
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                             ImageAlt = "August Wi-Fi Smart Lock Pro - Front View",
-                            ImageRef = "seed-0d6a9017-47e1-4477-86a9-67d9d9e468b8-0",
-                            ImageUrl = "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg"
+                            ImageUrl = "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg",
+                            OrderIndex = 0
                         });
                 });
 

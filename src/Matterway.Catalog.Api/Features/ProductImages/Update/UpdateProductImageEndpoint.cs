@@ -12,7 +12,7 @@ public class UpdateProductImageEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("ProductImages/{productId:guid}/{id:int}", Handler)
+        app.MapPatch("ProductImages/{productId:guid}/{orderIndex:int}", Handler)
             .WithName("UpdateProductImage").WithSummary("Update a ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces<UpdateProductImageResponse>()
@@ -26,16 +26,16 @@ public class UpdateProductImageEndpoint : IEndpoint
 
     private static async Task<Results<Ok<UpdateProductImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handler(
         Guid productId,
-        int id,
+        int orderIndex,
         UpdateProductImageRequest request,
         IProductImageRepository productImageRepository)
     {
-        var entity = await productImageRepository.GetById(productId, id);
+        var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex);
         if (entity is null) return TypedResults.NotFound();
 
         entity.MapUpdates(request);
 
-        var targetOrderIndex = request.OrderIndex ?? entity.Id;
+        var targetOrderIndex = request.OrderIndex ?? entity.OrderIndex;
 
         if (targetOrderIndex < 0)
         {

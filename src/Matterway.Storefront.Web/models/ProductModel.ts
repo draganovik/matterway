@@ -50,9 +50,12 @@ export default class ProductModel {
   }
 
   static fromDetailResponse(response: any): ProductModel {
-    const primaryImage =
-      response.productImages?.find((image: any) => image.isMain) ??
-      response.productImages?.[0];
+    const orderedImages = [...(response.productImages ?? [])].sort(
+      (a, b) =>
+        (a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+        (b.orderIndex ?? Number.MAX_SAFE_INTEGER),
+    );
+    const primaryImage = orderedImages[0];
     return new ProductModel({
       id: response.id,
       productCode: response.productCode,
@@ -60,7 +63,7 @@ export default class ProductModel {
       price: response.price,
       description: response.description,
       productDetails: response.productDetails ?? [],
-      productImages: response.productImages ?? [],
+      productImages: orderedImages,
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
         : primaryImage
@@ -85,10 +88,10 @@ export class ProductDetails {
 }
 
 export class ProductImages {
-  id?: number;
+  id?: string;
+  orderIndex?: number;
   imageUrl?: string;
   imageAlt?: string;
-  isMain?: boolean;
 }
 
 export class ProductThumbnail {

@@ -27,8 +27,8 @@ public record ProductDetailProperty
 
 public record ProductImageProperty
 {
-    public int Id { get; init; }
-    public string? ImageRef { get; init; }
+    public Guid Id { get; init; }
+    public int OrderIndex { get; init; }
     public string? ImageUrl { get; init; }
     public string? ImageAlt { get; init; }
 }

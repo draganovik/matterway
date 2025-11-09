@@ -11,7 +11,7 @@ public sealed class MinioImageStorageService(
 {
     private readonly ImageStorageOptions _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-    public async Task<ImageStorageUploadResult> UploadAsync(Guid productId, IFormFile file,
+    public async Task<ImageStorageUploadResult> UploadAsync(Guid productId, Guid imageId, IFormFile file,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(file);
@@ -21,7 +21,7 @@ public sealed class MinioImageStorageService(
             throw new InvalidOperationException("Cannot upload an empty file.");
         }
 
-        var objectName = BuildObjectName(productId, file.FileName);
+        var objectName = BuildObjectName(productId, imageId);
 
         await using var stream = file.OpenReadStream();
         var putObjectArgs = new PutObjectArgs()
@@ -35,20 +35,16 @@ public sealed class MinioImageStorageService(
         var client = clientFactory.CreateClient();
         await client.PutObjectAsync(putObjectArgs, cancellationToken).ConfigureAwait(false);
 
-        return new ImageStorageUploadResult(objectName, BuildPublicUrl(objectName));
+        return new ImageStorageUploadResult(imageId, BuildPublicUrl(objectName));
     }
 
-    public async Task DeleteAsync(string imageRef, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid productId, Guid imageId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(imageRef))
-        {
-            return;
-        }
-
+        var objectName = BuildObjectName(productId, imageId);
         var client = clientFactory.CreateClient();
         var removeArgs = new RemoveObjectArgs()
             .WithBucket(_options.Bucket)
-            .WithObject(imageRef);
+            .WithObject(objectName);
 
         try
         {
@@ -60,14 +56,9 @@ public sealed class MinioImageStorageService(
         }
     }
 
-    private static string BuildObjectName(Guid productId, string? originalFileName)
+    private static string BuildObjectName(Guid productId, Guid imageId)
     {
-        var extension = Path.GetExtension(originalFileName ?? string.Empty);
-        var sanitizedExtension = string.IsNullOrWhiteSpace(extension)
-            ? ".bin"
-            : extension.ToLowerInvariant();
-
-        return $"{productId:D}/{Guid.CreateVersion7():N}{sanitizedExtension}";
+        return $"{productId:D}/{imageId:N}";
     }
 
     private string BuildPublicUrl(string objectName)

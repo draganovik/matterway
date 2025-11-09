@@ -13,7 +13,8 @@ public record QueryProductResponse
 
 public record ProductImageProperty
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
+    public int OrderIndex { get; set; }
     public string? ImageUrl { get; set; }
     public string? ImageAlt { get; set; }
 }

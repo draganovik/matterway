@@ -12,7 +12,7 @@ public class RemoveProductImageEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("ProductImages/{productId:guid}/{id:int}", Handler)
+        app.MapDelete("ProductImages/{productId:guid}/{orderIndex:int}", Handler)
             .WithName("RemoveProductImage").WithSummary("Remove a ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces(StatusCodes.Status200OK)
@@ -25,26 +25,26 @@ public class RemoveProductImageEndpoint : IEndpoint
 
     private static async Task<Results<Ok<RemoveProductImageResponse>, NotFound>> Handler(
         Guid productId,
-        int id,
+        int orderIndex,
         IProductImageRepository productImageRepository,
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var entity = await productImageRepository.GetById(productId, id);
+        var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex);
 
         if (entity is null)
         {
             return TypedResults.NotFound();
         }
 
-        var isDeleted = await productImageRepository.Delete(productId, id);
+        var isDeleted = await productImageRepository.Delete(productId, orderIndex);
 
         if (!isDeleted)
         {
             return TypedResults.NotFound();
         }
 
-        await imageStorageService.DeleteAsync(entity.ImageRef, cancellationToken);
+        await imageStorageService.DeleteAsync(entity.ProductId, entity.Id, cancellationToken);
         return TypedResults.Ok(entity.ToResponse());
     }
 }

@@ -17,13 +17,13 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                     .Where(pi => pi.ProductId == requestModel.ProductId)
                     .CountAsync();
 
-                requestModel.Id = Math.Clamp(requestModel.Id, 0, existingCount);
+                requestModel.OrderIndex = Math.Clamp(requestModel.OrderIndex, 0, existingCount);
 
                 await context.ProductImage
                     .Where(pi => pi.ProductId == requestModel.ProductId)
-                    .Where(pi => pi.Id >= requestModel.Id)
+                    .Where(pi => pi.OrderIndex >= requestModel.OrderIndex)
                     .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(pi => pi.Id, pi => pi.Id + 1));
+                        setters.SetProperty(pi => pi.OrderIndex, pi => pi.OrderIndex + 1));
 
                 context.ProductImage.Add(requestModel);
                 var affected = await context.SaveChangesAsync();
@@ -47,7 +47,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
         });
     }
 
-    public async Task<bool> Delete(Guid parentId, int id)
+    public async Task<bool> Delete(Guid parentId, int orderIndex)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
@@ -57,7 +57,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
             {
                 var affected = await context.ProductImage
                     .Where(model => model.ProductId == parentId)
-                    .Where(model => model.Id == id)
+                    .Where(model => model.OrderIndex == orderIndex)
                     .ExecuteDeleteAsync();
                 if (affected != 1)
                 {
@@ -67,9 +67,9 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
                 await context.ProductImage
                     .Where(model => model.ProductId == parentId)
-                    .Where(model => model.Id > id)
+                    .Where(model => model.OrderIndex > orderIndex)
                     .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(model => model.Id, model => model.Id - 1));
+                        setters.SetProperty(model => model.OrderIndex, model => model.OrderIndex - 1));
 
                 await transaction.CommitAsync();
                 return true;
@@ -82,7 +82,12 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
         });
     }
 
-    public async Task<DomainProductImage?> GetById(Guid parentId, int id)
+    public async Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex)
+    {
+        return await context.ProductImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ProductId == parentId);
+    }
+
+    public async Task<DomainProductImage?> GetById(Guid parentId, Guid id)
     {
         return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
     }
@@ -97,7 +102,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
         return await context.ProductImage.AsNoTracking()
             .Include(x => x.Product)
             .OrderBy(x => x.ProductId)
-            .ThenBy(x => x.Id)
+            .ThenBy(x => x.OrderIndex)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -113,7 +118,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
             {
                 var existing = await context.ProductImage
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef);
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id);
 
                 if (existing is null)
                 {
@@ -133,29 +138,29 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
                 var clampedTarget = Math.Clamp(targetOrderIndex, 0, total - 1);
 
-                if (clampedTarget < existing.Id)
+                if (clampedTarget < existing.OrderIndex)
                 {
                     await context.ProductImage
                         .Where(x => x.ProductId == request.ProductId)
-                        .Where(x => x.Id >= clampedTarget && x.Id < existing.Id)
+                        .Where(x => x.OrderIndex >= clampedTarget && x.OrderIndex < existing.OrderIndex)
                         .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.Id, x => x.Id + 1));
+                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1));
                 }
-                else if (clampedTarget > existing.Id)
+                else if (clampedTarget > existing.OrderIndex)
                 {
                     await context.ProductImage
                         .Where(x => x.ProductId == request.ProductId)
-                        .Where(x => x.Id > existing.Id && x.Id <= clampedTarget)
+                        .Where(x => x.OrderIndex > existing.OrderIndex && x.OrderIndex <= clampedTarget)
                         .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.Id, x => x.Id - 1));
+                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1));
                 }
 
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
 
                 var updatedRows = await context.ProductImage
-                    .Where(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef)
+                    .Where(x => x.ProductId == request.ProductId && x.Id == request.Id)
                     .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(x => x.Id, x => clampedTarget)
+                        setters.SetProperty(x => x.OrderIndex, x => clampedTarget)
                             .SetProperty(x => x.ImageAlt, x => newAlt));
 
                 if (updatedRows != 1)
@@ -168,7 +173,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
                 return await context.ProductImage.Include(x => x.Product)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.ImageRef == request.ImageRef);
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id);
             }
             catch
             {

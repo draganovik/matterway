@@ -16,9 +16,9 @@ public static class UpdateProductImageExtensions
             return new UpdateProductImageResponse
             {
                 Id = entity.Id,
+                OrderIndex = entity.OrderIndex,
                 ProductId = entity.ProductId,
                 ProductName = entity.Product?.Title,
-                ImageRef = entity.ImageRef,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt,
             };

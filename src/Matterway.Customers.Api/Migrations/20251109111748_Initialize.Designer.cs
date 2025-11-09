@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Customers.Api.Migrations
 {
     [DbContext(typeof(CustomersDb))]
-    [Migration("20251108174100_Initialize")]
+    [Migration("20251109111748_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
