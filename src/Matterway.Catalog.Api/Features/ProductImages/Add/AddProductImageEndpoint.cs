@@ -48,7 +48,8 @@ public class AddProductImageEndpoint : IEndpoint
         ImageStorageUploadResult uploadResult;
         try
         {
-            uploadResult = await imageStorageService.UploadAsync(request.ProductId, imageId, request.File, cancellationToken);
+            uploadResult =
+                await imageStorageService.UploadAsync(request.ProductId, imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {

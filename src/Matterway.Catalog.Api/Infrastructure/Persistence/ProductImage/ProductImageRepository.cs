@@ -84,7 +84,8 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
 
     public async Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex)
     {
-        return await context.ProductImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ProductId == parentId);
+        return await
+            context.ProductImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ProductId == parentId);
     }
 
     public async Task<DomainProductImage?> GetById(Guid parentId, Guid id)
