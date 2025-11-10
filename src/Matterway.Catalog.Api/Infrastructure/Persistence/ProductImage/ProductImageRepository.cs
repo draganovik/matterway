@@ -5,17 +5,17 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 
 public sealed class ProductImageRepository(CatalogDb context) : IProductImageRepository
 {
-    public async Task<DomainProductImage?> Create(DomainProductImage requestModel)
+    public async Task<DomainProductImage?> Create(DomainProductImage requestModel, CancellationToken cancellationToken)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
         {
-            await using var transaction = await context.Database.BeginTransactionAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             try
             {
                 var existingCount = await context.ProductImage
                     .Where(pi => pi.ProductId == requestModel.ProductId)
-                    .CountAsync();
+                    .CountAsync(cancellationToken);
 
                 requestModel.OrderIndex = Math.Clamp(requestModel.OrderIndex, 0, existingCount);
 
@@ -23,45 +23,46 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                     .Where(pi => pi.ProductId == requestModel.ProductId)
                     .Where(pi => pi.OrderIndex >= requestModel.OrderIndex)
                     .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(pi => pi.OrderIndex, pi => pi.OrderIndex + 1));
+                        setters.SetProperty(pi => pi.OrderIndex, pi => pi.OrderIndex + 1), cancellationToken);
 
                 context.ProductImage.Add(requestModel);
-                var affected = await context.SaveChangesAsync();
+                var affected = await context.SaveChangesAsync(cancellationToken);
                 if (affected != 1)
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
                     return null;
                 }
 
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(cancellationToken);
 
                 return await context.ProductImage.Include(x => x.Product)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId);
+                    .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ProductId == requestModel.ProductId,
+                        cancellationToken);
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(cancellationToken);
                 throw;
             }
         });
     }
 
-    public async Task<bool> Delete(Guid parentId, int orderIndex)
+    public async Task<bool> Delete(Guid parentId, int orderIndex, CancellationToken cancellationToken = default)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
         {
-            await using var transaction = await context.Database.BeginTransactionAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             try
             {
                 var affected = await context.ProductImage
                     .Where(model => model.ProductId == parentId)
                     .Where(model => model.OrderIndex == orderIndex)
-                    .ExecuteDeleteAsync();
+                    .ExecuteDeleteAsync(cancellationToken);
                 if (affected != 1)
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
                     return false;
                 }
 
@@ -69,36 +70,42 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                     .Where(model => model.ProductId == parentId)
                     .Where(model => model.OrderIndex > orderIndex)
                     .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(model => model.OrderIndex, model => model.OrderIndex - 1));
+                            setters.SetProperty(model => model.OrderIndex, model => model.OrderIndex - 1),
+                        cancellationToken);
 
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(cancellationToken);
                 return true;
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(cancellationToken);
                 throw;
             }
         });
     }
 
-    public async Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex)
+    public async Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
+        CancellationToken cancellationToken = default)
     {
         return await
-            context.ProductImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ProductId == parentId);
+            context.ProductImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ProductId == parentId,
+                cancellationToken);
     }
 
-    public async Task<DomainProductImage?> GetById(Guid parentId, Guid id)
+    public async Task<DomainProductImage?> GetById(Guid parentId, Guid id,
+        CancellationToken cancellationToken = default)
     {
-        return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId);
+        return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId,
+            cancellationToken);
     }
 
-    public async Task<int> GetTotalEntities()
+    public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
     {
-        return await context.ProductImage.CountAsync();
+        return await context.ProductImage.CountAsync(cancellationToken);
     }
 
-    public async Task<ICollection<DomainProductImage>> Query(int pageIndex, int pageSize)
+    public async Task<ICollection<DomainProductImage>> Query(int pageIndex, int pageSize,
+        CancellationToken cancellationToken = default)
     {
         return await context.ProductImage.AsNoTracking()
             .Include(x => x.Product)
@@ -106,34 +113,36 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
             .ThenBy(x => x.OrderIndex)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex)
+    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex,
+        CancellationToken cancellationToken = default)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
         {
-            await using var transaction = await context.Database.BeginTransactionAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             try
             {
                 var existing = await context.ProductImage
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id);
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id,
+                        cancellationToken);
 
                 if (existing is null)
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
                     return null;
                 }
 
                 var total = await context.ProductImage
                     .Where(x => x.ProductId == request.ProductId)
-                    .CountAsync();
+                    .CountAsync(cancellationToken);
 
                 if (total == 0)
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
                     return null;
                 }
 
@@ -145,7 +154,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                         .Where(x => x.ProductId == request.ProductId)
                         .Where(x => x.OrderIndex >= clampedTarget && x.OrderIndex < existing.OrderIndex)
                         .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1));
+                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1), cancellationToken);
                 }
                 else if (clampedTarget > existing.OrderIndex)
                 {
@@ -153,7 +162,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                         .Where(x => x.ProductId == request.ProductId)
                         .Where(x => x.OrderIndex > existing.OrderIndex && x.OrderIndex <= clampedTarget)
                         .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1));
+                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1), cancellationToken);
                 }
 
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
@@ -162,23 +171,24 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                     .Where(x => x.ProductId == request.ProductId && x.Id == request.Id)
                     .ExecuteUpdateAsync(setters =>
                         setters.SetProperty(x => x.OrderIndex, x => clampedTarget)
-                            .SetProperty(x => x.ImageAlt, x => newAlt));
+                            .SetProperty(x => x.ImageAlt, x => newAlt), cancellationToken);
 
                 if (updatedRows != 1)
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
                     return null;
                 }
 
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(cancellationToken);
 
                 return await context.ProductImage.Include(x => x.Product)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id);
+                    .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.Id == request.Id,
+                        cancellationToken);
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(cancellationToken);
                 throw;
             }
         });

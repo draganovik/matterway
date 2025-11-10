@@ -65,7 +65,7 @@ public sealed class MinioImageStorageService(
     {
         var baseUrl = string.IsNullOrWhiteSpace(_options.PublicBaseUrl)
             ? _options.Endpoint
-            : _options.PublicBaseUrl!;
+            : _options.PublicBaseUrl;
 
         return $"{baseUrl.TrimEnd('/')}/{_options.Bucket}/{objectName}";
     }

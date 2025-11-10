@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
@@ -8,13 +9,13 @@ using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Matterway.Catalog.Api.Features.ProductImages.Add;
+namespace Matterway.Catalog.Api.Features.ProductImages;
 
-public class AddProductImageEndpoint : IEndpoint
+public class AddProductImage : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("ProductImages", Handler)
+        app.MapPost("ProductImages", Handle)
             .WithName("AddProductImage").WithSummary("Add a new ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces<AddProductImageResponse>(StatusCodes.Status201Created)
@@ -26,7 +27,7 @@ public class AddProductImageEndpoint : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Created<AddProductImageResponse>, BadRequest<ProblemDetails>>> Handler(
+    private static async Task<Results<Created<AddProductImageResponse>, BadRequest<ProblemDetails>>> Handle(
         [FromForm]
         AddProductImageRequest request,
         HttpContext httpContext,
@@ -61,12 +62,12 @@ public class AddProductImageEndpoint : IEndpoint
             });
         }
 
-        var entity = ProductImage.FromRequest(request, uploadResult);
+        var entity = MapToEntity(request, uploadResult);
         ProductImage? created;
 
         try
         {
-            created = await productImageRepository.Create(entity);
+            created = await productImageRepository.Create(entity, cancellationToken);
         }
         catch
         {
@@ -74,7 +75,7 @@ public class AddProductImageEndpoint : IEndpoint
             throw;
         }
 
-        var productImageModel = created?.ToResponse();
+        var productImageModel = MapToResponse(created);
 
         if (productImageModel is null)
         {
@@ -93,5 +94,57 @@ public class AddProductImageEndpoint : IEndpoint
 
         return TypedResults.Created(location,
             productImageModel);
+    }
+
+    public record AddProductImageRequest
+    {
+        [Required]
+        [Range(0, int.MaxValue)]
+        public int OrderIndex { get; init; }
+
+        [Required]
+        public Guid ProductId { get; init; }
+
+        [Required]
+        public IFormFile? File { get; init; }
+
+        public string? ImageAlt { get; init; }
+    }
+
+    public record AddProductImageResponse
+    {
+        public Guid Id { get; init; }
+        public int OrderIndex { get; init; }
+        public Guid ProductId { get; init; }
+        public string? ProductName { get; init; }
+        public string? ImageUrl { get; init; }
+        public string? ImageAlt { get; init; }
+    }
+
+    public static ProductImage MapToEntity(AddProductImageRequest request, ImageStorageUploadResult uploadResult)
+    {
+        return new ProductImage
+        {
+            Id = uploadResult.ImageId,
+            ProductId = request.ProductId,
+            OrderIndex = request.OrderIndex,
+            ImageUrl = uploadResult.ImageUrl,
+            ImageAlt = request.ImageAlt ?? string.Empty
+        };
+    }
+
+    public static AddProductImageResponse? MapToResponse(ProductImage? entity)
+    {
+        return entity is null
+            ? null
+            : new AddProductImageResponse
+            {
+                Id = entity.Id,
+                OrderIndex = entity.OrderIndex,
+                ProductId = entity.ProductId,
+                ProductName = entity.Product?.Title,
+                ImageUrl = entity.ImageUrl,
+                ImageAlt = entity.ImageAlt
+            };
     }
 }

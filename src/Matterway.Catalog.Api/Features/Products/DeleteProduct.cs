@@ -1,16 +1,16 @@
 using Asp.Versioning;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Matterway.Catalog.Api.Features.Products.Delete;
+namespace Matterway.Catalog.Api.Features.Products;
 
-public class DeleteProductEndpoint : IEndpoint
+public class DeleteProduct : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("Products/{id:guid}", Handler)
+        app.MapDelete("Products/{id:guid}", Handle)
             .WithName("DeleteProduct").WithSummary("Delete a Product.")
             .WithTags("Products")
             .Produces(StatusCodes.Status200OK)
@@ -21,15 +21,22 @@ public class DeleteProductEndpoint : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<DeleteProductResponse>, NotFound>> Handler(
+    private static async Task<Results<Ok<DeleteProductResponse>, NotFound>> Handle(
         Guid id,
-        IProductRepository productRepository)
+        IProductRepository productRepository,
+        CancellationToken cancellationToken)
     {
-        var isDeleted = await productRepository.Delete(id);
+        var isDeleted = await productRepository.Delete(id, cancellationToken);
         var response = new DeleteProductResponse
         {
             Id = id
         };
         return isDeleted ? TypedResults.Ok(response) : TypedResults.NotFound();
+    }
+
+    public record DeleteProductResponse
+    {
+        public Guid Id { get; init; }
+        public string Message { get; init; } = "Product deleted successfully.";
     }
 }
