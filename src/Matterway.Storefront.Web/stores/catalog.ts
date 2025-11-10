@@ -272,33 +272,57 @@ export const useCatalogStore = defineStore("catalog", {
 
     async createProductImage(
       productId: string,
-      imageId: number,
-      imageUrl: string,
+      orderIndex: number,
+      file: File,
       imageAlt: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
+      const formData = new FormData();
+      formData.append("OrderIndex", orderIndex.toString());
+      formData.append("ProductId", productId);
+      formData.append("File", file);
+      if (imageAlt) {
+        formData.append("ImageAlt", imageAlt);
+      }
+
       const response = await request(
         `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages`,
         {
           method: "POST",
-          body: JSON.stringify({
-            id: imageId,
-            productId: productId,
-            imageUrl: imageUrl,
-            imageAlt: imageAlt,
-            isMain: false,
-          }),
+          body: formData,
+        },
+      );
+      return response;
+    },
+    async updateProductImage(
+      productId: string,
+      orderIndex: number,
+      payload: { orderIndex?: number; imageAlt?: string },
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      const body: Record<string, unknown> = {};
+      if (typeof payload.orderIndex === "number") {
+        body.orderIndex = payload.orderIndex;
+      }
+      if (payload.imageAlt !== undefined) {
+        body.imageAlt = payload.imageAlt;
+      }
+      const response = await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${orderIndex}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(body),
         },
       );
       return response;
     },
     async deleteProductImage(
       productId: string,
-      imageId: number,
+      orderIndex: number,
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${imageId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${orderIndex}`,
         {
           method: "DELETE",
         },

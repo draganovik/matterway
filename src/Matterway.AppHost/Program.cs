@@ -1,4 +1,3 @@
-using Aspire.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -11,6 +10,9 @@ builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options 
 
 var postgresPassword = builder.AddParameter("PostgresPassword", secret: true);
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
+var minioRootUser = builder.AddParameter("MinioRootUser");
+var minioRootPassword = builder.AddParameter("MinioRootPassword", secret: true);
+const string productImagesBucket = "product-images";
 
 
 // Setup PostgreSQL container with databases
@@ -30,6 +32,21 @@ var customersDb = postgres.AddDatabase("CustomersDb");
 var identityDb = postgres.AddDatabase("IdentityDb");
 var paymentsDb = postgres.AddDatabase("PaymentsDb");
 var orderingDb = postgres.AddDatabase("OrderingDb");
+
+// Setup MinIO for product image storage
+var minio = builder.AddContainer("minio", "minio/minio:latest")
+    .WithVolume("matterway-minio-data", "/data")
+    .WithEnvironment("MINIO_ROOT_USER", minioRootUser)
+    .WithEnvironment("MINIO_ROOT_PASSWORD", minioRootPassword)
+    .WithArgs("server", "/data", "--console-address", ":9001")
+    .WithHttpEndpoint(port: 19000, targetPort: 9000, name: "http")
+    .WithHttpEndpoint(port: 19001, targetPort: 9001, name: "console")
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Command = ["server", "/data", "--console-address", ":9001"];
+        service.Ports = ["19000:9000", "19001:9001"];
+    });
 
 // Setup Identity API
 var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")
@@ -52,6 +69,7 @@ identityApi
 var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
     .WithReference(catalogDb)
     .WithReference(identityApi)
+    .WithReference(minio.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
     {
@@ -62,7 +80,13 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
 catalogApi
     .WithEnvironment("Jwt__Key", jwtSigningKey)
     .WithEnvironment("Jwt__Issuer", identityEndpoint)
-    .WithEnvironment("Jwt__Audience", identityEndpoint);
+    .WithEnvironment("Jwt__Audience", identityEndpoint)
+    .WithEnvironment("ImageStorage__Bucket", productImagesBucket)
+    .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
+    .WithEnvironment("ImageStorage__PublicBaseUrl", "http://localhost:19000")
+    .WithEnvironment("ImageStorage__AccessKey", minioRootUser)
+    .WithEnvironment("ImageStorage__SecretKey", minioRootPassword)
+    .WithEnvironment("ImageStorage__AllowPublicRead", "true");
 
 // Setup Customers API
 var customersApi = builder.AddProject<Matterway_Customers_Api>("customers-api")

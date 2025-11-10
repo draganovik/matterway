@@ -20,7 +20,9 @@ const heroImage = computed(() => {
     return null;
   }
   const sortedImages = [...images].sort(
-    (a, b) => Number(b.isMain) - Number(a.isMain),
+    (a, b) =>
+      (a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+      (b.orderIndex ?? Number.MAX_SAFE_INTEGER),
   );
   const candidate = sortedImages[0];
   if (!candidate?.imageUrl) {

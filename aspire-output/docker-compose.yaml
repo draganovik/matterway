@@ -29,6 +29,26 @@ services:
     networks:
       - "aspire"
     restart: "unless-stopped"
+  minio:
+    image: "quay.io/minio/minio:RELEASE.2024-06-11T01-39-51Z"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    command: "server /data --console-address :9001"
+    ports:
+      - "19000:9000"
+      - "19001:9001"
+    expose:
+      - "9000"
+      - "9001"
+    volumes:
+      - type: "volume"
+        target: "/data"
+        source: "matterway-minio-data"
+        read_only: false
+    networks:
+      - "aspire"
+    restart: "unless-stopped"
   identity-api:
     image: "${IDENTITY_API_IMAGE}"
     environment:
@@ -64,11 +84,19 @@ services:
       Jwt__Issuer: "http://identity-api:${IDENTITY_API_PORT}"
       Jwt__Audience: "http://identity-api:${IDENTITY_API_PORT}"
       services__storefront-web__http__0: "http://storefront-web:3000"
+      ImageStorage__Bucket: "product-images"
+      ImageStorage__Endpoint: "http://minio:9000"
+      ImageStorage__PublicBaseUrl: "http://localhost:19000"
+      ImageStorage__AccessKey: "${MINIO_ROOT_USER}"
+      ImageStorage__SecretKey: "${MINIO_ROOT_PASSWORD}"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://matterway-platform-dashboard:18889"
       OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
       OTEL_SERVICE_NAME: "catalog-api"
     ports:
       - "2001:8080"
+    depends_on:
+      minio:
+        condition: "service_started"
     networks:
       - "aspire"
     restart: "unless-stopped"
@@ -184,4 +212,6 @@ networks:
     driver: "bridge"
 volumes:
   matterway-postgres-data:
+    driver: "local"
+  matterway-minio-data:
     driver: "local"

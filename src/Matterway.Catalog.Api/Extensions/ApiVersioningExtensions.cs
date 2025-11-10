@@ -31,7 +31,8 @@ public static class ApiVersioningExtensions
             .ReportApiVersions()
             .Build();
 
-        var apiGroup = app.MapGroup("/api");
+        var apiGroup = app.MapGroup("/api")
+            .DisableAntiforgery();
         var versionedGroup = apiGroup
             .MapGroup("/v{version:apiVersion}")
             .WithApiVersionSet(versionSet);

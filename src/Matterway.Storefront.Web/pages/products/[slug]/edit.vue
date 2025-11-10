@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { useCatalogStore } from "~/stores/catalog";
-import ProductModel, { type ProductDetails } from "~/models/ProductModel";
+import ProductModel, {
+  type ProductDetails,
+  type ProductImages,
+} from "~/models/ProductModel";
 
 const catalogStore = useCatalogStore();
 const route = useRoute();
@@ -37,8 +40,14 @@ const galleryImages = computed(() => {
     });
   }
 
-  product.value.productImages
-    ?.filter((image) => Boolean(image?.imageUrl))
+  const sortedImages = [...(product.value.productImages ?? [])].sort(
+    (a, b) =>
+      (a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+      (b.orderIndex ?? Number.MAX_SAFE_INTEGER),
+  );
+
+  sortedImages
+    .filter((image) => Boolean(image?.imageUrl))
     .forEach((image) => {
       images.push({
         id: image.id,
@@ -63,10 +72,41 @@ const inputSpecs = ref({
 });
 
 const inputImage = ref({
-  imageId: 0,
-  imageUrl: "",
+  orderIndex: 0,
   imageAlt: "product image",
+  file: null as File | null,
 });
+
+const imageFileInput = ref<HTMLInputElement | null>(null);
+const imageOrderInputs = ref<Record<string, number>>({});
+
+const syncImageOrderInputs = () => {
+  if (!product.value?.productImages) {
+    imageOrderInputs.value = {};
+    return;
+  }
+  const entries: Record<string, number> = {};
+  product.value.productImages.forEach((image) => {
+    if (image.id) {
+      entries[image.id] = image.orderIndex ?? 0;
+    }
+  });
+  imageOrderInputs.value = entries;
+};
+
+const resetImageForm = () => {
+  inputImage.value.orderIndex = product.value?.productImages?.length ?? 0;
+  inputImage.value.imageAlt = "product image";
+  inputImage.value.file = null;
+  if (imageFileInput.value) {
+    imageFileInput.value.value = "";
+  }
+};
+
+const handleImageFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  inputImage.value.file = target?.files?.[0] ?? null;
+};
 
 const addSpec = async () => {
   if (!product.value || !inputSpecs.value.title || !inputSpecs.value.value) {
@@ -112,30 +152,56 @@ const updateSpec = async (detail: ProductDetails) => {
 };
 
 const addImage = async () => {
-  if (!product.value || !inputImage.value.imageUrl) {
+  if (!product.value || !inputImage.value.file) {
     return;
   }
   const response = await catalogStore.createProductImage(
     product.value.id,
-    inputImage.value.imageId,
-    inputImage.value.imageUrl,
+    inputImage.value.orderIndex,
+    inputImage.value.file,
     inputImage.value.imageAlt,
   );
   if (response.ok) {
-    inputImage.value.imageId = 0;
-    inputImage.value.imageUrl = "";
-    inputImage.value.imageAlt = "product image";
     await loadProduct();
   }
 };
 
-const deleteImage = async (imageId: number) => {
+const deleteImage = async (orderIndex?: number) => {
   if (!product.value) {
+    return;
+  }
+  if (typeof orderIndex !== "number") {
     return;
   }
   const response = await catalogStore.deleteProductImage(
     product.value.id,
-    imageId,
+    orderIndex,
+  );
+  if (response.ok) {
+    await loadProduct();
+  }
+};
+
+const updateImageOrder = async (image: ProductImages) => {
+  if (
+    !product.value ||
+    !image.id ||
+    typeof image.orderIndex !== "number" ||
+    !(image.id in imageOrderInputs.value)
+  ) {
+    return;
+  }
+
+  const targetIndex = imageOrderInputs.value[image.id];
+
+  if (targetIndex === image.orderIndex) {
+    return;
+  }
+
+  const response = await catalogStore.updateProductImage(
+    product.value.id,
+    image.orderIndex,
+    { orderIndex: targetIndex },
   );
   if (response.ok) {
     await loadProduct();
@@ -159,6 +225,12 @@ const loadProduct = async () => {
   product.value = await catalogStore.fetchProductById(
     route.params.slug.toString(),
   );
+  if (product.value) {
+    syncImageOrderInputs();
+    resetImageForm();
+  } else {
+    imageOrderInputs.value = {};
+  }
 };
 
 useHead({
@@ -240,24 +312,50 @@ onMounted(async () => {
         <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
           <li
             v-for="image in product.productImages"
-            :key="image.id"
-            class="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40"
+            :key="image.id ?? image.orderIndex"
+            class="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-semibold text-slate-400"
-                >#{{ image.id }}</span
+            <div class="min-w-0 flex-1 space-y-1">
+              <span class="text-xs font-semibold uppercase text-slate-400"
+                >Redosled #{{ image.orderIndex }}</span
               >
-              <span class="max-w-[16rem] truncate font-medium">
+              <p class="truncate font-medium">
                 {{ image.imageUrl }}
-              </span>
+              </p>
+              <p v-if="image.imageAlt" class="text-xs text-slate-400">
+                Alt: {{ image.imageAlt }}
+              </p>
             </div>
-            <button
-              type="button"
-              class="text-sm font-medium text-red-600 hover:underline dark:text-red-400"
-              @click="deleteImage(image.id!)"
+            <div
+              v-if="image.id"
+              class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center"
             >
-              Ukloni
-            </button>
+              <label class="flex items-center gap-2 text-xs uppercase">
+                Nova pozicija
+                <input
+                  v-model.number="imageOrderInputs[image.id]"
+                  type="number"
+                  min="0"
+                  class="w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                />
+              </label>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="rounded-lg border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                  @click="updateImageOrder(image)"
+                >
+                  Sačuvaj
+                </button>
+                <button
+                  type="button"
+                  class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                  @click="deleteImage(image.orderIndex)"
+                >
+                  Ukloni
+                </button>
+              </div>
+            </div>
           </li>
         </ul>
 
@@ -267,30 +365,43 @@ onMounted(async () => {
           <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
             Dodaj novu fotografiju
           </h3>
-          <div class="grid gap-3 sm:grid-cols-[90px_1fr_1fr]">
-            <input
-              v-model.number="inputImage.imageId"
-              type="number"
-              min="0"
-              placeholder="ID"
-              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            />
-            <input
-              v-model="inputImage.imageUrl"
-              type="url"
-              placeholder="https://..."
-              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            />
-            <input
-              v-model="inputImage.imageAlt"
-              type="text"
-              placeholder="Alt tekst"
-              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            />
+          <div class="grid gap-3 sm:grid-cols-[120px_1fr]">
+            <label class="text-xs font-semibold uppercase text-slate-500">
+              Redosled
+              <input
+                v-model.number="inputImage.orderIndex"
+                type="number"
+                min="0"
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              />
+            </label>
+            <label class="text-xs font-semibold uppercase text-slate-500">
+              Alt tekst
+              <input
+                v-model="inputImage.imageAlt"
+                type="text"
+                placeholder="Alt tekst"
+                class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              />
+            </label>
           </div>
+          <label class="text-xs font-semibold uppercase text-slate-500">
+            Datoteka
+            <input
+              ref="imageFileInput"
+              type="file"
+              accept="image/*"
+              class="mt-1 block w-full cursor-pointer rounded-lg border border-slate-300 bg-white text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:file:bg-blue-500"
+              @change="handleImageFileChange"
+            />
+          </label>
+          <p v-if="inputImage.file" class="text-xs text-slate-400">
+            Selektovano: {{ inputImage.file?.name }}
+          </p>
           <button
             type="button"
-            class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:bg-blue-400 disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            :disabled="!inputImage.file"
             @click="addImage()"
           >
             Dodaj sliku
