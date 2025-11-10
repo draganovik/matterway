@@ -105,19 +105,19 @@ public class QueryProducts : IEndpoint
         public IQueryable<Product> GenerateQuery(IQueryable<Product> query)
         {
             if (TitleLike != null)
-                query = query.Where(p => p.Title.Contains(TitleLike, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(p => p.Title != null && p.Title.ToLower().Contains(TitleLike.ToLower()));
             if (PriceMin.HasValue) query = query.Where(p => p.Price >= PriceMin);
             if (PriceMax.HasValue) query = query.Where(p => p.Price <= PriceMax);
             if (CategoryLike != null)
                 query = query.Where(p => p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                    pd.Type == DetailType.Category &&
-                    pd.Value.Contains(CategoryLike, StringComparison.CurrentCultureIgnoreCase)));
+                    pd.Type == DetailType.Category && pd.Value != null &&
+                    pd.Value.ToLower().Contains(CategoryLike.ToLower())));
             if (ProductDetailsLike?.Length > 0)
             {
                 query = ProductDetailsLike.Aggregate(query,
                     (current, productDetailLike) => current.Where(p =>
                         p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                            pd.Value.Contains(productDetailLike, StringComparison.CurrentCultureIgnoreCase))));
+                            pd.Value != null && pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
             }
 
             if (IsAvailable.HasValue) query = query.Where(p => p.IsAvailable == IsAvailable);
