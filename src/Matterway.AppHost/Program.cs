@@ -70,6 +70,7 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
     .WithReference(catalogDb)
     .WithReference(identityApi)
     .WithReference(minio.GetEndpoint("http"))
+    .WaitFor(minio)
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
     {
