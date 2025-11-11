@@ -278,13 +278,13 @@ onMounted(async () => {
       <dl class="grid gap-4 md:grid-cols-2">
         <div
           v-for="detail in product.productDetails"
-          :key="detail.id"
+          :key="detail.typeId ?? detail.title"
           class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
         >
           <dt
             class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
           >
-            {{ detail.title }}
+            {{ detail.title ?? `Tip #${detail.typeId}` }}
           </dt>
           <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
             {{ detail.value }}

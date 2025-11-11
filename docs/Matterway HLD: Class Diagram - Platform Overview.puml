@@ -65,14 +65,16 @@ package "Catalog" {
 
   class ProductDetailType {
     +id: Integer
-    +name: String
+    +title: String
+    +unit: String
   }
 
   class ProductImage {
-    +id: Integer
+    +id: UUID
     +productId: UUID
+    +orderIndex: Integer
     +imageUrl: String
-    +caption: String
+    +imageAlt: String
   }
 }
 

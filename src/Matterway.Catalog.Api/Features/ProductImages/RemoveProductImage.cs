@@ -12,7 +12,7 @@ public class RemoveProductImage : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("ProductImages/{productId:guid}/{orderIndex:int}", Handle)
+        app.MapDelete("Products/{productId:guid}/Images/{orderIndex:int}", Handle)
             .WithName("RemoveProductImage").WithSummary("Remove a ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces(StatusCodes.Status200OK)

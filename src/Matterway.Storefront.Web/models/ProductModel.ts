@@ -19,7 +19,10 @@ export default class ProductModel {
     this.description = initial?.description ?? "";
     this.productDetails =
       initial?.productDetails?.map((detail) => ({
-        ...detail,
+        typeId: detail.typeId ?? null,
+        title: detail.title,
+        value: detail.value,
+        unit: detail.unit ?? null,
       })) ?? [];
     this.productImages =
       initial?.productImages?.map((image) => ({ ...image })) ?? [];
@@ -62,7 +65,14 @@ export default class ProductModel {
       title: response.title,
       price: response.price,
       description: response.description,
-      productDetails: response.productDetails ?? [],
+      productDetails: (response.productDetails ?? []).map(
+        (detail: any) => ({
+          typeId: detail.typeId ?? null,
+          title: detail.title,
+          value: detail.value,
+          unit: detail.unit ?? null,
+        }),
+      ),
       productImages: orderedImages,
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
@@ -80,11 +90,10 @@ export default class ProductModel {
 }
 
 export class ProductDetails {
-  id?: string;
-  type?: string | number;
+  typeId?: number | null;
   title?: string;
   value?: string;
-  unit?: string;
+  unit?: string | null;
 }
 
 export class ProductImages {

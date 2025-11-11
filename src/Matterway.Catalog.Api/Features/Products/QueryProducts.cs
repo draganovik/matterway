@@ -42,8 +42,8 @@ public class QueryProducts : IEndpoint
 
         var paginationResponse = new PaginationResponse<QueryProductResponse>(
             total,
-            pagingQuery.Page!.Value,
-            pagingQuery.PageSize!.Value,
+            pagingQuery.Page.Value,
+            pagingQuery.PageSize.Value,
             results,
             location);
 
@@ -98,26 +98,21 @@ public class QueryProducts : IEndpoint
         public string? TitleLike { get; set; }
         public double? PriceMin { get; set; }
         public double? PriceMax { get; set; }
-        public string? CategoryLike { get; set; }
         public string[]? ProductDetailsLike { get; set; }
         public bool? IsAvailable { get; set; }
 
         public IQueryable<Product> GenerateQuery(IQueryable<Product> query)
         {
             if (TitleLike != null)
-                query = query.Where(p => p.Title != null && p.Title.ToLower().Contains(TitleLike.ToLower()));
+                query = query.Where(p => p.Title.ToLower().Contains(TitleLike.ToLower()));
             if (PriceMin.HasValue) query = query.Where(p => p.Price >= PriceMin);
             if (PriceMax.HasValue) query = query.Where(p => p.Price <= PriceMax);
-            if (CategoryLike != null)
-                query = query.Where(p => p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                    pd.Type == DetailType.Category && pd.Value != null &&
-                    pd.Value.ToLower().Contains(CategoryLike.ToLower())));
             if (ProductDetailsLike?.Length > 0)
             {
                 query = ProductDetailsLike.Aggregate(query,
                     (current, productDetailLike) => current.Where(p =>
                         p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                            pd.Value != null && pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
+                            pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
             }
 
             if (IsAvailable.HasValue) query = query.Where(p => p.IsAvailable == IsAvailable);

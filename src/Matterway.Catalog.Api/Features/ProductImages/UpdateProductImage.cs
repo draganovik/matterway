@@ -14,7 +14,7 @@ public class UpdateProductImage : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("ProductImages/{productId:guid}/{orderIndex:int}", Handle)
+        app.MapPatch("Products/{productId:guid}/Images/{orderIndex:int}", Handle)
             .WithName("UpdateProductImage").WithSummary("Update a ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces<UpdateProductImageResponse>()

@@ -14,7 +14,7 @@ public class UpdateProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("ProductDetails/{id:guid}", Handle)
+        app.MapPatch("Products/{productId:guid}/Details/{typeId:int}", Handle)
             .WithName("UpdateProductDetail").WithSummary("Update a ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces<UpdateProductDetailResponse>()
@@ -28,17 +28,18 @@ public class UpdateProductDetail : IEndpoint
 
     private static async Task<Results<Ok<UpdateProductDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handle(
-            Guid id,
+            Guid productId,
+            int typeId,
             UpdateProductDetailRequest request,
             IProductDetailRepository productDetailRepository,
             CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetById(id, cancellationToken);
+        var entity = await productDetailRepository.GetByKey(productId, typeId, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
 
-        var updated = await productDetailRepository.UpdateAsync(entity, cancellationToken);
+        var updated = await productDetailRepository.UpdateAsync(productId, typeId, entity, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 
@@ -48,54 +49,30 @@ public class UpdateProductDetail : IEndpoint
     public record UpdateProductDetailRequest
     {
         [Required]
-        public Guid ProductId { get; init; }
-
-        [Required]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public DetailType Type { get; init; }
-
-        [Required]
-        public string? Title { get; init; }
-
-        [Required]
-        public string? Value { get; init; }
-
-        public string? Unit { get; init; }
+        public required string Value { get; init; }
     }
 
     public record UpdateProductDetailResponse
     {
-        public Guid Id { get; init; }
-        public Guid ProductId { get; init; }
         public string? ProductTitle { get; init; }
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public DetailType Type { get; init; }
-
-        public string? Title { get; init; }
+        public string? Type { get; init; }
         public string? Value { get; init; }
         public string? Unit { get; init; }
     }
 
     public static void MapUpdates(ProductDetail entity, UpdateProductDetailRequest request)
     {
-        entity.Type = request.Type;
-        entity.Title = request.Title ?? entity.Title;
-        entity.Value = request.Value ?? entity.Value;
-        entity.Unit = request.Unit ?? entity.Unit;
+        entity.Value = request.Value;
     }
 
     public static UpdateProductDetailResponse MapToResponse(ProductDetail entity)
     {
         return new UpdateProductDetailResponse
         {
-            Id = entity.Id,
-            ProductId = entity.ProductId,
             ProductTitle = entity.Product?.Title,
-            Type = entity.Type,
-            Title = entity.Title,
+            Type = entity.Type?.Title,
             Value = entity.Value,
-            Unit = entity.Unit
+            Unit = entity.Type?.Unit
         };
     }
 }

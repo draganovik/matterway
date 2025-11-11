@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251109111744_Initialize")]
+    [Migration("20251111001547_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -122,150 +122,212 @@ namespace Matterway.Catalog.Api.Migrations
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductDetail", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
-                    b.Property<int>("Type")
+                    b.Property<int>("TypeId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Unit")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId", "TypeId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("TypeId");
 
                     b.ToTable("DomainProductDetail", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fd6f8de6-91c6-4362-ae90-6d8cf1d98f27"),
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            Title = "Compatibility",
-                            Type = 1,
+                            TypeId = 7,
                             Value = "Works with Alexa, Google Assistant, and Apple HomeKit"
                         },
                         new
                         {
-                            Id = new Guid("30ef1d9a-13f8-4c2a-a2c3-5e5a5c23f5e1"),
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            Title = "Display",
-                            Type = 1,
+                            TypeId = 12,
                             Value = "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)"
                         },
                         new
                         {
-                            Id = new Guid("b15e8e32-f357-4f97-9d19-1d2668e6d31a"),
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            Title = "Power",
-                            Type = 1,
+                            TypeId = 8,
                             Value = "Requires 24VAC power, uses less than 1 kWh/month"
                         },
                         new
                         {
-                            Id = new Guid("eb69b58c-8f2d-48ee-b3eb-49a9d0ce49cb"),
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            Title = "Connectivity",
-                            Type = 1,
+                            TypeId = 11,
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
-                            Id = new Guid("ab0e76b4-69ea-4cc4-8cc2-f1d672dc2e2d"),
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            Title = "Compatibility",
-                            Type = 1,
+                            TypeId = 10,
                             Value = "Works with Alexa, Google Assistant, and Siri"
                         },
                         new
                         {
-                            Id = new Guid("0b80edc9-5351-4d75-9c12-7f53c15e74b8"),
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            Title = "Battery",
-                            Type = 1,
+                            TypeId = 9,
                             Value = "Uses four AA batteries (included), lasts up to 6 months depending on usage"
                         },
                         new
                         {
-                            Id = new Guid("3692d929-1534-4d4d-aae9-ec9e757b77c5"),
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            Title = "Color Temperature",
-                            Type = 1,
+                            TypeId = 13,
                             Value = "Adjustable from warm white (2700K) to daylight (6500K)"
                         },
                         new
                         {
-                            Id = new Guid("a46a6ea7-1e2c-427d-91f8-3d020b34d09c"),
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            Title = "Compatibility",
-                            Type = 1,
+                            TypeId = 10,
                             Value = "Works with Alexa, Google Assistant, and Samsung SmartThings"
                         },
                         new
                         {
-                            Id = new Guid("f5e5f5c5-5bf5-4c20-8b2d-f2f719e78508"),
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            Title = "Power",
-                            Type = 1,
-                            Unit = "Watt",
+                            TypeId = 8,
                             Value = "9"
                         },
                         new
                         {
-                            Id = new Guid("5b5eaa60-3fb6-44f6-8640-bc56a55c986f"),
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            Title = "Weight",
-                            Type = 1,
-                            Unit = "gram",
+                            TypeId = 4,
                             Value = "970"
                         },
                         new
                         {
-                            Id = new Guid("ae18a00e-7f3b-4df3-8d4c-df4a0b271a87"),
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            Title = "Connectivity",
-                            Type = 1,
+                            TypeId = 7,
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
-                            Id = new Guid("f69c6d88-3a1c-46e8-bbcf-16d274f63052"),
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            Title = "Video",
-                            Type = 1,
+                            TypeId = 14,
                             Value = "1080p HD"
                         },
                         new
                         {
-                            Id = new Guid("0a108c0c-d5b5-4486-90a6-0e7eb8d25a3c"),
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            Title = "Audio",
-                            Type = 1,
+                            TypeId = 15,
                             Value = "Two-way audio with noise cancellation"
                         },
                         new
                         {
-                            Id = new Guid("259bdf85-efb1-42e7-a8d1-9c7a6b71979a"),
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            Title = "Connectivity",
-                            Type = 1,
+                            TypeId = 11,
                             Value = "Wi-Fi and Ethernet"
+                        });
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductDetailType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DomainProductDetailType", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Title = "Width",
+                            Unit = "millimeters"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "Height",
+                            Unit = "millimeters"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Title = "Depth",
+                            Unit = "millimeters"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Title = "Weight",
+                            Unit = "grams"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Title = "Color"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Title = "Material"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Title = "Connectivity"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Title = "Power",
+                            Unit = "Watts"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Title = "Battery"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Title = "Compatibility"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Title = "Connectivity"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Title = "Display"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Title = "Color Temperature",
+                            Unit = "Kelvin"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Title = "Video Quality"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Title = "Audio Quality"
                         });
                 });
 
@@ -348,7 +410,15 @@ namespace Matterway.Catalog.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Matterway.Catalog.Api.Domain.ProductDetailType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Product");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductImage", b =>

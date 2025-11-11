@@ -9,6 +9,12 @@ interface CatalogState {
   catalogLinks: any;
 }
 
+export interface ProductDetailTypeOption {
+  id: number;
+  title?: string;
+  unit?: string | null;
+}
+
 export const useCatalogStore = defineStore("catalog", {
   state: (): CatalogState => ({
     catalog: null,
@@ -214,60 +220,70 @@ export const useCatalogStore = defineStore("catalog", {
 
     async createProductSpec(
       productId: string,
-      title: string,
+      typeId: number,
       value: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
-      const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails`,
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details`,
         {
           method: "POST",
           body: JSON.stringify({
-            productId: productId,
-            type: "Specification",
-            title: title,
+            typeId: typeId,
             value: value,
           }),
         },
       );
-      return response;
     },
-    async deleteProductSpec(specId: string): Promise<Response> {
+    async deleteProductSpec(
+      productId: string,
+      typeId: number,
+    ): Promise<Response> {
       const config = useRuntimeConfig();
-      const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails/${specId}`,
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
         {
           method: "DELETE",
         },
       );
-      return response;
     },
     async updateProductSpec(
-      specId: string,
       productId: string,
-      title: string,
+      typeId: number,
       value: string,
-      type: string | number = "Specification",
-      unit?: string | null,
     ): Promise<Response> {
       const config = useRuntimeConfig();
-      const payload: Record<string, unknown> = {
-        productId: productId,
-        type: type,
-        title: title,
-        value: value,
-      };
-      if (unit !== undefined) {
-        payload.unit = unit;
-      }
-      const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetails/${specId}`,
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
         {
           method: "PATCH",
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ value: value }),
         },
       );
-      return response;
+    },
+
+    async queryProductDetailTypes(
+      searchTerm: string,
+      limit: number = 10,
+    ): Promise<ProductDetailTypeOption[]> {
+      const config = useRuntimeConfig();
+      const params = new URLSearchParams();
+      if (searchTerm?.trim()) {
+        params.set("titleLike", searchTerm.trim());
+      }
+      if (limit) {
+        params.set("limit", limit.toString());
+      }
+      const query = params.toString();
+      const response = await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetailTypes${
+          query ? `?${query}` : ""
+        }`,
+        {
+          method: "GET",
+        },
+      );
+      return (await response.json()) ?? [];
     },
 
     async createProductImage(
@@ -279,14 +295,13 @@ export const useCatalogStore = defineStore("catalog", {
       const config = useRuntimeConfig();
       const formData = new FormData();
       formData.append("OrderIndex", orderIndex.toString());
-      formData.append("ProductId", productId);
       formData.append("File", file);
       if (imageAlt) {
         formData.append("ImageAlt", imageAlt);
       }
 
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Images`,
         {
           method: "POST",
           body: formData,
@@ -308,7 +323,7 @@ export const useCatalogStore = defineStore("catalog", {
         body.imageAlt = payload.imageAlt;
       }
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${orderIndex}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Images/${orderIndex}`,
         {
           method: "PATCH",
           body: JSON.stringify(body),
@@ -322,7 +337,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductImages/${productId}/${orderIndex}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Images/${orderIndex}`,
         {
           method: "DELETE",
         },

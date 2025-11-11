@@ -15,7 +15,7 @@ public class AddProductImage : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("ProductImages", Handle)
+        app.MapPost("Products/{productId:guid}/Images", Handle)
             .WithName("AddProductImage").WithSummary("Add a new ProductImage.")
             .WithTags(nameof(ProductImage))
             .Produces<AddProductImageResponse>(StatusCodes.Status201Created)
@@ -28,6 +28,8 @@ public class AddProductImage : IEndpoint
     }
 
     private static async Task<Results<Created<AddProductImageResponse>, BadRequest<ProblemDetails>>> Handle(
+        [FromRoute]
+        Guid productId,
         [FromForm]
         AddProductImageRequest request,
         HttpContext httpContext,
@@ -50,7 +52,7 @@ public class AddProductImage : IEndpoint
         try
         {
             uploadResult =
-                await imageStorageService.UploadAsync(request.ProductId, imageId, request.File, cancellationToken);
+                await imageStorageService.UploadAsync(productId, imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -62,7 +64,7 @@ public class AddProductImage : IEndpoint
             });
         }
 
-        var entity = MapToEntity(request, uploadResult);
+        var entity = MapToEntity(productId, request, uploadResult);
         ProductImage? created;
 
         try
@@ -71,7 +73,7 @@ public class AddProductImage : IEndpoint
         }
         catch
         {
-            await imageStorageService.DeleteAsync(request.ProductId, imageId, cancellationToken);
+            await imageStorageService.DeleteAsync(productId, imageId, cancellationToken);
             throw;
         }
 
@@ -79,7 +81,7 @@ public class AddProductImage : IEndpoint
 
         if (productImageModel is null)
         {
-            await imageStorageService.DeleteAsync(request.ProductId, imageId, cancellationToken);
+            await imageStorageService.DeleteAsync(productId, imageId, cancellationToken);
             var problemDetails = new ProblemDetails
             {
                 Title = "Bad Request",
@@ -103,9 +105,6 @@ public class AddProductImage : IEndpoint
         public int OrderIndex { get; init; }
 
         [Required]
-        public Guid ProductId { get; init; }
-
-        [Required]
         public IFormFile? File { get; init; }
 
         public string? ImageAlt { get; init; }
@@ -121,12 +120,13 @@ public class AddProductImage : IEndpoint
         public string? ImageAlt { get; init; }
     }
 
-    public static ProductImage MapToEntity(AddProductImageRequest request, ImageStorageUploadResult uploadResult)
+    public static ProductImage MapToEntity(Guid productId, AddProductImageRequest request,
+        ImageStorageUploadResult uploadResult)
     {
         return new ProductImage
         {
             Id = uploadResult.ImageId,
-            ProductId = request.ProductId,
+            ProductId = productId,
             OrderIndex = request.OrderIndex,
             ImageUrl = uploadResult.ImageUrl,
             ImageAlt = request.ImageAlt ?? string.Empty

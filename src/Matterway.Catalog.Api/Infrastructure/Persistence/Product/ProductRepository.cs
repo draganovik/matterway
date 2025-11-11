@@ -13,7 +13,10 @@ public sealed class ProductRepository(CatalogDb context)
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
         {
-            return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+            return await context.Product
+                .Include(x => x.ProductDetails!)
+                .ThenInclude(pd => pd!.Type)
+                .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == requestModel.Id, cancellationToken);
         }
 
@@ -30,7 +33,10 @@ public sealed class ProductRepository(CatalogDb context)
 
     public async Task<DomainProduct?> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+        return await context.Product
+            .Include(x => x.ProductDetails!)
+            .ThenInclude(pd => pd!.Type)
+            .Include(x => x.ProductImages)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
@@ -60,7 +66,10 @@ public sealed class ProductRepository(CatalogDb context)
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
         {
-            return await context.Product.Include(x => x.ProductDetails).Include(x => x.ProductImages)
+            return await context.Product
+                .Include(x => x.ProductDetails!)
+                .ThenInclude(pd => pd!.Type)
+                .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
         }
 

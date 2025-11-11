@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/stores/catalog";
+import {
+  useCatalogStore,
+  type ProductDetailTypeOption,
+} from "~/stores/catalog";
 import ProductModel, {
   type ProductDetails,
   type ProductImages,
@@ -67,9 +70,95 @@ const galleryImages = computed(() => {
 });
 
 const inputSpecs = ref({
-  title: "",
+  typeSearch: "",
   value: "",
 });
+
+const selectedDetailType = ref<ProductDetailTypeOption | null>(null);
+const detailTypeOptions = ref<ProductDetailTypeOption[]>([]);
+const isDetailTypeDropdownOpen = ref(false);
+const isSearchingDetailTypes = ref(false);
+
+let detailTypeSearchHandle: ReturnType<typeof setTimeout> | null = null;
+
+const canSubmitDetail = computed(() => {
+  return (
+    Boolean(selectedDetailType.value?.id) &&
+    inputSpecs.value.value.trim().length > 0
+  );
+});
+
+const clearDetailTypeSelection = () => {
+  selectedDetailType.value = null;
+  detailTypeOptions.value = [];
+  inputSpecs.value.typeSearch = "";
+  isDetailTypeDropdownOpen.value = false;
+};
+
+const resetSpecForm = () => {
+  inputSpecs.value.value = "";
+  clearDetailTypeSelection();
+};
+
+const handleDetailTypeSelect = (option: ProductDetailTypeOption) => {
+  selectedDetailType.value = option;
+  inputSpecs.value.typeSearch = option.title ?? "";
+  isDetailTypeDropdownOpen.value = false;
+};
+
+const handleDetailTypeFocus = () => {
+  if (detailTypeOptions.value.length > 0) {
+    isDetailTypeDropdownOpen.value = true;
+  }
+};
+
+const handleDetailTypeBlur = () => {
+  setTimeout(() => {
+    isDetailTypeDropdownOpen.value = false;
+  }, 120);
+};
+
+const fetchDetailTypeOptions = (search: string) => {
+  if (detailTypeSearchHandle) {
+    clearTimeout(detailTypeSearchHandle);
+  }
+
+  if (!search || search.trim().length < 2) {
+    detailTypeOptions.value = [];
+    isDetailTypeDropdownOpen.value = false;
+    return;
+  }
+
+  isDetailTypeDropdownOpen.value = true;
+
+  detailTypeSearchHandle = setTimeout(async () => {
+    isSearchingDetailTypes.value = true;
+    try {
+      detailTypeOptions.value = await catalogStore.queryProductDetailTypes(
+        search.trim(),
+        8,
+      );
+      isDetailTypeDropdownOpen.value = true;
+    } catch (error) {
+      console.error("Failed to fetch detail types", error);
+      detailTypeOptions.value = [];
+      isDetailTypeDropdownOpen.value = false;
+    } finally {
+      isSearchingDetailTypes.value = false;
+    }
+  }, 250);
+};
+
+watch(
+  () => inputSpecs.value.typeSearch,
+  (newValue) => {
+    if (selectedDetailType.value?.title === newValue) {
+      return;
+    }
+    selectedDetailType.value = null;
+    fetchDetailTypeOptions(newValue);
+  },
+);
 
 const inputImage = ref({
   orderIndex: 0,
@@ -109,42 +198,47 @@ const handleImageFileChange = (event: Event) => {
 };
 
 const addSpec = async () => {
-  if (!product.value || !inputSpecs.value.title || !inputSpecs.value.value) {
+  const detailValue = inputSpecs.value.value.trim();
+  if (!product.value || !selectedDetailType.value?.id || !detailValue) {
     return;
   }
   const response = await catalogStore.createProductSpec(
     product.value.id,
-    inputSpecs.value.title,
-    inputSpecs.value.value,
+    selectedDetailType.value.id,
+    detailValue,
   );
   if (response.ok) {
-    inputSpecs.value.title = "";
-    inputSpecs.value.value = "";
+    resetSpecForm();
     await loadProduct();
   }
 };
 
-const removeSpec = async (detailId: string) => {
-  if (!product.value) {
+const removeSpec = async (typeId?: number) => {
+  if (!product.value || typeof typeId !== "number") {
     return;
   }
-  const response = await catalogStore.deleteProductSpec(detailId);
+  const response = await catalogStore.deleteProductSpec(
+    product.value.id,
+    typeId,
+  );
   if (response.ok) {
     await loadProduct();
   }
 };
 
 const updateSpec = async (detail: ProductDetails) => {
-  if (!product.value) {
+  const detailValue = detail.value?.trim();
+  if (
+    !product.value ||
+    typeof detail.typeId !== "number" ||
+    !detailValue
+  ) {
     return;
   }
   const response = await catalogStore.updateProductSpec(
-    detail.id!,
     product.value.id,
-    detail.title ?? "",
-    detail.value ?? "",
-    detail.type ?? "Specification",
-    detail.unit ?? null,
+    detail.typeId,
+    detailValue,
   );
   if (response.ok) {
     await loadProduct();
@@ -231,6 +325,7 @@ const loadProduct = async () => {
   } else {
     imageOrderInputs.value = {};
   }
+  resetSpecForm();
 };
 
 useHead({
@@ -313,13 +408,13 @@ onMounted(async () => {
           <li
             v-for="image in product.productImages"
             :key="image.id ?? image.orderIndex"
-            class="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40 sm:flex-row sm:items-center sm:justify-between"
+            class="flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40 sm:items-center sm:justify-between"
           >
-            <div class="min-w-0 flex-1 space-y-1">
+            <div class="min-w-0 w-full flex-1 space-y-1">
               <span class="text-xs font-semibold uppercase text-slate-400"
                 >Redosled #{{ image.orderIndex }}</span
               >
-              <p class="truncate font-medium">
+              <p class="w-full overflow-x-auto font-medium">
                 {{ image.imageUrl }}
               </p>
               <p v-if="image.imageAlt" class="text-xs text-slate-400">
@@ -328,10 +423,10 @@ onMounted(async () => {
             </div>
             <div
               v-if="image.id"
-              class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center"
+              class="flex flex-col w-full justify-between items-stretch gap-2 sm:flex-row sm:items-end"
             >
-              <label class="flex items-center gap-2 text-xs uppercase">
-                Nova pozicija
+              <label class="flex flex-col items-center gap-2 text-xs uppercase">
+                Pozicija
                 <input
                   v-model.number="imageOrderInputs[image.id]"
                   type="number"
@@ -505,22 +600,29 @@ onMounted(async () => {
         <div class="space-y-4">
           <div
             v-for="detail in product.productDetails"
-            :key="detail.id"
+            :key="detail.typeId ?? detail.title"
             class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
           >
-            <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-              <input
-                v-model="detail.title"
-                type="text"
-                placeholder="Naziv"
-                class="rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-              />
-              <textarea
-                v-model="detail.value"
-                rows="2"
-                placeholder="Vrednost"
-                class="rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-              ></textarea>
+            <div class="grid gap-3 md:grid-cols-[1fr_auto]">
+              <div class="space-y-2">
+                <p
+                  class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
+                >
+                  {{ detail.title ?? `Tip #${detail.typeId}` }}
+                  <span
+                    v-if="detail.unit"
+                    class="ml-1 text-[0.65rem] font-normal text-slate-400 dark:text-slate-500"
+                  >
+                    ({{ detail.unit }})
+                  </span>
+                </p>
+                <textarea
+                  v-model="detail.value"
+                  rows="2"
+                  placeholder="Vrednost"
+                  class="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                ></textarea>
+              </div>
               <div class="flex flex-col gap-2 md:items-end">
                 <button
                   type="button"
@@ -532,7 +634,7 @@ onMounted(async () => {
                 <button
                   type="button"
                   class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
-                  @click="removeSpec(detail.id!)"
+                  @click="removeSpec(detail.typeId ?? undefined)"
                 >
                   Ukloni
                 </button>
@@ -548,22 +650,102 @@ onMounted(async () => {
             Dodaj novu specifikaciju
           </h3>
           <div class="grid gap-3 md:grid-cols-2">
-            <input
-              v-model="inputSpecs.title"
-              type="text"
-              placeholder="Naziv"
-              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            />
-            <input
-              v-model="inputSpecs.value"
-              type="text"
-              placeholder="Vrednost"
-              class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            />
+            <div class="space-y-2 flex flex-col">
+              <label
+                class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
+              >
+                Tip specifikacije
+              </label>
+              <div class="relative">
+                <input
+                  v-model="inputSpecs.typeSearch"
+                  type="text"
+                  placeholder="Počnite da kucate naziv..."
+                  class="w-full rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  @focus="handleDetailTypeFocus"
+                  @blur="handleDetailTypeBlur"
+                />
+                <button
+                  v-if="selectedDetailType"
+                  type="button"
+                  class="absolute inset-y-0 right-2 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                  @mousedown.prevent
+                  @click="clearDetailTypeSelection"
+                >
+                  &times;
+                </button>
+                <div
+                  v-if="isDetailTypeDropdownOpen"
+                  class="absolute z-20 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                >
+                  <p
+                    v-if="isSearchingDetailTypes"
+                    class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400"
+                  >
+                    Pretraga u toku...
+                  </p>
+                  <template v-else>
+                    <ul
+                      v-if="detailTypeOptions.length > 0"
+                      class="max-h-56 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700"
+                    >
+                      <li
+                        v-for="option in detailTypeOptions"
+                        :key="option.id"
+                        class="cursor-pointer px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                        @mousedown.prevent="handleDetailTypeSelect(option)"
+                      >
+                        <p
+                          class="text-sm font-medium text-slate-900 dark:text-slate-100"
+                        >
+                          {{ option.title }}
+                        </p>
+                        <p
+                          v-if="option.unit"
+                          class="text-xs text-slate-500 dark:text-slate-400"
+                        >
+                          {{ option.unit }}
+                        </p>
+                      </li>
+                    </ul>
+                    <p
+                      v-else
+                      class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400"
+                    >
+                      {{
+                        inputSpecs.typeSearch.trim().length < 2
+                          ? "Unesite najmanje 2 karaktera"
+                          : "Nismo pronašli rezultate"
+                      }}
+                    </p>
+                  </template>
+                </div>
+              </div>
+              <p
+                v-if="selectedDetailType?.unit"
+                class="text-xs text-slate-500 dark:text-slate-400"
+              >
+                Merna jedinica: {{ selectedDetailType.unit }}
+              </p>
+            </div>
+            <div class="space-y-2 flex flex-col">
+              <label
+                class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
+              >
+                Vrednost
+              </label>
+              <input
+                v-model="inputSpecs.value"
+                type="text"
+                placeholder="npr. 120"
+                class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              />
+            </div>
           </div>
           <button
             type="button"
-            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            :disabled="!canSubmitDetail"
             @click="addSpec()"
           >
             Dodaj specifikaciju

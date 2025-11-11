@@ -15,7 +15,7 @@ public class AddProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("ProductDetails", Handle)
+        app.MapPost("Products/{productId:Guid}/Details", Handle)
             .WithName("AddProductDetail").WithSummary("Add a new ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces<AddProductDetailResponse>(StatusCodes.Status201Created)
@@ -27,12 +27,14 @@ public class AddProductDetail : IEndpoint
     }
 
     private static async Task<Results<Created<AddProductDetailResponse>, BadRequest<ProblemDetails>>> Handle(
+        [FromRoute]
+        Guid productId,
         AddProductDetailRequest request,
         HttpContext httpContext,
         IProductDetailRepository productDetailRepository,
         CancellationToken cancellationToken)
     {
-        var productDetailModel = MapToEntity(request);
+        var productDetailModel = MapToEntity(productId, request);
         var created = await productDetailRepository.Create(productDetailModel, cancellationToken);
         if (created is null)
         {
@@ -46,7 +48,7 @@ public class AddProductDetail : IEndpoint
         }
 
         var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductDetails/{created.Id}");
+            $"Products/{created.ProductId}/Details/{created.TypeId}");
 
         return TypedResults.Created(location,
             MapToResponse(created));
@@ -55,44 +57,29 @@ public class AddProductDetail : IEndpoint
     public record AddProductDetailRequest
     {
         [Required]
-        public Guid ProductId { get; init; }
+        public int TypeId { get; init; }
 
         [Required]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public DetailType Type { get; init; }
-
-        [Required]
-        public string? Title { get; init; }
-
-        [Required]
-        public string? Value { get; init; }
-
-        public string? Unit { get; init; }
+        public required string Value { get; init; }
     }
 
     public record AddProductDetailResponse
     {
-        public Guid Id { get; init; }
         public Guid ProductId { get; init; }
         public string? ProductTitle { get; init; }
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public DetailType Type { get; init; }
-
+        public int TypeId { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
         public string? Unit { get; init; }
     }
 
-    public static ProductDetail MapToEntity(AddProductDetailRequest request)
+    public static ProductDetail MapToEntity(Guid productId, AddProductDetailRequest request)
     {
         return new ProductDetail
         {
-            ProductId = request.ProductId,
-            Type = request.Type,
-            Title = request.Title ?? string.Empty,
-            Value = request.Value ?? string.Empty,
-            Unit = request.Unit
+            ProductId = productId,
+            TypeId = request.TypeId,
+            Value = request.Value,
         };
     }
 
@@ -100,13 +87,12 @@ public class AddProductDetail : IEndpoint
     {
         return new AddProductDetailResponse
         {
-            Id = entity.Id,
             ProductId = entity.ProductId,
             ProductTitle = entity.Product?.Title,
-            Type = entity.Type,
-            Title = entity.Title,
+            TypeId = entity.TypeId,
+            Title = entity.Type?.Title,
             Value = entity.Value,
-            Unit = entity.Unit
+            Unit = entity.Type?.Unit
         };
     }
 }
