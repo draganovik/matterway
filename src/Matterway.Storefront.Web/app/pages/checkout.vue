@@ -1,0 +1,129 @@
+<script lang="ts" setup>
+import { computed, type Ref } from "vue";
+import { useCartStore } from "~/stores/cart";
+import { useSessionStore } from "~/stores/session";
+import AddressModel from "~/models/AddressModel";
+import CardPaymentModel from "~/models/CardPaymentModel";
+
+const cart = useCartStore();
+const session = useSessionStore();
+
+const paymentData: Ref<CardPaymentModel> = ref(new CardPaymentModel());
+const addressData: Ref<AddressModel> = ref(new AddressModel());
+const isProcessingPayment = ref(false);
+
+const cartItems = computed(() => cart.getCartItems);
+const totalItems = computed(() => cart.getTotalItemCount);
+const totalPrice = computed(() => cart.getTotalPrice);
+
+const pay = async () => {
+  if (!addressData.value.validate()) {
+    return;
+  }
+  isProcessingPayment.value = true;
+  try {
+    const response = await fetch("/api/payments", {
+      method: "POST",
+      body: JSON.stringify({
+        ...paymentData.value,
+        amount: totalPrice.value,
+        ...addressData.value,
+        items: cartItems.value,
+        userId: session.getTokenData?.nameid,
+      }),
+    });
+    if (response.ok) {
+      await cart.clearCart();
+      navigateTo("/orders");
+    }
+  } finally {
+    isProcessingPayment.value = false;
+  }
+};
+
+useHead({
+  title: "Kupovina",
+});
+
+definePageMeta({
+  middleware: [
+    function (to, from) {
+      const cartCheck = useCartStore();
+      if (!cartCheck.getTotalItemCount) {
+        return navigateTo("/cart");
+      }
+    },
+    "auth",
+  ],
+});
+</script>
+
+<template>
+  <main class="mx-auto max-w-6xl space-y-12 px-4 pb-16 md:px-6">
+    <section class="space-y-3">
+      <span
+        class="inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:text-slate-300"
+      >
+        Završetak kupovine
+      </span>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="space-y-2">
+          <h1 class="text-3xl font-semibold text-slate-900 dark:text-white">
+            Kupovina
+          </h1>
+          <p class="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+            Unesite podatke o dostavi i plaćanju kako biste završili kupovinu.
+          </p>
+        </div>
+        <span
+          class="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-200"
+        >
+          {{ totalItems }} {{ totalItems === 1 ? "proizvod" : "proizvoda" }}
+        </span>
+      </div>
+    </section>
+
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)]">
+      <div class="space-y-8">
+        <!-- Order Items -->
+        <section
+          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        >
+          <header class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+              Vaša narudžbina
+            </h2>
+            <span
+              class="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500"
+            >
+              {{ totalItems }} {{ totalItems === 1 ? "artikal" : "artikala" }}
+            </span>
+          </header>
+          <CartItemsList :items="cartItems" />
+        </section>
+
+        <!-- Delivery Address -->
+        <section
+          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        >
+          <header class="mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+              Podaci za dostavu
+            </h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Unesite adresu na koju želite da dostavimo vašu narudžbinu.
+            </p>
+          </header>
+          <CheckoutAddressForm v-model="addressData" />
+        </section>
+      </div>
+      <CheckoutPaymentForm
+        v-model="paymentData"
+        :total-items="totalItems"
+        :total-price="totalPrice"
+        :loading="isProcessingPayment"
+        @submit="pay"
+      />
+    </div>
+  </main>
+</template>

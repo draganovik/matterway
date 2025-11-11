@@ -65,23 +65,21 @@ export default class ProductModel {
       title: response.title,
       price: response.price,
       description: response.description,
-      productDetails: (response.productDetails ?? []).map(
-        (detail: any) => ({
-          typeId: detail.typeId ?? null,
-          title: detail.title,
-          value: detail.value,
-          unit: detail.unit ?? null,
-        }),
-      ),
+      productDetails: (response.productDetails ?? []).map((detail: any) => ({
+        typeId: detail.typeId ?? null,
+        title: detail.title,
+        value: detail.value,
+        unit: detail.unit ?? null,
+      })),
       productImages: orderedImages,
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
         : primaryImage
-        ? {
-            imageUrl: primaryImage.imageUrl,
-            imageAlt: primaryImage.imageAlt,
-          }
-        : null,
+          ? {
+              imageUrl: primaryImage.imageUrl,
+              imageAlt: primaryImage.imageAlt,
+            }
+          : null,
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
       isAvailable: response.isAvailable ?? false,

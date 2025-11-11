@@ -14,7 +14,7 @@ export async function payWithStripe(
 ): Promise<string> {
   // Set up your Stripe API key
   const stripe = new Stripe(secretkey, {
-    apiVersion: "2022-11-15",
+    apiVersion: "2024-06-20",
   });
   try {
     // Create a Stripe payment method using the provided card details

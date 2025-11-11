@@ -228,11 +228,7 @@ const removeSpec = async (typeId?: number) => {
 
 const updateSpec = async (detail: ProductDetails) => {
   const detailValue = detail.value?.trim();
-  if (
-    !product.value ||
-    typeof detail.typeId !== "number" ||
-    !detailValue
-  ) {
+  if (!product.value || typeof detail.typeId !== "number" || !detailValue) {
     return;
   }
   const response = await catalogStore.updateProductSpec(

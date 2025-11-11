@@ -37,10 +37,16 @@ export const useSessionStore = defineStore("session", {
       return this.session;
     },
     getTokenData(): JwtModel | null {
-      if (this.session) {
-        return JSON.parse(
-          Buffer.from(this.session.token.split(".")[1], "base64").toString(),
-        );
+      if (this.session && this.session.token) {
+        const parts = this.session.token.split(".");
+        if (parts.length > 1 && parts[1]) {
+          try {
+            return JSON.parse(Buffer.from(parts[1], "base64").toString());
+          } catch (e) {
+            // invalid token payload
+            return null;
+          }
+        }
       }
       return null;
     },

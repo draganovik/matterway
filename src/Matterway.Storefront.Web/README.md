@@ -1,42 +1,38 @@
-# Nuxt 3 Minimal Starter
+# Matterway Storefront (Nuxt 4)
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This repository contains the Nuxt 4 storefront for Matterway. The project now follows the recommended `app` source directory structure and uses componentized form building blocks for better reuse and testability.
 
-## Setup
+## Requirements
 
-Make sure to install the dependencies:
+- Node.js **20.17** (LTS) or newer
+- npm **10.x**
+
+## Getting Started
 
 ```bash
-# yarn
-yarn install
-
-# npm
 npm install
-
-# pnpm
-pnpm install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`
-
-```bash
 npm run dev
 ```
 
-## Production
+The development server listens on `http://localhost:3000` by default.
 
-Build the application for production:
+## Project Structure
+
+- `app/` – Nuxt source (components, layouts, middleware, models, pages, server endpoints, stores, etc.)
+- `public/` – Static assets served as-is
+- `nuxt.config.ts` – Framework configuration (Pinia modules, runtime config, CSS, etc.)
+- `tailwind.config.ts` – Tailwind + Flowbite setup
+- `Dockerfile` – Multi-stage production build using Node 20
+
+Forms that previously lived directly in pages (authentication, checkout, product creation) are now extracted into typed components under `app/components/forms`.
+
+## Scripts
 
 ```bash
-npm run build
+npm run dev       # Start dev server
+npm run build     # Production build
+npm run preview   # Preview the production build locally
+npm run generate  # Static site generation
 ```
 
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Refer to the [Nuxt documentation](https://nuxt.com/docs) for additional guides and deployment options.

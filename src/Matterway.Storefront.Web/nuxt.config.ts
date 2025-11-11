@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  srcDir: "app",
   app: {
     head: {
       titleTemplate: "%s - Matterway Web Store",

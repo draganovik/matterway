@@ -2,10 +2,12 @@
 module.exports = {
   darkMode: "media",
   content: [
-    "./components/**/*.{js,vue,ts}",
-    "./layouts/**/*.vue",
-    "./pages/**/*.vue",
-    "./plugins/**/*.{js,ts}",
+    "./app/components/**/*.{js,vue,ts}",
+    "./app/layouts/**/*.vue",
+    "./app/pages/**/*.vue",
+    "./app/composables/**/*.{js,ts}",
+    "./app/plugins/**/*.{js,ts}",
+    "./app/app.vue",
     "./nuxt.config.{js,ts}",
     "./node_modules/flowbite/**/*.js",
   ],
