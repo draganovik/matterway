@@ -1,7 +1,7 @@
 // stores/catalog.ts
 
 import { defineStore } from "pinia";
-import ProductModel from "~/models/ProductModel";
+import ProductModel from "#models/ProductModel";
 
 interface CatalogState {
   catalog: ProductModel[] | null;

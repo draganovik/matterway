@@ -1,8 +1,8 @@
 // Import necessary dependencies
 import Stripe from "stripe";
-import AddressModel from "~/models/AddressModel";
-import CardPaymentModel from "~/models/CardPaymentModel";
-import CartItemModel from "~/models/CartItemModel";
+import AddressModel from "#models/AddressModel";
+import CardPaymentModel from "#models/CardPaymentModel";
+import CartItemModel from "#models/CartItemModel";
 
 // Create a function to handle the payment
 export async function payWithStripe(
@@ -33,6 +33,7 @@ export async function payWithStripe(
     const paymentIntent = await stripe.paymentIntents.create({
       amount: cardPayment.amount * 100, // Stripe expects the amount in cents
       currency: "rsd",
+      payment_method_types: ["card"],
       payment_method: paymentMethod.id,
       confirm: true,
       shipping: {

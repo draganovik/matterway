@@ -62,7 +62,7 @@ const previous = () => {
 <template>
   <div class="relative w-full">
     <div
-      class="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-700 md:aspect-[4/3]"
+      class="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-700 md:aspect-4/3"
     >
       <template v-if="slides.length > 0">
         <Transition name="slide" mode="out-in">
@@ -103,7 +103,7 @@ const previous = () => {
     >
       <button
         type="button"
-        class="carousel-nav"
+        class="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 p-2 text-slate-600 shadow transition hover:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-800"
         aria-label="Previous image"
         @click="previous"
       >
@@ -124,7 +124,7 @@ const previous = () => {
       </button>
       <button
         type="button"
-        class="carousel-nav"
+        class="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 p-2 text-slate-600 shadow transition hover:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-800"
         aria-label="Next image"
         @click="next"
       >
@@ -167,10 +167,6 @@ const previous = () => {
 </template>
 
 <style scoped>
-.carousel-nav {
-  @apply pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 p-2 text-slate-600 shadow transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-800;
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

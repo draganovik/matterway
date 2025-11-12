@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type ProductModel from "~/models/ProductModel";
-import { useCartStore } from "~/stores/cart";
-import { useSessionStore } from "~/stores/session";
+import type ProductModel from "#models/ProductModel";
+import { useCartStore } from "@stores/cart";
+import { useSessionStore } from "@stores/session";
 
 const session = useSessionStore();
 
@@ -53,7 +53,7 @@ const productLink = computed(() => `/products/${props.product.id}`);
 </script>
 <template>
   <div
-    class="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
+    class="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
   >
     <NuxtLink :to="productLink" class="relative h-56 w-full overflow-hidden">
       <span
@@ -134,14 +134,14 @@ const productLink = computed(() => `/products/${props.product.id}`);
             <button
               v-if="userCartStore.isProductInCart(product.id)"
               type="button"
-              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30 dark:focus:ring-red-800"
+              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-hidden focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30 dark:focus:ring-red-800"
               @click="userCartStore.removeFromCart(product)"
             >
               Ukloni
             </button>
             <button
               type="button"
-              class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               @click="userCartStore.addToCart(product)"
             >
               Dodaj u korpu

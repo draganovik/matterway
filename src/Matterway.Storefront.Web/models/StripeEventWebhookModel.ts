@@ -1,4 +1,4 @@
-class StripeEventWebhookModel {
+export default class StripeEventWebhookModel {
   id?: string;
   object?: string;
   api_version?: string;

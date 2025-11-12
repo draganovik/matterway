@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type AddressModel from "~/models/AddressModel";
+import type AddressModel from "#models/AddressModel";
 
 const address = defineModel<AddressModel>({ required: true });
 </script>

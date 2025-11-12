@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import { useCartStore } from "~/stores/cart";
+import { useCartStore } from "@stores/cart";
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -55,9 +55,9 @@ const goToCheckout = () => {
       </div>
     </section>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <section
-        class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
       >
         <div
           v-if="isEmpty"
@@ -90,7 +90,7 @@ const goToCheckout = () => {
           </div>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             @click="goToProducts"
           >
             <span>Pregledaj proizvode</span>

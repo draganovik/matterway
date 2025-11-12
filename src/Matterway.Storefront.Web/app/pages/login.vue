@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import LoginModel from "~/models/LoginModel";
-import { useSessionStore } from "~/stores/session";
+import LoginModel from "#models/LoginModel";
+import { useSessionStore } from "@stores/session";
 
 useHead({
   title: "Prijava",

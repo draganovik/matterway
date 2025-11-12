@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type ProductModel from "~/models/ProductModel";
+import type ProductModel from "#models/ProductModel";
 
 const product = defineModel<ProductModel>({ required: true });
 </script>
 
 <template>
   <div
-    class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+    class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
   >
     <div class="grid gap-4 md:grid-cols-2">
       <label class="grid gap-2 text-sm">
@@ -48,7 +48,7 @@ const product = defineModel<ProductModel>({ required: true });
         <input
           v-model="product.isAvailable"
           type="checkbox"
-          class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+          class="h-4 w-4 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
         />
         Dostupan za kupovinu
       </label>

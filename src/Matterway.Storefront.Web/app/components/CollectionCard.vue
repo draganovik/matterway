@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { CollectionIconVariant } from "~/composables/collections";
+import type { CollectionIconVariant } from "@composables/collections";
 
 const props = withDefaults(
   defineProps<{
@@ -38,13 +38,13 @@ const onClick = (event: MouseEvent) => {
 <template>
   <button
     type="button"
-    class="group flex h-full flex-col gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br p-6 text-left transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-800/60"
+    class="group flex h-full flex-col gap-3 rounded-2xl border border-slate-200 bg-linear-to-br p-6 text-left transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-800/60"
     :class="accentClasses"
     :disabled="disabled"
     @click="onClick"
   >
     <div
-      class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-blue-600 shadow-sm transition group-hover:scale-105 dark:bg-slate-900/80 dark:text-blue-300"
+      class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/70 text-blue-600 shadow-xs transition group-hover:scale-105 dark:bg-slate-900/80 dark:text-blue-300"
     >
       <slot name="icon">
         <svg

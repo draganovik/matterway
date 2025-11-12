@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import logoUrl from "~/assets/brand/logo.svg?url";
+import logoUrl from "@assets/brand/logo.svg?url";
 
 const year = new Date().getFullYear();
 

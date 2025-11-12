@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type CartItemModel from "~/models/CartItemModel";
-import { formatMoney } from "~/composables/formatMoney";
+import type CartItemModel from "#models/CartItemModel";
+import { formatMoney } from "@composables/formatMoney";
 
 defineProps<{
   items: CartItemModel[];
@@ -12,7 +12,7 @@ defineProps<{
     <li
       v-for="item in items"
       :key="item.productId"
-      class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+      class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-blue-200 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
     >
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="space-y-1">

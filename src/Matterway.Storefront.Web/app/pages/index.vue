@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted } from "vue";
-import { useCatalogStore } from "~/stores/catalog";
-import { featuredCollections } from "~/composables/collections";
+import { useCatalogStore } from "@stores/catalog";
+import { featuredCollections } from "@composables/collections";
 
 const router = useRouter();
 const catalogStore = useCatalogStore();
@@ -48,7 +48,7 @@ const goToProducts = () => router.push("/products");
 <template>
   <main class="space-y-16 pb-16">
     <section
-      class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-500 text-white"
+      class="relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-600 via-blue-500 to-indigo-500 text-white"
     >
       <div
         class="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/20 blur-3xl"
@@ -76,7 +76,7 @@ const goToProducts = () => router.push("/products");
           <div class="flex flex-wrap gap-3">
             <button
               type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow transition hover:bg-blue-50"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition hover:bg-blue-50"
               @click="goToProducts"
             >
               <span>Pregledaj ponudu</span>
@@ -97,7 +97,7 @@ const goToProducts = () => router.push("/products");
           </div>
         </div>
         <dl
-          class="mx-auto grid w-full max-w-md grid-cols-3 gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur md:max-w-sm"
+          class="mx-auto grid w-full max-w-md grid-cols-3 gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm md:max-w-sm"
         >
           <div
             v-for="stat in heroStats"

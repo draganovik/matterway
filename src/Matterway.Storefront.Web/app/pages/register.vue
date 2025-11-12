@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createUser } from "~/composables/createUser";
+import { createUser } from "@composables/createUser";
 type RegisterFormModel = {
   firstName: string;
   lastName: string;

@@ -1,6 +1,26 @@
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
+
+const projectRoot = fileURLToPath(new URL(".", import.meta.url));
+const withRoot = (...segments: string[]) => resolve(projectRoot, ...segments);
+
+const alias = {
+  "@assets": withRoot("app/assets"),
+  "@components": withRoot("app/components"),
+  "@composables": withRoot("app/composables"),
+  "@layouts": withRoot("app/layouts"),
+  "@middleware": withRoot("app/middleware"),
+  "@pages": withRoot("app/pages"),
+  "@plugins": withRoot("app/plugins"),
+  "@stores": withRoot("app/stores"),
+  $api: withRoot("server/api"),
+  "#models": withRoot("models"),
+  "#services": withRoot("services"),
+} satisfies Record<string, string>;
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  srcDir: "app",
+  alias,
   app: {
     head: {
       titleTemplate: "%s - Matterway Web Store",
@@ -8,7 +28,7 @@ export default defineNuxtConfig({
   },
   components: [
     {
-      path: "~/components",
+      path: alias["@components"],
       pathPrefix: false,
     },
   ],
@@ -28,12 +48,9 @@ export default defineNuxtConfig({
       orderingApiBaseUrl: process.env.ORDERING_API_BASE_URL,
     },
   },
-  css: ["@/assets/css/main.css"],
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
+  css: ["@assets/css/main.css"],
+  vite: {
+    plugins: [tailwindcss()],
   },
-  modules: ["@pinia/nuxt", "@pinia-plugin-persistedstate/nuxt"],
+  modules: ["@pinia/nuxt"],
 });

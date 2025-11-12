@@ -1,12 +1,9 @@
 <script lang="ts" setup>
-import {
-  useCatalogStore,
-  type ProductDetailTypeOption,
-} from "~/stores/catalog";
+import { useCatalogStore, type ProductDetailTypeOption } from "@stores/catalog";
 import ProductModel, {
   type ProductDetails,
   type ProductImages,
-} from "~/models/ProductModel";
+} from "#models/ProductModel";
 
 const catalogStore = useCatalogStore();
 const route = useRoute();
@@ -312,9 +309,16 @@ const deleteProduct = async () => {
 };
 
 const loadProduct = async () => {
-  product.value = await catalogStore.fetchProductById(
-    route.params.slug.toString(),
-  );
+  const slug = route.params.slug;
+  if (!slug) {
+    // If no slug is available, ensure state is reset and avoid calling toString() on undefined.
+    product.value = null;
+    imageOrderInputs.value = {};
+    resetSpecForm();
+    return;
+  }
+
+  product.value = await catalogStore.fetchProductById(slug.toString());
   if (product.value) {
     syncImageOrderInputs();
     resetImageForm();
@@ -340,7 +344,7 @@ onMounted(async () => {
     class="flex animate-pulse flex-col gap-8 md:grid md:grid-cols-5"
   >
     <div
-      class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded bg-slate-300 dark:bg-slate-700 md:aspect-[4/3]"
+      class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded-sm bg-slate-300 dark:bg-slate-700 md:aspect-4/3"
     >
       <svg
         class="h-12 w-12 text-slate-200"
@@ -389,7 +393,7 @@ onMounted(async () => {
       />
 
       <div
-        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
       >
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -433,14 +437,14 @@ onMounted(async () => {
               <div class="flex gap-2">
                 <button
                   type="button"
-                  class="rounded-lg border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                  class="rounded-lg border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30"
                   @click="updateImageOrder(image)"
                 >
                   Sačuvaj
                 </button>
                 <button
                   type="button"
-                  class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                  class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 focus:outline-hidden focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
                   @click="deleteImage(image.orderIndex)"
                 >
                   Ukloni
@@ -491,7 +495,7 @@ onMounted(async () => {
           </p>
           <button
             type="button"
-            class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:bg-blue-400 disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:bg-blue-400 disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             :disabled="!inputImage.file"
             @click="addImage()"
           >
@@ -503,7 +507,7 @@ onMounted(async () => {
 
     <div class="space-y-6">
       <div
-        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
       >
         <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
           Osnovne informacije
@@ -548,7 +552,7 @@ onMounted(async () => {
             <input
               v-model="product.isAvailable"
               type="checkbox"
-              class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+              class="h-4 w-4 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
             />
             Dostupan za kupovinu
           </label>
@@ -582,7 +586,7 @@ onMounted(async () => {
       </div>
 
       <div
-        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
       >
         <div class="flex flex-wrap items-center justify-between gap-3">
           <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -622,14 +626,14 @@ onMounted(async () => {
               <div class="flex flex-col gap-2 md:items-end">
                 <button
                   type="button"
-                  class="rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  class="rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   @click="updateSpec(detail)"
                 >
                   Sačuvaj
                 </button>
                 <button
                   type="button"
-                  class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
+                  class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-hidden focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
                   @click="removeSpec(detail.typeId ?? undefined)"
                 >
                   Ukloni
@@ -740,7 +744,7 @@ onMounted(async () => {
           </div>
           <button
             type="button"
-            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-hidden focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
             :disabled="!canSubmitDetail"
             @click="addSpec()"
           >
@@ -750,7 +754,7 @@ onMounted(async () => {
       </div>
 
       <footer
-        class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="space-y-1 text-sm text-slate-500 dark:text-slate-400">
           <p>Sačuvajte izmene kako bi bile dostupne u katalogu.</p>
@@ -759,21 +763,21 @@ onMounted(async () => {
         <div class="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
+            class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-hidden focus:ring-4 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
             @click="router.push('/products')"
           >
             Otkaži
           </button>
           <button
             type="button"
-            class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             @click="catalogStore.updateProduct(product!)"
           >
             Sačuvaj izmene
           </button>
           <button
             type="button"
-            class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
+            class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-hidden focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
             @click="deleteProduct()"
           >
             Obriši proizvod

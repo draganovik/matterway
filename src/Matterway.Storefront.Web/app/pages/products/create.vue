@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/stores/catalog";
-import ProductModel from "~/models/ProductModel";
+import { useCatalogStore } from "@stores/catalog";
+import ProductModel from "#models/ProductModel";
 
 const catalogStore = useCatalogStore();
 const router = useRouter();
@@ -44,7 +44,7 @@ definePageMeta({
     <div class="flex justify-end gap-4">
       <button
         type="button"
-        class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+        class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-hidden focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
         @click="router.push('/products')"
       >
         Otkaži
@@ -53,7 +53,7 @@ definePageMeta({
         @click="createProduct"
         type="button"
         :disabled="isSubmitting"
-        class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         {{ isSubmitting ? "Čuvanje..." : "Sačuvaj proizvod" }}
       </button>

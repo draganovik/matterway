@@ -1,7 +1,7 @@
 <template>
   <div id="default-carousel" class="relative w-full" data-carousel="slide">
     <!-- Carousel wrapper -->
-    <div class="relative h-[60svh] min-h-[20rem] overflow-hidden rounded-xl">
+    <div class="relative h-[60svh] min-h-80 overflow-hidden rounded-xl">
       <div
         v-for="(item, index) in carousel"
         :key="index"
@@ -19,7 +19,7 @@
           <h1 class="relative text-4xl md:text-5xl">Kupi novi proizvod sad!</h1>
           <NuxtLink
             to="/products"
-            class="group relative mb-2 mr-2 flex w-max items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-green-400 to-blue-600 p-0.5 text-sm font-medium text-slate-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-green-200 group-hover:from-green-400 group-hover:to-blue-600 dark:text-white dark:focus:ring-green-800"
+            class="group relative mb-2 mr-2 flex w-max items-center justify-center overflow-hidden rounded-lg bg-linear-to-br from-green-400 to-blue-600 p-0.5 text-sm font-medium text-slate-900 hover:text-white focus:outline-hidden focus:ring-4 focus:ring-green-200 group-hover:from-green-400 group-hover:to-blue-600 dark:text-white dark:focus:ring-green-800"
           >
             <span
               class="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-slate-900"
@@ -46,11 +46,11 @@
     <!-- Slider controls -->
     <button
       type="button"
-      class="group absolute left-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+      class="group absolute left-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-hidden"
       data-carousel-prev
     >
       <span
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-hidden group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
       >
         <svg
           aria-hidden="true"
@@ -72,11 +72,11 @@
     </button>
     <button
       type="button"
-      class="group absolute right-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+      class="group absolute right-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-hidden"
       data-carousel-next
     >
       <span
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-hidden group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
       >
         <svg
           aria-hidden="true"

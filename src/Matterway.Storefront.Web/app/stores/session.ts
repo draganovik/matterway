@@ -2,9 +2,9 @@
 
 import { defineStore } from "pinia";
 import { Buffer } from "buffer";
-import LoginModel from "~/models/LoginModel";
-import SessionModel from "~/models/SessionModel";
-import JwtModel from "~/models/JwtModel";
+import LoginModel from "#models/LoginModel";
+import SessionModel from "#models/SessionModel";
+import JwtModel from "#models/JwtModel";
 import { useCartStore } from "./cart";
 
 interface SessionState {

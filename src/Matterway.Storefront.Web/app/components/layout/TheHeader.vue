@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { useCartStore } from "~/stores/cart";
-import { useSessionStore } from "~/stores/session";
-import logoUrl from "~/assets/brand/logo.svg?url";
+import { useCartStore } from "@stores/cart";
+import { useSessionStore } from "@stores/session";
+import logoUrl from "@assets/brand/logo.svg?url";
 
 const router = useRouter();
 const route = useRoute();
@@ -96,7 +96,7 @@ onMounted(() => {
 
 <template>
   <header
-    class="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:border-slate-700 dark:bg-slate-900/70"
+    class="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-sm supports-backdrop-filter:bg-white/70 dark:border-slate-700 dark:bg-slate-900/70"
   >
     <div
       class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6"
@@ -163,14 +163,14 @@ onMounted(() => {
               v-model="searchTerm"
               type="search"
               placeholder="Pretraži proizvode"
-              class="w-56 rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 transition focus:border-blue-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 dark:bg-slate-800 dark:text-slate-200 dark:focus:bg-slate-900"
+              class="w-56 rounded-full border border-transparent bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 transition focus:border-blue-200 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:bg-slate-800 dark:text-slate-200 dark:focus:bg-slate-900"
             />
           </label>
         </form>
 
         <button
           type="button"
-          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
           @click="toggleMobileSearch"
         >
           <span class="sr-only">Pretraga</span>
@@ -201,7 +201,7 @@ onMounted(() => {
 
         <button
           type="button"
-          class="relative rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800"
+          class="relative rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800"
           @click="goToCart"
         >
           <span class="sr-only">Korpa</span>
@@ -247,7 +247,7 @@ onMounted(() => {
           </NuxtLink>
           <button
             type="button"
-            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             @click="logout"
           >
             Odjava
@@ -256,7 +256,7 @@ onMounted(() => {
 
         <button
           type="button"
-          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
           @click="toggleMobileMenu"
         >
           <span class="sr-only">Navigacija</span>
@@ -314,12 +314,12 @@ onMounted(() => {
               v-model="searchTerm"
               type="search"
               placeholder="Pretraži proizvode"
-              class="flex-1 border-0 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-none dark:text-slate-200"
+              class="flex-1 border-0 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-hidden dark:text-slate-200"
             />
           </label>
           <button
             type="submit"
-            class="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+            class="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
           >
             Traži
           </button>

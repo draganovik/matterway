@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { formatMoney } from "~/composables/formatMoney";
+import { formatMoney } from "@composables/formatMoney";
 
 const props = defineProps<{
   itemsCount: number;
@@ -20,7 +20,7 @@ const itemsLabel = computed(() =>
 
 <template>
   <aside
-    class="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+    class="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
   >
     <header class="space-y-1.5">
       <h2 class="text-xl font-semibold text-slate-900 dark:text-white">
@@ -63,7 +63,7 @@ const itemsLabel = computed(() =>
     <div class="flex flex-col gap-3">
       <button
         type="button"
-        class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="isEmpty"
         @click="emit('checkout')"
       >
@@ -71,7 +71,7 @@ const itemsLabel = computed(() =>
       </button>
       <button
         type="button"
-        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-slate-600 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+        class="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-slate-600 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
         @click="emit('continue')"
       >
         Nastavi kupovinu

@@ -1,9 +1,9 @@
 // stores/cart.ts
 
 import { defineStore } from "pinia";
-import CartItemModel from "~/models/CartItemModel";
-import { useSessionStore } from "./session";
-import ProductModel from "~/models/ProductModel";
+import CartItemModel from "#models/CartItemModel";
+import { useSessionStore } from "@stores/session";
+import ProductModel from "#models/ProductModel";
 
 interface CartState {
   cartItems: CartItemModel[];

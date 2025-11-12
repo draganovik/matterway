@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, type Ref } from "vue";
-import { useCartStore } from "~/stores/cart";
-import { useSessionStore } from "~/stores/session";
-import AddressModel from "~/models/AddressModel";
-import CardPaymentModel from "~/models/CardPaymentModel";
+import { useCartStore } from "@stores/cart";
+import { useSessionStore } from "@stores/session";
+import AddressModel from "#models/AddressModel";
+import CardPaymentModel from "#models/CardPaymentModel";
 
 const cart = useCartStore();
 const session = useSessionStore();
@@ -24,6 +24,9 @@ const pay = async () => {
   try {
     const response = await fetch("/api/payments", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         ...paymentData.value,
         amount: totalPrice.value,
@@ -83,11 +86,11 @@ definePageMeta({
       </div>
     </section>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <div class="space-y-8">
         <!-- Order Items -->
         <section
-          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
         >
           <header class="mb-6 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
@@ -104,7 +107,7 @@ definePageMeta({
 
         <!-- Delivery Address -->
         <section
-          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
         >
           <header class="mb-6">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">

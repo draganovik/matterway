@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { formatMoney } from "~/composables/formatMoney";
-import type CardPaymentModel from "~/models/CardPaymentModel";
+import { formatMoney } from "@composables/formatMoney";
+import type CardPaymentModel from "#models/CardPaymentModel";
 
 const payment = defineModel<CardPaymentModel>({ required: true });
 
@@ -24,7 +24,7 @@ const handleSubmit = () => emit("submit");
 
 <template>
   <form
-    class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+    class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
     @submit.prevent="handleSubmit"
   >
     <div class="mb-6 flex items-center gap-4">
@@ -151,7 +151,7 @@ const handleSubmit = () => emit("submit");
     <button
       type="submit"
       :disabled="loading"
-      class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
+      class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
     >
       <span>{{ loading ? "Obrada plaćanja..." : "Potvrdi plaćanje" }}</span>
       <svg

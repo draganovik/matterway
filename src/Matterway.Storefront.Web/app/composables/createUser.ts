@@ -1,5 +1,5 @@
-import { useSessionStore } from "~/stores/session";
-import LoginModel from "~/models/LoginModel";
+import { useSessionStore } from "@stores/session";
+import LoginModel from "#models/LoginModel";
 
 export async function createUser(
   firstName: string,

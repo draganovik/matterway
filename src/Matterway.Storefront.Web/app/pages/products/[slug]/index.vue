@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useCatalogStore } from "~/stores/catalog";
-import type ProductModel from "~/models/ProductModel";
-import { useSessionStore } from "~/stores/session";
-import { useCartStore } from "~/stores/cart";
+import { useCatalogStore } from "@stores/catalog";
+import type ProductModel from "#models/ProductModel";
+import { useSessionStore } from "@stores/session";
+import { useCartStore } from "@stores/cart";
 
 const catalogStore = useCatalogStore();
 const sessionStore = useSessionStore();
@@ -96,7 +96,7 @@ onMounted(async () => {
     class="flex animate-pulse flex-col gap-8 md:grid md:grid-cols-5"
   >
     <div
-      class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded bg-slate-300 dark:bg-slate-700 md:aspect-[4/3]"
+      class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded-sm bg-slate-300 dark:bg-slate-700 md:aspect-4/3"
     >
       <svg
         class="h-12 w-12 text-slate-200"
@@ -148,7 +148,7 @@ onMounted(async () => {
     />
 
     <section
-      class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
     >
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="space-y-2">
@@ -199,7 +199,7 @@ onMounted(async () => {
           <button
             @click="userCartStore.addToCart(product)"
             type="button"
-            class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             <svg
               aria-hidden="true"
@@ -237,13 +237,13 @@ onMounted(async () => {
           <div class="flex gap-3">
             <NuxtLink
               :to="route.path + '/edit'"
-              class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Izmeni proizvod
             </NuxtLink>
             <button
               type="button"
-              class="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
+              class="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-hidden focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
               @click="deleteProduct()"
             >
               Obriši proizvod
@@ -260,7 +260,7 @@ onMounted(async () => {
 
     <section
       v-if="product.productDetails?.length"
-      class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 lg:col-span-2"
+      class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800 lg:col-span-2"
     >
       <div class="mb-8">
         <h2
