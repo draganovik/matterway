@@ -1,20 +1,32 @@
+using Matterway.Common.Extensions;
+
 namespace Matterway.Ordering.Api.Extensions;
 
 public static class CorsExtensions
 {
-    public static IServiceCollection ConfigureCors(this IServiceCollection services)
+    public static IServiceCollection ConfigureCors(this IHostApplicationBuilder builder)
     {
-        services.AddCors(options =>
+        ArgumentNullException.ThrowIfNull(builder.Configuration);
+
+        var configuredOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                                ?? ["http://localhost:3000", "http://localhost:3001"];
+
+        var storefrontOrigin = builder.Configuration.ResolveServiceUri("storefront-web")
+            .GetLeftPart(UriPartial.Authority);
+
+        var allowedOrigins = configuredOrigins.Append(storefrontOrigin)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
-            });
+            options.AddDefaultPolicy(policy => policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
         });
 
-        return services;
+        return builder.Services;
     }
 }

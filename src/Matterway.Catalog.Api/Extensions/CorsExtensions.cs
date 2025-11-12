@@ -1,6 +1,6 @@
 using Matterway.Common.Extensions;
 
-namespace Matterway.Customers.Api.Extensions;
+namespace Matterway.Catalog.Api.Extensions;
 
 public static class CorsExtensions
 {

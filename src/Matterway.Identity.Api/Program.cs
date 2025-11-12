@@ -32,7 +32,7 @@ builder.Services.ConfigureOpenApi();
 builder.Services.ConfigureApiVersioning();
 
 builder.Services.AddValidation();
-builder.Services.ConfigureCors();
+builder.ConfigureCors();
 
 var app = builder.Build();
 
