@@ -31,18 +31,11 @@ const handleSubmit = () => emit("submit");
       <span
         class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-200"
       >
-        <svg
-          class="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M2.25 8.25h19.5m-17.25 6h3.375m-3.375 3h3.375M6 5.25h12A2.25 2.25 0 0120.25 7.5v9a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 16.5v-9A2.25 2.25 0 016 5.25z"
-          />
-        </svg>
+        <Icon
+          name="heroicons-outline:credit-card"
+          class="text-2xl"
+          aria-hidden="true"
+        />
       </span>
       <div>
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
@@ -154,19 +147,11 @@ const handleSubmit = () => emit("submit");
       class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
     >
       <span>{{ loading ? "Obrada plaćanja..." : "Potvrdi plaćanje" }}</span>
-      <svg
-        class="h-4 w-4"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
+      <Icon
+        name="heroicons-outline:check-circle"
+        class="text-base"
+        aria-hidden="true"
+      />
     </button>
   </form>
 </template>

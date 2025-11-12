@@ -80,19 +80,11 @@ const goToProducts = () => router.push("/products");
               @click="goToProducts"
             >
               <span>Pregledaj ponudu</span>
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.5 4.5L21 12m0 0-7.5 7.5M21 12H3"
-                />
-              </svg>
+              <Icon
+                name="heroicons-outline:arrow-long-right"
+                class="text-base"
+                aria-hidden="true"
+              />
             </button>
           </div>
         </div>
@@ -157,19 +149,11 @@ const goToProducts = () => router.push("/products");
           class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline dark:text-blue-300"
         >
           Pogledaj sve
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M13.5 4.5L21 12m0 0-7.5 7.5M21 12H3"
-            />
-          </svg>
+          <Icon
+            name="heroicons-outline:arrow-long-right"
+            class="text-base"
+            aria-hidden="true"
+          />
         </NuxtLink>
       </div>
       <div class="mt-6">

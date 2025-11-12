@@ -83,6 +83,9 @@ useHead({
   title: "Proizvod",
 });
 onMounted(async () => {
+  if (!route.params.slug) {
+    return;
+  }
   product.value = await catalogStore.fetchProductById(
     route.params.slug.toString(),
   );
@@ -98,17 +101,11 @@ onMounted(async () => {
     <div
       class="relative col-span-2 flex aspect-video w-full items-center justify-center rounded-sm bg-slate-300 dark:bg-slate-700 md:aspect-4/3"
     >
-      <svg
-        class="h-12 w-12 text-slate-200"
-        xmlns="http://www.w3.org/2000/svg"
+      <Icon
+        name="heroicons-outline:photo"
+        class="text-5xl text-slate-200"
         aria-hidden="true"
-        fill="currentColor"
-        viewBox="0 0 640 512"
-      >
-        <path
-          d="M480 80C480 35.82 515.8 0 560 0C604.2 0 640 35.82 640 80C640 124.2 604.2 160 560 160C515.8 160 480 124.2 480 80zM0 456.1C0 445.6 2.964 435.3 8.551 426.4L225.3 81.01C231.9 70.42 243.5 64 256 64C268.5 64 280.1 70.42 286.8 81.01L412.7 281.7L460.9 202.7C464.1 196.1 472.2 192 480 192C487.8 192 495 196.1 499.1 202.7L631.1 419.1C636.9 428.6 640 439.7 640 450.9C640 484.6 612.6 512 578.9 512H55.91C25.03 512 .0006 486.1 .0006 456.1L0 456.1z"
-        />
-      </svg>
+      />
     </div>
     <div class="col-span-3 flex w-full flex-col md:grid-cols-5">
       <div
@@ -201,19 +198,11 @@ onMounted(async () => {
             type="button"
             class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            <svg
+            <Icon
+              name="heroicons-solid:shopping-bag"
               aria-hidden="true"
-              class="-ml-1 mr-2 h-5 w-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                clip-rule="evenodd"
-                fill-rule="evenodd"
-                d="M6 5v1H4.667a1.75 1.75 0 00-1.743 1.598l-.826 9.5A1.75 1.75 0 003.84 19H16.16a1.75 1.75 0 001.743-1.902l-.826-9.5A1.75 1.75 0 0015.333 6H14V5a4 4 0 00-8 0zm4-2.5A2.5 2.5 0 007.5 5v1h5V5A2.5 2.5 0 0010 2.5zM7.5 10a2.5 2.5 0 005 0V8.75a.75.75 0 011.5 0V10a4 4 0 01-8 0V8.75a.75.75 0 011.5 0V10z"
-              ></path>
-            </svg>
+              class="-ml-1 mr-2 text-xl"
+            />
             Dodaj u korpu
           </button>
           <div
@@ -259,7 +248,6 @@ onMounted(async () => {
     </section>
 
     <section
-      v-if="product.productDetails?.length"
       class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800 lg:col-span-2"
     >
       <div class="mb-8">
@@ -268,11 +256,15 @@ onMounted(async () => {
         >
           Opis
         </h2>
-        <p class="text-base leading-relaxed text-slate-600 dark:text-slate-300">
-          {{ product.description }}
-        </p>
+        <pre
+          class="text-base whitespace-pre-wrap font-[inherit] leading-relaxed text-slate-600 dark:text-slate-300"
+          >{{ product.description }}</pre
+        >
       </div>
-      <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+      <h2
+        v-if="product.productDetails && product.productDetails.length"
+        class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100"
+      >
         Specifikacije
       </h2>
       <dl class="grid gap-4 md:grid-cols-2">

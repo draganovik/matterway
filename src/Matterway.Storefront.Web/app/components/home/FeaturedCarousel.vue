@@ -52,21 +52,11 @@
       <span
         class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-hidden group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
       >
-        <svg
+        <Icon
+          name="heroicons-outline:chevron-left"
           aria-hidden="true"
-          class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          ></path>
-        </svg>
+          class="text-xl text-white dark:text-slate-800 sm:text-2xl"
+        />
         <span class="sr-only">Previous</span>
       </span>
     </button>
@@ -78,21 +68,11 @@
       <span
         class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/30 group-hover:bg-white/50 group-focus:outline-hidden group-focus:ring-4 group-focus:ring-white dark:bg-slate-800/30 dark:group-hover:bg-slate-800/60 dark:group-focus:ring-slate-800/70 sm:h-10 sm:w-10"
       >
-        <svg
+        <Icon
+          name="heroicons-outline:chevron-right"
           aria-hidden="true"
-          class="h-5 w-5 text-white dark:text-slate-800 sm:h-6 sm:w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          ></path>
-        </svg>
+          class="text-xl text-white dark:text-slate-800 sm:text-2xl"
+        />
         <span class="sr-only">Next</span>
       </span>
     </button>

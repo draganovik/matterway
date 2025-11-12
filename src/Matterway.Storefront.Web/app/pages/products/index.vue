@@ -206,7 +206,7 @@ watch(
               <select
                 id="page-size"
                 :value="pagination.pageSize"
-                class="hidden rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-500 sm:flex"
+                class="hidden rounded-full border border-slate-200 bg-white pl-3 text-right pr-8 py-2 text-sm font-medium text-slate-600 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-500 sm:flex"
                 @change="
                   changePageSize(
                     Number(($event.target as HTMLSelectElement).value),
@@ -266,19 +266,11 @@ watch(
             to="/products/create"
             class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-dashed border-blue-300 bg-blue-50 px-5 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100 focus:outline-hidden focus:ring-4 focus:ring-blue-200 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-900/40"
           >
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 6v12m6-6H6"
-              />
-            </svg>
+            <Icon
+              name="heroicons-outline:plus"
+              class="text-base"
+              aria-hidden="true"
+            />
             Dodaj novi proizvod
           </NuxtLink>
         </form>
@@ -297,19 +289,11 @@ watch(
           class="grid min-h-64 place-items-center rounded-3xl border border-slate-200 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-800"
         >
           <div class="space-y-4 text-slate-500 dark:text-slate-300">
-            <svg
-              class="mx-auto h-12 w-12"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.813 15.904A6.5 6.5 0 018.25 4.5 6.5 6.5 0 1115.5 11a6.46 6.46 0 01-.904 3.313L21 20.719 20.281 21l-4.407-4.407A6.46 6.46 0 0112 17.5a6.46 6.46 0 01-2.187-.407"
-              />
-            </svg>
+            <Icon
+              name="heroicons-outline:magnifying-glass"
+              class="mx-auto text-5xl"
+              aria-hidden="true"
+            />
             <h2
               class="text-lg font-semibold text-slate-700 dark:text-slate-100"
             >

@@ -66,19 +66,11 @@ const goToCheckout = () => {
           <span
             class="flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300"
           >
-            <svg
-              class="h-8 w-8"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 3h2l.4 2M7 13h10l3.055-6.109A1 1 0 0 0 19.117 6H6.163M7 13l-1.6 5.6A1 1 0 0 0 6.362 20H19M7 13l-2-8M9 21a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm10 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"
-              />
-            </svg>
+            <Icon
+              name="heroicons-outline:shopping-cart"
+              class="text-4xl"
+              aria-hidden="true"
+            />
           </span>
           <div class="space-y-2">
             <h2 class="text-xl font-semibold text-slate-900 dark:text-white">
@@ -94,19 +86,11 @@ const goToCheckout = () => {
             @click="goToProducts"
           >
             <span>Pregledaj proizvode</span>
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m13.5 4.5 7.5 7.5m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
+            <Icon
+              name="heroicons-outline:arrow-long-right"
+              class="text-base"
+              aria-hidden="true"
+            />
           </button>
         </div>
         <div v-else class="space-y-6">

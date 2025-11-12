@@ -99,7 +99,7 @@ onMounted(() => {
     class="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-sm supports-backdrop-filter:bg-white/70 dark:border-slate-700 dark:bg-slate-900/70"
   >
     <div
-      class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6"
+      class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6"
     >
       <NuxtLink
         to="/"
@@ -112,7 +112,7 @@ onMounted(() => {
       </NuxtLink>
 
       <nav
-        class="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex"
+        class="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex"
       >
         <NuxtLink
           v-for="link in navLinks"
@@ -130,34 +130,16 @@ onMounted(() => {
       </nav>
 
       <div class="flex items-center gap-2">
-        <form class="hidden md:block" @submit.prevent="submitSearch">
+        <form class="hidden lg:block" @submit.prevent="submitSearch">
           <label class="group relative flex items-center">
             <span
-              class="pointer-events-none absolute left-3 text-slate-400 group-focus-within:text-blue-600"
+              class="pointer-events-none mt-1 absolute left-3 text-slate-400 group-focus-within:text-blue-600"
             >
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <line
-                  x1="16.65"
-                  y1="16.65"
-                  x2="21"
-                  y2="21"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <Icon
+                name="heroicons-outline:magnifying-glass"
+                class="text-base"
+                aria-hidden="true"
+              />
             </span>
             <input
               v-model="searchTerm"
@@ -170,75 +152,43 @@ onMounted(() => {
 
         <button
           type="button"
-          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          class="rounded-full py-1 px-3 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
           @click="toggleMobileSearch"
         >
           <span class="sr-only">Pretraga</span>
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              cx="11"
-              cy="11"
-              r="7"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <line
-              x1="16.65"
-              y1="16.65"
-              x2="21"
-              y2="21"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <Icon
+            name="heroicons-outline:magnifying-glass"
+            class="text-xl mt-1"
+            aria-hidden="true"
+          />
         </button>
 
         <button
           type="button"
-          class="relative rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800"
+          class="relative rounded-full py-1 px-3 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800"
           @click="goToCart"
         >
           <span class="sr-only">Korpa</span>
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            viewBox="0 0 24 24"
-          >
-            <g fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                stroke-linecap="round"
-                d="M8 12V8a4 4 0 0 1 4-4v0a4 4 0 0 1 4 4v4"
-              />
-              <path
-                d="M3.694 12.668c.145-1.741.218-2.611.792-3.14S5.934 9 7.681 9h8.639c1.746 0 2.62 0 3.194.528s.647 1.399.792 3.14l.514 6.166c.084 1.013.126 1.52-.17 1.843c-.298.323-.806.323-1.824.323H5.174c-1.017 0-1.526 0-1.823-.323s-.255-.83-.17-1.843z"
-              />
-            </g>
-          </svg>
+          <Icon
+            name="heroicons-outline:shopping-bag"
+            class="text-xl mt-1"
+            aria-hidden="true"
+          />
           <span
             v-if="cartItemCount"
-            class="absolute bottom-0 right-0 inline-flex items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-semibold text-white"
-          >
-            {{ cartItemCount }}
-          </span>
+            class="absolute size-1.5 top-1 right-2.5 inline-flex items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white"
+          />
         </button>
 
         <NuxtLink
           v-if="!isLoggedIn"
           to="/login"
-          class="hidden rounded-full border border-blue-200 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30 md:inline-flex"
+          class="hidden rounded-full border border-blue-200 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900/30 lg:inline-flex"
         >
           Prijava
         </NuxtLink>
 
-        <div v-else class="hidden items-center gap-3 md:flex">
+        <div v-else class="hidden items-center gap-3 lg:flex">
           <NuxtLink
             to="/orders"
             class="text-sm font-medium text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-300"
@@ -256,23 +206,15 @@ onMounted(() => {
 
         <button
           type="button"
-          class="rounded-full p-2 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          class="rounded-full py-0.5 px-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-hidden focus:ring-2 focus:ring-blue-200 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
           @click="toggleMobileMenu"
         >
           <span class="sr-only">Navigacija</span>
-          <svg
-            class="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <Icon
+            name="heroicons-outline:bars-3"
+            class="text-2xl mt-1"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>
@@ -280,35 +222,17 @@ onMounted(() => {
     <transition name="fade">
       <div
         v-if="showMobileSearch"
-        class="border-t border-slate-200 bg-white/95 px-4 py-3 dark:border-slate-700 dark:bg-slate-900 md:hidden"
+        class="border-t border-slate-200 bg-white/95 px-4 py-3 dark:border-slate-700 dark:bg-slate-900 lg:hidden"
       >
         <form @submit.prevent="submitSearch" class="flex items-center gap-2">
           <label
             class="flex flex-1 items-center gap-2 rounded-full bg-slate-100 px-4 py-2 dark:bg-slate-800"
           >
-            <svg
-              class="h-5 w-5 text-slate-500"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <line
-                x1="16.65"
-                y1="16.65"
-                x2="21"
-                y2="21"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <Icon
+              name="heroicons-outline:magnifying-glass"
+              class="text-xl text-slate-500"
+              aria-hidden="true"
+            />
             <input
               ref="searchInput"
               v-model="searchTerm"
@@ -330,7 +254,7 @@ onMounted(() => {
     <transition name="slide-fade">
       <div
         v-if="showMobileMenu"
-        class="border-t border-slate-200 bg-white/95 px-4 py-4 dark:border-slate-700 dark:bg-slate-900 md:hidden"
+        class="border-t border-slate-200 bg-white/95 px-4 py-4 dark:border-slate-700 dark:bg-slate-900 lg:hidden"
       >
         <nav class="flex flex-col gap-2">
           <NuxtLink
