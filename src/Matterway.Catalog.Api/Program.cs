@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Matterway.Catalog.Api.Extensions;
-using Matterway.Common.Extensions;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
@@ -9,8 +8,6 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     Args = args,
     ContentRootPath = Directory.GetCurrentDirectory()
 });
-
-builder.AddServiceDefaults();
 
 // Configure environment-specific settings
 builder.Configuration
@@ -25,33 +22,26 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-// Configure CORS
-builder.ConfigureCors();
-
-// Configure services
-builder.ConfigurePersistence();
-builder.ConfigureProxyServices();
-builder.ConfigureAuthentication();
-builder.ConfigureImageStorage();
-
-// Add validation and problem details
-builder.ConfigureProblemDetails();
 builder.Services.AddValidation();
-//builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
+builder.AddServiceDefaults();
 
-// Register endpoints and API explorer
-builder.Services.AddEndpoints();
-builder.Services.AddEndpointsApiExplorer();
+builder
+    .ConfigureProblemDetails()
+    .ConfigureApiVersioning()
+    .ConfigureOpenApi()
+    .ConfigureCors();
 
-// Add OpenAPI and API versioning
-builder.Services.ConfigureOpenApi();
-builder.Services.ConfigureApiVersioning();
+builder
+    .ConfigureAuthentication()
+    .ConfigureProxyServices()
+    .ConfigureImageStorage()
+    .ConfigurePersistence()
+    .ConfigureFeatures();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-
 app.UseExceptionHandler();
+app.MapDefaultEndpoints();
 app.UseStatusCodePages();
 app.UseCors();
 

@@ -1,5 +1,4 @@
 ﻿using Matterway.Ordering.Api.Extensions;
-using Matterway.Common.Extensions;
 using Matterway.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -22,15 +21,14 @@ builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = fal
 builder.Services.ConfigureAuthentication(builder.Configuration);
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureRepositories();
+builder.Services.ConfigureFeatures();
 
 builder.Services.ConfigureMapper();
 builder.Services.ConfigureJsonOptions();
 
-builder.Services.AddEndpoints();
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.ConfigureOpenApi();
 builder.Services.ConfigureApiVersioning();
+//builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddValidation();
 builder.ConfigureCors();

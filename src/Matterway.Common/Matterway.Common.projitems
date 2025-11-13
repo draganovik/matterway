@@ -13,8 +13,6 @@
         <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\PaymentState.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Extensions\EndpointRegistrationExtensions.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Extensions\ServiceDiscoveryExtensions.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IEndpoint.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Customer.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>

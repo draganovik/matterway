@@ -1,0 +1,98 @@
+using Asp.Versioning;
+using Matterway.Common.Abstractions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Scalar.AspNetCore;
+
+namespace Matterway.Customers.Api.Extensions;
+
+public static class EndpointRegistration
+{
+    extension(IServiceCollection services)
+    {
+        public IServiceCollection ConfigureApiVersioning()
+        {
+            services.AddApiVersioning(options =>
+                {
+                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.ReportApiVersions = true;
+                    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+                })
+                .AddApiExplorer(options =>
+                {
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                });
+
+            return services;
+        }
+
+        public IServiceCollection ConfigureFeatures()
+        {
+            var uniqueTypes = new HashSet<Type>();
+
+            var serviceDescriptors = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly =>
+                {
+                    try
+                    {
+                        return assembly.DefinedTypes;
+                    }
+                    catch
+                    {
+                        return [];
+                    } // avoid ReflectionTypeLoadException
+                })
+                .Where(type =>
+                    type is { IsAbstract: false, IsInterface: false } &&
+                    type.IsAssignableTo(typeof(IEndpoint)) &&
+                    uniqueTypes.Add(type.AsType()))
+                .Select(type =>
+                    ServiceDescriptor.Transient(typeof(IEndpoint), type.AsType()))
+                .ToArray();
+
+            services.TryAddEnumerable(serviceDescriptors);
+
+            return services;
+        }
+    }
+
+    extension(WebApplication app)
+    {
+        public WebApplication ApplyEndpoints()
+        {
+            var versionSet = app.NewApiVersionSet()
+                .HasApiVersion(new ApiVersion(1, 0))
+                .ReportApiVersions()
+                .Build();
+
+            var apiGroup = app.MapGroup("/api")
+                .DisableAntiforgery();
+
+            var versionedApiGroup = apiGroup
+                .MapGroup("/v{version:apiVersion}")
+                .WithApiVersionSet(versionSet);
+
+            var endpoints = app.Services
+                .GetRequiredService<IEnumerable<IEndpoint>>();
+
+            foreach (var endpoint in endpoints)
+            {
+                endpoint.MapEndpoint(versionedApiGroup);
+            }
+
+            return app;
+        }
+
+        public WebApplication ApplyScalar()
+        {
+            app.MapScalarApiReference("/", options =>
+            {
+                options.WithOpenApiRoutePattern("/openapi/{documentName}.yaml");
+                options.WithTitle("Matterway Customers API");
+            });
+
+            return app;
+        }
+    }
+}

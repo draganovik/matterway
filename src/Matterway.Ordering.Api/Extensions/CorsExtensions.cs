@@ -1,4 +1,4 @@
-using Matterway.Common.Extensions;
+using Matterway.ServiceDefaults;
 
 namespace Matterway.Ordering.Api.Extensions;
 

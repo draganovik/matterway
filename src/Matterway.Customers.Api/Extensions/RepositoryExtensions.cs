@@ -1,7 +1,7 @@
-using Matterway.Common.Extensions;
 using Matterway.Common.Services.Brokers;
 using Matterway.Customers.Api.Features.CartItems.Data;
 using Matterway.Customers.Api.Features.Customers.Data;
+using Matterway.ServiceDefaults;
 
 namespace Matterway.Customers.Api.Extensions;
 

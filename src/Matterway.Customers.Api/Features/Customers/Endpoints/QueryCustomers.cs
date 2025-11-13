@@ -7,7 +7,6 @@ using Matterway.Customers.Api.Features.Customers.Contracts;
 using Matterway.Customers.Api.Features.Customers.Data;
 using Matterway.Customers.Api.Features.Customers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
-using OpenTelemetry.Trace;
 
 namespace Matterway.Customers.Api.Features.Customers.Endpoints;
 
