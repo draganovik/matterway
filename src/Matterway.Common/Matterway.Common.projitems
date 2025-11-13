@@ -20,7 +20,6 @@
         <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Http\ApiResourceUriBuilder.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Pagination\PaginationResponse.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Pagination\PagingQueryParams.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs"/>

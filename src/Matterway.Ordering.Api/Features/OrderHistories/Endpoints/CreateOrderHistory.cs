@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +30,7 @@ public class CreateOrderHistory : IEndpoint
     private static async Task<Results<Created<OrderHistoryBaseResponse>, BadRequest<ProblemDetails>, ValidationProblem>>
         Handler(OrderHistoryBaseRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IOrderHistoryRepository orderHistoryRepository,
             IMapper mapper)
     {
@@ -63,7 +63,7 @@ public class CreateOrderHistory : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"OrderHistories/{newEntity.Id}");
+        var location = linkGenerator.GetPathByName(httpContext, "GetOrderHistoryById", new { id = newEntity.Id });
 
         return TypedResults.Created(location, mapper.Map<OrderHistoryBaseResponse>(newEntity));
     }

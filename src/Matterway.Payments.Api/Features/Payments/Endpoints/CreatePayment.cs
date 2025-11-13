@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,6 +26,7 @@ public class CreatePayment : IEndpoint
     private static async Task<Results<Created<PaymentBaseResponse>, BadRequest<ProblemDetails>, ValidationProblem>>
         Handler([FromBody] PaymentBaseRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IPaymentRepository paymentRepository,
             IMapper mapper)
     {
@@ -59,7 +59,10 @@ public class CreatePayment : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Payments/{newEntity.Id}");
+        var location = linkGenerator.GetPathByName(
+            httpContext,
+            "GetPaymentById",
+            new { paymentId = newEntity.Id });
 
         return TypedResults.Created(location, mapper.Map<PaymentBaseResponse>(newEntity));
     }

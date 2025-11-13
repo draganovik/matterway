@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Matterway.Payments.Api.Features.Payments.Contracts;
 using Matterway.Payments.Api.Features.Payments.Data;
@@ -32,6 +31,7 @@ public class QueryPayments : IEndpoint
             [AsParameters]
             PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IPaymentRepository paymentRepository,
             IMapper mapper)
     {
@@ -39,10 +39,10 @@ public class QueryPayments : IEndpoint
         var entities = await paymentRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Payments");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryPayments", values: null);
         var paginationResponse = new PaginationResponse<PaymentBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<PaymentBaseResponse>>(entities).ToList(), baseUri);
+            mapper.Map<IEnumerable<PaymentBaseResponse>>(entities).ToList(), new Uri(baseUri));
 
         return TypedResults.Ok(paginationResponse);
     }

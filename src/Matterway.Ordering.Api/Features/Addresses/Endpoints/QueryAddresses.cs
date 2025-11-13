@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Matterway.Ordering.Api.Features.Addresses.Contracts;
 using Matterway.Ordering.Api.Features.Addresses.Data;
@@ -32,6 +31,7 @@ public class QueryAddresses : IEndpoint
             [AsParameters]
             PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IAddressRepository addressRepository,
             IMapper mapper)
     {
@@ -41,10 +41,11 @@ public class QueryAddresses : IEndpoint
 
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Addresses");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryAddresses", values: null);
+        ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<AddressBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<AddressBaseResponse>>(entities).ToList(), baseUri);
+            mapper.Map<IEnumerable<AddressBaseResponse>>(entities).ToList(), new Uri(baseUri));
 
         return TypedResults.Ok(paginationResponse);
     }

@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Matterway.Identity.Api.Features.Sessions.Contracts;
 using Matterway.Identity.Api.Features.Sessions.Data;
@@ -33,19 +32,20 @@ public class QuerySessions : IEndpoint
             , ValidationProblem>>
         Handler([AsParameters] PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             ISessionRepository sessionRepository,
             IMapper mapper)
     {
         var total = await sessionRepository.GetTotalEntities();
         var entities = await sessionRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Sessions");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySessions", values: null);
 
         var paginationResponse = new PaginationResponse<SessionBaseResponse>(
             total,
             pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<SessionBaseResponse>>(entities).ToList(),
-            baseUri);
+            new Uri(baseUri));
 
         return entities is IEnumerable<Session> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

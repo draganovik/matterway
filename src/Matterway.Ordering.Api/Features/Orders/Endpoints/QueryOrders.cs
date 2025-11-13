@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
@@ -32,6 +31,7 @@ public class QueryOrders : IEndpoint
             [AsParameters]
             PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IOrderRepository orderRepository,
             IMapper mapper)
     {
@@ -58,10 +58,11 @@ public class QueryOrders : IEndpoint
 
         if (entities is not { } value || !value.Any()) return TypedResults.NoContent();
 
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Orders");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrders", values: null);
+        ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<OrderBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<OrderBaseResponse>>(value).ToList(), baseUri);
+            mapper.Map<IEnumerable<OrderBaseResponse>>(value).ToList(), new Uri(baseUri));
 
         return TypedResults.Ok(paginationResponse);
     }

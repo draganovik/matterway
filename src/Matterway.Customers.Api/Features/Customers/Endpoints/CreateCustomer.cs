@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +30,7 @@ public class CreateCustomer : IEndpoint
             Results<Created<CustomerBaseResponse>, BadRequest<ProblemDetails>, ForbidHttpResult, ValidationProblem>>
         Handler(CustomerBaseRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             ICustomerRepository customerRepository,
             IMapper mapper)
     {
@@ -78,7 +78,8 @@ public class CreateCustomer : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Customers/{createdCustomer.Id}");
+        var location = linkGenerator.GetPathByName(httpContext, "GetCustomerById",
+            new { customerId = createdCustomer.Id });
 
         return TypedResults.Created(location,
             mapper.Map<CustomerBaseResponse>(createdCustomer));

@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Matterway.Identity.Api.Features.SystemUsers.Contracts;
 using Matterway.Identity.Api.Features.SystemUsers.Data;
@@ -33,19 +32,20 @@ public class QuerySystemUsers : IEndpoint
             BadRequest<ProblemDetails>, ValidationProblem>>
         Handler([AsParameters] PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             ISystemUserRepository systemUserRepository,
             IMapper mapper)
     {
         var total = await systemUserRepository.GetTotalEntities();
         var entities = await systemUserRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "SystemUsers");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySystemUsers", values: null);
 
         var paginationResponse = new PaginationResponse<SystemUserBaseResponse>(
             total,
             pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<SystemUserBaseResponse>>(entities).ToList(),
-            baseUri);
+            new Uri(baseUri));
 
         return entities is IEnumerable<SystemUser> value && value.Any()
             ? TypedResults.Ok(paginationResponse)

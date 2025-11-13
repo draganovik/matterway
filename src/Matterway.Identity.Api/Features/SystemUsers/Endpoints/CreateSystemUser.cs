@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +31,7 @@ public class CreateSystemUser : IEndpoint
         Handler(
             SystemUserBaseRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             ISystemUserRepository systemUserRepository,
             IMapper mapper,
             IPasswordHasher<SystemUser> passwordHasher)
@@ -76,7 +76,8 @@ public class CreateSystemUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails("User is not created"));
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"SystemUsers/{createdSystemUser.Id}");
+        var location = linkGenerator.GetPathByName(httpContext, "GetSystemUserById",
+            new { systemUserId = createdSystemUser.Id });
 
         return TypedResults.Created(location, mapper.Map<SystemUserBaseResponse>(createdSystemUser));
     }

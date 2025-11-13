@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Matterway.Ordering.Api.Features.OrderHistories.Contracts;
 using Matterway.Ordering.Api.Features.OrderHistories.Data;
@@ -32,6 +31,7 @@ public class QueryOrderHistories : IEndpoint
             [AsParameters]
             PagingQueryParams pagingQuery,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IOrderHistoryRepository orderHistoryRepository,
             IMapper mapper)
     {
@@ -39,10 +39,11 @@ public class QueryOrderHistories : IEndpoint
         var entities = await orderHistoryRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "OrderHistories");
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrderHistories", values: null);
+        ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<OrderHistoryBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<OrderHistoryBaseResponse>>(entities).ToList(), baseUri);
+            mapper.Map<IEnumerable<OrderHistoryBaseResponse>>(entities).ToList(), new Uri(baseUri));
 
         return TypedResults.Ok(paginationResponse);
     }

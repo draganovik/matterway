@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,6 +26,7 @@ public class CreateAddress : IEndpoint
     private static async Task<Results<Created<AddressBaseResponse>, BadRequest<ProblemDetails>, ValidationProblem>>
         Handler(AddressBaseRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IAddressRepository addressRepository,
             IMapper mapper)
     {
@@ -60,7 +60,7 @@ public class CreateAddress : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Addresses/{newEntity.Id}");
+        var location = linkGenerator.GetPathByName(httpContext, "GetAddressById", new { id = newEntity.Id });
 
         return TypedResults.Created(location, mapper.Map<AddressBaseResponse>(newEntity));
     }

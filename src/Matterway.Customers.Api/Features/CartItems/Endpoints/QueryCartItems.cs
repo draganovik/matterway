@@ -2,7 +2,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
@@ -31,6 +30,7 @@ public class QueryCartItems : IEndpoint
         [AsParameters]
         PagingQueryParams pagingQuery,
         HttpContext httpContext,
+        LinkGenerator linkGenerator,
         ICartItemRepository cartItemRepository,
         IMapper mapper)
     {
@@ -56,10 +56,10 @@ public class QueryCartItems : IEndpoint
             entities = await cartItemRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         }
 
-        var baseUri = ApiResourceUriBuilder.BuildAbsoluteUri(httpContext, "Customers/CartItems");
-        var paginationResponse = new PaginationResponse<CartItemBaseResponse>(total, pagingQuery.Page!.Value,
-            pagingQuery.PageSize!.Value,
-            mapper.Map<IEnumerable<CartItemBaseResponse>>(entities).ToList(), baseUri);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCartItems", values: null);
+        var paginationResponse = new PaginationResponse<CartItemBaseResponse>(total, pagingQuery.Page.Value,
+            pagingQuery.PageSize.Value,
+            mapper.Map<IEnumerable<CartItemBaseResponse>>(entities).ToList(), new Uri(baseUri));
 
         return entities.Any()
             ? TypedResults.Ok(paginationResponse)

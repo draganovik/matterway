@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
 using Matterway.Common.Abstractions;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,6 +26,7 @@ public class CreateOrder : IEndpoint
     private static async Task<Results<Created<OrderBaseResponse>, BadRequest<ProblemDetails>, ValidationProblem>>
         Handler(OrderCreateRequest request,
             HttpContext httpContext,
+            LinkGenerator linkGenerator,
             IOrderRepository orderRepository,
             IMapper mapper)
     {
@@ -59,7 +59,7 @@ public class CreateOrder : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext, $"Orders/{newEntity.Id}");
+        var location = linkGenerator.GetPathByName(httpContext, "GetOrderById", new { id = newEntity.Id });
 
         return TypedResults.Created(location, mapper.Map<OrderBaseResponse>(newEntity));
     }
