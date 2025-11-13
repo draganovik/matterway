@@ -1,5 +1,6 @@
 ﻿using Matterway.Ordering.Api.Extensions;
 using Matterway.Common.Extensions;
+using Matterway.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {

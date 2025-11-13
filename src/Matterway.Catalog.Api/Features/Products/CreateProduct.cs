@@ -28,6 +28,7 @@ public class CreateProduct : IEndpoint
         CreateProductRequest request,
         IProductRepository productRepository,
         HttpContext httpContext,
+        LinkGenerator linkGenerator,
         CancellationToken cancellationToken)
     {
         var product = MapToEntity(request);
@@ -43,7 +44,13 @@ public class CreateProduct : IEndpoint
             });
         }
 
-        var location = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/Products/{created.Id}";
+        var location = linkGenerator.GetUriByName(
+            httpContext,
+            "GetProductById",
+            new
+            {
+                id = created.Id
+            });
 
         return TypedResults.Created(location, MapToResponse(created));
     }

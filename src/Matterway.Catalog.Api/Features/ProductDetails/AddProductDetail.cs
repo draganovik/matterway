@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +29,7 @@ public class AddProductDetail : IEndpoint
         Guid productId,
         AddProductDetailRequest request,
         HttpContext httpContext,
+        LinkGenerator linkGenerator,
         IProductDetailRepository productDetailRepository,
         CancellationToken cancellationToken)
     {
@@ -47,8 +46,13 @@ public class AddProductDetail : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"Products/{created.ProductId}/Details/{created.TypeId}");
+        var location = linkGenerator.GetUriByName(
+            httpContext,
+            "GetProductById",
+            new
+            {
+                id = created.ProductId
+            });
 
         return TypedResults.Created(location,
             MapToResponse(created));

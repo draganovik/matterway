@@ -53,7 +53,7 @@ public static class ApiResourceUriBuilder
 
         var formatted = version.ToString();
 
-        return formatted!.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+        return formatted.StartsWith("v", StringComparison.OrdinalIgnoreCase)
             ? formatted
             : $"v{formatted}";
     }
@@ -67,7 +67,7 @@ public static class ApiResourceUriBuilder
             return $"/{sanitizedRelative}";
         }
 
-        var sanitizedBase = pathBase.Value!.TrimEnd('/');
+        var sanitizedBase = pathBase.Value.TrimEnd('/');
         return $"{sanitizedBase}/{sanitizedRelative}";
     }
 }

@@ -1,5 +1,6 @@
 using Matterway.Common.Extensions;
 using Matterway.Identity.Api.Extensions;
+using Matterway.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {

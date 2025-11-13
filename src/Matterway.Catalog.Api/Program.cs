@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Matterway.Catalog.Api.Extensions;
 using Matterway.Common.Extensions;
+using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions

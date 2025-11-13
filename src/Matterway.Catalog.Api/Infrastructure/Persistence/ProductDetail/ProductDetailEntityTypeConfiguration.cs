@@ -1,4 +1,3 @@
-using Matterway.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using DomainProductDetail = Matterway.Catalog.Api.Domain.ProductDetail;

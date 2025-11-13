@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
-using Matterway.Catalog.Api.Infrastructure.Storage;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;

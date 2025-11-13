@@ -5,7 +5,6 @@ using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
-using Matterway.Common.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -91,10 +90,7 @@ public class AddProductImage : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        var location = ApiResourceUriBuilder.BuildRelativePath(httpContext,
-            $"ProductImages/{productImageModel.ProductId}/{productImageModel.OrderIndex}");
-
-        return TypedResults.Created(location,
+        return TypedResults.Created(productImageModel.ImageUrl,
             productImageModel);
     }
 

@@ -1,6 +1,4 @@
-﻿using Matterway.Common.Enums;
-
-namespace Matterway.Catalog.Api.Domain;
+﻿namespace Matterway.Catalog.Api.Domain;
 
 public class ProductDetail
 {
