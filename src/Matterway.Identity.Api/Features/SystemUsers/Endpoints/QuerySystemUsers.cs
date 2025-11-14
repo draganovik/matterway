@@ -38,7 +38,7 @@ public class QuerySystemUsers : IEndpoint
     {
         var total = await systemUserRepository.GetTotalEntities();
         var entities = await systemUserRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySystemUsers", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySystemUsers", null);
 
         var paginationResponse = new PaginationResponse<SystemUserBaseResponse>(
             total,

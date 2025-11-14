@@ -16,10 +16,7 @@ public sealed class MinioImageStorageService(
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        if (file.Length == 0)
-        {
-            throw new InvalidOperationException("Cannot upload an empty file.");
-        }
+        if (file.Length == 0) throw new InvalidOperationException("Cannot upload an empty file.");
 
         var objectName = BuildObjectName(productId, imageId);
 

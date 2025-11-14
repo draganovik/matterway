@@ -44,7 +44,7 @@ public class QueryCartItems : IEndpoint
         var entities = await cartItemRepository.QueryByCustomerId(systemUserId, pagingQuery.Page!.Value,
             pagingQuery.PageSize.Value);
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCartItems", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCartItems", null);
         var paginationResponse = new PaginationResponse<CartItemBaseResponse>(total, pagingQuery.Page.Value,
             pagingQuery.PageSize.Value,
             mapper.Map<IEnumerable<CartItemBaseResponse>>(entities).ToList(), new Uri(baseUri));

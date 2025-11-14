@@ -38,7 +38,7 @@ public class QuerySessions : IEndpoint
     {
         var total = await sessionRepository.GetTotalEntities();
         var entities = await sessionRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySessions", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QuerySessions", null);
 
         var paginationResponse = new PaginationResponse<SessionBaseResponse>(
             total,

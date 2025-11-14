@@ -43,27 +43,18 @@ public class CreateSystemUser : IEndpoint
         if (!hasRole)
         {
             request.Role ??= SystemUserRole.Customer;
-            if (request.Role != SystemUserRole.Customer)
-            {
-                return TypedResults.Forbid();
-            }
+            if (request.Role != SystemUserRole.Customer) return TypedResults.Forbid();
         }
         else
         {
             if (currentUserRole == SystemUserRole.Customer)
-            {
                 return TypedResults.BadRequest(CreateProblemDetails("Customer can not create other users"));
-            }
 
             if (currentUserRole == SystemUserRole.Manager && request.Role == SystemUserRole.Admin)
-            {
                 return TypedResults.BadRequest(CreateProblemDetails("Manager can not create Admin"));
-            }
 
             if (currentUserRole == SystemUserRole.Manager && request.Role == SystemUserRole.Manager)
-            {
                 return TypedResults.BadRequest(CreateProblemDetails("Manager can not create Manager"));
-            }
         }
 
         var systemUser = mapper.Map<SystemUser>(request);
@@ -71,10 +62,7 @@ public class CreateSystemUser : IEndpoint
         systemUser.PasswordHash = passwordHasher.HashPassword(systemUser, request.Password!);
 
         var createdSystemUser = await systemUserRepository.Create(systemUser);
-        if (createdSystemUser is null)
-        {
-            return TypedResults.BadRequest(CreateProblemDetails("User is not created"));
-        }
+        if (createdSystemUser is null) return TypedResults.BadRequest(CreateProblemDetails("User is not created"));
 
         var location = linkGenerator.GetPathByName(httpContext, "GetSystemUserById",
             new { systemUserId = createdSystemUser.Id });

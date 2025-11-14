@@ -35,7 +35,7 @@ public class QueryCustomers : IEndpoint
     {
         var total = await customerRepository.GetTotalEntities();
         var entities = await customerRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCustomers", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCustomers", null);
 
         var paginationResponse = new PaginationResponse<CustomerBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

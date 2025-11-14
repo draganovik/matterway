@@ -76,10 +76,7 @@ public static class EndpointRegistration
             var endpoints = app.Services
                 .GetRequiredService<IEnumerable<IEndpoint>>();
 
-            foreach (var endpoint in endpoints)
-            {
-                endpoint.MapEndpoint(versionedApiGroup);
-            }
+            foreach (var endpoint in endpoints) endpoint.MapEndpoint(versionedApiGroup);
 
             return app;
         }

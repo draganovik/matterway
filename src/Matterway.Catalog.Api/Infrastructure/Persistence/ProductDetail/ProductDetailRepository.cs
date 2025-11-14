@@ -11,11 +11,9 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         context.ProductDetail.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
-        {
             return await context.ProductDetail.Include(x => x.Product).Include(x => x.Type)
                 .FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.TypeId == requestModel.TypeId,
                     cancellationToken);
-        }
 
         return null;
     }
@@ -57,12 +55,10 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         context.ProductDetail.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
-        {
             return await context.ProductDetail
                 .Include(x => x.Product)
                 .Include(x => x.Type)
                 .FirstOrDefaultAsync(x => x.ProductId == productId && x.TypeId == typeId, cancellationToken);
-        }
 
         return null;
     }

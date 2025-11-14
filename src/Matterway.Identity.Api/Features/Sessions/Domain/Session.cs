@@ -26,7 +26,13 @@ public class Session
     [Required(ErrorMessage = "Refresh expires is required.")]
     public DateTime? RefreshExpires { get; set; }
 
-    public bool IsExpired() => Expires <= DateTime.UtcNow;
+    public bool IsExpired()
+    {
+        return Expires <= DateTime.UtcNow;
+    }
 
-    public bool IsRefreshExpired() => RefreshExpires <= DateTime.UtcNow;
+    public bool IsRefreshExpired()
+    {
+        return RefreshExpires <= DateTime.UtcNow;
+    }
 }

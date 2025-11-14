@@ -55,10 +55,8 @@ public class OrderItemRepository : IOrderItemRepository
             context.OrderItem.Add(requestModel);
             var inserted = await context.SaveChangesAsync();
             if (inserted == 1)
-            {
                 return await context.OrderItem.FirstOrDefaultAsync(x =>
                     x.ProductId == requestModel.ProductId && x.OrderId == requestModel.OrderId);
-            }
 
             return null;
         }

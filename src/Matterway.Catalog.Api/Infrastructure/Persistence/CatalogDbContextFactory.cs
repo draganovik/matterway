@@ -9,7 +9,7 @@ public sealed class CatalogDbContextFactory : IDesignTimeDbContextFactory<Catalo
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("Properties/appsettings.Development.json", optional: true)
+            .AddJsonFile("Properties/appsettings.Development.json", true)
             .AddEnvironmentVariables()
             .Build();
 

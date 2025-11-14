@@ -43,10 +43,7 @@ public class CreateCustomer : IEndpoint
 
         var newEntity = mapper.Map<Customer>(request);
 
-        if (userRole == SystemUserRole.Customer && newEntity.SystemUserId != systemUserId)
-        {
-            return TypedResults.Forbid();
-        }
+        if (userRole == SystemUserRole.Customer && newEntity.SystemUserId != systemUserId) return TypedResults.Forbid();
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(newEntity);

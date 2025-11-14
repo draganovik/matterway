@@ -12,13 +12,11 @@ public sealed class ProductRepository(CatalogDb context)
         context.Product.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
-        {
             return await context.Product
                 .Include(x => x.ProductDetails!)
                 .ThenInclude(pd => pd!.Type)
                 .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == requestModel.Id, cancellationToken);
-        }
 
         return null;
     }
@@ -65,13 +63,11 @@ public sealed class ProductRepository(CatalogDb context)
         context.Product.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
-        {
             return await context.Product
                 .Include(x => x.ProductDetails!)
                 .ThenInclude(pd => pd!.Type)
                 .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-        }
 
         return null;
     }

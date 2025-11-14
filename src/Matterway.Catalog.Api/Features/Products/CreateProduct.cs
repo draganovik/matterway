@@ -36,13 +36,11 @@ public class CreateProduct : IEndpoint
         var created = await productRepository.Create(product, cancellationToken);
 
         if (created is null)
-        {
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Product could not be created.",
                 Status = StatusCodes.Status400BadRequest
             });
-        }
 
         var location = linkGenerator.GetUriByName(
             httpContext,

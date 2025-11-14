@@ -20,9 +20,7 @@ public sealed class ImageStorageInitializer(
             await EnsureBucketAsync(client, cancellationToken).ConfigureAwait(false);
 
             if (_options.AllowPublicRead)
-            {
                 await EnsurePublicAccessPolicyAsync(client, cancellationToken).ConfigureAwait(false);
-            }
         }
         catch (Exception ex)
         {
@@ -31,7 +29,10 @@ public sealed class ImageStorageInitializer(
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
     private async Task EnsureBucketAsync(IMinioClient client, CancellationToken cancellationToken)
     {
@@ -39,10 +40,7 @@ public sealed class ImageStorageInitializer(
             new BucketExistsArgs().WithBucket(_options.Bucket),
             cancellationToken).ConfigureAwait(false);
 
-        if (bucketExists)
-        {
-            return;
-        }
+        if (bucketExists) return;
 
         logger.LogInformation("Creating image storage bucket '{Bucket}'.", _options.Bucket);
         await client.MakeBucketAsync(

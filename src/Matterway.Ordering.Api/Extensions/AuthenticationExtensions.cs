@@ -53,9 +53,7 @@ public static class AuthenticationExtensions
                             context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
 
                         if (await identityServiceBroker.ValidateTokenAsync(jwtToken.EncodedToken) is null)
-                        {
                             context.Fail("Unauthorized");
-                        }
                     }
                 };
             });

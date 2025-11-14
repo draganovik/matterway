@@ -83,7 +83,7 @@ public class AddProductDetail : IEndpoint
         {
             ProductId = productId,
             TypeId = request.TypeId,
-            Value = request.Value,
+            Value = request.Value
         };
     }
 

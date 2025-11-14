@@ -27,15 +27,10 @@ public class RevokeSession : IEndpoint
     {
         var identity = context.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out _))
-        {
             return TypedResults.Unauthorized();
-        }
 
         var token = await context.GetTokenAsync("access_token");
-        if (string.IsNullOrEmpty(token))
-        {
-            return TypedResults.Unauthorized();
-        }
+        if (string.IsNullOrEmpty(token)) return TypedResults.Unauthorized();
 
         var isDeleted = await sessionRepository.DeleteByToken(token);
         return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();

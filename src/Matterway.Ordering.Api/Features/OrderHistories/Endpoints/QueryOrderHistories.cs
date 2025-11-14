@@ -39,7 +39,7 @@ public class QueryOrderHistories : IEndpoint
         var entities = await orderHistoryRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrderHistories", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrderHistories", null);
         ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<OrderHistoryBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

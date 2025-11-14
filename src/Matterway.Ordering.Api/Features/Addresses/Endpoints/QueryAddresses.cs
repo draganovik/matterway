@@ -41,7 +41,7 @@ public class QueryAddresses : IEndpoint
 
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryAddresses", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryAddresses", null);
         ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<AddressBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

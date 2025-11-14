@@ -12,8 +12,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 // Configure environment-specific settings
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
-        reloadOnChange: true)
+    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", true,
+        true)
     .AddEnvironmentVariables();
 
 // Configure JSON options

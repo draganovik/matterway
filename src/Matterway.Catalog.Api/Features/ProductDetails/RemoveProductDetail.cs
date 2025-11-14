@@ -30,10 +30,7 @@ public class RemoveProductDetail : IEndpoint
     {
         var entity = await productDetailRepository.GetByKey(productId, typeId, cancellationToken);
 
-        if (entity is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (entity is null) return TypedResults.NotFound();
 
         var isDeleted = await productDetailRepository.Delete(productId, typeId, cancellationToken);
 
@@ -52,7 +49,7 @@ public class RemoveProductDetail : IEndpoint
         return new RemoveProductDetailResponse
         {
             ProductId = entity.ProductId,
-            DetailType = entity.Type?.Title ?? "Detail key: " + entity.TypeId,
+            DetailType = entity.Type?.Title ?? "Detail key: " + entity.TypeId
         };
     }
 }

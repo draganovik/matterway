@@ -58,7 +58,7 @@ public class QueryOrders : IEndpoint
 
         if (entities is not { } value || !value.Any()) return TypedResults.NoContent();
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrders", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrders", null);
         ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<OrderBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

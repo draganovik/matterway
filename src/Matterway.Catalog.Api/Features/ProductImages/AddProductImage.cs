@@ -37,14 +37,12 @@ public class AddProductImage : IEndpoint
         CancellationToken cancellationToken)
     {
         if (request.File is null || request.File.Length == 0)
-        {
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Invalid request",
                 Status = StatusCodes.Status400BadRequest,
                 Detail = "Image file is required."
             });
-        }
 
         var imageId = Guid.CreateVersion7();
         ImageStorageUploadResult uploadResult;

@@ -34,10 +34,7 @@ public class DeleteCartItem : IEndpoint
         if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
             return TypedResults.Forbid();
 
-        if (userRole != SystemUserRole.Admin && id != systemUserId)
-        {
-            return TypedResults.Forbid();
-        }
+        if (userRole != SystemUserRole.Admin && id != systemUserId) return TypedResults.Forbid();
 
         var isDeleted = await cartItemRepository.Delete(id, productId);
         return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();

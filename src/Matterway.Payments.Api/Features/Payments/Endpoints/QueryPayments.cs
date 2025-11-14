@@ -39,7 +39,7 @@ public class QueryPayments : IEndpoint
         var entities = await paymentRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryPayments", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryPayments", null);
         var paginationResponse = new PaginationResponse<PaymentBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,
             mapper.Map<IEnumerable<PaymentBaseResponse>>(entities).ToList(), new Uri(baseUri));

@@ -30,21 +30,13 @@ public class IntrospectSession : IEndpoint
         var identity = context.User.Identity as ClaimsIdentity;
 
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-        {
             return TypedResults.Unauthorized();
-        }
 
         var token = await context.GetTokenAsync("access_token");
-        if (string.IsNullOrEmpty(token))
-        {
-            return TypedResults.Unauthorized();
-        }
+        if (string.IsNullOrEmpty(token)) return TypedResults.Unauthorized();
 
         var currentSession = await sessionRepository.GetByToken(token);
-        if (currentSession is null || currentSession.SystemUserId != systemUserId)
-        {
-            return TypedResults.Unauthorized();
-        }
+        if (currentSession is null || currentSession.SystemUserId != systemUserId) return TypedResults.Unauthorized();
 
         return TypedResults.Ok(mapper.Map<SessionBaseResponse>(currentSession));
     }

@@ -47,9 +47,7 @@ public class UpdateCustomerById : IEndpoint
         updateEntity.Id = id;
 
         if (userRole == SystemUserRole.Customer && updateEntity.SystemUserId != systemUserId)
-        {
             return TypedResults.Forbid();
-        }
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(updateEntity);

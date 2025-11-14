@@ -49,9 +49,7 @@ public static class AuthRegistration
                             var broker =
                                 context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
                             if (await broker.ValidateTokenAsync(jwtToken.EncodedToken) is null)
-                            {
                                 context.Fail("Unauthorized");
-                            }
                         }
                     };
                 });

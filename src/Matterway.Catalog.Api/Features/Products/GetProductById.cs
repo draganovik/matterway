@@ -25,10 +25,7 @@ public class GetProductById : IEndpoint
     {
         var product = await productRepository.GetById(id, cancellationToken);
 
-        if (product == null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (product == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(product));
     }

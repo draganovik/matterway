@@ -8,8 +8,10 @@ public class IdentityServiceBroker : IIdentityServiceBroker
 {
     private readonly HttpClient _httpClient;
 
-    public IdentityServiceBroker(HttpClient httpClient) =>
+    public IdentityServiceBroker(HttpClient httpClient)
+    {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+    }
 
     public async Task<ClaimsPrincipal?> ValidateTokenAsync(string token)
     {

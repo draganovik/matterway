@@ -15,15 +15,9 @@ public sealed class MinioClientFactory(IOptions<ImageStorageOptions> options) : 
             .WithEndpoint(endpoint.Host, endpoint.Port)
             .WithCredentials(_options.AccessKey, _options.SecretKey);
 
-        if (endpoint.UseSsl)
-        {
-            clientBuilder = clientBuilder.WithSSL();
-        }
+        if (endpoint.UseSsl) clientBuilder = clientBuilder.WithSSL();
 
-        if (!string.IsNullOrWhiteSpace(_options.Region))
-        {
-            clientBuilder = clientBuilder.WithRegion(_options.Region);
-        }
+        if (!string.IsNullOrWhiteSpace(_options.Region)) clientBuilder = clientBuilder.WithRegion(_options.Region);
 
         return clientBuilder.Build();
     }
@@ -31,15 +25,11 @@ public sealed class MinioClientFactory(IOptions<ImageStorageOptions> options) : 
     private static (string Host, int Port, bool UseSsl) ParseEndpoint(string endpoint)
     {
         if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var uri))
-        {
             throw new ArgumentException($"Invalid storage endpoint '{endpoint}'.", nameof(endpoint));
-        }
 
         var port = uri.Port;
         if (port == -1)
-        {
             port = string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ? 443 : 80;
-        }
 
         return (uri.Host, port, string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase));
     }

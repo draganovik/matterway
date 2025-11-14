@@ -56,10 +56,7 @@ public static class AuthenticationExtensions
                             .AnyAsync(s => s.Token == jwtToken.EncodedToken,
                                 context.HttpContext.RequestAborted);
 
-                        if (!sessionExists)
-                        {
-                            context.Fail("Unauthorized");
-                        }
+                        if (!sessionExists) context.Fail("Unauthorized");
                     }
                 };
             });

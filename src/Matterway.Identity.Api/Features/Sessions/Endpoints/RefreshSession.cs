@@ -32,9 +32,7 @@ public class RefreshSession : IEndpoint
     {
         var session = await sessionRepository.GetByRefreshToken(request.RefreshToken!);
         if (session is null || session.Expires > DateTime.UtcNow || session.SystemUser is null)
-        {
             return TypedResults.BadRequest(CreateProblemDetails("Token did not expire or refresh token was invalid."));
-        }
 
         if (session.IsRefreshExpired())
         {
@@ -52,10 +50,7 @@ public class RefreshSession : IEndpoint
         session.RefreshExpires = refreshDescriptor.Expires ?? DateTime.UtcNow;
 
         var refreshedSession = await sessionRepository.Refresh(session);
-        if (refreshedSession is null)
-        {
-            return TypedResults.Unauthorized();
-        }
+        if (refreshedSession is null) return TypedResults.Unauthorized();
 
         return TypedResults.Ok(mapper.Map<SessionBaseResponse>(refreshedSession));
     }

@@ -39,7 +39,7 @@ public class QueryOrderItems : IEndpoint
         var entities = await orderItemRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
         if (!entities.Any()) return TypedResults.NoContent();
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrderItems", values: null);
+        var baseUri = linkGenerator.GetPathByName(httpContext, "QueryOrderItems", null);
         ArgumentNullException.ThrowIfNull(baseUri);
         var paginationResponse = new PaginationResponse<OrderItemBaseResponse>(total, pagingQuery.Page!.Value,
             pagingQuery.PageSize!.Value,

@@ -149,21 +149,17 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                 var clampedTarget = Math.Clamp(targetOrderIndex, 0, total - 1);
 
                 if (clampedTarget < existing.OrderIndex)
-                {
                     await context.ProductImage
                         .Where(x => x.ProductId == request.ProductId)
                         .Where(x => x.OrderIndex >= clampedTarget && x.OrderIndex < existing.OrderIndex)
                         .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1), cancellationToken);
-                }
                 else if (clampedTarget > existing.OrderIndex)
-                {
                     await context.ProductImage
                         .Where(x => x.ProductId == request.ProductId)
                         .Where(x => x.OrderIndex > existing.OrderIndex && x.OrderIndex <= clampedTarget)
                         .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1), cancellationToken);
-                }
 
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
 

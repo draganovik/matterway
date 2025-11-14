@@ -7,8 +7,10 @@ public class CatalogServiceBroker : ICatalogServiceBroker
 {
     private readonly HttpClient _httpClient;
 
-    public CatalogServiceBroker(HttpClient httpClient) =>
+    public CatalogServiceBroker(HttpClient httpClient)
+    {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+    }
 
     public async Task<Product?> GetProductById(Guid id)
     {

@@ -19,13 +19,11 @@ public class OrderRepository : IOrderRepository
         context.Order.Add(requestModel);
         var affected = await context.SaveChangesAsync();
         if (affected == 1)
-        {
             return await context.Order
                 .Include(o => o.OrderHistory)
                 .Include(o => o.OrderItems)
                 .Include(o => o.Address)
                 .FirstOrDefaultAsync(o => o.Id == requestModel.Id);
-        }
 
         return null;
     }

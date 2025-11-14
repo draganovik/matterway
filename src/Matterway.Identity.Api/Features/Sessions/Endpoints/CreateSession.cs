@@ -38,9 +38,7 @@ public class CreateSession : IEndpoint
         if (existingUser is null ||
             passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash!, request.Password!) !=
             PasswordVerificationResult.Success)
-        {
             return TypedResults.BadRequest(CreateProblemDetails("Cannot create entity"));
-        }
 
         var (token, tokenDescriptor) = JwtOperations.Generate(existingUser, configuration);
         var (refreshToken, refreshDescriptor) = JwtOperations.Generate(existingUser, configuration, true);

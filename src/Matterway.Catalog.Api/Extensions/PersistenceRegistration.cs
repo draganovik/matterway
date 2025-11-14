@@ -15,9 +15,7 @@ public static class PersistenceRegistration
         {
             var postgresConnectionString = builder.Configuration.GetConnectionString("CatalogDb");
             if (string.IsNullOrEmpty(postgresConnectionString))
-            {
                 throw new InvalidOperationException("Connection string 'CatalogDb' not found.");
-            }
 
             builder.Services.AddDbContext<CatalogDb>(options =>
                 options.UseNpgsql(postgresConnectionString,

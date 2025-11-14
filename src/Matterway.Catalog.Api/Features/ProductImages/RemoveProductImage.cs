@@ -32,17 +32,11 @@ public class RemoveProductImage : IEndpoint
     {
         var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex, cancellationToken);
 
-        if (entity is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (entity is null) return TypedResults.NotFound();
 
         var isDeleted = await productImageRepository.Delete(productId, orderIndex, cancellationToken);
 
-        if (!isDeleted)
-        {
-            return TypedResults.NotFound();
-        }
+        if (!isDeleted) return TypedResults.NotFound();
 
         await imageStorageService.DeleteAsync(entity.ProductId, entity.Id, cancellationToken);
         return TypedResults.Ok(MapToResponse(entity));

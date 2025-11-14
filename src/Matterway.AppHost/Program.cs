@@ -3,10 +3,10 @@ using Projects;
 var builder = DistributedApplication.CreateBuilder(args);
 
 const string productImagesBucket = "product-images";
-var jwtSigningKey = builder.AddParameter("JwtSigningKey", secret: true);
-var postgresPassword = builder.AddParameter("PostgresPassword", secret: true);
+var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
+var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
-var minioPassword = builder.AddParameter("MinioRootPassword", secret: true);
+var minioPassword = builder.AddParameter("MinioRootPassword", true);
 
 // Setup Docker Compose environment for dashboard
 builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options =>
@@ -39,8 +39,8 @@ var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
     .WithArgs("server", "/data", "--console-address", ":9001")
-    .WithHttpEndpoint(port: 19000, targetPort: 9000, name: "http")
-    .WithHttpEndpoint(port: 19001, targetPort: 9001, name: "console")
+    .WithHttpEndpoint(19000, 9000, "http")
+    .WithHttpEndpoint(19001, 9001, "console")
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";

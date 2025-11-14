@@ -83,7 +83,7 @@ internal sealed class ProductDetailEntityTypeConfiguration : IEntityTypeConfigur
             {
                 ProductId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 TypeId = 4, // Weight
-                Value = "970",
+                Value = "970"
             },
             new DomainProductDetail
             {

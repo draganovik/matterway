@@ -107,12 +107,10 @@ public class QueryProducts : IEndpoint
             if (PriceMin.HasValue) query = query.Where(p => p.Price >= PriceMin);
             if (PriceMax.HasValue) query = query.Where(p => p.Price <= PriceMax);
             if (ProductDetailsLike?.Length > 0)
-            {
                 query = ProductDetailsLike.Aggregate(query,
                     (current, productDetailLike) => current.Where(p =>
                         p.ProductDetails != null && p.ProductDetails.Any(pd =>
                             pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
-            }
 
             if (IsAvailable.HasValue) query = query.Where(p => p.IsAvailable == IsAvailable);
 

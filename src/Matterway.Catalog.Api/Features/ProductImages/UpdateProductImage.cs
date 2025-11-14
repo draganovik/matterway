@@ -39,10 +39,7 @@ public class UpdateProductImage : IEndpoint
 
         var targetOrderIndex = request.OrderIndex ?? entity.OrderIndex;
 
-        if (targetOrderIndex < 0)
-        {
-            targetOrderIndex = 0;
-        }
+        if (targetOrderIndex < 0) targetOrderIndex = 0;
 
         var updated = await productImageRepository.UpdateAsync(entity, targetOrderIndex, cancellationToken);
 
@@ -83,7 +80,7 @@ public class UpdateProductImage : IEndpoint
             ProductId = entity.ProductId,
             ProductName = entity.Product?.Title,
             ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt,
+            ImageAlt = entity.ImageAlt
         };
     }
 }
