@@ -28,7 +28,7 @@ public class IdentityDb : DbContext
             new SystemUser
             {
                 Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
-                Email = "mladen@matterway.com",
+                Email = "mladen@matterway.local",
                 Role = SystemUserRole.Admin,
                 Created = new DateTime(2021, 9, 9, 10, 10, 10, DateTimeKind.Utc),
                 //sifr45
@@ -37,7 +37,7 @@ public class IdentityDb : DbContext
             new SystemUser
             {
                 Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-                Email = "jelena@matterway.com",
+                Email = "jelena@matterway.local",
                 Role = SystemUserRole.Manager,
                 Created = new DateTime(2022, 10, 10, 11, 11, 11, DateTimeKind.Utc),
                 //sifr56
@@ -46,7 +46,7 @@ public class IdentityDb : DbContext
             new SystemUser
             {
                 Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
-                Email = "stefan999@gmail.com",
+                Email = "stefan999@mail.local",
                 Role = SystemUserRole.Customer,
                 Created = new DateTime(2023, 4, 12, 12, 10, 0, DateTimeKind.Utc),
                 //sifr67
@@ -55,7 +55,7 @@ public class IdentityDb : DbContext
             new SystemUser
             {
                 Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                Email = "marag2@gmail.com",
+                Email = "marag@mail.local",
                 Role = SystemUserRole.Customer,
                 Created = new DateTime(2024, 2, 20, 9, 30, 0, DateTimeKind.Utc),
                 //sifr78

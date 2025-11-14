@@ -55,7 +55,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Description =
                     "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
                 Price = 4999,
-                ProductCode = "PH-002",
+                ProductCode = "PH002",
                 IsAvailable = true
             },
             new DomainProduct
@@ -67,7 +67,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Description =
                     "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
                 Price = 24999,
-                ProductCode = "NT-003",
+                ProductCode = "NT003",
                 IsAvailable = true
             },
             new DomainProduct
@@ -79,7 +79,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Description =
                     "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
                 Price = 27999,
-                ProductCode = "AL-001",
+                ProductCode = "AL001",
                 IsAvailable = true
             },
             new DomainProduct
@@ -91,7 +91,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Description =
                     "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
                 Price = 9999,
-                ProductCode = "AE-004",
+                ProductCode = "AE004",
                 IsAvailable = true
             },
             new DomainProduct
@@ -103,7 +103,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Description =
                     "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
                 Price = 19999,
-                ProductCode = "RS-001",
+                ProductCode = "RS001",
                 IsAvailable = true
             }
         );

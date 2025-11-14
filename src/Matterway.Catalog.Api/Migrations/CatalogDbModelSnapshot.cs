@@ -67,7 +67,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Description = "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
                             IsAvailable = true,
                             Price = 4999.0,
-                            ProductCode = "PH-002",
+                            ProductCode = "PH002",
                             Title = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
                             UpdatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -78,7 +78,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Description = "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
                             IsAvailable = true,
                             Price = 24999.0,
-                            ProductCode = "NT-003",
+                            ProductCode = "NT003",
                             Title = "Nest Learning Thermostat",
                             UpdatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc)
                         },
@@ -89,7 +89,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Description = "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
                             IsAvailable = true,
                             Price = 27999.0,
-                            ProductCode = "AL-001",
+                            ProductCode = "AL001",
                             Title = "August Wi-Fi Smart Lock Pro",
                             UpdatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc)
                         },
@@ -100,7 +100,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Description = "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
                             IsAvailable = true,
                             Price = 9999.0,
-                            ProductCode = "AE-004",
+                            ProductCode = "AE004",
                             Title = "Amazon Echo (4th Gen)",
                             UpdatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc)
                         },
@@ -111,7 +111,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Description = "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
                             IsAvailable = true,
                             Price = 19999.0,
-                            ProductCode = "RS-001",
+                            ProductCode = "RS001",
                             Title = "Ring Spotlight Cam",
                             UpdatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc)
                         });

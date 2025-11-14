@@ -22,6 +22,8 @@ public class QueryCartItems : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireRole(
+                nameof(SystemUserRole.Customer)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -38,23 +40,9 @@ public class QueryCartItems : IEndpoint
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
             return TypedResults.Forbid();
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out SystemUserRole userRole))
-            return TypedResults.Forbid();
-
-        int total;
-        IEnumerable<CartItem> entities;
-
-        if (userRole == SystemUserRole.Customer)
-        {
-            total = await cartItemRepository.GetTotalEntities(systemUserId);
-            entities = await cartItemRepository.QueryByCustomerId(systemUserId, pagingQuery.Page!.Value,
-                pagingQuery.PageSize!.Value);
-        }
-        else
-        {
-            total = await cartItemRepository.GetTotalEntities();
-            entities = await cartItemRepository.Query(pagingQuery.Page!.Value, pagingQuery.PageSize!.Value);
-        }
+        var total = await cartItemRepository.GetTotalEntities(systemUserId);
+        var entities = await cartItemRepository.QueryByCustomerId(systemUserId, pagingQuery.Page!.Value,
+            pagingQuery.PageSize.Value);
 
         var baseUri = linkGenerator.GetPathByName(httpContext, "QueryCartItems", values: null);
         var paginationResponse = new PaginationResponse<CartItemBaseResponse>(total, pagingQuery.Page.Value,
