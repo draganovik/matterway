@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Identity.Api.Migrations
 {
     [DbContext(typeof(IdentityDb))]
-    [Migration("20251111195601_Initialize")]
+    [Migration("20251114001752_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -87,7 +87,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"),
                             Created = new DateTime(2021, 9, 9, 10, 10, 10, 0, DateTimeKind.Utc),
-                            Email = "mladen@matterway.com",
+                            Email = "mladen@matterway.local",
                             PasswordHash = "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw==",
                             Role = 0
                         },
@@ -95,7 +95,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
                             Created = new DateTime(2022, 10, 10, 11, 11, 11, 0, DateTimeKind.Utc),
-                            Email = "jelena@matterway.com",
+                            Email = "jelena@matterway.local",
                             PasswordHash = "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg==",
                             Role = 1
                         },
@@ -103,7 +103,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                             Created = new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc),
-                            Email = "stefan999@gmail.com",
+                            Email = "stefan999@mail.local",
                             PasswordHash = "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==",
                             Role = 2
                         },
@@ -111,7 +111,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                             Created = new DateTime(2024, 2, 20, 9, 30, 0, 0, DateTimeKind.Utc),
-                            Email = "marag2@gmail.com",
+                            Email = "marag@mail.local",
                             PasswordHash = "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q==",
                             Role = 2
                         });
