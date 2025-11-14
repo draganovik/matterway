@@ -12,27 +12,27 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
             return await context.ProductDetail.Include(x => x.Product).Include(x => x.Type)
-                .FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.TypeId == requestModel.TypeId,
+                .FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.TypeSlug == requestModel.TypeSlug,
                     cancellationToken);
 
         return null;
     }
 
-    public async Task<bool> Delete(Guid productId, int typeId, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(Guid productId, string typeSlug, CancellationToken cancellationToken = default)
     {
         var affected = await context.ProductDetail
-            .Where(model => model.ProductId == productId && model.TypeId == typeId)
+            .Where(model => model.ProductId == productId && model.TypeSlug == typeSlug)
             .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<DomainProductDetail?> GetByKey(Guid productId, int typeId,
+    public async Task<DomainProductDetail?> GetByKey(Guid productId, string typeSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetail
             .Include(pd => pd.Product)
             .Include(pd => pd.Type)
-            .FirstOrDefaultAsync(pd => pd.ProductId == productId && pd.TypeId == typeId, cancellationToken);
+            .FirstOrDefaultAsync(pd => pd.ProductId == productId && pd.TypeSlug == typeSlug, cancellationToken);
     }
 
     public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductDetail?> UpdateAsync(Guid productId, int typeId, DomainProductDetail request,
+    public async Task<DomainProductDetail?> UpdateAsync(Guid productId, string typeSlug, DomainProductDetail request,
         CancellationToken cancellationToken = default)
     {
         context.ProductDetail.Update(request);
@@ -58,7 +58,7 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
             return await context.ProductDetail
                 .Include(x => x.Product)
                 .Include(x => x.Type)
-                .FirstOrDefaultAsync(x => x.ProductId == productId && x.TypeId == typeId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.ProductId == productId && x.TypeSlug == typeSlug, cancellationToken);
 
         return null;
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -36,14 +35,13 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "DomainProductDetailType",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Title = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Unit = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductDetailType", x => x.Id);
+                    table.PrimaryKey("PK_DomainProductDetailType", x => x.Slug);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,17 +70,17 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeId = table.Column<int>(type: "integer", nullable: false),
+                    TypeSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Value = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductDetail", x => new { x.ProductId, x.TypeId });
+                    table.PrimaryKey("PK_DomainProductDetail", x => new { x.ProductId, x.TypeSlug });
                     table.ForeignKey(
-                        name: "FK_DomainProductDetail_DomainProductDetailType_TypeId",
-                        column: x => x.TypeId,
+                        name: "FK_DomainProductDetail_DomainProductDetailType_TypeSlug",
+                        column: x => x.TypeSlug,
                         principalTable: "DomainProductDetailType",
-                        principalColumn: "Id",
+                        principalColumn: "Slug",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DomainProductDetail_DomainProduct_ProductId",
@@ -106,45 +104,45 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "DomainProductDetailType",
-                columns: new[] { "Id", "Title", "Unit" },
+                columns: new[] { "Slug", "Title", "Unit" },
                 values: new object[,]
                 {
-                    { 1, "Width", "millimeters" },
-                    { 2, "Height", "millimeters" },
-                    { 3, "Depth", "millimeters" },
-                    { 4, "Weight", "grams" },
-                    { 5, "Color", null },
-                    { 6, "Material", null },
-                    { 7, "Connectivity", null },
-                    { 8, "Power", "Watts" },
-                    { 9, "Battery", null },
-                    { 10, "Compatibility", null },
-                    { 11, "Connectivity", null },
-                    { 12, "Display", null },
-                    { 13, "Color Temperature", "Kelvin" },
-                    { 14, "Video Quality", null },
-                    { 15, "Audio Quality", null }
+                    { "audio-quality", "Audio Quality", null },
+                    { "battery", "Battery", null },
+                    { "color", "Color", null },
+                    { "color-temperature", "Color Temperature", "Kelvin" },
+                    { "compatibility", "Compatibility", null },
+                    { "connectivity", "Connectivity", null },
+                    { "depth", "Depth", "millimeters" },
+                    { "display", "Display", null },
+                    { "height", "Height", "millimeters" },
+                    { "material", "Material", null },
+                    { "power", "Power", "Watts" },
+                    { "storage", "Storage", "GB" },
+                    { "video-quality", "Video Quality", null },
+                    { "weight", "Weight", "grams" },
+                    { "width", "Width", "millimeters" }
                 });
 
             migrationBuilder.InsertData(
                 table: "DomainProductDetail",
-                columns: new[] { "ProductId", "TypeId", "Value" },
+                columns: new[] { "ProductId", "TypeSlug", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 9, "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 10, "Works with Alexa, Google Assistant, and Siri" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 11, "Wi-Fi and Bluetooth" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 4, "970" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 7, "Wi-Fi and Bluetooth" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 11, "Wi-Fi and Ethernet" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 14, "1080p HD" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 15, "Two-way audio with noise cancellation" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 7, "Works with Alexa, Google Assistant, and Apple HomeKit" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 8, "Requires 24VAC power, uses less than 1 kWh/month" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 12, "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 8, "9" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 10, "Works with Alexa, Google Assistant, and Samsung SmartThings" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 13, "Adjustable from warm white (2700K) to daylight (6500K)" }
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "compatibility", "Works with Alexa, Google Assistant, and Siri" },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "connectivity", "Wi-Fi and Bluetooth" },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "connectivity", "Wi-Fi and Bluetooth" },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "weight", "970" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "audio-quality", "Two-way audio with noise cancellation" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "connectivity", "Wi-Fi and Ethernet" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "video-quality", "1080p HD" },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "power", "Requires 24VAC power, uses less than 1 kWh/month" },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "power", "9" }
                 });
 
             migrationBuilder.InsertData(
@@ -160,9 +158,9 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProductDetail_TypeId",
+                name: "IX_DomainProductDetail_TypeSlug",
                 table: "DomainProductDetail",
-                column: "TypeId");
+                column: "TypeSlug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainProductImage_ProductId_OrderIndex",

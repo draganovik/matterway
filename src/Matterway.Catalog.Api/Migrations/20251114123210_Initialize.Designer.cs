@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251114001742_Initialize")]
+    [Migration("20251114123210_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -125,17 +125,18 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("TypeId")
-                        .HasColumnType("integer");
+                    b.Property<string>("TypeSlug")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("ProductId", "TypeId");
+                    b.HasKey("ProductId", "TypeSlug");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("TypeSlug");
 
                     b.ToTable("DomainProductDetail", (string)null);
 
@@ -143,96 +144,94 @@ namespace Matterway.Catalog.Api.Migrations
                         new
                         {
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            TypeId = 7,
+                            TypeSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Apple HomeKit"
                         },
                         new
                         {
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            TypeId = 12,
+                            TypeSlug = "display",
                             Value = "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)"
                         },
                         new
                         {
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            TypeId = 8,
+                            TypeSlug = "power",
                             Value = "Requires 24VAC power, uses less than 1 kWh/month"
                         },
                         new
                         {
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            TypeId = 11,
+                            TypeSlug = "connectivity",
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            TypeId = 10,
+                            TypeSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Siri"
                         },
                         new
                         {
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            TypeId = 9,
+                            TypeSlug = "battery",
                             Value = "Uses four AA batteries (included), lasts up to 6 months depending on usage"
                         },
                         new
                         {
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            TypeId = 13,
+                            TypeSlug = "color-temperature",
                             Value = "Adjustable from warm white (2700K) to daylight (6500K)"
                         },
                         new
                         {
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            TypeId = 10,
+                            TypeSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Samsung SmartThings"
                         },
                         new
                         {
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            TypeId = 8,
+                            TypeSlug = "power",
                             Value = "9"
                         },
                         new
                         {
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            TypeId = 4,
+                            TypeSlug = "weight",
                             Value = "970"
                         },
                         new
                         {
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            TypeId = 7,
+                            TypeSlug = "connectivity",
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            TypeId = 14,
+                            TypeSlug = "video-quality",
                             Value = "1080p HD"
                         },
                         new
                         {
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            TypeId = 15,
+                            TypeSlug = "audio-quality",
                             Value = "Two-way audio with noise cancellation"
                         },
                         new
                         {
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            TypeId = 11,
+                            TypeSlug = "connectivity",
                             Value = "Wi-Fi and Ethernet"
                         });
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.ProductDetailType", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Slug")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -243,90 +242,91 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Slug");
 
                     b.ToTable("DomainProductDetailType", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Slug = "width",
                             Title = "Width",
                             Unit = "millimeters"
                         },
                         new
                         {
-                            Id = 2,
+                            Slug = "height",
                             Title = "Height",
                             Unit = "millimeters"
                         },
                         new
                         {
-                            Id = 3,
+                            Slug = "depth",
                             Title = "Depth",
                             Unit = "millimeters"
                         },
                         new
                         {
-                            Id = 4,
+                            Slug = "weight",
                             Title = "Weight",
                             Unit = "grams"
                         },
                         new
                         {
-                            Id = 5,
+                            Slug = "color",
                             Title = "Color"
                         },
                         new
                         {
-                            Id = 6,
+                            Slug = "material",
                             Title = "Material"
                         },
                         new
                         {
-                            Id = 7,
-                            Title = "Connectivity"
+                            Slug = "compatibility",
+                            Title = "Compatibility"
                         },
                         new
                         {
-                            Id = 8,
+                            Slug = "power",
                             Title = "Power",
                             Unit = "Watts"
                         },
                         new
                         {
-                            Id = 9,
+                            Slug = "battery",
                             Title = "Battery"
                         },
                         new
                         {
-                            Id = 10,
-                            Title = "Compatibility"
-                        },
-                        new
-                        {
-                            Id = 11,
+                            Slug = "connectivity",
                             Title = "Connectivity"
                         },
                         new
                         {
-                            Id = 12,
+                            Slug = "display",
                             Title = "Display"
                         },
                         new
                         {
-                            Id = 13,
+                            Slug = "storage",
+                            Title = "Storage",
+                            Unit = "GB"
+                        },
+                        new
+                        {
+                            Slug = "color-temperature",
                             Title = "Color Temperature",
                             Unit = "Kelvin"
                         },
                         new
                         {
-                            Id = 14,
+                            Slug = "video-quality",
                             Title = "Video Quality"
                         },
                         new
                         {
-                            Id = 15,
+                            Slug = "audio-quality",
                             Title = "Audio Quality"
                         });
                 });
@@ -412,7 +412,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasOne("Matterway.Catalog.Api.Domain.ProductDetailType", "Type")
                         .WithMany()
-                        .HasForeignKey("TypeId")
+                        .HasForeignKey("TypeSlug")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

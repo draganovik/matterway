@@ -46,7 +46,7 @@ public class GetProductById : IEndpoint
 
     public record ProductDetailProperty
     {
-        public int TypeId { get; init; }
+        public string? TypeSlug { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
         public string? Unit { get; init; }
@@ -84,7 +84,7 @@ public class GetProductById : IEndpoint
     {
         return new ProductDetailProperty
         {
-            TypeId = entity.TypeId,
+            TypeSlug = entity.TypeSlug,
             Title = entity.Type?.Title,
             Value = entity.Value,
             Unit = entity.Type?.Unit

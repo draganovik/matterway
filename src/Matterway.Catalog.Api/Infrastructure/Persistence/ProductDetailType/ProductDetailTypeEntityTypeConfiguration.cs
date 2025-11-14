@@ -9,7 +9,10 @@ internal sealed class ProductDetailTypeEntityTypeConfiguration : IEntityTypeConf
     public void Configure(EntityTypeBuilder<DomainProductDetailType> builder)
     {
         builder.ToTable(nameof(DomainProductDetailType));
-        builder.HasKey(pdt => pdt.Id);
+        builder.HasKey(pdt => pdt.Slug);
+        builder.Property(pdt => pdt.Slug)
+            .HasMaxLength(80)
+            .IsRequired();
         builder.Property(pdt => pdt.Title)
             .HasMaxLength(80)
             .IsRequired();
@@ -19,91 +22,91 @@ internal sealed class ProductDetailTypeEntityTypeConfiguration : IEntityTypeConf
         builder.HasData(
             new DomainProductDetailType
             {
-                Id = 1,
+                Slug = "width",
                 Title = "Width",
                 Unit = "millimeters"
             },
             new DomainProductDetailType
             {
-                Id = 2,
+                Slug = "height",
                 Title = "Height",
                 Unit = "millimeters"
             },
             new DomainProductDetailType
             {
-                Id = 3,
+                Slug = "depth",
                 Title = "Depth",
                 Unit = "millimeters"
             },
             new DomainProductDetailType
             {
-                Id = 4,
+                Slug = "weight",
                 Title = "Weight",
                 Unit = "grams"
             },
             new DomainProductDetailType
             {
-                Id = 5,
+                Slug = "color",
                 Title = "Color",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 6,
+                Slug = "material",
                 Title = "Material",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 7,
-                Title = "Connectivity",
-                Unit = null
-            },
-            new DomainProductDetailType
-            {
-                Id = 8,
-                Title = "Power",
-                Unit = "Watts"
-            },
-            new DomainProductDetailType
-            {
-                Id = 9,
-                Title = "Battery",
-                Unit = null
-            },
-            new DomainProductDetailType
-            {
-                Id = 10,
+                Slug = "compatibility",
                 Title = "Compatibility",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 11,
+                Slug = "power",
+                Title = "Power",
+                Unit = "Watts"
+            },
+            new DomainProductDetailType
+            {
+                Slug = "battery",
+                Title = "Battery",
+                Unit = null
+            },
+            new DomainProductDetailType
+            {
+                Slug = "connectivity",
                 Title = "Connectivity",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 12,
+                Slug = "display",
                 Title = "Display",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 13,
+                Slug = "storage",
+                Title = "Storage",
+                Unit = "GB"
+            },
+            new DomainProductDetailType
+            {
+                Slug = "color-temperature",
                 Title = "Color Temperature",
                 Unit = "Kelvin"
             },
             new DomainProductDetailType
             {
-                Id = 14,
+                Slug = "video-quality",
                 Title = "Video Quality",
                 Unit = null
             },
             new DomainProductDetailType
             {
-                Id = 15,
+                Slug = "audio-quality",
                 Title = "Audio Quality",
                 Unit = null
             }

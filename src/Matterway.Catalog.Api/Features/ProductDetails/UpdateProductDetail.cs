@@ -12,7 +12,7 @@ public class UpdateProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("Products/{productId:guid}/Details/{typeId:int}", Handle)
+        app.MapPatch("Products/{productId:guid}/Details/{typeSlug}", Handle)
             .WithName("UpdateProductDetail").WithSummary("Update a ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces<UpdateProductDetailResponse>()
@@ -27,17 +27,17 @@ public class UpdateProductDetail : IEndpoint
     private static async Task<Results<Ok<UpdateProductDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handle(
             Guid productId,
-            int typeId,
+            string typeSlug,
             UpdateProductDetailRequest request,
             IProductDetailRepository productDetailRepository,
             CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, typeId, cancellationToken);
+        var entity = await productDetailRepository.GetByKey(productId, typeSlug, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
 
-        var updated = await productDetailRepository.UpdateAsync(productId, typeId, entity, cancellationToken);
+        var updated = await productDetailRepository.UpdateAsync(productId, typeSlug, entity, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 

@@ -43,7 +43,7 @@ public class QueryProductDetailTypes : IEndpoint
 
     public record QueryProductDetailTypeResponse
     {
-        public int Id { get; init; }
+        public string? Slug { get; init; }
         public string? Title { get; init; }
         public string? Unit { get; init; }
     }
@@ -52,7 +52,7 @@ public class QueryProductDetailTypes : IEndpoint
     {
         return new QueryProductDetailTypeResponse
         {
-            Id = entity.Id,
+            Slug = entity.Slug,
             Title = entity.Title,
             Unit = entity.Unit
         };

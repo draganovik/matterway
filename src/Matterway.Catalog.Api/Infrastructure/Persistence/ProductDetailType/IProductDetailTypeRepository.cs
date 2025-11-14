@@ -7,5 +7,5 @@ public interface IProductDetailTypeRepository
     Task<ICollection<DomainProductDetailType>> QueryAsync(string? titleLike, int limit,
         CancellationToken cancellationToken = default);
 
-    Task<DomainProductDetailType?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<DomainProductDetailType?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
 }

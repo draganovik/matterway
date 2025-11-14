@@ -60,7 +60,7 @@ public class AddProductDetail : IEndpoint
     public record AddProductDetailRequest
     {
         [Required]
-        public int TypeId { get; init; }
+        public required string TypeSlug { get; init; }
 
         [Required]
         public required string Value { get; init; }
@@ -70,7 +70,7 @@ public class AddProductDetail : IEndpoint
     {
         public Guid ProductId { get; init; }
         public string? ProductTitle { get; init; }
-        public int TypeId { get; init; }
+        public string? TypeSlug { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
         public string? Unit { get; init; }
@@ -81,7 +81,7 @@ public class AddProductDetail : IEndpoint
         return new ProductDetail
         {
             ProductId = productId,
-            TypeId = request.TypeId,
+            TypeSlug = request.TypeSlug,
             Value = request.Value
         };
     }
@@ -92,7 +92,7 @@ public class AddProductDetail : IEndpoint
         {
             ProductId = entity.ProductId,
             ProductTitle = entity.Product?.Title,
-            TypeId = entity.TypeId,
+            TypeSlug = entity.TypeSlug,
             Title = entity.Type?.Title,
             Value = entity.Value,
             Unit = entity.Type?.Unit

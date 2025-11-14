@@ -27,10 +27,10 @@ public sealed class ProductDetailTypeRepository(CatalogDb context) : IProductDet
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductDetailType?> GetByIdAsync(int id,
+    public async Task<DomainProductDetailType?> GetBySlugAsync(string slug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetailType.AsNoTracking()
-            .FirstOrDefaultAsync(pdt => pdt.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(pdt => pdt.Slug == slug, cancellationToken);
     }
 }
