@@ -1,8 +1,8 @@
 using Asp.Versioning;
-using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
+using Matterway.Catalog.Api.Application;
 using Matterway.Identity.Api.Features.Sessions.Data;
 
 namespace Matterway.Identity.Api.Features.Sessions.Endpoints;

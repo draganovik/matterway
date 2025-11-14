@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Matterway.Common.Enums;
 using Matterway.Ordering.Api.Features.Orders.Data;
 using Matterway.Ordering.Api.Features.Orders.Domain;

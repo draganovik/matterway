@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Matterway.Catalog.Api.Extensions;
+using Matterway.Catalog.Api.Application;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
@@ -33,7 +33,6 @@ builder
 
 builder
     .ConfigureAuthentication()
-    .ConfigureProxyServices()
     .ConfigureImageStorage()
     .ConfigurePersistence()
     .ConfigureFeatures();

@@ -1,11 +1,8 @@
-using System.Security.Claims;
 using System.Text;
-using Matterway.Common.Services.Brokers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Matterway.Catalog.Api.Extensions;
+namespace Matterway.Catalog.Api.Application;
 
 public static class AuthRegistration
 {
@@ -32,25 +29,6 @@ public static class AuthRegistration
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
-                    };
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnTokenValidated = async context =>
-                        {
-                            var identifier = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-                            if (!Guid.TryParse(identifier, out _) ||
-                                context.SecurityToken is not JsonWebToken jwtToken ||
-                                string.IsNullOrWhiteSpace(jwtToken.EncodedToken))
-                            {
-                                context.Fail("Unauthorized");
-                                return;
-                            }
-
-                            var broker =
-                                context.HttpContext.RequestServices.GetRequiredService<IIdentityServiceBroker>();
-                            if (await broker.ValidateTokenAsync(jwtToken.EncodedToken) is null)
-                                context.Fail("Unauthorized");
-                        }
                     };
                 });
             builder.Services.AddAuthorization();

@@ -13,13 +13,11 @@
         <Compile Include="$(MSBuildThisFileDirectory)Enums\OrderStatus.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\PaymentState.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemUserRole.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Abstractions\IEndpoint.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Customer.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\Product.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductDetail.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Models\ProductImage.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Pagination\PaginationResponse.cs"/>
-        <Compile Include="$(MSBuildThisFileDirectory)Pagination\PagingQueryParams.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Mapping\ValidationProfile.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CatalogServiceBroker.cs"/>
         <Compile Include="$(MSBuildThisFileDirectory)Services\Brokers\CustomersServiceBroker.cs"/>

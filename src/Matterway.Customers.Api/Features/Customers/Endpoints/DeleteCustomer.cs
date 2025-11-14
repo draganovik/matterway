@@ -1,6 +1,6 @@
 using Asp.Versioning;
-using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
+using Matterway.Customers.Api.Extensions;
 using Matterway.Customers.Api.Features.Customers.Data;
 using Matterway.Customers.Api.Features.Customers.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;

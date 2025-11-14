@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Scalar.AspNetCore;
 

@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Matterway.Common.Enums;
 using Matterway.Payments.Api.Features.Payments.Data;
 using Matterway.Payments.Api.Features.Payments.Domain;

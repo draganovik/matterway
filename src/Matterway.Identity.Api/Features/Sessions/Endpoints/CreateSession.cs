@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Matterway.Identity.Api.Features.Sessions.Contracts;
 using Matterway.Identity.Api.Features.Sessions.Data;
 using Matterway.Identity.Api.Features.Sessions.Domain;

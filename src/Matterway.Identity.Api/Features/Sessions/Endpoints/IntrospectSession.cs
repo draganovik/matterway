@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
+using Matterway.Catalog.Api.Application;
 using Matterway.Identity.Api.Features.Sessions.Contracts;
 using Matterway.Identity.Api.Features.Sessions.Data;
 

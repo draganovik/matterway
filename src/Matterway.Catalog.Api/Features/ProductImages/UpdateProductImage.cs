@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
-using Matterway.Common.Abstractions;
-using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,8 +19,8 @@ public class UpdateProductImage : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)))
+                nameof(RequestClaimsRole.Admin),
+                nameof(RequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

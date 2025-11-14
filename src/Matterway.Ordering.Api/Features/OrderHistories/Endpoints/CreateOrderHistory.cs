@@ -1,10 +1,10 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Matterway.Catalog.Api.Application;
 using Matterway.Ordering.Api.Features.OrderHistories.Contracts;
 using Matterway.Ordering.Api.Features.OrderHistories.Data;
 using Matterway.Ordering.Api.Features.OrderHistories.Domain;

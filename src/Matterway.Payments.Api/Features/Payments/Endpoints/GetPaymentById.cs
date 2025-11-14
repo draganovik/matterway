@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Matterway.Payments.Api.Features.Payments.Contracts;
 using Matterway.Payments.Api.Features.Payments.Data;
 using Matterway.Payments.Api.Features.Payments.Domain;

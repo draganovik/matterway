@@ -1,4 +1,4 @@
-namespace Matterway.Common.Abstractions;
+namespace Matterway.Customers.Api.Extensions;
 
 public interface IEndpoint
 {

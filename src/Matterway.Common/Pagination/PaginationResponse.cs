@@ -39,6 +39,8 @@ public class PaginationResponse<T>
     public PaginationLinks Links { get; set; }
 }
 
+public record PaginationMeta(int TotalCount, int TotalPages, int CurrentPage, int PageSize);
+
 public record PaginationLinks(
     [Url]
     string? First,
@@ -49,4 +51,13 @@ public record PaginationLinks(
     [Url]
     string? Next);
 
-public record PaginationMeta(int TotalCount, int TotalPages, int CurrentPage, int PageSize);
+public record PagingQueryParams
+{
+    [Required(ErrorMessage = "The field Page is required and must be valid number.")]
+    [Range(1, int.MaxValue)]
+    public int? Page { get; init; }
+
+    [Required(ErrorMessage = "The field PageSize is required and must be valid number.")]
+    [Range(1, int.MaxValue)]
+    public int? PageSize { get; init; }
+}

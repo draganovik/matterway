@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Matterway.Catalog.Api.Application;
 using Matterway.Identity.Api.Features.SystemUsers.Contracts;
 using Matterway.Identity.Api.Features.SystemUsers.Data;
 using Matterway.Identity.Api.Features.SystemUsers.Domain;

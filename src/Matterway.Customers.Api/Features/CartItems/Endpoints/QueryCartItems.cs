@@ -1,10 +1,10 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
 using Matterway.Common.Enums;
 using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
+using Matterway.Customers.Api.Extensions;
 using Matterway.Customers.Api.Features.CartItems.Contracts;
 using Matterway.Customers.Api.Features.CartItems.Data;
 using Matterway.Customers.Api.Features.CartItems.Domain;

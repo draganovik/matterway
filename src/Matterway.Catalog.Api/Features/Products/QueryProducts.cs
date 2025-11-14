@@ -1,8 +1,7 @@
 using Asp.Versioning;
+using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
-using Matterway.Common.Abstractions;
-using Matterway.Common.Pagination;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;
@@ -22,28 +21,32 @@ public class QueryProducts : IEndpoint
     }
 
     private static async Task<Results<Ok<PaginationResponse<QueryProductResponse>>, NoContent>>
-        Handle([AsParameters] PagingQueryParams pagingQuery, [AsParameters] QueryProductFilter queryProductFilter,
-            HttpContext httpContext, IProductRepository productRepository, CancellationToken cancellationToken)
+        Handle([AsParameters] PaginationQuery pagingQuery, [AsParameters] QueryProductFilter queryProductFilter,
+            HttpContext httpContext, LinkGenerator linkGenerator, IProductRepository productRepository,
+            CancellationToken cancellationToken)
     {
         var total = await productRepository.GetTotalEntities(queryProductFilter, cancellationToken);
         if (total == 0)
             return TypedResults.NoContent();
 
         var entities = await productRepository.Query(
-            pagingQuery.Page!.Value,
-            pagingQuery.PageSize!.Value,
+            pagingQuery.Page,
+            pagingQuery.PageSize,
             queryProductFilter,
             cancellationToken);
 
-        var location = new Uri($"{httpContext.Request.Scheme}://{httpContext.Request.Host}/Products");
+        var location = linkGenerator.GetUriByName(
+            httpContext,
+            "QueryProducts",
+            null);
 
         var results = entities.Select(MapToResponse).ToList();
 
-        var paginationResponse = new PaginationResponse<QueryProductResponse>(
-            total,
-            pagingQuery.Page.Value,
-            pagingQuery.PageSize.Value,
+        var paginationResponse = PaginationResponse<QueryProductResponse>.Create(
             results,
+            total,
+            pagingQuery.Page,
+            pagingQuery.PageSize,
             location);
 
         return TypedResults.Ok(paginationResponse);

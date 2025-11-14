@@ -1,6 +1,6 @@
 using Matterway.ServiceDefaults;
 
-namespace Matterway.Catalog.Api.Extensions;
+namespace Matterway.Catalog.Api.Application;
 
 public static class CorsRegistration
 {

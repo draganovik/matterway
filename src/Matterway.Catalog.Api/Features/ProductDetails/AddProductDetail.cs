@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
-using Matterway.Common.Abstractions;
-using Matterway.Common.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,8 +18,8 @@ public class AddProductDetail : IEndpoint
             .Produces<AddProductDetailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(SystemUserRole.Admin),
-                nameof(SystemUserRole.Manager)))
+                nameof(RequestClaimsRole.Admin),
+                nameof(RequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

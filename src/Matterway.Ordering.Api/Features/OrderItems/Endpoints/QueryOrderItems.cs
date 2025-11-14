@@ -1,6 +1,6 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
+using Matterway.Catalog.Api.Application;
 using Matterway.Common.Enums;
 using Matterway.Common.Pagination;
 using Matterway.Ordering.Api.Features.OrderItems.Contracts;

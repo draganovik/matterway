@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using AutoMapper;
-using Matterway.Common.Abstractions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Matterway.Catalog.Api.Application;
 using Matterway.Ordering.Api.Features.Addresses.Contracts;
 using Matterway.Ordering.Api.Features.Addresses.Data;
 using Matterway.Ordering.Api.Features.Addresses.Domain;

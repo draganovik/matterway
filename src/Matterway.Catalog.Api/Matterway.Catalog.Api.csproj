@@ -12,7 +12,6 @@
     <ItemGroup>
         <PackageReference Include="Asp.Versioning.Http" Version="8.1.0"/>
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0"/>
-        <PackageReference Include="AutoMapper" Version="15.1.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0-rc.2"/>
@@ -37,7 +36,5 @@
     <PropertyGroup>
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
     </PropertyGroup>
-
-    <Import Project="..\Matterway.Common\Matterway.Common.projitems" Label="Shared"/>
 
 </Project>
