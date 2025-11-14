@@ -10,7 +10,7 @@ interface CatalogState {
 }
 
 export interface ProductDetailTypeOption {
-  id: number;
+  slug: string;
   title?: string;
   unit?: string | null;
 }
@@ -220,7 +220,7 @@ export const useCatalogStore = defineStore("catalog", {
 
     async createProductSpec(
       productId: string,
-      typeId: number,
+      typeSlug: string,
       value: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
@@ -229,7 +229,7 @@ export const useCatalogStore = defineStore("catalog", {
         {
           method: "POST",
           body: JSON.stringify({
-            typeId: typeId,
+            typeSlug: typeSlug,
             value: value,
           }),
         },
@@ -237,11 +237,11 @@ export const useCatalogStore = defineStore("catalog", {
     },
     async deleteProductSpec(
       productId: string,
-      typeId: number,
+      typeSlug: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${encodeURIComponent(typeSlug)}`,
         {
           method: "DELETE",
         },
@@ -249,12 +249,12 @@ export const useCatalogStore = defineStore("catalog", {
     },
     async updateProductSpec(
       productId: string,
-      typeId: number,
+      typeSlug: string,
       value: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${encodeURIComponent(typeSlug)}`,
         {
           method: "PATCH",
           body: JSON.stringify({ value: value }),

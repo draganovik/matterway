@@ -19,7 +19,7 @@ export default class ProductModel {
     this.description = initial?.description ?? "";
     this.productDetails =
       initial?.productDetails?.map((detail) => ({
-        typeId: detail.typeId ?? null,
+        typeSlug: detail.typeSlug ?? null,
         title: detail.title,
         value: detail.value,
         unit: detail.unit ?? null,
@@ -66,7 +66,7 @@ export default class ProductModel {
       price: response.price,
       description: response.description,
       productDetails: (response.productDetails ?? []).map((detail: any) => ({
-        typeId: detail.typeId ?? null,
+        typeSlug: detail.typeSlug ?? null,
         title: detail.title,
         value: detail.value,
         unit: detail.unit ?? null,
@@ -88,7 +88,7 @@ export default class ProductModel {
 }
 
 export class ProductDetails {
-  typeId?: number | null;
+  typeSlug?: string | null;
   title?: string;
   value?: string;
   unit?: string | null;

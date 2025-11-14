@@ -80,7 +80,7 @@ let detailTypeSearchHandle: ReturnType<typeof setTimeout> | null = null;
 
 const canSubmitDetail = computed(() => {
   return (
-    Boolean(selectedDetailType.value?.id) &&
+    Boolean(selectedDetailType.value?.slug) &&
     inputSpecs.value.value.trim().length > 0
   );
 });
@@ -196,12 +196,12 @@ const handleImageFileChange = (event: Event) => {
 
 const addSpec = async () => {
   const detailValue = inputSpecs.value.value.trim();
-  if (!product.value || !selectedDetailType.value?.id || !detailValue) {
+  if (!product.value || !selectedDetailType.value?.slug || !detailValue) {
     return;
   }
   const response = await catalogStore.createProductSpec(
     product.value.id,
-    selectedDetailType.value.id,
+    selectedDetailType.value.slug,
     detailValue,
   );
   if (response.ok) {
@@ -210,13 +210,13 @@ const addSpec = async () => {
   }
 };
 
-const removeSpec = async (typeId?: number) => {
-  if (!product.value || typeof typeId !== "number") {
+const removeSpec = async (typeSlug?: string) => {
+  if (!product.value || !typeSlug) {
     return;
   }
   const response = await catalogStore.deleteProductSpec(
     product.value.id,
-    typeId,
+    typeSlug,
   );
   if (response.ok) {
     await loadProduct();
@@ -225,12 +225,12 @@ const removeSpec = async (typeId?: number) => {
 
 const updateSpec = async (detail: ProductDetails) => {
   const detailValue = detail.value?.trim();
-  if (!product.value || typeof detail.typeId !== "number" || !detailValue) {
+  if (!product.value || !detail.typeSlug || !detailValue) {
     return;
   }
   const response = await catalogStore.updateProductSpec(
     product.value.id,
-    detail.typeId,
+    detail.typeSlug,
     detailValue,
   );
   if (response.ok) {
@@ -594,7 +594,7 @@ onMounted(async () => {
         <div class="space-y-4">
           <div
             v-for="detail in product.productDetails"
-            :key="detail.typeId ?? detail.title"
+            :key="detail.typeSlug ?? detail.title"
             class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
           >
             <div class="grid gap-3 md:grid-cols-[1fr_auto]">
@@ -602,7 +602,7 @@ onMounted(async () => {
                 <p
                   class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
                 >
-                  {{ detail.title ?? `Tip #${detail.typeId}` }}
+                  {{ detail.title ?? `Tip #${detail.typeSlug}` }}
                   <span
                     v-if="detail.unit"
                     class="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500"
@@ -628,7 +628,7 @@ onMounted(async () => {
                 <button
                   type="button"
                   class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-hidden focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
-                  @click="removeSpec(detail.typeId ?? undefined)"
+                  @click="removeSpec(detail.typeSlug ?? undefined)"
                 >
                   Ukloni
                 </button>
@@ -685,7 +685,7 @@ onMounted(async () => {
                     >
                       <li
                         v-for="option in detailTypeOptions"
-                        :key="option.id"
+                        :key="option.slug"
                         class="cursor-pointer px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60"
                         @mousedown.prevent="handleDetailTypeSelect(option)"
                       >
