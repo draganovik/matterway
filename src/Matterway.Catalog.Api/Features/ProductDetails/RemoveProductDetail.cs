@@ -11,7 +11,7 @@ public class RemoveProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("Products/{productId:guid}/Details/{typeSlug}", Handle)
+        app.MapDelete("Products/{productId:guid}/Details/{detailSlug}", Handle)
             .WithName("DeleteProductDetail").WithSummary("Delete a ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces(StatusCodes.Status200OK)
@@ -24,15 +24,15 @@ public class RemoveProductDetail : IEndpoint
 
     private static async Task<Results<Ok<RemoveProductDetailResponse>, NotFound>> Handle(
         Guid productId,
-        string typeSlug,
+        string detailSlug,
         IProductDetailRepository productDetailRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, typeSlug, cancellationToken);
+        var entity = await productDetailRepository.GetByKey(productId, detailSlug, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 
-        var isDeleted = await productDetailRepository.Delete(productId, typeSlug, cancellationToken);
+        var isDeleted = await productDetailRepository.Delete(productId, detailSlug, cancellationToken);
 
         return isDeleted ? TypedResults.Ok(MapToResponse(entity)) : TypedResults.NotFound();
     }
@@ -49,7 +49,7 @@ public class RemoveProductDetail : IEndpoint
         return new RemoveProductDetailResponse
         {
             ProductId = entity.ProductId,
-            DetailType = entity.Type?.Title ?? "Detail key: " + entity.TypeSlug
+            DetailType = entity.Detail?.Title ?? "Detail key: " + entity.DetailSlug
         };
     }
 }

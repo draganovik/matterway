@@ -14,7 +14,9 @@ public sealed class ProductRepository(CatalogDb context)
         if (affected == 1)
             return await context.Product
                 .Include(x => x.ProductDetails!)
-                .ThenInclude(pd => pd!.Type)
+                .ThenInclude(pd => pd!.Detail)
+                .Include(x => x.ProductSpecifications!)
+                .ThenInclude(ps => ps!.Specification)
                 .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == requestModel.Id, cancellationToken);
 
@@ -33,7 +35,9 @@ public sealed class ProductRepository(CatalogDb context)
     {
         return await context.Product
             .Include(x => x.ProductDetails!)
-            .ThenInclude(pd => pd!.Type)
+            .ThenInclude(pd => pd!.Detail)
+            .Include(x => x.ProductSpecifications!)
+            .ThenInclude(ps => ps!.Specification)
             .Include(x => x.ProductImages)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
@@ -65,7 +69,9 @@ public sealed class ProductRepository(CatalogDb context)
         if (affected == 1)
             return await context.Product
                 .Include(x => x.ProductDetails!)
-                .ThenInclude(pd => pd!.Type)
+                .ThenInclude(pd => pd!.Detail)
+                .Include(x => x.ProductSpecifications!)
+                .ThenInclude(ps => ps!.Specification)
                 .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 

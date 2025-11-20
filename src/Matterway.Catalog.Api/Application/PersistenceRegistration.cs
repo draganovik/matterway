@@ -1,8 +1,10 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Detail;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailType;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Specification;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Application;
@@ -22,9 +24,11 @@ public static class PersistenceRegistration
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );
             builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
+            builder.Services.AddScoped<IDetailRepository, DetailRepository>();
             builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IProductDetailTypeRepository, ProductDetailTypeRepository>();
+            builder.Services.AddScoped<IProductSpecificationRepository, ProductSpecificationRepository>();
+            builder.Services.AddScoped<ISpecificationRepository, SpecificationRepository>();
 
             return builder;
         }

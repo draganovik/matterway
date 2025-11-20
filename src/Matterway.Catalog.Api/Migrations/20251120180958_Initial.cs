@@ -8,11 +8,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Matterway.Catalog.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "DomainDetail",
+                columns: table => new
+                {
+                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DomainDetail", x => x.Slug);
+                });
+
             migrationBuilder.CreateTable(
                 name: "DomainProduct",
                 columns: table => new
@@ -32,16 +44,41 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProductDetailType",
+                name: "DomainSpecification",
                 columns: table => new
                 {
                     Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Title = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Unit = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true)
+                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    Unit = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductDetailType", x => x.Slug);
+                    table.PrimaryKey("PK_DomainSpecification", x => x.Slug);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DomainProductDetail",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DetailSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Value = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DomainProductDetail", x => new { x.ProductId, x.DetailSlug });
+                    table.ForeignKey(
+                        name: "FK_DomainProductDetail_DomainDetail_DetailSlug",
+                        column: x => x.DetailSlug,
+                        principalTable: "DomainDetail",
+                        principalColumn: "Slug",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DomainProductDetail_DomainProduct_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "DomainProduct",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,28 +103,53 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProductDetail",
+                name: "DomainProductSpecification",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Value = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                    SpecificationSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductDetail", x => new { x.ProductId, x.TypeSlug });
+                    table.PrimaryKey("PK_DomainProductSpecification", x => new { x.ProductId, x.SpecificationSlug });
                     table.ForeignKey(
-                        name: "FK_DomainProductDetail_DomainProductDetailType_TypeSlug",
-                        column: x => x.TypeSlug,
-                        principalTable: "DomainProductDetailType",
-                        principalColumn: "Slug",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DomainProductDetail_DomainProduct_ProductId",
+                        name: "FK_DomainProductSpecification_DomainProduct_ProductId",
                         column: x => x.ProductId,
                         principalTable: "DomainProduct",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DomainProductSpecification_DomainSpecification_Specificatio~",
+                        column: x => x.SpecificationSlug,
+                        principalTable: "DomainSpecification",
+                        principalColumn: "Slug",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "DomainDetail",
+                columns: new[] { "Slug", "Title" },
+                values: new object[,]
+                {
+                    { "audio", "Audio" },
+                    { "audio-quality", "Audio Quality" },
+                    { "battery", "Battery" },
+                    { "brand", "Brand" },
+                    { "camera", "Camera" },
+                    { "color", "Color" },
+                    { "color-temperature", "Color Temperature" },
+                    { "compatibility", "Compatibility" },
+                    { "connectivity", "Connectivity" },
+                    { "display", "Display" },
+                    { "features", "Features" },
+                    { "material", "Material" },
+                    { "model", "Model" },
+                    { "operating-system", "Operating System" },
+                    { "ports", "Ports" },
+                    { "processor", "Processor" },
+                    { "resolution", "Resolution" },
+                    { "video-quality", "Video Quality" }
                 });
 
             migrationBuilder.InsertData(
@@ -103,46 +165,38 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainProductDetailType",
+                table: "DomainSpecification",
                 columns: new[] { "Slug", "Title", "Unit" },
                 values: new object[,]
                 {
-                    { "audio-quality", "Audio Quality", null },
-                    { "battery", "Battery", null },
-                    { "color", "Color", null },
-                    { "color-temperature", "Color Temperature", "Kelvin" },
-                    { "compatibility", "Compatibility", null },
-                    { "connectivity", "Connectivity", null },
+                    { "battery-size", "Battery Size", "mAh" },
                     { "depth", "Depth", "millimeters" },
-                    { "display", "Display", null },
                     { "height", "Height", "millimeters" },
-                    { "material", "Material", null },
-                    { "power", "Power", "Watts" },
+                    { "power", "Power", "watts" },
+                    { "ram-size", "RAM Size", "GB" },
+                    { "refresh-rate", "Refresh Rate", "Hz" },
+                    { "screen-size", "Screen Size", "inches" },
                     { "storage", "Storage", "GB" },
-                    { "video-quality", "Video Quality", null },
                     { "weight", "Weight", "grams" },
                     { "width", "Width", "millimeters" }
                 });
 
             migrationBuilder.InsertData(
                 table: "DomainProductDetail",
-                columns: new[] { "ProductId", "TypeSlug", "Value" },
+                columns: new[] { "DetailSlug", "ProductId", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "compatibility", "Works with Alexa, Google Assistant, and Siri" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "weight", "970" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "audio-quality", "Two-way audio with noise cancellation" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "connectivity", "Wi-Fi and Ethernet" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "video-quality", "1080p HD" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "power", "Requires 24VAC power, uses less than 1 kWh/month" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "power", "9" }
+                    { "battery", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
+                    { "compatibility", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "Works with Alexa, Google Assistant, and Siri" },
+                    { "connectivity", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "Wi-Fi and Bluetooth" },
+                    { "connectivity", new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Wi-Fi and Bluetooth" },
+                    { "audio-quality", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Two-way audio with noise cancellation" },
+                    { "connectivity", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Wi-Fi and Ethernet" },
+                    { "video-quality", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "1080p HD" },
+                    { "compatibility", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Works with Alexa, Google Assistant, and Apple HomeKit" },
+                    { "display", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
+                    { "color-temperature", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Adjustable from warm white (2700K) to daylight (6500K)" },
+                    { "compatibility", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Works with Alexa, Google Assistant, and Samsung SmartThings" }
                 });
 
             migrationBuilder.InsertData(
@@ -157,16 +211,41 @@ namespace Matterway.Catalog.Api.Migrations
                     { new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
                 });
 
+            migrationBuilder.InsertData(
+                table: "DomainProductSpecification",
+                columns: new[] { "ProductId", "SpecificationSlug", "Value" },
+                values: new object[,]
+                {
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery-size", 3000m },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "weight", 400m },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "power", 15m },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "weight", 970m },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "power", 8m },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "weight", 480m },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "depth", 28m },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "height", 84m },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "power", 24m },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "screen-size", 2.0m },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "width", 84m },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "power", 9m },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "weight", 72m }
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProductDetail_TypeSlug",
+                name: "IX_DomainProductDetail_DetailSlug",
                 table: "DomainProductDetail",
-                column: "TypeSlug");
+                column: "DetailSlug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainProductImage_ProductId_OrderIndex",
                 table: "DomainProductImage",
                 columns: new[] { "ProductId", "OrderIndex" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DomainProductSpecification_SpecificationSlug",
+                table: "DomainProductSpecification",
+                column: "SpecificationSlug");
         }
 
         /// <inheritdoc />
@@ -179,10 +258,16 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "DomainProductImage");
 
             migrationBuilder.DropTable(
-                name: "DomainProductDetailType");
+                name: "DomainProductSpecification");
+
+            migrationBuilder.DropTable(
+                name: "DomainDetail");
 
             migrationBuilder.DropTable(
                 name: "DomainProduct");
+
+            migrationBuilder.DropTable(
+                name: "DomainSpecification");
         }
     }
 }

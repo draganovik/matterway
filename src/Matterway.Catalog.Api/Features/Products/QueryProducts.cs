@@ -27,8 +27,9 @@ public class QueryProducts : IEndpoint
                         StringComparison.OrdinalIgnoreCase));
 
                 const string filterDescription =
-                    "RSQL filter string. Use ';' for AND and ',' for OR. Operators: eq, !=, ge, le, in, out. " +
-                    "Fields: title, code, description, price, available, and configured product detail slugs.";
+                    "RSQL filter string. Use ';' for AND and ',' for OR. Details (text) support ==, !=, in, out; " +
+                    "specifications (numeric) support eq, !=, ge, le, in, out. " +
+                    "Fields: title, code, description, price, available, detail slugs, specification slugs.";
 
                 filterParam?.Description = filterDescription;
 
@@ -71,10 +72,10 @@ public class QueryProducts : IEndpoint
     public sealed record QueryProductsParameters : PaginationRequestParameters
     {
         /// <summary>
-        /// RSQL filter string. Use ';' for AND, and ',' for OR.
-        /// Operators: eq, !=, ge, le, in, out.
-        /// Fields: title, code, description, price, available, and configured product detail slugs.
-        /// NOTE: eq and == are equivalent and validate if a field contains the given value.
+        /// RSQL filter string. Use ';' for AND, and ',' for OR. Text fields (details) support ==/!=/in/out;
+        /// numeric fields (price, specifications) support eq/!=/ge/le/in/out. Fields:
+        /// title, code, description, price, available, detail slugs, and specification slugs.
+        /// NOTE: eq and == are equivalent and validate if a field contains the given value for strings.
         /// </summary>
         public string? Filter { get; init; }
     }
@@ -82,18 +83,13 @@ public class QueryProducts : IEndpoint
     public record QueryProductResponse
     {
         public Guid Id { get; set; }
-        public string? ProductCode { get; set; }
+        public string? Code { get; set; }
         public string? Title { get; set; }
         public double? Price { get; set; }
         public string? Description { get; set; }
-        public ProductPropertyImage? ThumbnailImage { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public string? ThumbnailAlt { get; set; }
         public bool IsAvailable { get; set; }
-    }
-
-    public record ProductPropertyImage
-    {
-        public string? ImageUrl { get; set; }
-        public string? ImageAlt { get; set; }
     }
 
     public static QueryProductResponse MapToResponse(Product entity)
@@ -101,24 +97,19 @@ public class QueryProducts : IEndpoint
         return new QueryProductResponse
         {
             Id = entity.Id,
-            ProductCode = entity.ProductCode,
+            Code = entity.ProductCode,
             Title = entity.Title,
             Price = entity.Price,
             Description = entity.Description,
-            ThumbnailImage = entity.ProductImages?
+            ThumbnailUrl = entity.ProductImages?
                 .OrderBy(pi => pi.OrderIndex)
-                .Select(MapImageToResponse)
-                .FirstOrDefault(),
+                .FirstOrDefault()
+                ?.ImageUrl,
+            ThumbnailAlt = entity.ProductImages?
+                .OrderBy(pi => pi.OrderIndex)
+                .FirstOrDefault()
+                ?.ImageAlt,
             IsAvailable = entity.IsAvailable
-        };
-    }
-
-    public static ProductPropertyImage MapImageToResponse(ProductImage entity)
-    {
-        return new ProductPropertyImage
-        {
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
         };
     }
 }

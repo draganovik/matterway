@@ -11,28 +11,29 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         context.ProductDetail.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected == 1)
-            return await context.ProductDetail.Include(x => x.Product).Include(x => x.Type)
-                .FirstOrDefaultAsync(x => x.ProductId == requestModel.ProductId && x.TypeSlug == requestModel.TypeSlug,
+            return await context.ProductDetail.Include(x => x.Product).Include(x => x.Detail)
+                .FirstOrDefaultAsync(
+                    x => x.ProductId == requestModel.ProductId && x.DetailSlug == requestModel.DetailSlug,
                     cancellationToken);
 
         return null;
     }
 
-    public async Task<bool> Delete(Guid productId, string typeSlug, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(Guid productId, string detailSlug, CancellationToken cancellationToken = default)
     {
         var affected = await context.ProductDetail
-            .Where(model => model.ProductId == productId && model.TypeSlug == typeSlug)
+            .Where(model => model.ProductId == productId && model.DetailSlug == detailSlug)
             .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<DomainProductDetail?> GetByKey(Guid productId, string typeSlug,
+    public async Task<DomainProductDetail?> GetByKey(Guid productId, string detailSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetail
             .Include(pd => pd.Product)
-            .Include(pd => pd.Type)
-            .FirstOrDefaultAsync(pd => pd.ProductId == productId && pd.TypeSlug == typeSlug, cancellationToken);
+            .Include(pd => pd.Detail)
+            .FirstOrDefaultAsync(pd => pd.ProductId == productId && pd.DetailSlug == detailSlug, cancellationToken);
     }
 
     public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
@@ -43,13 +44,13 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
     public async Task<ICollection<DomainProductDetail>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await context.ProductDetail.Include(pd => pd.Product).AsNoTracking()
+        return await context.ProductDetail.Include(pd => pd.Product).Include(pd => pd.Detail).AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductDetail?> UpdateAsync(Guid productId, string typeSlug, DomainProductDetail request,
+    public async Task<DomainProductDetail?> UpdateAsync(Guid productId, string detailSlug, DomainProductDetail request,
         CancellationToken cancellationToken = default)
     {
         context.ProductDetail.Update(request);
@@ -57,8 +58,8 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         if (affected == 1)
             return await context.ProductDetail
                 .Include(x => x.Product)
-                .Include(x => x.Type)
-                .FirstOrDefaultAsync(x => x.ProductId == productId && x.TypeSlug == typeSlug, cancellationToken);
+                .Include(x => x.Detail)
+                .FirstOrDefaultAsync(x => x.ProductId == productId && x.DetailSlug == detailSlug, cancellationToken);
 
         return null;
     }

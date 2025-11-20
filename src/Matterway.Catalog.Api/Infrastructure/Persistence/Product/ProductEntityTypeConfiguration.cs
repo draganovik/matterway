@@ -41,6 +41,10 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
             .WithOne(pd => pd.Product)
             .HasForeignKey(pd => pd.ProductId);
 
+        builder.HasMany(p => p.ProductSpecifications)
+            .WithOne(ps => ps.Product)
+            .HasForeignKey(ps => ps.ProductId);
+
         builder.HasMany(p => p.ProductImages)
             .WithOne(pi => pi.Product)
             .HasForeignKey(pi => pi.ProductId);

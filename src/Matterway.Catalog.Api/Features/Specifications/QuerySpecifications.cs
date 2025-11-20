@@ -3,38 +3,38 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailType;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Specification;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Matterway.Catalog.Api.Features.ProductDetailTypes;
+namespace Matterway.Catalog.Api.Features.Specifications;
 
-public class QueryProductDetailTypes : IEndpoint
+public class QuerySpecifications : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("ProductDetailTypes", Handle)
-            .WithName("QueryProductDetailTypes").WithSummary("Query available ProductDetail types.")
-            .WithTags(nameof(ProductDetailType))
-            .Produces<ICollection<QueryProductDetailTypeResponse>>()
+        app.MapGet("Specifications", Handle)
+            .WithName("QuerySpecifications").WithSummary("Query available specifications.")
+            .WithTags(nameof(Specification))
+            .Produces<ICollection<QuerySpecificationResponse>>()
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(RequestClaimsRole.Admin),
                 nameof(RequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Ok<ICollection<QueryProductDetailTypeResponse>>> Handle(
+    private static async Task<Ok<ICollection<QuerySpecificationResponse>>> Handle(
         [AsParameters]
-        QueryProductDetailTypeRequest request,
-        IProductDetailTypeRepository productDetailTypeRepository,
+        QuerySpecificationRequest request,
+        ISpecificationRepository specificationRepository,
         CancellationToken cancellationToken)
     {
         var entities =
-            await productDetailTypeRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
+            await specificationRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
         var response = entities.Select(MapToResponse).ToList();
-        return TypedResults.Ok<ICollection<QueryProductDetailTypeResponse>>(response);
+        return TypedResults.Ok<ICollection<QuerySpecificationResponse>>(response);
     }
 
-    public record QueryProductDetailTypeRequest
+    public record QuerySpecificationRequest
     {
         [Range(1, 50)]
         public int Limit { get; init; } = 10;
@@ -42,16 +42,16 @@ public class QueryProductDetailTypes : IEndpoint
         public string? TitleLike { get; init; }
     }
 
-    public record QueryProductDetailTypeResponse
+    public record QuerySpecificationResponse
     {
         public string? Slug { get; init; }
         public string? Title { get; init; }
         public string? Unit { get; init; }
     }
 
-    public static QueryProductDetailTypeResponse MapToResponse(ProductDetailType entity)
+    public static QuerySpecificationResponse MapToResponse(Specification entity)
     {
-        return new QueryProductDetailTypeResponse
+        return new QuerySpecificationResponse
         {
             Slug = entity.Slug,
             Title = entity.Title,

@@ -8,6 +8,7 @@ public class Product
     public required double Price { get; set; }
     public required string Description { get; set; }
     public ICollection<ProductDetail>? ProductDetails { get; init; }
+    public ICollection<ProductSpecification>? ProductSpecifications { get; init; }
     public ICollection<ProductImage>? ProductImages { get; init; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -12,8 +12,9 @@ namespace Matterway.Catalog.Api.Domain;
 /// </summary>
 /// <remarks>
 /// This extension translates a filter string into LINQ expressions EF can execute server-side.
-/// Base product fields live in <see cref="ProductFieldRules"/> and product-detail slugs in
-/// <see cref="ProductDetailRules"/>; add entries there to expose new filters without touching callers.
+/// Base product fields live in <see cref="ProductFieldRules"/>, detail slugs in
+/// <see cref="ProductDetailRules"/>, and specification slugs in <see cref="ProductSpecificationRules"/>;
+/// add entries there to expose new filters without touching callers.
 /// Examples:
 /// <list type="bullet">
 /// <item><description><c>title==bulb;price=le=5000</c></description></item>
@@ -29,13 +30,15 @@ public static class ProductRsqlExtensions
     private static readonly MethodInfo ToLowerMethod =
         typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes) ?? throw new InvalidOperationException();
 
-    private static readonly MethodInfo ConvertToDoubleMethod =
-        typeof(Convert).GetMethod(nameof(Convert.ToDouble), [typeof(string)]) ?? throw new InvalidOperationException();
-
-    private static readonly MethodInfo AnyMethod = typeof(Enumerable)
+    private static readonly MethodInfo AnyDetailMethod = typeof(Enumerable)
         .GetMethods()
         .Single(m => m.Name == nameof(Enumerable.Any) && m.GetParameters().Length == 2)
         .MakeGenericMethod(typeof(ProductDetail));
+
+    private static readonly MethodInfo AnySpecificationMethod = typeof(Enumerable)
+        .GetMethods()
+        .Single(m => m.Name == nameof(Enumerable.Any) && m.GetParameters().Length == 2)
+        .MakeGenericMethod(typeof(ProductSpecification));
 
     /// <summary>
     /// Token map for parsing operator fragments inside the filter string.
@@ -62,62 +65,124 @@ public static class ProductRsqlExtensions
             ["available"] = ProductFieldRule.Bool(p => p.IsAvailable)
         };
 
-    // Product detail slugs that can be filtered via RSQL.
-    // Add new entries here to expose extra detail filters (numeric rules assume values are stored as numbers).
+    // Product detail slugs that can be filtered via RSQL (string comparisons only).
     private static readonly IReadOnlyDictionary<string, ProductDetailRule> ProductDetailRules =
         new Dictionary<string, ProductDetailRule>(StringComparer.OrdinalIgnoreCase)
         {
-            ["brand"] = ProductDetailRule.Text("brand", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["model"] = ProductDetailRule.Text("model", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["color"] = ProductDetailRule.Text("color", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["weight"] = ProductDetailRule.Number("weight", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["width"] = ProductDetailRule.Number("width", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["height"] = ProductDetailRule.Number("height", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["depth"] = ProductDetailRule.Number("depth", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["power"] = ProductDetailRule.Number("power", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["battery"] = ProductDetailRule.Text("battery", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["connectivity"] = ProductDetailRule.Text("connectivity", RsqlOperator.Equal, RsqlOperator.In,
+            ["audio"] = ProductDetailRule.Text("audio", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["audio-quality"] = ProductDetailRule.Text("audio-quality", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
+            ["battery"] = ProductDetailRule.Text("battery", RsqlOperator.Equal, RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["brand"] = ProductDetailRule.Text("brand", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["camera"] = ProductDetailRule.Text("camera", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["color"] = ProductDetailRule.Text("color", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["color-temperature"] = ProductDetailRule.Text("color-temperature", RsqlOperator.Equal,
+                RsqlOperator.In, RsqlOperator.NotIn),
             ["compatibility"] = ProductDetailRule.Text("compatibility", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["display"] = ProductDetailRule.Text("display", RsqlOperator.Equal, RsqlOperator.In,
+            ["connectivity"] = ProductDetailRule.Text("connectivity", RsqlOperator.Equal, RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["display"] = ProductDetailRule.Text("display", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["features"] = ProductDetailRule.Text("features", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
             ["material"] = ProductDetailRule.Text("material", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["color-temperature"] = ProductDetailRule.Text("color-temperature", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["camera"] = ProductDetailRule.Text("camera", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["battery-size"] = ProductDetailRule.Number("battery-size", RsqlOperator.Equal,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["storage"] = ProductDetailRule.Number("storage", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["ram-size"] = ProductDetailRule.Number("ram-size", RsqlOperator.Equal, RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
+            ["model"] = ProductDetailRule.Text("model", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
+            ["operating-system"] = ProductDetailRule.Text("operating-system", RsqlOperator.Equal,
+                RsqlOperator.In, RsqlOperator.NotIn),
+            ["ports"] = ProductDetailRule.Text("ports", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
             ["processor"] = ProductDetailRule.Text("processor", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["operating-system"] = ProductDetailRule.Text("operating-system", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["screen-size"] = ProductDetailRule.Number("screen-size", RsqlOperator.Equal,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
             ["resolution"] = ProductDetailRule.Text("resolution", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
             ["video-quality"] = ProductDetailRule.Text("video-quality", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["audio-quality"] = ProductDetailRule.Text("audio-quality", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["refresh-rate"] = ProductDetailRule.Number("refresh-rate", RsqlOperator.Equal,
+                RsqlOperator.NotIn)
+        };
+
+    // Product specification slugs that can be filtered via RSQL (numeric comparisons).
+    private static readonly IReadOnlyDictionary<string, ProductSpecificationRule> ProductSpecificationRules =
+        new Dictionary<string, ProductSpecificationRule>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["battery-size"] = ProductSpecificationRule.Number(
+                "battery-size",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
                 RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual),
-            ["audio"] = ProductDetailRule.Text("audio", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["ports"] = ProductDetailRule.Text("ports", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["features"] = ProductDetailRule.Text("features", RsqlOperator.Equal, RsqlOperator.In,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["depth"] = ProductSpecificationRule.Number(
+                "depth",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["height"] = ProductSpecificationRule.Number(
+                "height",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["power"] = ProductSpecificationRule.Number(
+                "power",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["ram-size"] = ProductSpecificationRule.Number(
+                "ram-size",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["refresh-rate"] = ProductSpecificationRule.Number(
+                "refresh-rate",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["screen-size"] = ProductSpecificationRule.Number(
+                "screen-size",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["storage"] = ProductSpecificationRule.Number(
+                "storage",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["weight"] = ProductSpecificationRule.Number(
+                "weight",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["width"] = ProductSpecificationRule.Number(
+                "width",
+                RsqlOperator.Equal,
+                RsqlOperator.NotEqual,
+                RsqlOperator.GreaterThanOrEqual,
+                RsqlOperator.LessThanOrEqual,
+                RsqlOperator.In,
                 RsqlOperator.NotIn)
         };
 
@@ -245,6 +310,9 @@ public static class ProductRsqlExtensions
         if (ProductDetailRules.TryGetValue(token.Field, out var detailRule))
             return BuildDetailExpression(parameter, token, detailRule);
 
+        if (ProductSpecificationRules.TryGetValue(token.Field, out var specificationRule))
+            return BuildSpecificationExpression(parameter, token, specificationRule);
+
         return null;
     }
 
@@ -256,13 +324,7 @@ public static class ProductRsqlExtensions
         if (!rule.SupportedOperators.Contains(token.Operator))
             return null;
 
-        return rule.ValueKind switch
-        {
-            DetailValueKind.Text => BuildTextDetailExpression(productParam, token, rule),
-            DetailValueKind.Number => BuildNumericDetailExpression(productParam, token, rule),
-            DetailValueKind.Boolean => BuildBooleanDetailExpression(productParam, token, rule),
-            _ => null
-        };
+        return BuildTextDetailExpression(productParam, token, rule);
     }
 
     private static Expression? BuildTextDetailExpression(
@@ -278,82 +340,63 @@ public static class ProductRsqlExtensions
             return null;
 
         var slugPredicate = Expression.Equal(
-            Expression.Property(DetailParameter, nameof(ProductDetail.TypeSlug)),
+            Expression.Property(DetailParameter, nameof(ProductDetail.DetailSlug)),
             Expression.Constant(rule.Slug));
 
         var detailMatchBody = Expression.AndAlso(slugPredicate, valuePredicate);
         var detailLambda = Expression.Lambda<Func<ProductDetail, bool>>(detailMatchBody, DetailParameter);
 
-        return BuildAnyCall(productParam, detailLambda);
+        return BuildAnyCall(
+            productParam,
+            nameof(Product.ProductDetails),
+            detailLambda,
+            AnyDetailMethod);
     }
 
-    private static Expression? BuildNumericDetailExpression(
+    private static Expression? BuildSpecificationExpression(
         ParameterExpression productParam,
         FilterToken token,
-        ProductDetailRule rule)
+        ProductSpecificationRule rule)
     {
+        if (!rule.SupportedOperators.Contains(token.Operator))
+            return null;
+
         if (!TryParseNumericValues(token.Values, out var numbers))
             return null;
 
-        var parsedValue = Expression.Call(
-            ConvertToDoubleMethod,
-            Expression.Property(DetailParameter, nameof(ProductDetail.Value)));
+        var parsedValue = Expression.Convert(
+            Expression.Property(SpecificationParameter, nameof(ProductSpecification.Value)),
+            typeof(double));
 
         var comparison = BuildNumericComparison(parsedValue, token.Operator, numbers);
         if (comparison is null)
             return null;
 
         var slugPredicate = Expression.Equal(
-            Expression.Property(DetailParameter, nameof(ProductDetail.TypeSlug)),
+            Expression.Property(SpecificationParameter, nameof(ProductSpecification.SpecificationSlug)),
             Expression.Constant(rule.Slug));
 
-        var detailMatchBody = Expression.AndAlso(slugPredicate, comparison);
-        var detailLambda = Expression.Lambda<Func<ProductDetail, bool>>(detailMatchBody, DetailParameter);
+        var specificationMatchBody = Expression.AndAlso(slugPredicate, comparison);
+        var specificationLambda =
+            Expression.Lambda<Func<ProductSpecification, bool>>(specificationMatchBody, SpecificationParameter);
 
-        return BuildAnyCall(productParam, detailLambda);
-    }
-
-    private static Expression? BuildBooleanDetailExpression(
-        ParameterExpression productParam,
-        FilterToken token,
-        ProductDetailRule rule)
-    {
-        if (!bool.TryParse(token.Values.FirstOrDefault(), out var boolValue))
-            return null;
-
-        var detailValue = Expression.Property(DetailParameter, nameof(ProductDetail.Value));
-        var detailEquals = Expression.Equal(
-            NormalizeString(detailValue),
-            Expression.Constant(boolValue.ToString().ToLower()));
-
-        Expression? comparison = token.Operator switch
-        {
-            RsqlOperator.Equal => detailEquals,
-            RsqlOperator.NotEqual => Expression.Not(detailEquals),
-            _ => null
-        };
-
-        if (comparison is null)
-            return null;
-
-        var slugPredicate = Expression.Equal(
-            Expression.Property(DetailParameter, nameof(ProductDetail.TypeSlug)),
-            Expression.Constant(rule.Slug));
-
-        var detailMatchBody = Expression.AndAlso(slugPredicate, comparison);
-        var detailLambda = Expression.Lambda<Func<ProductDetail, bool>>(detailMatchBody, DetailParameter);
-
-        return BuildAnyCall(productParam, detailLambda);
+        return BuildAnyCall(
+            productParam,
+            nameof(Product.ProductSpecifications),
+            specificationLambda,
+            AnySpecificationMethod);
     }
 
     private static Expression BuildAnyCall(
         ParameterExpression productParam,
-        LambdaExpression predicate)
+        string propertyName,
+        LambdaExpression predicate,
+        MethodInfo anyMethod)
     {
-        var detailsProperty = Expression.Property(productParam, nameof(Product.ProductDetails));
+        var property = Expression.Property(productParam, propertyName);
         var notNull =
-            Expression.NotEqual(detailsProperty, Expression.Constant(null, typeof(ICollection<ProductDetail>)));
-        var anyCall = Expression.Call(AnyMethod, detailsProperty, predicate);
+            Expression.NotEqual(property, Expression.Constant(null, property.Type));
+        var anyCall = Expression.Call(anyMethod, property, predicate);
         return Expression.AndAlso(notNull, anyCall);
     }
 
@@ -485,32 +528,37 @@ public static class ProductRsqlExtensions
     private static readonly ParameterExpression DetailParameter =
         Expression.Parameter(typeof(ProductDetail), "detail");
 
+    private static readonly ParameterExpression SpecificationParameter =
+        Expression.Parameter(typeof(ProductSpecification), "specification");
+
     /// <summary>
     /// Parsed token representing a single <c>field op value</c> fragment in the filter string.
     /// </summary>
     private sealed record FilterToken(string Field, RsqlOperator Operator, IReadOnlyList<string> Values);
 
     /// <summary>
-    /// Describes how a product detail slug should be interpreted (value kind plus supported operators).
+    /// Describes how a product detail slug should be interpreted (string operators only).
     /// </summary>
     private sealed record ProductDetailRule(
         string Slug,
-        DetailValueKind ValueKind,
         ISet<RsqlOperator> SupportedOperators)
     {
         public static ProductDetailRule Text(string slug, params RsqlOperator[] operators)
         {
-            return new ProductDetailRule(slug, DetailValueKind.Text, operators.ToHashSet());
+            return new ProductDetailRule(slug, operators.ToHashSet());
         }
+    }
 
-        public static ProductDetailRule Number(string slug, params RsqlOperator[] operators)
+    /// <summary>
+    /// Describes how a product specification slug should be interpreted (numeric operators).
+    /// </summary>
+    private sealed record ProductSpecificationRule(
+        string Slug,
+        ISet<RsqlOperator> SupportedOperators)
+    {
+        public static ProductSpecificationRule Number(string slug, params RsqlOperator[] operators)
         {
-            return new ProductDetailRule(slug, DetailValueKind.Number, operators.ToHashSet());
-        }
-
-        public static ProductDetailRule Boolean(string slug, params RsqlOperator[] operators)
-        {
-            return new ProductDetailRule(slug, DetailValueKind.Boolean, operators.ToHashSet());
+            return new ProductSpecificationRule(slug, operators.ToHashSet());
         }
     }
 
@@ -561,12 +609,5 @@ public static class ProductRsqlExtensions
         GreaterThanOrEqual,
         LessThan,
         LessThanOrEqual
-    }
-
-    private enum DetailValueKind
-    {
-        Text,
-        Number,
-        Boolean
     }
 }

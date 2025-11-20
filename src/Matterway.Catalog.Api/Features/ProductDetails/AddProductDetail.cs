@@ -61,7 +61,7 @@ public class AddProductDetail : IEndpoint
     public record AddProductDetailRequest
     {
         [Required]
-        public required string TypeSlug { get; init; }
+        public required string DetailSlug { get; init; }
 
         [Required]
         public required string Value { get; init; }
@@ -71,10 +71,9 @@ public class AddProductDetail : IEndpoint
     {
         public Guid ProductId { get; init; }
         public string? ProductTitle { get; init; }
-        public string? TypeSlug { get; init; }
+        public string? DetailSlug { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
-        public string? Unit { get; init; }
     }
 
     public static ProductDetail MapToEntity(Guid productId, AddProductDetailRequest request)
@@ -82,7 +81,7 @@ public class AddProductDetail : IEndpoint
         return new ProductDetail
         {
             ProductId = productId,
-            TypeSlug = request.TypeSlug,
+            DetailSlug = request.DetailSlug,
             Value = request.Value
         };
     }
@@ -93,10 +92,9 @@ public class AddProductDetail : IEndpoint
         {
             ProductId = entity.ProductId,
             ProductTitle = entity.Product?.Title,
-            TypeSlug = entity.TypeSlug,
-            Title = entity.Type?.Title,
-            Value = entity.Value,
-            Unit = entity.Type?.Unit
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Value = entity.Value
         };
     }
 }
