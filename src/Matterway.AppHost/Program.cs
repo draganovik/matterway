@@ -60,10 +60,7 @@ var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")
 
 // Setup Catalog API
 var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
-    .WaitFor(minio)
     .WithReference(catalogDb)
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithReference(minio.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
     {
@@ -72,6 +69,8 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
     });
 
 catalogApi
+    .WaitFor(minio)
+    .WithReference(minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__Bucket", productImagesBucket)
     .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
