@@ -11,7 +11,7 @@ useHead({
 });
 
 onMounted(() => {
-  catalogStore.fetchCatalog(1, 8, "", 0, 0);
+  catalogStore.fetchCatalog({ page: 1, pageSize: 8 });
 });
 
 const isLoading = computed(() => catalogStore.catalog === null);

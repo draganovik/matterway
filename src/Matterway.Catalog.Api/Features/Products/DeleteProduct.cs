@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;

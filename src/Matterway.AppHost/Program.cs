@@ -60,10 +60,7 @@ var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")
 
 // Setup Catalog API
 var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
-    .WaitFor(minio)
     .WithReference(catalogDb)
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithReference(minio.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
     {
@@ -72,6 +69,8 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
     });
 
 catalogApi
+    .WaitFor(minio)
+    .WithReference(minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__Bucket", productImagesBucket)
     .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
@@ -130,12 +129,17 @@ var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.W
     .WaitFor(catalogApi)
     .WithEnvironment("NUXT_SERVER_ORDERING_API_BASE_URL", orderingApi.GetEndpoint("http"))
     .WithEnvironment("NUXT_SERVER_PAYMENTS_API_BASE_URL", paymentsApi.GetEndpoint("http"))
+    .WithEndpoint("http", e =>
+    {
+        e.TargetPort = 3000;
+        e.Port = 3001;
+    })
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile()
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = ["3001:8000"];
+        service.Ports = ["3001:3000"];
     });
 
 ConfigureApiJwtSettings(catalogApi);

@@ -9,8 +9,13 @@ interface CatalogState {
   catalogLinks: any;
 }
 
-export interface ProductDetailTypeOption {
-  id: number;
+export interface DetailOption {
+  slug: string;
+  title?: string;
+}
+
+export interface SpecificationOption {
+  slug: string;
   title?: string;
   unit?: string | null;
 }
@@ -52,31 +57,32 @@ export const useCatalogStore = defineStore("catalog", {
           const responseObject = await response.json();
           return ProductModel.fromDetailResponse(responseObject);
         } catch (error) {
-          console.error("Failed to parse product detail response", error);
+          console.error("Failed to parse product response", error);
         }
       }
       return null;
     },
-    async fetchCatalog(
-      page: number = 1,
-      pageSize: number = 10,
-      titleLike: string = "",
-      priceMin: number = 0,
-      priceMax: number = 0,
-    ) {
-      let advancedQuery = "";
-      if (titleLike != "") {
-        advancedQuery = `&TitleLike=${titleLike}`;
+    async fetchCatalog(options?: {
+      page?: number;
+      pageSize?: number;
+      filter?: string;
+    }) {
+      const page = options?.page ?? 1;
+      const pageSize = options?.pageSize ?? 10;
+      const filter = options?.filter?.trim();
+
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      if (filter) {
+        params.set("filter", filter);
       }
-      if (priceMin > 0) {
-        advancedQuery = `${advancedQuery}&PriceMin=${priceMin}`;
-      }
-      if (priceMax > 0) {
-        advancedQuery = `${advancedQuery}&PriceMax=${priceMax}`;
-      }
+
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products?page=${page}&pageSize=${pageSize}${advancedQuery}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products?${params.toString()}`,
         {
           method: "GET",
           headers: {
@@ -137,7 +143,8 @@ export const useCatalogStore = defineStore("catalog", {
       if (response.ok) {
         try {
           const payload = await response.clone().json();
-          product.productCode = payload.productCode ?? product.productCode;
+          product.productCode =
+            payload.productCode ?? payload.code ?? product.productCode;
           product.title = payload.title ?? product.title;
           product.price = payload.price ?? product.price;
           product.description = payload.description ?? product.description;
@@ -208,6 +215,8 @@ export const useCatalogStore = defineStore("catalog", {
             );
           }
           product.id = payload.id ?? product.id;
+          product.productCode =
+            payload.productCode ?? payload.code ?? product.productCode;
           product.createdAt = payload.createdAt ?? product.createdAt;
           product.updatedAt = payload.updatedAt ?? product.updatedAt;
           product.isAvailable = payload.isAvailable ?? product.isAvailable;
@@ -218,9 +227,9 @@ export const useCatalogStore = defineStore("catalog", {
       return response;
     },
 
-    async createProductSpec(
+    async createProductDetail(
       productId: string,
-      typeId: number,
+      detailSlug: string,
       value: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
@@ -229,43 +238,87 @@ export const useCatalogStore = defineStore("catalog", {
         {
           method: "POST",
           body: JSON.stringify({
-            typeId: typeId,
-            value: value,
+            detailSlug: detailSlug,
+            value,
           }),
         },
       );
     },
-    async deleteProductSpec(
+    async deleteProductDetail(
       productId: string,
-      typeId: number,
+      detailSlug: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${encodeURIComponent(detailSlug)}`,
         {
           method: "DELETE",
         },
       );
     },
-    async updateProductSpec(
+    async updateProductDetail(
       productId: string,
-      typeId: number,
+      detailSlug: string,
       value: string,
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${typeId}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Details/${encodeURIComponent(detailSlug)}`,
         {
           method: "PATCH",
-          body: JSON.stringify({ value: value }),
+          body: JSON.stringify({ value }),
         },
       );
     },
 
-    async queryProductDetailTypes(
+    async createProductSpecification(
+      productId: string,
+      specificationSlug: string,
+      value: number,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Specifications`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            specificationSlug,
+            value,
+          }),
+        },
+      );
+    },
+    async deleteProductSpecification(
+      productId: string,
+      specificationSlug: string,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Specifications/${encodeURIComponent(specificationSlug)}`,
+        {
+          method: "DELETE",
+        },
+      );
+    },
+    async updateProductSpecification(
+      productId: string,
+      specificationSlug: string,
+      value: number,
+    ): Promise<Response> {
+      const config = useRuntimeConfig();
+      return await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products/${productId}/Specifications/${encodeURIComponent(specificationSlug)}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ value }),
+        },
+      );
+    },
+
+    async queryDetails(
       searchTerm: string,
       limit: number = 10,
-    ): Promise<ProductDetailTypeOption[]> {
+    ): Promise<DetailOption[]> {
       const config = useRuntimeConfig();
       const params = new URLSearchParams();
       if (searchTerm?.trim()) {
@@ -276,12 +329,34 @@ export const useCatalogStore = defineStore("catalog", {
       }
       const query = params.toString();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/ProductDetailTypes${
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Details${
           query ? `?${query}` : ""
         }`,
         {
           method: "GET",
         },
+      );
+      return (await response.json()) ?? [];
+    },
+
+    async querySpecifications(
+      searchTerm: string,
+      limit: number = 10,
+    ): Promise<SpecificationOption[]> {
+      const config = useRuntimeConfig();
+      const params = new URLSearchParams();
+      if (searchTerm?.trim()) {
+        params.set("titleLike", searchTerm.trim());
+      }
+      if (limit) {
+        params.set("limit", limit.toString());
+      }
+      const query = params.toString();
+      const response = await request(
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Specifications${
+          query ? `?${query}` : ""
+        }`,
+        { method: "GET" },
       );
       return (await response.json()) ?? [];
     },

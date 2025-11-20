@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.OpenApi;
 
 namespace Matterway.Catalog.Api.Features.Products;
 
@@ -17,22 +19,37 @@ public class QueryProducts : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1, 0))
+            .AddOpenApiOperationTransformer((operation, context, ct) =>
+            {
+                var filterParam = operation.Parameters?
+                    .FirstOrDefault(p => string.Equals(p.Name, nameof(QueryProductsParameters.Filter),
+                        StringComparison.OrdinalIgnoreCase));
+
+                const string filterDescription =
+                    "RSQL filter string. Use ';' for AND and ',' for OR. Details (text) support ==, !=, in, out; " +
+                    "specifications (numeric) support eq, !=, ge, le, in, out. " +
+                    "Fields: title, code, description, price, available, detail slugs, specification slugs.";
+
+                filterParam?.Description = filterDescription;
+
+                return Task.CompletedTask;
+            });
     }
 
     private static async Task<Results<Ok<PaginationResponse<QueryProductResponse>>, NoContent>>
-        Handle([AsParameters] PaginationQuery pagingQuery, [AsParameters] QueryProductFilter queryProductFilter,
+        Handle([AsParameters] QueryProductsParameters queryParameters,
             HttpContext httpContext, LinkGenerator linkGenerator, IProductRepository productRepository,
             CancellationToken cancellationToken)
     {
-        var total = await productRepository.GetTotalEntities(queryProductFilter, cancellationToken);
+        var total = await productRepository.GetTotalEntities(queryParameters.Filter, cancellationToken);
         if (total == 0)
             return TypedResults.NoContent();
 
         var entities = await productRepository.Query(
-            pagingQuery.Page,
-            pagingQuery.PageSize,
-            queryProductFilter,
+            queryParameters.Page,
+            queryParameters.PageSize,
+            queryParameters.Filter,
             cancellationToken);
 
         var location = linkGenerator.GetUriByName(
@@ -45,28 +62,34 @@ public class QueryProducts : IEndpoint
         var paginationResponse = PaginationResponse<QueryProductResponse>.Create(
             results,
             total,
-            pagingQuery.Page,
-            pagingQuery.PageSize,
+            queryParameters.Page,
+            queryParameters.PageSize,
             location);
 
         return TypedResults.Ok(paginationResponse);
     }
 
+    public sealed record QueryProductsParameters : PaginationRequestParameters
+    {
+        /// <summary>
+        /// RSQL filter string. Use ';' for AND, and ',' for OR. Text fields (details) support ==/!=/in/out;
+        /// numeric fields (price, specifications) support eq/!=/ge/le/in/out. Fields:
+        /// title, code, description, price, available, detail slugs, and specification slugs.
+        /// NOTE: eq and == are equivalent and validate if a field contains the given value for strings.
+        /// </summary>
+        public string? Filter { get; init; }
+    }
+
     public record QueryProductResponse
     {
         public Guid Id { get; set; }
-        public string? ProductCode { get; set; }
+        public string? Code { get; set; }
         public string? Title { get; set; }
         public double? Price { get; set; }
         public string? Description { get; set; }
-        public ProductPropertyImage? ThumbnailImage { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public string? ThumbnailAlt { get; set; }
         public bool IsAvailable { get; set; }
-    }
-
-    public record ProductPropertyImage
-    {
-        public string? ImageUrl { get; set; }
-        public string? ImageAlt { get; set; }
     }
 
     public static QueryProductResponse MapToResponse(Product entity)
@@ -74,50 +97,19 @@ public class QueryProducts : IEndpoint
         return new QueryProductResponse
         {
             Id = entity.Id,
-            ProductCode = entity.ProductCode,
+            Code = entity.ProductCode,
             Title = entity.Title,
             Price = entity.Price,
             Description = entity.Description,
-            ThumbnailImage = entity.ProductImages?
+            ThumbnailUrl = entity.ProductImages?
                 .OrderBy(pi => pi.OrderIndex)
-                .Select(MapImageToResponse)
-                .FirstOrDefault(),
+                .FirstOrDefault()
+                ?.ImageUrl,
+            ThumbnailAlt = entity.ProductImages?
+                .OrderBy(pi => pi.OrderIndex)
+                .FirstOrDefault()
+                ?.ImageAlt,
             IsAvailable = entity.IsAvailable
         };
-    }
-
-    public static ProductPropertyImage MapImageToResponse(ProductImage entity)
-    {
-        return new ProductPropertyImage
-        {
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
-        };
-    }
-
-    public record QueryProductFilter
-    {
-        public string? TitleLike { get; set; }
-        public double? PriceMin { get; set; }
-        public double? PriceMax { get; set; }
-        public string[]? ProductDetailsLike { get; set; }
-        public bool? IsAvailable { get; set; }
-
-        public IQueryable<Product> GenerateQuery(IQueryable<Product> query)
-        {
-            if (TitleLike != null)
-                query = query.Where(p => p.Title.ToLower().Contains(TitleLike.ToLower()));
-            if (PriceMin.HasValue) query = query.Where(p => p.Price >= PriceMin);
-            if (PriceMax.HasValue) query = query.Where(p => p.Price <= PriceMax);
-            if (ProductDetailsLike?.Length > 0)
-                query = ProductDetailsLike.Aggregate(query,
-                    (current, productDetailLike) => current.Where(p =>
-                        p.ProductDetails != null && p.ProductDetails.Any(pd =>
-                            pd.Value.ToLower().Contains(productDetailLike.ToLower()))));
-
-            if (IsAvailable.HasValue) query = query.Where(p => p.IsAvailable == IsAvailable);
-
-            return query;
-        }
     }
 }

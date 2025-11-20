@@ -1,7 +1,8 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;
@@ -33,12 +34,13 @@ public class GetProductById : IEndpoint
     public record GetProductByIdResponse
     {
         public Guid Id { get; init; }
-        public string? ProductCode { get; init; }
+        public string? Code { get; init; }
         public string? Title { get; init; }
         public double? Price { get; init; }
         public string? Description { get; init; }
-        public ICollection<ProductDetailProperty>? ProductDetails { get; init; } = [];
-        public ICollection<ProductImageProperty>? ProductImages { get; init; } = [];
+        public ICollection<ProductDetailProperty>? Details { get; init; } = [];
+        public ICollection<ProductSpecificationProperty>? Specifications { get; init; } = [];
+        public ICollection<ProductImageProperty>? Images { get; init; } = [];
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
         public bool IsAvailable { get; init; }
@@ -46,9 +48,16 @@ public class GetProductById : IEndpoint
 
     public record ProductDetailProperty
     {
-        public int TypeId { get; init; }
+        public string? DetailSlug { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
+    }
+
+    public record ProductSpecificationProperty
+    {
+        public string? SpecificationSlug { get; init; }
+        public string? Title { get; init; }
+        public decimal Value { get; init; }
         public string? Unit { get; init; }
     }
 
@@ -65,13 +74,15 @@ public class GetProductById : IEndpoint
         return new GetProductByIdResponse
         {
             Id = entity.Id,
-            ProductCode = entity.ProductCode,
+            Code = entity.ProductCode,
             Title = entity.Title,
             Price = entity.Price,
             Description = entity.Description,
-            ProductDetails = entity.ProductDetails?
+            Details = entity.ProductDetails?
                 .Select(MapDetailToResponse).ToList(),
-            ProductImages = entity.ProductImages?
+            Specifications = entity.ProductSpecifications?
+                .Select(MapSpecificationToResponse).ToList(),
+            Images = entity.ProductImages?
                 .OrderBy(pi => pi.OrderIndex)
                 .Select(MapImageToResponse).ToList(),
             CreatedAt = entity.CreatedAt,
@@ -84,10 +95,20 @@ public class GetProductById : IEndpoint
     {
         return new ProductDetailProperty
         {
-            TypeId = entity.TypeId,
-            Title = entity.Type?.Title,
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Value = entity.Value
+        };
+    }
+
+    public static ProductSpecificationProperty MapSpecificationToResponse(ProductSpecification entity)
+    {
+        return new ProductSpecificationProperty
+        {
+            SpecificationSlug = entity.SpecificationSlug,
+            Title = entity.Specification?.Title,
             Value = entity.Value,
-            Unit = entity.Type?.Unit
+            Unit = entity.Specification?.Unit
         };
     }
 

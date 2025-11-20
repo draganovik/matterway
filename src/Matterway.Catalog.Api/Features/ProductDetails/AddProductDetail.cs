@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
+using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,7 +61,7 @@ public class AddProductDetail : IEndpoint
     public record AddProductDetailRequest
     {
         [Required]
-        public int TypeId { get; init; }
+        public required string DetailSlug { get; init; }
 
         [Required]
         public required string Value { get; init; }
@@ -70,10 +71,9 @@ public class AddProductDetail : IEndpoint
     {
         public Guid ProductId { get; init; }
         public string? ProductTitle { get; init; }
-        public int TypeId { get; init; }
+        public string? DetailSlug { get; init; }
         public string? Title { get; init; }
         public string? Value { get; init; }
-        public string? Unit { get; init; }
     }
 
     public static ProductDetail MapToEntity(Guid productId, AddProductDetailRequest request)
@@ -81,7 +81,7 @@ public class AddProductDetail : IEndpoint
         return new ProductDetail
         {
             ProductId = productId,
-            TypeId = request.TypeId,
+            DetailSlug = request.DetailSlug,
             Value = request.Value
         };
     }
@@ -92,10 +92,9 @@ public class AddProductDetail : IEndpoint
         {
             ProductId = entity.ProductId,
             ProductTitle = entity.Product?.Title,
-            TypeId = entity.TypeId,
-            Title = entity.Type?.Title,
-            Value = entity.Value,
-            Unit = entity.Type?.Unit
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Value = entity.Value
         };
     }
 }

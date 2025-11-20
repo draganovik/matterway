@@ -59,12 +59,23 @@ package "Catalog" {
 
   class ProductDetail {
     +productId: UUID
-    +typeId: Integer
+    +detailSlug: String
     +value: String
   }
 
-  class ProductDetailType {
-    +id: Integer
+  class Detail {
+    +slug: String
+    +title: String
+  }
+
+  class ProductSpecification {
+    +productId: UUID
+    +specificationSlug: String
+    +value: Decimal
+  }
+
+  class Specification {
+    +slug: String
     +title: String
     +unit: String
   }
@@ -250,9 +261,11 @@ CartItem "0..*" --> "1" Product : productId
 
 ' Catalog
 ProductDiscount "0..*" --> "1" Product : productId
-ProductDiscount "0..*" --> "1" Discount : discountId
+ProductDiscount "0..*" -up-> "1" Discount : discountId
 ProductDetail "0..*" --> "1" Product : productId
-ProductDetail "0..*" --> "1" ProductDetailType : typeId
+ProductDetail "0..*" -up-> "1" Detail : detailSlug
+ProductSpecification "0..*" --> "1" Product : productId
+ProductSpecification "0..*" -up-> "1" Specification : specificationSlug
 ProductImage "0..*" --> "1" Product : productId
 
 ' Sales

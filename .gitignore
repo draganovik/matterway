@@ -366,3 +366,4 @@ FodyWeavers.xsd
 .DS_Store
 /.aspire
 /docker-compose-artifacts
+src/*/*.sln

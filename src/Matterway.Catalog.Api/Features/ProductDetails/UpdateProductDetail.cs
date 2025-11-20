@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
+using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ public class UpdateProductDetail : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("Products/{productId:guid}/Details/{typeId:int}", Handle)
+        app.MapPatch("Products/{productId:guid}/Details/{detailSlug}", Handle)
             .WithName("UpdateProductDetail").WithSummary("Update a ProductDetail.")
             .WithTags(nameof(ProductDetail))
             .Produces<UpdateProductDetailResponse>()
@@ -27,17 +28,17 @@ public class UpdateProductDetail : IEndpoint
     private static async Task<Results<Ok<UpdateProductDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handle(
             Guid productId,
-            int typeId,
+            string detailSlug,
             UpdateProductDetailRequest request,
             IProductDetailRepository productDetailRepository,
             CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, typeId, cancellationToken);
+        var entity = await productDetailRepository.GetByKey(productId, detailSlug, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
 
-        var updated = await productDetailRepository.UpdateAsync(productId, typeId, entity, cancellationToken);
+        var updated = await productDetailRepository.UpdateAsync(productId, detailSlug, entity, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 
@@ -53,9 +54,8 @@ public class UpdateProductDetail : IEndpoint
     public record UpdateProductDetailResponse
     {
         public string? ProductTitle { get; init; }
-        public string? Type { get; init; }
+        public string? Detail { get; init; }
         public string? Value { get; init; }
-        public string? Unit { get; init; }
     }
 
     public static void MapUpdates(ProductDetail entity, UpdateProductDetailRequest request)
@@ -68,9 +68,8 @@ public class UpdateProductDetail : IEndpoint
         return new UpdateProductDetailResponse
         {
             ProductTitle = entity.Product?.Title,
-            Type = entity.Type?.Title,
-            Value = entity.Value,
-            Unit = entity.Type?.Unit
+            Detail = entity.Detail?.Title,
+            Value = entity.Value
         };
     }
 }
