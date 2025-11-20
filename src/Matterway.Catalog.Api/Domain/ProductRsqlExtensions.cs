@@ -198,53 +198,55 @@ public static class ProductRsqlExtensions
             return query;
 
         var predicate = BuildPredicate(rsqlFilter);
-        return predicate is null ? query : query.Where(predicate);
+        return query.Where(predicate);
     }
 
-    private static Expression<Func<Product, bool>>? BuildPredicate(string rsqlFilter)
+    private static Expression<Func<Product, bool>> BuildPredicate(string rsqlFilter)
     {
+        var filterGroups = ParseFilterGroupsOrThrow(rsqlFilter);
         var parameter = Expression.Parameter(typeof(Product), "product");
         Expression? orExpression = null;
 
-        foreach (var andGroup in ParseFilterGroups(rsqlFilter))
+        foreach (var andGroup in filterGroups)
         {
             Expression? andExpression = null;
             foreach (var token in andGroup)
             {
                 var expression = BuildExpressionForToken(parameter, token);
-                if (expression is null)
-                    continue;
-
                 andExpression = andExpression is null
                     ? expression
                     : Expression.AndAlso(andExpression, expression);
             }
 
-            if (andExpression is null)
-                continue;
-
-            orExpression = orExpression is null
-                ? andExpression
-                : Expression.OrElse(orExpression, andExpression);
+            if (andExpression != null)
+                orExpression = orExpression is null ? andExpression : Expression.OrElse(orExpression, andExpression);
         }
 
-        return orExpression is null
-            ? null
-            : Expression.Lambda<Func<Product, bool>>(orExpression, parameter);
+        if (orExpression is null)
+            throw BadFilter("Filter is invalid or empty.");
+
+        return Expression.Lambda<Func<Product, bool>>(orExpression, parameter);
     }
 
-    private static IEnumerable<IReadOnlyList<FilterToken>> ParseFilterGroups(string rsqlFilter)
+    private static IReadOnlyList<IReadOnlyList<FilterToken>> ParseFilterGroupsOrThrow(string rsqlFilter)
     {
+        var result = new List<IReadOnlyList<FilterToken>>();
         foreach (var orSegment in SplitSegments(rsqlFilter, ','))
         {
-            var tokens = new List<FilterToken>();
-            foreach (var andSegment in SplitSegments(orSegment, ';'))
-                if (TryParseToken(andSegment, out var token))
-                    tokens.Add(token);
+            var tokens = SplitSegments(orSegment, ';')
+                .Select(ParseTokenOrThrow)
+                .ToList();
 
-            if (tokens.Count > 0)
-                yield return tokens;
+            if (tokens.Count == 0)
+                throw BadFilter("Filter is invalid or empty.");
+
+            result.Add(tokens);
         }
+
+        if (result.Count == 0)
+            throw BadFilter("Filter is invalid or empty.");
+
+        return result;
     }
 
     private static IEnumerable<string> SplitSegments(string value, char separator)
@@ -252,11 +254,10 @@ public static class ProductRsqlExtensions
         return value.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
-    private static bool TryParseToken(string rawToken, out FilterToken? token)
+    private static FilterToken ParseTokenOrThrow(string rawToken)
     {
-        token = null;
         if (string.IsNullOrWhiteSpace(rawToken))
-            return false;
+            throw BadFilter("Filter is invalid or empty.");
 
         var trimmed = rawToken.Trim();
         foreach (var (opToken, op) in OperatorTokens)
@@ -268,17 +269,16 @@ public static class ProductRsqlExtensions
             var field = trimmed[..opIndex].Trim();
             var rawValue = trimmed[(opIndex + opToken.Length)..].Trim();
             if (string.IsNullOrWhiteSpace(field) || string.IsNullOrWhiteSpace(rawValue))
-                return false;
+                break;
 
             var values = op is RsqlOperator.In or RsqlOperator.NotIn
                 ? SplitList(rawValue)
                 : [UnwrapValue(rawValue)];
 
-            token = new FilterToken(field, op, values);
-            return true;
+            return new FilterToken(field, op, values);
         }
 
-        return false;
+        throw BadFilter($"Invalid filter fragment '{rawToken}'.");
     }
 
     private static IReadOnlyList<string> SplitList(string rawValue)
@@ -302,10 +302,14 @@ public static class ProductRsqlExtensions
         return trimmed;
     }
 
-    private static Expression? BuildExpressionForToken(ParameterExpression parameter, FilterToken token)
+    private static Expression BuildExpressionForToken(ParameterExpression parameter, FilterToken token)
     {
         if (ProductFieldRules.TryGetValue(token.Field, out var fieldRule))
-            return fieldRule.Build(parameter, token);
+        {
+            var expression = fieldRule.Build(parameter, token);
+            return expression ??
+                   throw BadFilter($"Operator '{token.Operator}' is not supported for field '{token.Field}'.");
+        }
 
         if (ProductDetailRules.TryGetValue(token.Field, out var detailRule))
             return BuildDetailExpression(parameter, token, detailRule);
@@ -313,21 +317,22 @@ public static class ProductRsqlExtensions
         if (ProductSpecificationRules.TryGetValue(token.Field, out var specificationRule))
             return BuildSpecificationExpression(parameter, token, specificationRule);
 
-        return null;
+        throw BadFilter($"Unknown filter field or slug '{token.Field}'.");
     }
 
-    private static Expression? BuildDetailExpression(
+    private static Expression BuildDetailExpression(
         ParameterExpression productParam,
         FilterToken token,
         ProductDetailRule rule)
     {
         if (!rule.SupportedOperators.Contains(token.Operator))
-            return null;
+            throw BadFilter(
+                $"Operator '{token.Operator}' is not supported for detail '{rule.Slug}'. Use one of: {string.Join(", ", rule.SupportedOperators)}.");
 
         return BuildTextDetailExpression(productParam, token, rule);
     }
 
-    private static Expression? BuildTextDetailExpression(
+    private static Expression BuildTextDetailExpression(
         ParameterExpression productParam,
         FilterToken token,
         ProductDetailRule rule)
@@ -335,9 +340,6 @@ public static class ProductRsqlExtensions
         var valuePredicate = BuildStringPredicate(
             NormalizeString(Expression.Property(DetailParameter, nameof(ProductDetail.Value))),
             token);
-
-        if (valuePredicate is null)
-            return null;
 
         var slugPredicate = Expression.Equal(
             Expression.Property(DetailParameter, nameof(ProductDetail.DetailSlug)),
@@ -353,25 +355,22 @@ public static class ProductRsqlExtensions
             AnyDetailMethod);
     }
 
-    private static Expression? BuildSpecificationExpression(
+    private static Expression BuildSpecificationExpression(
         ParameterExpression productParam,
         FilterToken token,
         ProductSpecificationRule rule)
     {
         if (!rule.SupportedOperators.Contains(token.Operator))
-            return null;
+            throw BadFilter(
+                $"Operator '{token.Operator}' is not supported for specification '{rule.Slug}'. Use one of: {string.Join(", ", rule.SupportedOperators)}.");
 
-        if (!TryParseNumericValues(token.Values, out var numbers))
-            return null;
+        var numbers = ParseNumericValues(token.Values);
 
         var parsedValue = Expression.Convert(
             Expression.Property(SpecificationParameter, nameof(ProductSpecification.Value)),
             typeof(double));
 
         var comparison = BuildNumericComparison(parsedValue, token.Operator, numbers);
-        if (comparison is null)
-            return null;
-
         var slugPredicate = Expression.Equal(
             Expression.Property(SpecificationParameter, nameof(ProductSpecification.SpecificationSlug)),
             Expression.Constant(rule.Slug));
@@ -400,7 +399,7 @@ public static class ProductRsqlExtensions
         return Expression.AndAlso(notNull, anyCall);
     }
 
-    private static Expression? BuildStringPredicate(Expression normalizedProperty, FilterToken token)
+    private static Expression BuildStringPredicate(Expression normalizedProperty, FilterToken token)
     {
         var normalizedValues = token.Values
             .Select(v => UnwrapValue(v).ToLower())
@@ -408,7 +407,7 @@ public static class ProductRsqlExtensions
             .ToArray();
 
         if (normalizedValues.Length == 0)
-            return null;
+            throw BadFilter("Filter value is required for string comparison.");
 
         Expression Contains(string value)
         {
@@ -421,23 +420,22 @@ public static class ProductRsqlExtensions
             RsqlOperator.NotEqual => Expression.Not(Contains(normalizedValues.First())),
             RsqlOperator.In => CombineWithOr(normalizedValues.Select(Contains)),
             RsqlOperator.NotIn => Expression.Not(CombineWithOr(normalizedValues.Select(Contains))),
-            _ => null
+            _ => throw BadFilter($"Operator '{token.Operator}' is not supported for string comparisons.")
         };
     }
 
-    private static Expression? BuildNumericPredicate(
+    private static Expression BuildNumericPredicate(
         ParameterExpression parameter,
         Expression<Func<Product, double>> selector,
         FilterToken token)
     {
-        if (!TryParseNumericValues(token.Values, out var values))
-            return null;
+        var values = ParseNumericValues(token.Values);
 
         var property = ReplaceParameter(selector, parameter);
         return BuildNumericComparison(property, token.Operator, values);
     }
 
-    private static Expression? BuildNumericComparison(
+    private static Expression BuildNumericComparison(
         Expression numericExpression,
         RsqlOperator op,
         IReadOnlyList<double> values)
@@ -463,17 +461,17 @@ public static class ProductRsqlExtensions
                 [typeof(double)],
                 Expression.Constant(values.ToArray()),
                 numericExpression)),
-            _ => null
+            _ => throw BadFilter($"Operator '{op}' is not supported for numeric comparisons.")
         };
     }
 
-    private static Expression? BuildBooleanPredicate(
+    private static Expression BuildBooleanPredicate(
         ParameterExpression parameter,
         Expression<Func<Product, bool>> selector,
         FilterToken token)
     {
         if (!bool.TryParse(token.Values.FirstOrDefault(), out var boolValue))
-            return null;
+            throw BadFilter("Boolean comparison requires 'true' or 'false'.");
 
         var property = ReplaceParameter(selector, parameter);
         var constant = Expression.Constant(boolValue);
@@ -482,7 +480,7 @@ public static class ProductRsqlExtensions
         {
             RsqlOperator.Equal => Expression.Equal(property, constant),
             RsqlOperator.NotEqual => Expression.NotEqual(property, constant),
-            _ => null
+            _ => throw BadFilter($"Operator '{token.Operator}' is not supported for boolean comparisons.")
         };
     }
 
@@ -492,22 +490,21 @@ public static class ProductRsqlExtensions
         return Expression.Call(coalesced, ToLowerMethod);
     }
 
-    private static bool TryParseNumericValues(IReadOnlyList<string> values, out IReadOnlyList<double> parsed)
+    private static IReadOnlyList<double> ParseNumericValues(IReadOnlyList<string> values)
     {
         var numbers = new List<double>();
         foreach (var raw in values)
         {
             if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
-            {
-                parsed = [];
-                return false;
-            }
+                throw BadFilter($"Value '{raw}' is not a valid number.");
 
             numbers.Add(number);
         }
 
-        parsed = numbers;
-        return numbers.Count > 0;
+        if (numbers.Count == 0)
+            throw BadFilter("At least one numeric value is required.");
+
+        return numbers;
     }
 
     private static Expression ReplaceParameter(LambdaExpression expression, ParameterExpression parameter)
@@ -523,6 +520,11 @@ public static class ProductRsqlExtensions
             combined = combined is null ? expression : Expression.OrElse(combined, expression);
 
         return combined ?? Expression.Constant(false);
+    }
+
+    private static BadHttpRequestException BadFilter(string detail)
+    {
+        return new BadHttpRequestException(detail, StatusCodes.Status400BadRequest);
     }
 
     private static readonly ParameterExpression DetailParameter =

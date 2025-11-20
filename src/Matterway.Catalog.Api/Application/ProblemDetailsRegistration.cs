@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Application;
@@ -17,7 +18,24 @@ public static class ProblemDetailsRegistration
                     if (ctx.Exception is not BadHttpRequestException
                         {
                             InnerException: JsonException jsonException
-                        }) return;
+                        })
+                    {
+                        if (ctx.Exception is BadHttpRequestException badHttpException)
+                        {
+                            ctx.HttpContext.Response.StatusCode = badHttpException.StatusCode;
+                            ctx.ProblemDetails = new ProblemDetails
+                            {
+                                Status = badHttpException.StatusCode,
+                                Title = "Bad Request",
+                                Detail = badHttpException.Message,
+                                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+                            };
+                            ctx.ProblemDetails.Extensions["traceId"] =
+                                Activity.Current?.Id ?? ctx.HttpContext.TraceIdentifier;
+                        }
+
+                        return;
+                    }
 
                     ctx.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                     var member = jsonException.Path?.TrimStart('$').TrimStart('.');
