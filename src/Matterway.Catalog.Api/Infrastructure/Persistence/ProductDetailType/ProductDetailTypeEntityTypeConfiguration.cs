@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DomainProductDetailType = Matterway.Catalog.Api.Domain.ProductDetailType;
+using DomainProductDetailType = Matterway.Catalog.Api.Domain.Entities.ProductDetailType;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailType;
 

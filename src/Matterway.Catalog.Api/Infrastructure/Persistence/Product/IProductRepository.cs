@@ -1,12 +1,11 @@
-using Matterway.Catalog.Api.Features.Products;
-using DomainProduct = Matterway.Catalog.Api.Domain.Product;
+using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 
 public interface IProductRepository
 {
     Task<ICollection<DomainProduct>> Query(int pageIndex, int pageSize,
-        QueryProducts.QueryProductFilter queryProductFilter, CancellationToken cancellationToken = default);
+        string? filter, CancellationToken cancellationToken = default);
 
     Task<DomainProduct?> GetById(Guid id, CancellationToken cancellationToken = default);
 
@@ -16,6 +15,5 @@ public interface IProductRepository
 
     Task<bool> Delete(Guid id, CancellationToken cancellationToken = default);
 
-    Task<int> GetTotalEntities(QueryProducts.QueryProductFilter queryProductFilter,
-        CancellationToken cancellationToken = default);
+    Task<int> GetTotalEntities(string? filter, CancellationToken cancellationToken = default);
 }

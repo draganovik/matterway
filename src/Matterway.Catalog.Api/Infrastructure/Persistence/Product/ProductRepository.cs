@@ -1,6 +1,6 @@
-using Matterway.Catalog.Api.Features.Products;
+using Matterway.Catalog.Api.Domain;
 using Microsoft.EntityFrameworkCore;
-using DomainProduct = Matterway.Catalog.Api.Domain.Product;
+using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 
@@ -38,20 +38,20 @@ public sealed class ProductRepository(CatalogDb context)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<int> GetTotalEntities(QueryProducts.QueryProductFilter queryProductFilter,
+    public async Task<int> GetTotalEntities(string? filter,
         CancellationToken cancellationToken = default)
     {
-        var productQuery = queryProductFilter.GenerateQuery(context.Product.AsQueryable());
+        var productQuery = context.Product.AsQueryable().ApplyProductRsql(filter);
         return await productQuery.CountAsync(cancellationToken);
     }
 
     public async Task<ICollection<DomainProduct>> Query(
         int pageIndex,
         int pageSize,
-        QueryProducts.QueryProductFilter queryProductFilter,
+        string? filter,
         CancellationToken cancellationToken = default)
     {
-        var productQuery = queryProductFilter.GenerateQuery(context.Product.AsQueryable());
+        var productQuery = context.Product.AsQueryable().ApplyProductRsql(filter);
         return await productQuery.Include(x => x.ProductImages).AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using DomainProductImage = Matterway.Catalog.Api.Domain.ProductImage;
+using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 

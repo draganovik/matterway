@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
 
-using DomainProduct = Matterway.Catalog.Api.Domain.Product;
+using DomainProduct = Domain.Entities.Product;
 
 internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<DomainProduct>
 {

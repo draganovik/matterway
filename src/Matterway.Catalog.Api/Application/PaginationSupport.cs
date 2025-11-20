@@ -3,10 +3,21 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.WebUtilities;
 
+public record PaginationRequestParameters
+{
+    [Required(ErrorMessage = "The field Page is required and must be a valid number.")]
+    [Range(1, int.MaxValue)]
+    public int Page { get; init; }
+
+    [Required(ErrorMessage = "The field PageSize is required and must be a valid number.")]
+    [Range(1, int.MaxValue)]
+    public int PageSize { get; init; }
+}
+
 public sealed record PaginationResponse<T>(
-    PaginationMeta Meta,
+    PaginationResponseMeta Meta,
     IReadOnlyList<T> Data,
-    PaginationLinks Links
+    PaginationResponseLinks? Links
 )
 {
     public static PaginationResponse<T> Create(
@@ -14,7 +25,7 @@ public sealed record PaginationResponse<T>(
         int totalCount,
         int currentPage,
         int pageSize,
-        string endpointUrl)
+        string? endpointUrl)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
 
@@ -23,7 +34,7 @@ public sealed record PaginationResponse<T>(
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
         // Build metadata
-        var meta = new PaginationMeta(
+        var meta = new PaginationResponseMeta(
             totalCount,
             totalPages,
             currentPage,
@@ -31,12 +42,14 @@ public sealed record PaginationResponse<T>(
         );
 
         // Build links
-        var links = new PaginationLinks(
-            totalPages > 0 ? BuildUrl(1) : null,
-            totalPages > 0 ? BuildUrl(totalPages) : null,
-            currentPage > 1 ? BuildUrl(currentPage - 1) : null,
-            currentPage < totalPages ? BuildUrl(currentPage + 1) : null
-        );
+        var links = endpointUrl == null
+            ? null
+            : new PaginationResponseLinks(
+                totalPages > 0 ? BuildUrl(1) : null,
+                totalPages > 0 ? BuildUrl(totalPages) : null,
+                currentPage > 1 ? BuildUrl(currentPage - 1) : null,
+                currentPage < totalPages ? BuildUrl(currentPage + 1) : null
+            );
 
         return new PaginationResponse<T>(meta, data, links);
 
@@ -50,31 +63,16 @@ public sealed record PaginationResponse<T>(
     }
 }
 
-public sealed record PaginationMeta(
+public sealed record PaginationResponseMeta(
     int TotalCount,
     int TotalPages,
     int CurrentPage,
     int PageSize
 );
 
-public sealed record PaginationLinks(
-    [Url]
+public sealed record PaginationResponseLinks(
     string? First,
-    [Url]
     string? Last,
-    [Url]
     string? Prev,
-    [Url]
     string? Next
 );
-
-public sealed record PaginationQuery
-{
-    [Required(ErrorMessage = "The field Page is required and must be a valid number.")]
-    [Range(1, int.MaxValue)]
-    public int Page { get; init; }
-
-    [Required(ErrorMessage = "The field PageSize is required and must be a valid number.")]
-    [Range(1, int.MaxValue)]
-    public int PageSize { get; init; }
-}

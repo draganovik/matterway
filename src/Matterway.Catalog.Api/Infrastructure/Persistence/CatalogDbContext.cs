@@ -3,10 +3,10 @@ using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailType;
 using Microsoft.EntityFrameworkCore;
-using DomainProduct = Matterway.Catalog.Api.Domain.Product;
-using DomainProductDetail = Matterway.Catalog.Api.Domain.ProductDetail;
-using DomainProductImage = Matterway.Catalog.Api.Domain.ProductImage;
-using DomainProductDetailType = Matterway.Catalog.Api.Domain.ProductDetailType;
+using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
+using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
+using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
+using DomainProductDetailType = Matterway.Catalog.Api.Domain.Entities.ProductDetailType;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 

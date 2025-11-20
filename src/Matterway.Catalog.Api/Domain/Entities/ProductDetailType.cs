@@ -1,4 +1,4 @@
-namespace Matterway.Catalog.Api.Domain;
+namespace Matterway.Catalog.Api.Domain.Entities;
 
 public class ProductDetailType
 {

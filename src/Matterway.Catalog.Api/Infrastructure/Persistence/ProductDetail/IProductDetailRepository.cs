@@ -1,4 +1,4 @@
-using DomainProductDetail = Matterway.Catalog.Api.Domain.ProductDetail;
+using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
 
