@@ -57,26 +57,27 @@ export const useCatalogStore = defineStore("catalog", {
       }
       return null;
     },
-    async fetchCatalog(
-      page: number = 1,
-      pageSize: number = 10,
-      titleLike: string = "",
-      priceMin: number = 0,
-      priceMax: number = 0,
-    ) {
-      let advancedQuery = "";
-      if (titleLike != "") {
-        advancedQuery = `&TitleLike=${titleLike}`;
+    async fetchCatalog(options?: {
+      page?: number;
+      pageSize?: number;
+      filter?: string;
+    }) {
+      const page = options?.page ?? 1;
+      const pageSize = options?.pageSize ?? 10;
+      const filter = options?.filter?.trim();
+
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      if (filter) {
+        params.set("filter", filter);
       }
-      if (priceMin > 0) {
-        advancedQuery = `${advancedQuery}&PriceMin=${priceMin}`;
-      }
-      if (priceMax > 0) {
-        advancedQuery = `${advancedQuery}&PriceMax=${priceMax}`;
-      }
+
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Products?page=${page}&pageSize=${pageSize}${advancedQuery}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/Products?${params.toString()}`,
         {
           method: "GET",
           headers: {
