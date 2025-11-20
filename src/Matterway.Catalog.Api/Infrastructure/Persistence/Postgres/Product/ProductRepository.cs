@@ -25,10 +25,51 @@ public sealed class ProductRepository(CatalogDb context)
 
     public async Task<bool> Delete(Guid id, CancellationToken cancellationToken = default)
     {
-        var affected = await context.Product
-            .Where(model => model.Id == id)
-            .ExecuteDeleteAsync(cancellationToken);
-        return affected == 1;
+        var strategy = context.Database.CreateExecutionStrategy();
+
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var exists = await context.Product.AnyAsync(p => p.Id == id, cancellationToken);
+                if (!exists)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return false;
+                }
+
+                await context.ProductImage
+                    .Where(model => model.ProductId == id)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                await context.ProductDetail
+                    .Where(model => model.ProductId == id)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                await context.ProductSpecification
+                    .Where(model => model.ProductId == id)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                var affected = await context.Product
+                    .Where(model => model.Id == id)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                if (affected != 1)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return false;
+                }
+
+                await transaction.CommitAsync(cancellationToken);
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
     }
 
     public async Task<DomainProduct?> GetById(Guid id, CancellationToken cancellationToken = default)

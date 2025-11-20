@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;
@@ -24,14 +25,29 @@ public class DeleteProduct : IEndpoint
     private static async Task<Results<Ok<DeleteProductResponse>, NotFound>> Handle(
         Guid id,
         IProductRepository productRepository,
+        IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
+        var product = await productRepository.GetById(id, cancellationToken);
+
+        if (product is null) return TypedResults.NotFound();
+
+        var imageIds = product.ProductImages?
+            .Select(image => new { image.ProductId, image.Id })
+            .ToList();
+
         var isDeleted = await productRepository.Delete(id, cancellationToken);
+        if (!isDeleted) return TypedResults.NotFound();
+
+        if (imageIds is not null)
+            foreach (var image in imageIds)
+                await imageStorageService.DeleteAsync(image.ProductId, image.Id, cancellationToken);
+
         var response = new DeleteProductResponse
         {
             Id = id
         };
-        return isDeleted ? TypedResults.Ok(response) : TypedResults.NotFound();
+        return TypedResults.Ok(response);
     }
 
     public record DeleteProductResponse
