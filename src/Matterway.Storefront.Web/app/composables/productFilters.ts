@@ -1,16 +1,21 @@
-export type ProductDetailFilterType = "text" | "number";
-
-export interface ProductDetailFilterDefinition {
+export interface DetailFilterDefinition {
   slug: string;
   label: string;
-  type: ProductDetailFilterType;
+}
+
+export interface SpecificationFilterDefinition {
+  slug: string;
+  label: string;
   unit?: string;
 }
 
-export interface ProductDetailFilterState {
+export interface DetailFilterState {
   slug: string;
-  type: ProductDetailFilterType;
   value?: string;
+}
+
+export interface SpecificationFilterState {
+  slug: string;
   min?: number;
   max?: number;
 }
@@ -19,57 +24,49 @@ export interface ProductFilterState {
   search?: string;
   minPrice?: number;
   maxPrice?: number;
-  detailFilters: ProductDetailFilterState[];
+  detailFilters: DetailFilterState[];
+  specificationFilters: SpecificationFilterState[];
 }
 
-export const supportedProductDetailFilters: ProductDetailFilterDefinition[] = [
-  { slug: "brand", label: "Brend", type: "text" },
-  { slug: "model", label: "Model", type: "text" },
-  { slug: "color", label: "Boja", type: "text" },
-  { slug: "weight", label: "Tezina (g)", type: "number", unit: "g" },
-  { slug: "width", label: "Sirina (cm)", type: "number", unit: "cm" },
-  { slug: "height", label: "Visina (cm)", type: "number", unit: "cm" },
-  { slug: "depth", label: "Dubina (cm)", type: "number", unit: "cm" },
-  { slug: "power", label: "Snaga (W)", type: "number", unit: "W" },
-  { slug: "battery", label: "Baterija", type: "text" },
-  { slug: "connectivity", label: "Povezivanje", type: "text" },
-  { slug: "compatibility", label: "Kompatibilnost", type: "text" },
-  { slug: "display", label: "Ekran", type: "text" },
-  { slug: "material", label: "Materijal", type: "text" },
-  { slug: "color-temperature", label: "Temperatura boje", type: "text" },
-  { slug: "camera", label: "Kamera", type: "text" },
-  {
-    slug: "battery-size",
-    label: "Kapacitet baterije (mAh)",
-    type: "number",
-    unit: "mAh",
-  },
-  { slug: "storage", label: "Memorija (GB)", type: "number", unit: "GB" },
-  { slug: "ram-size", label: "RAM (GB)", type: "number", unit: "GB" },
-  { slug: "processor", label: "Procesor", type: "text" },
-  { slug: "operating-system", label: "Operativni sistem", type: "text" },
-  {
-    slug: "screen-size",
-    label: "Velicina ekrana (in)",
-    type: "number",
-    unit: "in",
-  },
-  { slug: "resolution", label: "Rezolucija", type: "text" },
-  { slug: "video-quality", label: "Video kvalitet", type: "text" },
-  { slug: "audio-quality", label: "Audio kvalitet", type: "text" },
-  {
-    slug: "refresh-rate",
-    label: "Osvezavanje (Hz)",
-    type: "number",
-    unit: "Hz",
-  },
-  { slug: "audio", label: "Audio", type: "text" },
-  { slug: "ports", label: "Portovi", type: "text" },
-  { slug: "features", label: "Karakteristike", type: "text" },
+export const supportedDetailFilters: DetailFilterDefinition[] = [
+  { slug: "brand", label: "Brend" },
+  { slug: "model", label: "Model" },
+  { slug: "color", label: "Boja" },
+  { slug: "battery", label: "Baterija" },
+  { slug: "connectivity", label: "Povezivanje" },
+  { slug: "compatibility", label: "Kompatibilnost" },
+  { slug: "display", label: "Ekran" },
+  { slug: "material", label: "Materijal" },
+  { slug: "color-temperature", label: "Temperatura boje" },
+  { slug: "camera", label: "Kamera" },
+  { slug: "processor", label: "Procesor" },
+  { slug: "operating-system", label: "Operativni sistem" },
+  { slug: "resolution", label: "Rezolucija" },
+  { slug: "video-quality", label: "Video kvalitet" },
+  { slug: "audio-quality", label: "Audio kvalitet" },
+  { slug: "audio", label: "Audio" },
+  { slug: "ports", label: "Portovi" },
+  { slug: "features", label: "Karakteristike" },
+];
+
+export const supportedSpecificationFilters: SpecificationFilterDefinition[] = [
+  { slug: "battery-size", label: "Kapacitet baterije", unit: "mAh" },
+  { slug: "depth", label: "Dubina", unit: "mm" },
+  { slug: "height", label: "Visina", unit: "mm" },
+  { slug: "power", label: "Snaga", unit: "W" },
+  { slug: "ram-size", label: "RAM", unit: "GB" },
+  { slug: "refresh-rate", label: "Osvezavanje", unit: "Hz" },
+  { slug: "screen-size", label: "Velicina ekrana", unit: "in" },
+  { slug: "storage", label: "Memorija", unit: "GB" },
+  { slug: "weight", label: "Tezina", unit: "g" },
+  { slug: "width", label: "Sirina", unit: "mm" },
 ];
 
 const detailDefinitionMap = new Map(
-  supportedProductDetailFilters.map((definition) => [
+  supportedDetailFilters.map((definition) => [definition.slug, definition]),
+);
+const specificationDefinitionMap = new Map(
+  supportedSpecificationFilters.map((definition) => [
     definition.slug,
     definition,
   ]),
@@ -81,51 +78,39 @@ const toNumeric = (value?: number) =>
 export const resolveDetailDefinition = (slug?: string) =>
   slug ? detailDefinitionMap.get(slug) : undefined;
 
-export const createEmptyDetailFilter = (): ProductDetailFilterState => {
-  const fallback = supportedProductDetailFilters[0];
+export const resolveSpecificationDefinition = (slug?: string) =>
+  slug ? specificationDefinitionMap.get(slug) : undefined;
+
+export const createEmptyDetailFilter = (): DetailFilterState => {
+  const fallback = supportedDetailFilters[0];
   return {
     slug: fallback?.slug ?? "",
-    type: fallback?.type ?? "text",
     value: "",
+  };
+};
+
+export const createEmptySpecificationFilter = (): SpecificationFilterState => {
+  const fallback = supportedSpecificationFilters[0];
+  return {
+    slug: fallback?.slug ?? "",
     min: undefined,
     max: undefined,
   };
 };
 
 export const serializeDetailFilters = (
-  detailFilters: ProductDetailFilterState[],
+  detailFilters: DetailFilterState[],
 ): string | undefined => {
-  if (!detailFilters.length) {
-    return undefined;
-  }
-
   const normalized = detailFilters
     .map((filter) => {
       const definition = resolveDetailDefinition(filter.slug);
-      if (!definition) {
-        return null;
-      }
-
-      if (definition.type === "text") {
-        return {
-          slug: definition.slug,
-          type: definition.type,
-          value: filter.value ?? "",
-        };
-      }
-
-      return {
-        slug: definition.slug,
-        type: definition.type,
-        min: toNumeric(filter.min),
-        max: toNumeric(filter.max),
-      };
+      const value = filter.value?.trim();
+      if (!definition || !value) return null;
+      return { slug: definition.slug, value };
     })
     .filter(Boolean);
 
-  if (normalized.length === 0) {
-    return undefined;
-  }
+  if (!normalized.length) return undefined;
 
   try {
     return JSON.stringify(normalized);
@@ -136,43 +121,73 @@ export const serializeDetailFilters = (
 
 export const parseDetailFilters = (
   serialized?: string | null,
-): ProductDetailFilterState[] => {
-  if (!serialized || typeof serialized !== "string") {
-    return [];
-  }
-
+): DetailFilterState[] => {
+  if (!serialized || typeof serialized !== "string") return [];
   try {
     const parsed = JSON.parse(serialized);
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
+    if (!Array.isArray(parsed)) return [];
 
     return parsed
       .map((item) => {
-        if (!item || typeof item.slug !== "string") {
-          return null;
-        }
+        if (!item || typeof item.slug !== "string") return null;
         const definition = resolveDetailDefinition(item.slug);
-        if (!definition) {
-          return null;
-        }
-
-        if (definition.type === "text") {
-          return {
-            slug: definition.slug,
-            type: definition.type,
-            value: typeof item.value === "string" ? item.value : "",
-          };
-        }
+        if (!definition) return null;
 
         return {
           slug: definition.slug,
-          type: definition.type,
+          value: typeof item.value === "string" ? item.value : "",
+        };
+      })
+      .filter(Boolean) as DetailFilterState[];
+  } catch {
+    return [];
+  }
+};
+
+export const serializeSpecificationFilters = (
+  specificationFilters: SpecificationFilterState[],
+): string | undefined => {
+  const normalized = specificationFilters
+    .map((filter) => {
+      const definition = resolveSpecificationDefinition(filter.slug);
+      const min = toNumeric(filter.min);
+      const max = toNumeric(filter.max);
+      if (!definition || (min === undefined && max === undefined)) {
+        return null;
+      }
+      return { slug: definition.slug, min, max };
+    })
+    .filter(Boolean);
+
+  if (!normalized.length) return undefined;
+
+  try {
+    return JSON.stringify(normalized);
+  } catch {
+    return undefined;
+  }
+};
+
+export const parseSpecificationFilters = (
+  serialized?: string | null,
+): SpecificationFilterState[] => {
+  if (!serialized || typeof serialized !== "string") return [];
+  try {
+    const parsed = JSON.parse(serialized);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item) => {
+        if (!item || typeof item.slug !== "string") return null;
+        const definition = resolveSpecificationDefinition(item.slug);
+        if (!definition) return null;
+        return {
+          slug: definition.slug,
           min: toNumeric(item.min),
           max: toNumeric(item.max),
         };
       })
-      .filter(Boolean) as ProductDetailFilterState[];
+      .filter(Boolean) as SpecificationFilterState[];
   } catch {
     return [];
   }
@@ -200,20 +215,17 @@ export const buildProductsRsqlFilter = (
 
   for (const detail of filters.detailFilters ?? []) {
     const definition = resolveDetailDefinition(detail.slug);
-    if (!definition) {
-      continue;
-    }
+    const value = detail.value?.trim();
+    if (!definition || !value) continue;
+    clauses.push(`${definition.slug}==${value}`);
+  }
 
-    if (definition.type === "text") {
-      const value = detail.value?.trim();
-      if (value) {
-        clauses.push(`${definition.slug}==${value}`);
-      }
-      continue;
-    }
+  for (const spec of filters.specificationFilters ?? []) {
+    const definition = resolveSpecificationDefinition(spec.slug);
+    if (!definition) continue;
+    const min = toNumeric(spec.min);
+    const max = toNumeric(spec.max);
 
-    const min = toNumeric(detail.min);
-    const max = toNumeric(detail.max);
     if (min !== undefined) {
       clauses.push(`${definition.slug}=ge=${min}`);
     }

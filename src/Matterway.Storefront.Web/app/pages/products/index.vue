@@ -3,11 +3,17 @@ import { computed, onMounted, reactive, watch } from "vue";
 import {
   buildProductsRsqlFilter,
   createEmptyDetailFilter,
+  createEmptySpecificationFilter,
   parseDetailFilters,
+  parseSpecificationFilters,
   serializeDetailFilters,
-  supportedProductDetailFilters,
+  serializeSpecificationFilters,
+  supportedDetailFilters,
+  supportedSpecificationFilters,
   resolveDetailDefinition,
-  type ProductDetailFilterState,
+  resolveSpecificationDefinition,
+  type DetailFilterState,
+  type SpecificationFilterState,
 } from "@composables/productFilters";
 import { useCatalogStore } from "@stores/catalog";
 import { useSessionStore } from "@stores/session";
@@ -23,7 +29,8 @@ type FiltersState = {
   search: string;
   minPrice?: number;
   maxPrice?: number;
-  detailFilters: ProductDetailFilterState[];
+  detailFilters: DetailFilterState[];
+  specificationFilters: SpecificationFilterState[];
 };
 
 const parseRouteDetailFilters = () => {
@@ -38,11 +45,24 @@ const parseRouteDetailFilters = () => {
   return parseDetailFilters(serialized);
 };
 
+const parseRouteSpecificationFilters = () => {
+  const specificationFiltersParam = route.query.specFilters;
+  const serialized =
+    typeof specificationFiltersParam === "string"
+      ? specificationFiltersParam
+      : Array.isArray(specificationFiltersParam)
+        ? specificationFiltersParam[0]
+        : undefined;
+
+  return parseSpecificationFilters(serialized);
+};
+
 const filters = reactive<FiltersState>({
   search: (route.query.productName as string) ?? "",
   minPrice: route.query.minPrice ? Number(route.query.minPrice) : undefined,
   maxPrice: route.query.maxPrice ? Number(route.query.maxPrice) : undefined,
   detailFilters: parseRouteDetailFilters(),
+  specificationFilters: parseRouteSpecificationFilters(),
 });
 
 const pagination = reactive({
@@ -60,7 +80,8 @@ const canManage = computed(() => {
   return role === "Admin" || role === "Manager";
 });
 const pageOptions = [9, 12, 18];
-const detailFilterOptions = supportedProductDetailFilters;
+const detailFilterOptions = supportedDetailFilters;
+const specificationFilterOptions = supportedSpecificationFilters;
 
 const pages = computed(() =>
   totalPages.value
@@ -77,6 +98,7 @@ const applyRouteState = () => {
     ? Number(route.query.maxPrice)
     : undefined;
   filters.detailFilters = parseRouteDetailFilters();
+  filters.specificationFilters = parseRouteSpecificationFilters();
   pagination.page = Number(route.query.page ?? 1) || 1;
   pagination.pageSize =
     Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
@@ -90,15 +112,12 @@ const sanitizeNumericFilters = () => {
     filters.maxPrice = undefined;
   }
 
-  filters.detailFilters.forEach((detail) => {
-    if (detail.type !== "number") {
-      return;
+  filters.specificationFilters.forEach((spec) => {
+    if (typeof spec.min === "number" && Number.isNaN(spec.min)) {
+      spec.min = undefined;
     }
-    if (typeof detail.min === "number" && Number.isNaN(detail.min)) {
-      detail.min = undefined;
-    }
-    if (typeof detail.max === "number" && Number.isNaN(detail.max)) {
-      detail.max = undefined;
+    if (typeof spec.max === "number" && Number.isNaN(spec.max)) {
+      spec.max = undefined;
     }
   });
 };
@@ -109,6 +128,7 @@ const buildFilterQuery = () =>
     minPrice: filters.minPrice,
     maxPrice: filters.maxPrice,
     detailFilters: filters.detailFilters,
+    specificationFilters: filters.specificationFilters,
   });
 
 const fetchProducts = () => {
@@ -123,6 +143,9 @@ const fetchProducts = () => {
 const updateRoute = () => {
   sanitizeNumericFilters();
   const serializedDetailFilters = serializeDetailFilters(filters.detailFilters);
+  const serializedSpecificationFilters = serializeSpecificationFilters(
+    filters.specificationFilters,
+  );
   router.push({
     query: {
       page: pagination.page !== 1 ? pagination.page : undefined,
@@ -134,6 +157,7 @@ const updateRoute = () => {
       minPrice: filters.minPrice !== undefined ? filters.minPrice : undefined,
       maxPrice: filters.maxPrice !== undefined ? filters.maxPrice : undefined,
       detailFilters: serializedDetailFilters,
+      specFilters: serializedSpecificationFilters,
     },
   });
 };
@@ -149,6 +173,7 @@ const resetFilters = () => {
   filters.minPrice = undefined;
   filters.maxPrice = undefined;
   filters.detailFilters = [];
+  filters.specificationFilters = [];
   pagination.page = 1;
   updateRoute();
 };
@@ -176,20 +201,36 @@ const removeDetailFilter = (index: number) => {
 };
 
 const handleDetailFilterSlugChange = (
-  filter: ProductDetailFilterState,
+  filter: DetailFilterState,
   slug: string,
 ) => {
   const definition = resolveDetailDefinition(slug);
-  const fallback = supportedProductDetailFilters[0];
+  const fallback = supportedDetailFilters[0];
   filter.slug = definition?.slug ?? fallback?.slug ?? "";
-  filter.type = definition?.type ?? fallback?.type ?? "text";
   filter.value = "";
+};
+
+const addSpecificationFilter = () => {
+  filters.specificationFilters.push(createEmptySpecificationFilter());
+};
+
+const removeSpecificationFilter = (index: number) => {
+  filters.specificationFilters.splice(index, 1);
+};
+
+const handleSpecificationFilterSlugChange = (
+  filter: SpecificationFilterState,
+  slug: string,
+) => {
+  const definition = resolveSpecificationDefinition(slug);
+  const fallback = supportedSpecificationFilters[0];
+  filter.slug = definition?.slug ?? fallback?.slug ?? "";
   filter.min = undefined;
   filter.max = undefined;
 };
 
-const getDetailUnit = (slug: string) =>
-  resolveDetailDefinition(slug)?.unit ?? "";
+const getSpecificationUnit = (slug: string) =>
+  resolveSpecificationDefinition(slug)?.unit ?? "";
 
 useHead({
   title: "Proizvodi",
@@ -286,12 +327,12 @@ watch(
                 class="text-base"
                 aria-hidden="true"
               />
-              Dodaj filter
+              Dodaj detalj
             </button>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            Filtrirajte po brendu, dimenzijama ili snazi uređaja. Prazna polja
-            se preskaču.
+            Filtrirajte po brendu, modelu ili drugim opisnim detaljima. Prazna
+            polja se preskaču.
           </p>
 
           <div v-if="filters.detailFilters.length" class="space-y-3">
@@ -326,7 +367,7 @@ watch(
                 </select>
               </div>
 
-              <div v-if="detailFilter.type === 'text'" class="grid gap-2">
+              <div class="grid gap-2">
                 <label
                   class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
                 >
@@ -338,45 +379,6 @@ watch(
                   placeholder="npr. Philips, bele boje"
                   class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
                 />
-              </div>
-
-              <div v-else class="grid gap-3">
-                <div class="grid gap-2">
-                  <label
-                    class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
-                  >
-                    Minimalna vrednost
-                  </label>
-                  <input
-                    v-model.number="detailFilter.min"
-                    type="number"
-                    min="0"
-                    :placeholder="
-                      getDetailUnit(detailFilter.slug)
-                        ? `0 ${getDetailUnit(detailFilter.slug)}`
-                        : '0'
-                    "
-                    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
-                  />
-                </div>
-                <div class="grid gap-2">
-                  <label
-                    class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
-                  >
-                    Maksimalna vrednost
-                  </label>
-                  <input
-                    v-model.number="detailFilter.max"
-                    type="number"
-                    min="0"
-                    :placeholder="
-                      getDetailUnit(detailFilter.slug)
-                        ? `Max ${getDetailUnit(detailFilter.slug)}`
-                        : '100'
-                    "
-                    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
-                  />
-                </div>
               </div>
 
               <div class="flex justify-end">
@@ -401,6 +403,129 @@ watch(
             class="rounded-xl border border-dashed border-slate-300 px-4 py-3 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400"
           >
             Dodajte filter po specifikaciji kako biste suzili pretragu.
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <label
+              class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400"
+            >
+              Specifikacije (numerički)
+            </label>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-200 dark:focus:ring-blue-500"
+              @click="addSpecificationFilter"
+            >
+              <Icon
+                name="heroicons-outline:plus"
+                class="text-base"
+                aria-hidden="true"
+              />
+              Specifikacija
+            </button>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Postavite minimalne i maksimalne vrednosti za dimenzije, snagu ili
+            kapacitete. Prazna polja se preskaču.
+          </p>
+
+          <div v-if="filters.specificationFilters.length" class="space-y-3">
+            <div
+              v-for="(specFilter, index) in filters.specificationFilters"
+              :key="`spec-filter-${index}-${specFilter.slug}`"
+              class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900/30"
+            >
+              <div class="grid gap-2">
+                <label
+                  class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Tip specifikacije
+                </label>
+                <select
+                  v-model="specFilter.slug"
+                  class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
+                  @change="
+                    handleSpecificationFilterSlugChange(
+                      specFilter,
+                      ($event.target as HTMLSelectElement).value,
+                    )
+                  "
+                >
+                  <option
+                    v-for="option in specificationFilterOptions"
+                    :key="option.slug"
+                    :value="option.slug"
+                  >
+                    {{ option.label }}
+                    <span v-if="option.unit"> ({{ option.unit }})</span>
+                  </option>
+                </select>
+              </div>
+
+              <div class="grid gap-3">
+                <div class="grid gap-2">
+                  <label
+                    class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                  >
+                    Minimalna vrednost
+                  </label>
+                  <input
+                    v-model.number="specFilter.min"
+                    type="number"
+                    min="0"
+                    :placeholder="
+                      getSpecificationUnit(specFilter.slug)
+                        ? `0 ${getSpecificationUnit(specFilter.slug)}`
+                        : '0'
+                    "
+                    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
+                  />
+                </div>
+                <div class="grid gap-2">
+                  <label
+                    class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                  >
+                    Maksimalna vrednost
+                  </label>
+                  <input
+                    v-model.number="specFilter.max"
+                    type="number"
+                    min="0"
+                    :placeholder="
+                      getSpecificationUnit(specFilter.slug)
+                        ? `Max ${getSpecificationUnit(specFilter.slug)}`
+                        : '100'
+                    "
+                    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-blue-300 focus:outline-hidden focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div class="flex justify-end">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-600 hover:underline dark:text-red-300"
+                  @click="removeSpecificationFilter(index)"
+                >
+                  <Icon
+                    name="heroicons-outline:trash"
+                    class="text-base"
+                    aria-hidden="true"
+                  />
+                  Ukloni
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="rounded-xl border border-dashed border-slate-300 px-4 py-3 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400"
+          >
+            Dodajte numerički filter kako biste suzili pretragu prema dimenziji
+            ili snazi.
           </div>
         </div>
 
