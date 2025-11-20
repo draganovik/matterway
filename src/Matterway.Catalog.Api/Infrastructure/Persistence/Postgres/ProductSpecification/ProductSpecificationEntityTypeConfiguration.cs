@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
 
 internal sealed class ProductSpecificationEntityTypeConfiguration : IEntityTypeConfiguration<DomainProductSpecification>
 {

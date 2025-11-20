@@ -1,6 +1,6 @@
 using DomainSpecification = Matterway.Catalog.Api.Domain.Entities.Specification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Specification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface ISpecificationRepository
 {

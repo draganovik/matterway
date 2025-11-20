@@ -1,6 +1,6 @@
 using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductRepository
 {

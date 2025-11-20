@@ -1,9 +1,9 @@
-﻿using Matterway.Catalog.Api.Infrastructure.Persistence.Detail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Specification;
+﻿using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Specification;
 using Microsoft.EntityFrameworkCore;
 using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
@@ -12,7 +12,7 @@ using DomainDetail = Matterway.Catalog.Api.Domain.Entities.Detail;
 using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 using DomainSpecification = Matterway.Catalog.Api.Domain.Entities.Specification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
 
 public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
 {

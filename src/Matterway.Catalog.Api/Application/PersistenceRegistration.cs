@@ -1,10 +1,11 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Detail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Product;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Specification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Specification;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Application;

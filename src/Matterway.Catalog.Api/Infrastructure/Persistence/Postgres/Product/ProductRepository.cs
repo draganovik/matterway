@@ -2,7 +2,7 @@ using Matterway.Catalog.Api.Domain;
 using Microsoft.EntityFrameworkCore;
 using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
 
 public sealed class ProductRepository(CatalogDb context)
     : IProductRepository

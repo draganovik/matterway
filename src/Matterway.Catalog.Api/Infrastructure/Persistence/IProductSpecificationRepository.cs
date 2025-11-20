@@ -1,6 +1,6 @@
 using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductSpecificationRepository
 {

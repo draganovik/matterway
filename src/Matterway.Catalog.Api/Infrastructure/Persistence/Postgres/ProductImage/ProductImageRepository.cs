@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
 
 public sealed class ProductImageRepository(CatalogDb context) : IProductImageRepository
 {

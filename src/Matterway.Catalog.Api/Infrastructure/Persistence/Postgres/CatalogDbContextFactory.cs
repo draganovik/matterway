@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
 
 public sealed class CatalogDbContextFactory : IDesignTimeDbContextFactory<CatalogDb>
 {

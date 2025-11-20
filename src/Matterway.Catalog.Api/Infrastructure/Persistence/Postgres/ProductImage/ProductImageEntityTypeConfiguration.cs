@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
 
 internal sealed class ProductImageEntityTypeConfiguration : IEntityTypeConfiguration<DomainProductImage>
 {

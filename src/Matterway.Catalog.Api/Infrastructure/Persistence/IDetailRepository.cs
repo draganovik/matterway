@@ -1,6 +1,6 @@
 using DomainDetail = Matterway.Catalog.Api.Domain.Entities.Detail;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Detail;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IDetailRepository
 {

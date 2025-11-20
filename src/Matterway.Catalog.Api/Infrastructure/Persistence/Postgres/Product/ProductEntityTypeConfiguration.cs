@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Product;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
 
 using DomainProduct = Domain.Entities.Product;
 

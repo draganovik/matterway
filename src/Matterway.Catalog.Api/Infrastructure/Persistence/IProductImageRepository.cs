@@ -1,6 +1,6 @@
 using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductImage;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductImageRepository
 {

@@ -1,6 +1,6 @@
 using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetail;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductDetailRepository
 {
