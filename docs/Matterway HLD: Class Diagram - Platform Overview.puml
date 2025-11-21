@@ -41,20 +41,32 @@ package "Catalog" {
     +validTo: DateTime
   }
 
-  class ProductDiscount {
-    +productId: UUID
+  class PriceDiscount {
+    +priceId: UUID
     +discountId: UUID
+    +discountedAmount: Money
+  }
+
+  class Price {
+    +id: UUID
+    +productId: UUID
+    +currency: SupportedCurrency
+    +amount: Money
+    +validFrom: DateTime
+  }
+
+  enum SupportedCurrency {
+    RSD
+    EUR
   }
 
   class Product {
     +id: UUID
-    +productCode: String
+    +sku: String
     +title: String
     +description: String
-    +regularPriceRsd: Money
     +isAvailable: Boolean
     +addedOn: DateTime
-    +updatedOn: DateTime
   }
 
   class ProductDetail {
@@ -260,8 +272,9 @@ CartItem "0..*" --> "1" Customer : customerId
 CartItem "0..*" --> "1" Product : productId
 
 ' Catalog
-ProductDiscount "0..*" --> "1" Product : productId
-ProductDiscount "0..*" -up-> "1" Discount : discountId
+Price "1..*" --> "1" Product : productId
+PriceDiscount "1..*" --> "1" Price : priceId
+PriceDiscount "1..*" --> "1" Discount : discountId
 ProductDetail "0..*" --> "1" Product : productId
 ProductDetail "0..*" -up-> "1" Detail : detailSlug
 ProductSpecification "0..*" --> "1" Product : productId
