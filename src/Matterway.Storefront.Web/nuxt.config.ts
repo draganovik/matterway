@@ -24,6 +24,13 @@ export default defineNuxtConfig({
   app: {
     head: {
       titleTemplate: "%s - Matterway Web Store",
+      link: [
+        {
+          rel: "icon",
+          type: "image/svg+xml",
+          href: "/logo.svg",
+        },
+      ],
     },
   },
   components: [
