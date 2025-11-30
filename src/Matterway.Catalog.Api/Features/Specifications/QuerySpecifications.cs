@@ -17,8 +17,8 @@ public class QuerySpecifications : IEndpoint
             .WithTags(nameof(Specification))
             .Produces<ICollection<QuerySpecificationResponse>>()
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(RequestClaimsRole.Admin),
-                nameof(RequestClaimsRole.Manager)))
+                nameof(ERequestClaimsRole.Admin),
+                nameof(ERequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

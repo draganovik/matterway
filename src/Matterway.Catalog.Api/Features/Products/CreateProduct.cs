@@ -19,8 +19,8 @@ public class CreateProduct : IEndpoint
             .Produces<CreateProductResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(RequestClaimsRole.Admin),
-                nameof(RequestClaimsRole.Manager)))
+                nameof(ERequestClaimsRole.Admin),
+                nameof(ERequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

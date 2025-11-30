@@ -20,8 +20,8 @@ public class UpdateProduct : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(RequestClaimsRole.Admin),
-                nameof(RequestClaimsRole.Manager)))
+                nameof(ERequestClaimsRole.Admin),
+                nameof(ERequestClaimsRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

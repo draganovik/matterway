@@ -2,7 +2,7 @@
 
 namespace Matterway.Catalog.Api.Domain;
 
-public enum RequestClaimsRole
+public enum ERequestClaimsRole
 {
     [EnumMember(Value = "Admin")]
     Admin = 0,
