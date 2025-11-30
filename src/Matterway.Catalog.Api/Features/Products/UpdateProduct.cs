@@ -78,10 +78,25 @@ public class UpdateProduct : IEndpoint
     {
         entity.ProductCode = request.ProductCode ?? entity.ProductCode;
         entity.Title = request.Title ?? entity.Title;
-        entity.Price = request.Price ?? entity.Price;
         entity.Description = request.Description ?? entity.Description;
         entity.IsAvailable = request.IsAvailable;
         entity.UpdatedAt = DateTime.UtcNow;
+
+        if (request.Price is not null)
+        {
+            var price = entity.Prices
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD);
+
+            if (price != null)
+                price.Amount = request.Price.Value;
+            else
+                entity.Prices.Add(new Price
+                {
+                    ProductId = entity.Id,
+                    Currency = ESupportedCurrency.RSD,
+                    Amount = request.Price.Value
+                });
+        }
     }
 
     public static UpdateProductResponse MapToResponse(Product entity)
@@ -91,7 +106,9 @@ public class UpdateProduct : IEndpoint
             Id = entity.Id,
             ProductCode = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Price,
+            Price = entity.Prices?
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Amount,
             Description = entity.Description,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

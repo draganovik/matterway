@@ -45,7 +45,7 @@ internal sealed class ProductImageEntityTypeConfiguration : IEntityTypeConfigura
                 OrderIndex = 0,
                 ImageAlt = "Spotlight Cam Plus",
                 ImageUrl =
-                    "https://cdn.shopify.com/s/files/1/2393/8647/products/ring_spotlight_cam_plus_insitu_battery_1500x1500_0a5ecca0-fa41-49d7-86ad-01d797694845.jpg"
+                    "https://images.ctfassets.net/a3peezndovsu/product-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/product-24529407541337-media.jpg"
             },
             new DomainProductImage
             {

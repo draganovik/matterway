@@ -35,24 +35,18 @@ package "Identity" {
 
 package "Catalog" {
   class Discount {
-    +id: UUID
+    +code: String
+    +productId: UUID
+    +currency: SupportedCurrency
     +percentage: Integer
     +validFrom: DateTime
     +validTo: DateTime
   }
 
-  class PriceDiscount {
-    +priceId: UUID
-    +discountId: UUID
-    +discountedAmount: Money
-  }
-
   class Price {
-    +id: UUID
     +productId: UUID
     +currency: SupportedCurrency
     +amount: Money
-    +validFrom: DateTime
   }
 
   enum SupportedCurrency {
@@ -273,8 +267,7 @@ CartItem "0..*" --> "1" Product : productId
 
 ' Catalog
 Price "1..*" --> "1" Product : productId
-PriceDiscount "1..*" --> "1" Price : priceId
-PriceDiscount "1..*" --> "1" Discount : discountId
+Discount "0..*" --> "1" Price : (productId, currency)
 ProductDetail "0..*" --> "1" Product : productId
 ProductDetail "0..*" -up-> "1" Detail : detailSlug
 ProductSpecification "0..*" --> "1" Product : productId

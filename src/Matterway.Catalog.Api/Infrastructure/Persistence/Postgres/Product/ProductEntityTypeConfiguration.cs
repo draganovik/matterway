@@ -13,15 +13,16 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
 
         builder.HasKey(p => p.Id);
 
+        builder.HasIndex(p => p.ProductCode)
+            .IsUnique();
+
+
         builder.Property(p => p.ProductCode)
             .HasMaxLength(10)
             .IsRequired();
 
         builder.Property(p => p.Title)
             .HasMaxLength(200)
-            .IsRequired();
-
-        builder.Property(p => p.Price)
             .IsRequired();
 
         builder.Property(p => p.Description)
@@ -58,7 +59,6 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 UpdatedAt = new DateTime(2024, 6, 1, 9, 0, 0, DateTimeKind.Utc),
                 Description =
                     "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
-                Price = 4999,
                 ProductCode = "PH002",
                 IsAvailable = true
             },
@@ -70,7 +70,6 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 Title = "Nest Learning Thermostat",
                 Description =
                     "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
-                Price = 24999,
                 ProductCode = "NT003",
                 IsAvailable = true
             },
@@ -82,7 +81,6 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 UpdatedAt = new DateTime(2024, 6, 3, 16, 45, 0, DateTimeKind.Utc),
                 Description =
                     "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
-                Price = 27999,
                 ProductCode = "AL001",
                 IsAvailable = true
             },
@@ -94,7 +92,6 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 UpdatedAt = new DateTime(2024, 6, 4, 11, 15, 0, DateTimeKind.Utc),
                 Description =
                     "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
-                Price = 9999,
                 ProductCode = "AE004",
                 IsAvailable = true
             },
@@ -106,7 +103,6 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 UpdatedAt = new DateTime(2024, 6, 5, 13, 20, 0, DateTimeKind.Utc),
                 Description =
                     "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
-                Price = 19999,
                 ProductCode = "RS001",
                 IsAvailable = true
             }

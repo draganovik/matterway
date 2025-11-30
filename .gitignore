@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /.aspire
 /docker-compose-artifacts
 src/*/*.sln
+*.DotSettings

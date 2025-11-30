@@ -11,8 +11,9 @@ public sealed class ProductRepository(CatalogDb context)
     {
         context.Product.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1)
+        if (affected > 0)
             return await context.Product
+                .Include(x => x.Prices)
                 .Include(x => x.ProductDetails!)
                 .ThenInclude(pd => pd!.Detail)
                 .Include(x => x.ProductSpecifications!)
@@ -38,6 +39,10 @@ public sealed class ProductRepository(CatalogDb context)
                     await transaction.RollbackAsync(cancellationToken);
                     return false;
                 }
+
+                await context.Price
+                    .Where(model => model.ProductId == id)
+                    .ExecuteDeleteAsync(cancellationToken);
 
                 await context.ProductImage
                     .Where(model => model.ProductId == id)
@@ -74,7 +79,10 @@ public sealed class ProductRepository(CatalogDb context)
 
     public async Task<DomainProduct?> GetById(Guid id, CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
         return await context.Product
+            .Include(x => x.Prices)
+            .ThenInclude(p => p.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
             .Include(x => x.ProductDetails!)
             .ThenInclude(pd => pd!.Detail)
             .Include(x => x.ProductSpecifications!)
@@ -97,7 +105,12 @@ public sealed class ProductRepository(CatalogDb context)
         CancellationToken cancellationToken = default)
     {
         var productQuery = context.Product.AsQueryable().ApplyProductRsql(filter);
-        return await productQuery.Include(x => x.ProductImages).AsNoTracking()
+        var now = DateTime.UtcNow;
+        return await productQuery
+            .Include(x => x.Prices)
+            .ThenInclude(p => p.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
+            .AsNoTracking()
+            .Include(x => x.ProductImages).AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -107,12 +120,12 @@ public sealed class ProductRepository(CatalogDb context)
     {
         context.Product.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1)
+        if (affected > 0)
             return await context.Product
                 .Include(x => x.ProductDetails!)
-                .ThenInclude(pd => pd!.Detail)
-                .Include(x => x.ProductSpecifications!)
-                .ThenInclude(ps => ps!.Specification)
+                .ThenInclude(pd => pd.Detail)
+                .Include(x => x.ProductSpecifications)
+                .ThenInclude(ps => ps.Specification)
                 .Include(x => x.ProductImages)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 

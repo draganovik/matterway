@@ -4,7 +4,6 @@ using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.OpenApi;
 
 namespace Matterway.Catalog.Api.Features.Products;
 
@@ -86,6 +85,7 @@ public class QueryProducts : IEndpoint
         public string? Code { get; set; }
         public string? Title { get; set; }
         public double? Price { get; set; }
+        public decimal? Discount { get; set; }
         public string? Description { get; set; }
         public string? ThumbnailUrl { get; set; }
         public string? ThumbnailAlt { get; set; }
@@ -94,12 +94,20 @@ public class QueryProducts : IEndpoint
 
     public static QueryProductResponse MapToResponse(Product entity)
     {
+        var now = DateTime.UtcNow;
         return new QueryProductResponse
         {
             Id = entity.Id,
             Code = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Price,
+            Price = entity.Prices?
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Amount,
+            Discount = entity.Prices?
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Discounts
+                .MinBy(d => d.ValidFrom)
+                ?.Percentage,
             Description = entity.Description,
             ThumbnailUrl = entity.ProductImages?
                 .OrderBy(pi => pi.OrderIndex)

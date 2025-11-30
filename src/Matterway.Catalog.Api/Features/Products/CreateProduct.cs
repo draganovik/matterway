@@ -87,14 +87,21 @@ public class CreateProduct : IEndpoint
 
     public static Product MapToEntity(CreateProductRequest request)
     {
-        return new Product
+        var product = new Product
         {
             ProductCode = request.ProductCode,
             Title = request.Title,
-            Price = request.Price,
             Description = request.Description,
             IsAvailable = request.IsAvailable
         };
+        var price = new Price
+        {
+            ProductId = product.Id,
+            Amount = request.Price,
+            Currency = ESupportedCurrency.RSD
+        };
+        product.Prices.Add(price);
+        return product;
     }
 
     public static CreateProductResponse MapToResponse(Product entity)
@@ -104,7 +111,9 @@ public class CreateProduct : IEndpoint
             Id = entity.Id,
             ProductCode = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Price,
+            Price = entity.Prices?
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Amount,
             Description = entity.Description,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

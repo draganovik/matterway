@@ -61,7 +61,8 @@ public static class ProductRsqlExtensions
             ["title"] = ProductFieldRule.Text(p => p.Title),
             ["code"] = ProductFieldRule.Text(p => p.ProductCode),
             ["description"] = ProductFieldRule.Text(p => p.Description),
-            ["price"] = ProductFieldRule.Number(p => p.Price),
+            ["price"] = ProductFieldRule.Number(p => p.Prices.FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)
+                .Amount),
             ["available"] = ProductFieldRule.Bool(p => p.IsAvailable)
         };
 

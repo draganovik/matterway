@@ -37,6 +37,7 @@ public class GetProductById : IEndpoint
         public string? Code { get; init; }
         public string? Title { get; init; }
         public double? Price { get; init; }
+        public decimal? Discount { get; set; }
         public string? Description { get; init; }
         public ICollection<ProductDetailProperty>? Details { get; init; } = [];
         public ICollection<ProductSpecificationProperty>? Specifications { get; init; } = [];
@@ -71,12 +72,19 @@ public class GetProductById : IEndpoint
 
     public static GetProductByIdResponse MapToResponse(Product entity)
     {
+        var now = DateTime.UtcNow;
         return new GetProductByIdResponse
         {
             Id = entity.Id,
             Code = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Price,
+            Price = entity.Prices?.FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Amount,
+            Discount = entity.Prices?
+                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
+                .Discounts
+                .MinBy(d => d.ValidFrom)
+                ?.Percentage,
             Description = entity.Description,
             Details = entity.ProductDetails?
                 .Select(MapDetailToResponse).ToList(),
