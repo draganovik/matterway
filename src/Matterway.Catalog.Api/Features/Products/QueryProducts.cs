@@ -84,7 +84,7 @@ public class QueryProducts : IEndpoint
         public Guid Id { get; set; }
         public string? Code { get; set; }
         public string? Title { get; set; }
-        public double? Price { get; set; }
+        public decimal? Price { get; set; }
         public decimal? Discount { get; set; }
         public string? Description { get; set; }
         public string? ThumbnailUrl { get; set; }

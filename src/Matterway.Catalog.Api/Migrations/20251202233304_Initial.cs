@@ -61,7 +61,7 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     Currency = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<double>(type: "double precision", nullable: false)
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -153,7 +153,6 @@ namespace Matterway.Catalog.Api.Migrations
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     Currency = table.Column<string>(type: "character varying(3)", nullable: false),
                     Percentage = table.Column<decimal>(type: "numeric", nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -227,11 +226,11 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: new[] { "Currency", "ProductId", "Amount" },
                 values: new object[,]
                 {
-                    { "RSD", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 27999.0 },
-                    { "RSD", new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 9999.0 },
-                    { "RSD", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 19999.0 },
-                    { "RSD", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 24999.0 },
-                    { "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 4999.0 }
+                    { "RSD", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 27999m },
+                    { "RSD", new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 9999m },
+                    { "RSD", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 19999m },
+                    { "RSD", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 24999m },
+                    { "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 4999m }
                 });
 
             migrationBuilder.InsertData(
@@ -286,8 +285,8 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "DomainDiscount",
-                columns: new[] { "Code", "Currency", "ProductId", "Description", "Percentage", "ValidFrom", "ValidTo" },
-                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Winter 2025 Discount", 25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
+                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainDiscount_ProductId_Currency",

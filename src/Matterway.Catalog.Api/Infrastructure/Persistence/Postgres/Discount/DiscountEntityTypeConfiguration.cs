@@ -19,9 +19,6 @@ internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration
         builder.Property(d => d.Percentage)
             .IsRequired();
 
-        builder.Property(d => d.Description)
-            .HasMaxLength(500);
-
         builder.Property(d => d.ValidFrom)
             .IsRequired();
 
@@ -38,8 +35,7 @@ internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 Percentage = 25,
                 ValidFrom = new DateTime(2025, 11, 20).ToUniversalTime(),
-                ValidTo = new DateTime(2026, 3, 20).ToUniversalTime(),
-                Description = "Winter 2025 Discount"
+                ValidTo = new DateTime(2026, 3, 20).ToUniversalTime()
             }
         );
     }

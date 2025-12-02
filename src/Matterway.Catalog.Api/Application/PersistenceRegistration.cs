@@ -1,6 +1,7 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Discount;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
@@ -24,6 +25,7 @@ public static class PersistenceRegistration
                 options.UseNpgsql(postgresConnectionString,
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );
+            builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
             builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             builder.Services.AddScoped<IDetailRepository, DetailRepository>();
             builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();

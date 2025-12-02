@@ -65,7 +65,7 @@ public class CreateProduct : IEndpoint
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
-        public required double Price { get; init; }
+        public required decimal Price { get; init; }
 
         [Required]
         public required string Description { get; init; }
@@ -78,7 +78,7 @@ public class CreateProduct : IEndpoint
         public Guid Id { get; init; }
         public string? ProductCode { get; init; }
         public string? Title { get; init; }
-        public double? Price { get; init; }
+        public decimal? Price { get; init; }
         public string? Description { get; init; }
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }

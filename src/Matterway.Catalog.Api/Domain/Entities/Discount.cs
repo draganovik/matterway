@@ -3,10 +3,9 @@ namespace Matterway.Catalog.Api.Domain.Entities;
 public class Discount
 {
     public required string Code { get; init; }
-    public required decimal Percentage { get; init; }
-    public string? Description { get; init; }
-    public DateTime ValidFrom { get; init; }
-    public DateTime? ValidTo { get; init; }
+    public required decimal Percentage { get; set; }
+    public DateTime ValidFrom { get; set; }
+    public DateTime? ValidTo { get; set; }
 
     public required Guid ProductId { get; init; }
     public ESupportedCurrency Currency { get; init; }

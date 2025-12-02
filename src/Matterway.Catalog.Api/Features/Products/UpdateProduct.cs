@@ -54,7 +54,7 @@ public class UpdateProduct : IEndpoint
         public string? Title { get; init; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
-        public double? Price { get; init; }
+        public decimal? Price { get; init; }
 
         [MinLength(1, ErrorMessage = "Description cannot be empty if provided.")]
         public string? Description { get; init; }
@@ -67,7 +67,7 @@ public class UpdateProduct : IEndpoint
         public Guid Id { get; init; }
         public string? ProductCode { get; init; }
         public string? Title { get; init; }
-        public double? Price { get; init; }
+        public decimal? Price { get; init; }
         public string? Description { get; init; }
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }

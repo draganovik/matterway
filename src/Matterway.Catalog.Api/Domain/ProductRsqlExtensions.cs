@@ -367,9 +367,7 @@ public static class ProductRsqlExtensions
 
         var numbers = ParseNumericValues(token.Values);
 
-        var parsedValue = Expression.Convert(
-            Expression.Property(SpecificationParameter, nameof(ProductSpecification.Value)),
-            typeof(double));
+        var parsedValue = Expression.Property(SpecificationParameter, nameof(ProductSpecification.Value));
 
         var comparison = BuildNumericComparison(parsedValue, token.Operator, numbers);
         var slugPredicate = Expression.Equal(
@@ -427,7 +425,7 @@ public static class ProductRsqlExtensions
 
     private static Expression BuildNumericPredicate(
         ParameterExpression parameter,
-        Expression<Func<Product, double>> selector,
+        Expression<Func<Product, decimal>> selector,
         FilterToken token)
     {
         var values = ParseNumericValues(token.Values);
@@ -439,7 +437,7 @@ public static class ProductRsqlExtensions
     private static Expression BuildNumericComparison(
         Expression numericExpression,
         RsqlOperator op,
-        IReadOnlyList<double> values)
+        IReadOnlyList<decimal> values)
     {
         var value = Expression.Constant(values.First());
         return op switch
@@ -453,13 +451,13 @@ public static class ProductRsqlExtensions
             RsqlOperator.In => Expression.Call(
                 typeof(Enumerable),
                 nameof(Enumerable.Contains),
-                [typeof(double)],
+                [typeof(decimal)],
                 Expression.Constant(values.ToArray()),
                 numericExpression),
             RsqlOperator.NotIn => Expression.Not(Expression.Call(
                 typeof(Enumerable),
                 nameof(Enumerable.Contains),
-                [typeof(double)],
+                [typeof(decimal)],
                 Expression.Constant(values.ToArray()),
                 numericExpression)),
             _ => throw BadFilter($"Operator '{op}' is not supported for numeric comparisons.")
@@ -491,12 +489,12 @@ public static class ProductRsqlExtensions
         return Expression.Call(coalesced, ToLowerMethod);
     }
 
-    private static IReadOnlyList<double> ParseNumericValues(IReadOnlyList<string> values)
+    private static IReadOnlyList<decimal> ParseNumericValues(IReadOnlyList<string> values)
     {
-        var numbers = new List<double>();
+        var numbers = new List<decimal>();
         foreach (var raw in values)
         {
-            if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+            if (!decimal.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
                 throw BadFilter($"Value '{raw}' is not a valid number.");
 
             numbers.Add(number);
@@ -579,7 +577,7 @@ public static class ProductRsqlExtensions
             });
         }
 
-        public static ProductFieldRule Number(Expression<Func<Product, double>> selector)
+        public static ProductFieldRule Number(Expression<Func<Product, decimal>> selector)
         {
             return new ProductFieldRule((parameter, token) => BuildNumericPredicate(parameter, selector, token));
         }

@@ -36,7 +36,7 @@ public class GetProductById : IEndpoint
         public Guid Id { get; init; }
         public string? Code { get; init; }
         public string? Title { get; init; }
-        public double? Price { get; init; }
+        public decimal? Price { get; init; }
         public decimal? Discount { get; set; }
         public string? Description { get; init; }
         public ICollection<ProductDetailProperty>? Details { get; init; } = [];

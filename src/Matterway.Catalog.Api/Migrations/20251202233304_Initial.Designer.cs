@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251130202727_Initial")]
+    [Migration("20251202233304_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -145,10 +145,6 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<string>("Currency")
                         .HasColumnType("character varying(3)");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
                     b.Property<decimal>("Percentage")
                         .HasColumnType("numeric");
 
@@ -170,7 +166,6 @@ namespace Matterway.Catalog.Api.Migrations
                             Code = "WINTER25",
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             Currency = "RSD",
-                            Description = "Winter 2025 Discount",
                             Percentage = 25m,
                             ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
@@ -186,8 +181,8 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)");
 
-                    b.Property<double>("Amount")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
 
                     b.HasKey("ProductId", "Currency");
 
@@ -198,31 +193,31 @@ namespace Matterway.Catalog.Api.Migrations
                         {
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             Currency = "RSD",
-                            Amount = 4999.0
+                            Amount = 4999m
                         },
                         new
                         {
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                             Currency = "RSD",
-                            Amount = 24999.0
+                            Amount = 24999m
                         },
                         new
                         {
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                             Currency = "RSD",
-                            Amount = 27999.0
+                            Amount = 27999m
                         },
                         new
                         {
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                             Currency = "RSD",
-                            Amount = 9999.0
+                            Amount = 9999m
                         },
                         new
                         {
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                             Currency = "RSD",
-                            Amount = 19999.0
+                            Amount = 19999m
                         });
                 });
 
