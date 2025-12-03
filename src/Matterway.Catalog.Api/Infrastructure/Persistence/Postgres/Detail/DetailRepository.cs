@@ -32,4 +32,38 @@ public sealed class DetailRepository(CatalogDb context) : IDetailRepository
         return await context.Detail.AsNoTracking()
             .FirstOrDefaultAsync(d => d.Slug == slug, cancellationToken);
     }
+
+    public async Task<DomainDetail?> UpsertAsync(DomainDetail requestModel,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await context.Detail.FirstOrDefaultAsync(d => d.Slug == requestModel.Slug, cancellationToken);
+        if (existing is null)
+        {
+            context.Detail.Add(requestModel);
+        }
+        else
+        {
+            existing.Title = requestModel.Title;
+            context.Detail.Update(existing);
+        }
+
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        if (affected <= 0) return null;
+
+        return await context.Detail.AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Slug == requestModel.Slug, cancellationToken);
+    }
+
+    public async Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        var inUse = await context.ProductDetail.AnyAsync(pd => pd.DetailSlug == slug, cancellationToken);
+        if (inUse) return false;
+
+        var entity = await context.Detail.FirstOrDefaultAsync(d => d.Slug == slug, cancellationToken);
+        if (entity is null) return false;
+
+        context.Detail.Remove(entity);
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        return affected > 0;
+    }
 }

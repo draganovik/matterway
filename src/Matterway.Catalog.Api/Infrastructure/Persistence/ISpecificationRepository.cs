@@ -8,4 +8,9 @@ public interface ISpecificationRepository
         CancellationToken cancellationToken = default);
 
     Task<DomainSpecification?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+
+    Task<DomainSpecification?> UpsertAsync(DomainSpecification requestModel,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default);
 }

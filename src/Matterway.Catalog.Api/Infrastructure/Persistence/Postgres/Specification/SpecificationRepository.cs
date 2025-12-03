@@ -33,4 +33,40 @@ public sealed class SpecificationRepository(CatalogDb context) : ISpecificationR
         return await context.Specification.AsNoTracking()
             .FirstOrDefaultAsync(s => s.Slug == slug, cancellationToken);
     }
+
+    public async Task<DomainSpecification?> UpsertAsync(DomainSpecification requestModel,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await context.Specification.FirstOrDefaultAsync(s => s.Slug == requestModel.Slug,
+            cancellationToken);
+        if (existing is null)
+        {
+            context.Specification.Add(requestModel);
+        }
+        else
+        {
+            existing.Title = requestModel.Title;
+            existing.Unit = requestModel.Unit;
+            context.Specification.Update(existing);
+        }
+
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        if (affected <= 0) return null;
+
+        return await context.Specification.AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Slug == requestModel.Slug, cancellationToken);
+    }
+
+    public async Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        var inUse = await context.ProductSpecification.AnyAsync(ps => ps.SpecificationSlug == slug, cancellationToken);
+        if (inUse) return false;
+
+        var entity = await context.Specification.FirstOrDefaultAsync(s => s.Slug == slug, cancellationToken);
+        if (entity is null) return false;
+
+        context.Specification.Remove(entity);
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        return affected > 0;
+    }
 }

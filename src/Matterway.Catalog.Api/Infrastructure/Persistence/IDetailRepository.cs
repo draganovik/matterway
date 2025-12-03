@@ -8,4 +8,8 @@ public interface IDetailRepository
         CancellationToken cancellationToken = default);
 
     Task<DomainDetail?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+
+    Task<DomainDetail?> UpsertAsync(DomainDetail requestModel, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default);
 }
