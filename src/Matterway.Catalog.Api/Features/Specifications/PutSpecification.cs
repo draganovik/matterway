@@ -33,7 +33,7 @@ public class PutSpecification : IEndpoint
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var normalizedSlug = slug.Trim();
+        var normalizedSlug = slug.Trim().ToLower();
         if (string.IsNullOrWhiteSpace(normalizedSlug))
             return TypedResults.BadRequest(new ProblemDetails
             {
@@ -53,7 +53,8 @@ public class PutSpecification : IEndpoint
         if (saved is null)
             return TypedResults.BadRequest(new ProblemDetails
             {
-                Title = "Cannot save specification",
+                Title = "Cannot create or save specification",
+                Detail = "Slug is already used by a detail or update failed.",
                 Status = StatusCodes.Status400BadRequest
             });
 

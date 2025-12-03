@@ -19,6 +19,12 @@ internal sealed class DetailEntityTypeConfiguration : IEntityTypeConfiguration<D
             .HasMaxLength(120)
             .IsRequired();
 
+        builder.HasOne<Matterway.Catalog.Api.Domain.Entities.AttributeSlug>()
+            .WithMany()
+            .HasPrincipalKey(a => a.Slug)
+            .HasForeignKey(d => d.Slug)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
             new DomainDetail { Slug = "audio", Title = "Audio" },
             new DomainDetail { Slug = "audio-quality", Title = "Audio Quality" },

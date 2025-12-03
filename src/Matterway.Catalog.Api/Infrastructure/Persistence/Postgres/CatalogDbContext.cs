@@ -1,4 +1,5 @@
 ﻿using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.AttributeSlug;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Discount;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Price;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
@@ -15,11 +16,14 @@ using DomainDetail = Matterway.Catalog.Api.Domain.Entities.Detail;
 using DomainDiscount = Matterway.Catalog.Api.Domain.Entities.Discount;
 using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 using DomainSpecification = Matterway.Catalog.Api.Domain.Entities.Specification;
+using DomainAttributeSlug = Matterway.Catalog.Api.Domain.Entities.AttributeSlug;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
 
 public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
 {
+    public DbSet<DomainAttributeSlug> AttributeSlug { get; set; }
+
     public DbSet<DomainDetail> Detail { get; set; }
 
     public DbSet<DomainDiscount> Discount { get; set; }
@@ -46,5 +50,6 @@ public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
         modelBuilder.ApplyConfiguration(new ProductSpecificationEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new PriceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new SpecificationEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new AttributeSlugEntityTypeConfiguration());
     }
 }

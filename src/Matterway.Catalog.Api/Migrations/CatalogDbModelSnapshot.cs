@@ -22,6 +22,134 @@ namespace Matterway.Catalog.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", b =>
+                {
+                    b.Property<string>("Slug")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("DomainAttributeSlug", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Slug = "audio"
+                        },
+                        new
+                        {
+                            Slug = "audio-quality"
+                        },
+                        new
+                        {
+                            Slug = "battery"
+                        },
+                        new
+                        {
+                            Slug = "brand"
+                        },
+                        new
+                        {
+                            Slug = "camera"
+                        },
+                        new
+                        {
+                            Slug = "color"
+                        },
+                        new
+                        {
+                            Slug = "color-temperature"
+                        },
+                        new
+                        {
+                            Slug = "compatibility"
+                        },
+                        new
+                        {
+                            Slug = "connectivity"
+                        },
+                        new
+                        {
+                            Slug = "display"
+                        },
+                        new
+                        {
+                            Slug = "features"
+                        },
+                        new
+                        {
+                            Slug = "material"
+                        },
+                        new
+                        {
+                            Slug = "model"
+                        },
+                        new
+                        {
+                            Slug = "operating-system"
+                        },
+                        new
+                        {
+                            Slug = "ports"
+                        },
+                        new
+                        {
+                            Slug = "processor"
+                        },
+                        new
+                        {
+                            Slug = "resolution"
+                        },
+                        new
+                        {
+                            Slug = "video-quality"
+                        },
+                        new
+                        {
+                            Slug = "battery-size"
+                        },
+                        new
+                        {
+                            Slug = "depth"
+                        },
+                        new
+                        {
+                            Slug = "height"
+                        },
+                        new
+                        {
+                            Slug = "power"
+                        },
+                        new
+                        {
+                            Slug = "ram-size"
+                        },
+                        new
+                        {
+                            Slug = "refresh-rate"
+                        },
+                        new
+                        {
+                            Slug = "screen-size"
+                        },
+                        new
+                        {
+                            Slug = "storage"
+                        },
+                        new
+                        {
+                            Slug = "weight"
+                        },
+                        new
+                        {
+                            Slug = "width"
+                        });
+                });
+
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
                 {
                     b.Property<string>("Slug")
@@ -650,6 +778,15 @@ namespace Matterway.Catalog.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
+                {
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
+                        .WithMany()
+                        .HasForeignKey("Slug")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Discount", b =>
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Price", "Price")
@@ -719,6 +856,15 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Specification");
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Specification", b =>
+                {
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
+                        .WithMany()
+                        .HasForeignKey("Slug")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Price", b =>

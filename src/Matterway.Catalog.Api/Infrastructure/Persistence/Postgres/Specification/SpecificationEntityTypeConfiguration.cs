@@ -22,6 +22,12 @@ internal sealed class SpecificationEntityTypeConfiguration : IEntityTypeConfigur
         builder.Property(s => s.Unit)
             .HasMaxLength(30);
 
+        builder.HasOne<Matterway.Catalog.Api.Domain.Entities.AttributeSlug>()
+            .WithMany()
+            .HasPrincipalKey(a => a.Slug)
+            .HasForeignKey(s => s.Slug)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
             new DomainSpecification { Slug = "battery-size", Title = "Battery Size", Unit = "mAh" },
             new DomainSpecification { Slug = "depth", Title = "Depth", Unit = "millimeters" },

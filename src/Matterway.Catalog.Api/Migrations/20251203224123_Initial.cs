@@ -14,15 +14,14 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "DomainDetail",
+                name: "DomainAttributeSlug",
                 columns: table => new
                 {
-                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainDetail", x => x.Slug);
+                    table.PrimaryKey("PK_DomainAttributeSlug", x => x.Slug);
                 });
 
             migrationBuilder.CreateTable(
@@ -43,6 +42,24 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DomainDetail",
+                columns: table => new
+                {
+                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DomainDetail", x => x.Slug);
+                    table.ForeignKey(
+                        name: "FK_DomainDetail_DomainAttributeSlug_Slug",
+                        column: x => x.Slug,
+                        principalTable: "DomainAttributeSlug",
+                        principalColumn: "Slug",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DomainSpecification",
                 columns: table => new
                 {
@@ -53,6 +70,12 @@ namespace Matterway.Catalog.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DomainSpecification", x => x.Slug);
+                    table.ForeignKey(
+                        name: "FK_DomainSpecification_DomainAttributeSlug_Slug",
+                        column: x => x.Slug,
+                        principalTable: "DomainAttributeSlug",
+                        principalColumn: "Slug",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,6 +91,27 @@ namespace Matterway.Catalog.Api.Migrations
                     table.PrimaryKey("PK_DomainPrice", x => new { x.ProductId, x.Currency });
                     table.ForeignKey(
                         name: "FK_DomainPrice_DomainProduct_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "DomainProduct",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DomainProductImage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderIndex = table.Column<int>(type: "integer", nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    ImageAlt = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DomainProductImage", x => new { x.Id, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_DomainProductImage_DomainProduct_ProductId",
                         column: x => x.ProductId,
                         principalTable: "DomainProduct",
                         principalColumn: "Id",
@@ -93,27 +137,6 @@ namespace Matterway.Catalog.Api.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DomainProductDetail_DomainProduct_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "DomainProduct",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DomainProductImage",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderIndex = table.Column<int>(type: "integer", nullable: false),
-                    ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    ImageAlt = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DomainProductImage", x => new { x.Id, x.ProductId });
-                    table.ForeignKey(
-                        name: "FK_DomainProductImage_DomainProduct_ProductId",
                         column: x => x.ProductId,
                         principalTable: "DomainProduct",
                         principalColumn: "Id",
@@ -168,6 +191,53 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "DomainAttributeSlug",
+                column: "Slug",
+                values: new object[]
+                {
+                    "audio",
+                    "audio-quality",
+                    "battery",
+                    "battery-size",
+                    "brand",
+                    "camera",
+                    "color",
+                    "color-temperature",
+                    "compatibility",
+                    "connectivity",
+                    "depth",
+                    "display",
+                    "features",
+                    "height",
+                    "material",
+                    "model",
+                    "operating-system",
+                    "ports",
+                    "power",
+                    "processor",
+                    "ram-size",
+                    "refresh-rate",
+                    "resolution",
+                    "screen-size",
+                    "storage",
+                    "video-quality",
+                    "weight",
+                    "width"
+                });
+
+            migrationBuilder.InsertData(
+                table: "DomainProduct",
+                columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "ProductCode", "Title", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc), "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.", true, "AL001", "August Wi-Fi Smart Lock Pro", new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc), "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.", true, "AE004", "Amazon Echo (4th Gen)", new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc), "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.", true, "RS001", "Ring Spotlight Cam", new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc), "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.", true, "NT003", "Nest Learning Thermostat", new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc), "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.", true, "PH002", "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
                 table: "DomainDetail",
                 columns: new[] { "Slug", "Title" },
                 values: new object[,]
@@ -193,15 +263,27 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainProduct",
-                columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "ProductCode", "Title", "UpdatedAt" },
+                table: "DomainPrice",
+                columns: new[] { "Currency", "ProductId", "Amount" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc), "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.", true, "AL001", "August Wi-Fi Smart Lock Pro", new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc), "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.", true, "AE004", "Amazon Echo (4th Gen)", new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc), "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.", true, "RS001", "Ring Spotlight Cam", new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc), "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.", true, "NT003", "Nest Learning Thermostat", new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc), "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.", true, "PH002", "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc) }
+                    { "RSD", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 27999m },
+                    { "RSD", new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 9999m },
+                    { "RSD", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 19999m },
+                    { "RSD", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 24999m },
+                    { "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 4999m }
+                });
+
+            migrationBuilder.InsertData(
+                table: "DomainProductImage",
+                columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl", "OrderIndex" },
+                values: new object[,]
+                {
+                    { new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/product-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/product-24529407541337-media.jpg", 0 },
+                    { new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
+                    { new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
+                    { new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
+                    { new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -222,16 +304,9 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainPrice",
-                columns: new[] { "Currency", "ProductId", "Amount" },
-                values: new object[,]
-                {
-                    { "RSD", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 27999m },
-                    { "RSD", new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), 9999m },
-                    { "RSD", new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), 19999m },
-                    { "RSD", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), 24999m },
-                    { "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 4999m }
-                });
+                table: "DomainDiscount",
+                columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
+                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 table: "DomainProductDetail",
@@ -249,18 +324,6 @@ namespace Matterway.Catalog.Api.Migrations
                     { "display", new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
                     { "color-temperature", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Adjustable from warm white (2700K) to daylight (6500K)" },
                     { "compatibility", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Works with Alexa, Google Assistant, and Samsung SmartThings" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "DomainProductImage",
-                columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl", "OrderIndex" },
-                values: new object[,]
-                {
-                    { new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/product-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/product-24529407541337-media.jpg", 0 },
-                    { new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
-                    { new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
-                    { new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
-                    { new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -283,10 +346,11 @@ namespace Matterway.Catalog.Api.Migrations
                     { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "weight", 72m }
                 });
 
-            migrationBuilder.InsertData(
-                table: "DomainDiscount",
-                columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
-                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
+            migrationBuilder.CreateIndex(
+                name: "IX_DomainAttributeSlug_Slug",
+                table: "DomainAttributeSlug",
+                column: "Slug",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainDiscount_ProductId_Currency",
@@ -342,6 +406,9 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "DomainProduct");
+
+            migrationBuilder.DropTable(
+                name: "DomainAttributeSlug");
         }
     }
 }

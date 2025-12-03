@@ -29,10 +29,11 @@ public class DeleteDetail : IEndpoint
         IDetailRepository repository,
         CancellationToken cancellationToken)
     {
-        var entity = await repository.GetBySlugAsync(slug, cancellationToken);
+        var normalizedSlug = slug.Trim().ToLower();
+        var entity = await repository.GetBySlugAsync(normalizedSlug, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
-        var deleted = await repository.DeleteAsync(slug, cancellationToken);
+        var deleted = await repository.DeleteAsync(normalizedSlug, cancellationToken);
         if (!deleted)
             return TypedResults.BadRequest(new ProblemDetails
             {
@@ -43,7 +44,7 @@ public class DeleteDetail : IEndpoint
 
         return TypedResults.Ok(new DeleteDetailResponse
         {
-            Slug = slug,
+            Slug = normalizedSlug,
             Message = "Detail removed successfully."
         });
     }
