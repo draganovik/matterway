@@ -36,8 +36,9 @@ public class GetProductById : IEndpoint
         public Guid Id { get; init; }
         public string? Code { get; init; }
         public string? Title { get; init; }
+        public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
-        public decimal? Discount { get; set; }
+        public ProductDiscountProperty? Discount { get; set; }
         public string? Description { get; init; }
         public ICollection<ProductDetailProperty>? Details { get; init; } = [];
         public ICollection<ProductSpecificationProperty>? Specifications { get; init; } = [];
@@ -45,6 +46,13 @@ public class GetProductById : IEndpoint
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
         public bool IsAvailable { get; init; }
+    }
+
+    public record ProductDiscountProperty
+    {
+        public decimal Percentage { get; init; }
+        public DateTime ValidFrom { get; init; }
+        public DateTime? ValidTo { get; init; }
     }
 
     public record ProductDetailProperty
@@ -72,19 +80,24 @@ public class GetProductById : IEndpoint
 
     public static GetProductByIdResponse MapToResponse(Product entity)
     {
-        var now = DateTime.UtcNow;
+        var basePrice = entity.GetBasePrice(ESupportedCurrency.RSD);
+        var price = entity.GetFinalPrice(ESupportedCurrency.RSD);
+        var discount = entity.GetLatestActiveDiscount(ESupportedCurrency.RSD);
         return new GetProductByIdResponse
         {
             Id = entity.Id,
             Code = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Prices?.FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Amount,
-            Discount = entity.Prices?
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Discounts
-                .MinBy(d => d.ValidFrom)
-                ?.Percentage,
+            BasePrice = basePrice,
+            Price = price,
+            Discount = discount is null
+                ? null
+                : new ProductDiscountProperty
+                {
+                    Percentage = discount.Percentage,
+                    ValidFrom = discount.ValidFrom,
+                    ValidTo = discount.ValidTo
+                },
             Description = entity.Description,
             Details = entity.ProductDetails?
                 .Select(MapDetailToResponse).ToList(),

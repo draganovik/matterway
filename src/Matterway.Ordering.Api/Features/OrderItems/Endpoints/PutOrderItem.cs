@@ -42,7 +42,7 @@ public class PutOrderItem : IEndpoint
         if (product is null) return TypedResults.NotFound();
 
         updatedEntity.ProductName = product.Title;
-        updatedEntity.UnitPrice = product.Price ?? 0;
+        updatedEntity.UnitPrice = product.Price ?? product.BasePrice ?? 0;
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(updatedEntity);

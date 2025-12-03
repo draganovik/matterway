@@ -7,12 +7,12 @@ export default class CartItemModel {
   quantity: number = 1;
 
   totalPrice(): number {
-    return this.unitPrice || 0 * this.quantity;
+    return (this.unitPrice ?? 0) * this.quantity;
   }
 
   constructor(product: ProductModel) {
     this.productId = product.id;
     this.productName = product.title;
-    this.unitPrice = product.price;
+    this.unitPrice = product.price ?? product.basePrice ?? 0;
   }
 }

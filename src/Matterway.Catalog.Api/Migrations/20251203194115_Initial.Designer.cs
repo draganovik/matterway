@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251202233304_Initial")]
+    [Migration("20251203194115_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -166,7 +166,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Code = "WINTER25",
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             Currency = "RSD",
-                            Percentage = 25m,
+                            Percentage = 0.25m,
                             ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
                         });

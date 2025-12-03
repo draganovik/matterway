@@ -50,6 +50,17 @@ const canManage = computed(() => {
 });
 
 const productLink = computed(() => `/products/${props.product.id}`);
+
+const hasDiscount = computed(
+  () =>
+    (props.product.discount?.percentage ?? 0) > 0 &&
+    (props.product.basePrice ?? 0) > (props.product.price ?? 0),
+);
+
+const discountPercentLabel = computed(() => {
+  if (!hasDiscount.value) return null;
+  return Math.round((props.product.discount?.percentage ?? 0) * 100);
+});
 </script>
 <template>
   <div
@@ -95,9 +106,27 @@ const productLink = computed(() => `/products/${props.product.id}`);
       </div>
 
       <div class="flex items-baseline justify-between gap-3">
-        <p class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-          {{ formatMoney(product.price) }}
-        </p>
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <p
+              class="text-2xl font-semibold text-slate-900 dark:text-slate-100"
+            >
+              {{ formatMoney(product.price ?? product.basePrice ?? 0) }}
+            </p>
+            <span
+              v-if="hasDiscount"
+              class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
+            >
+              -{{ discountPercentLabel }}%
+            </span>
+          </div>
+          <p
+            v-if="hasDiscount"
+            class="text-sm text-slate-500 line-through dark:text-slate-400"
+          >
+            {{ formatMoney(product.basePrice ?? 0) }}
+          </p>
+        </div>
         <NuxtLink
           v-if="canManage"
           :to="productLink + '/edit'"

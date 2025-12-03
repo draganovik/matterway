@@ -40,7 +40,7 @@ public class DeleteDiscount : IEndpoint
 
     public record DeleteDiscountResponse
     {
-        public string Code { get; init; } = default!;
+        public string Code { get; init; } = string.Empty;
         public int RemovedCount { get; init; }
         public string Message { get; init; } = "Discount(s) removed successfully.";
     }

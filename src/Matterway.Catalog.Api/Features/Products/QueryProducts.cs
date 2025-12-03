@@ -84,30 +84,42 @@ public class QueryProducts : IEndpoint
         public Guid Id { get; set; }
         public string? Code { get; set; }
         public string? Title { get; set; }
+        public decimal? BasePrice { get; set; }
         public decimal? Price { get; set; }
-        public decimal? Discount { get; set; }
+        public ProductDiscountProperty? Discount { get; set; }
         public string? Description { get; set; }
         public string? ThumbnailUrl { get; set; }
         public string? ThumbnailAlt { get; set; }
         public bool IsAvailable { get; set; }
     }
 
+    public record ProductDiscountProperty
+    {
+        public decimal Percentage { get; init; }
+        public DateTime ValidFrom { get; init; }
+        public DateTime? ValidTo { get; init; }
+    }
+
     public static QueryProductResponse MapToResponse(Product entity)
     {
-        var now = DateTime.UtcNow;
+        var basePrice = entity.GetBasePrice(ESupportedCurrency.RSD);
+        var price = entity.GetFinalPrice(ESupportedCurrency.RSD);
+        var discount = entity.GetLatestActiveDiscount(ESupportedCurrency.RSD);
         return new QueryProductResponse
         {
             Id = entity.Id,
             Code = entity.ProductCode,
             Title = entity.Title,
-            Price = entity.Prices?
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Amount,
-            Discount = entity.Prices?
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Discounts
-                .MinBy(d => d.ValidFrom)
-                ?.Percentage,
+            BasePrice = basePrice,
+            Price = price,
+            Discount = discount is null
+                ? null
+                : new ProductDiscountProperty
+                {
+                    Percentage = discount.Percentage,
+                    ValidFrom = discount.ValidFrom,
+                    ValidTo = discount.ValidTo
+                },
             Description = entity.Description,
             ThumbnailUrl = entity.ProductImages?
                 .OrderBy(pi => pi.OrderIndex)

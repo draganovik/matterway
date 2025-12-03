@@ -96,7 +96,7 @@ public class CreateDiscounts : IEndpoint
             ErrorMessage = "Code can use uppercase letters, numbers, hyphens or underscores.")]
         public required string Code { get; init; }
 
-        [Range(0.01, 100, ErrorMessage = "Percentage must be between 0.01 and 100.")]
+        [Range(0.01, 1, ErrorMessage = "Percentage must be between 0.01 and 1.")]
         public required decimal Percentage { get; init; }
 
         [Required]

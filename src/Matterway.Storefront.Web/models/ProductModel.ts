@@ -2,7 +2,9 @@ export default class ProductModel {
   id: string;
   productCode: string;
   title: string;
+  basePrice: number;
   price: number;
+  discount: ProductDiscount | null;
   description: string;
   productDetails: ProductDetail[];
   productSpecifications: ProductSpecification[];
@@ -16,7 +18,26 @@ export default class ProductModel {
     this.id = initial?.id ?? "";
     this.productCode = initial?.productCode ?? initial?.code ?? "";
     this.title = initial?.title ?? "";
-    this.price = initial?.price ?? 0;
+    this.basePrice = initial?.basePrice ?? initial?.price ?? 0;
+    this.price = initial?.price ?? initial?.basePrice ?? 0;
+    this.discount = initial?.discount
+      ? {
+          percentage:
+            Number(
+              initial.discount.percentage ??
+                (initial.discount as any).Percentage ??
+                0,
+            ) ?? 0,
+          validFrom:
+            initial.discount.validFrom ??
+            (initial.discount as any).ValidFrom ??
+            null,
+          validTo:
+            initial.discount.validTo ??
+            (initial.discount as any).ValidTo ??
+            null,
+        }
+      : null;
     this.description = initial?.description ?? "";
     this.productDetails =
       initial?.productDetails?.map((detail) => ({
@@ -46,7 +67,9 @@ export default class ProductModel {
       id: response.id,
       productCode: response.productCode ?? response.code,
       title: response.title,
-      price: response.price,
+      basePrice: response.basePrice ?? response.price,
+      price: response.price ?? response.basePrice,
+      discount: response.discount ?? null,
       description: response.description,
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
@@ -78,7 +101,9 @@ export default class ProductModel {
       id: response.id,
       productCode: response.productCode ?? response.code,
       title: response.title,
-      price: response.price,
+      basePrice: response.basePrice ?? response.price,
+      price: response.price ?? response.basePrice,
+      discount: response.discount ?? null,
       description: response.description,
       productDetails: (response.details ?? response.productDetails ?? []).map(
         (detail: any) => ({
@@ -137,4 +162,10 @@ export class ProductImages {
 export class ProductThumbnail {
   imageUrl?: string;
   imageAlt?: string;
+}
+
+export class ProductDiscount {
+  percentage?: number;
+  validFrom?: string | null;
+  validTo?: string | null;
 }

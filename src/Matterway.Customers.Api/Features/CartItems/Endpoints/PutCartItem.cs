@@ -56,7 +56,7 @@ public class PutCartItem : IEndpoint
         if (product is null) return TypedResults.NotFound();
 
         newEntity.ProductName = product.Title;
-        newEntity.UnitPrice = product.Price ?? 0;
+        newEntity.UnitPrice = product.Price ?? product.BasePrice ?? 0;
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(request);

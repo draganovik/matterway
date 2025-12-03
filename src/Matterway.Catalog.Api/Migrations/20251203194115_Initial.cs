@@ -286,7 +286,7 @@ namespace Matterway.Catalog.Api.Migrations
             migrationBuilder.InsertData(
                 table: "DomainDiscount",
                 columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
-                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
+                values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DomainDiscount_ProductId_Currency",
