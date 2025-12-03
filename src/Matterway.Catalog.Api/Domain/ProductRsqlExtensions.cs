@@ -61,8 +61,18 @@ public static class ProductRsqlExtensions
             ["title"] = ProductFieldRule.Text(p => p.Title),
             ["code"] = ProductFieldRule.Text(p => p.ProductCode),
             ["description"] = ProductFieldRule.Text(p => p.Description),
-            ["price"] = ProductFieldRule.Number(p => p.Prices.FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)
-                .Amount),
+            ["price"] = ProductFieldRule.Number(p =>
+                p.Prices
+                    .Where(price => price.Currency == ESupportedCurrency.RSD)
+                    .Select(price => (decimal?)(
+                        price.Amount *
+                        (1 - price.Discounts
+                            .Where(d => d.ValidFrom <= DateTime.UtcNow &&
+                                        (d.ValidTo == null || d.ValidTo >= DateTime.UtcNow))
+                            .OrderByDescending(d => d.Percentage)
+                            .Select(d => d.Percentage)
+                            .FirstOrDefault())))
+                    .FirstOrDefault() ?? 0),
             ["available"] = ProductFieldRule.Bool(p => p.IsAvailable)
         };
 
@@ -391,7 +401,7 @@ public static class ProductRsqlExtensions
         LambdaExpression predicate,
         MethodInfo anyMethod)
     {
-        var property = Expression.Property(productParam, propertyName);
+        var property = Expression.PropertyOrField(productParam, propertyName);
         var notNull =
             Expression.NotEqual(property, Expression.Constant(null, property.Type));
         var anyCall = Expression.Call(anyMethod, property, predicate);
