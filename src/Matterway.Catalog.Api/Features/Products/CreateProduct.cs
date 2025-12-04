@@ -91,16 +91,10 @@ public class CreateProduct : IEndpoint
         {
             ProductCode = request.ProductCode,
             Title = request.Title,
-            Description = request.Description,
-            IsAvailable = request.IsAvailable
+            Description = request.Description
         };
-        var price = new Price
-        {
-            ProductId = product.Id,
-            Amount = request.Price,
-            Currency = ESupportedCurrency.RSD
-        };
-        product.Prices.Add(price);
+        product.SetPrice(ESupportedCurrency.RSD, request.Price);
+        product.SetAvailability(request.IsAvailable);
         return product;
     }
 

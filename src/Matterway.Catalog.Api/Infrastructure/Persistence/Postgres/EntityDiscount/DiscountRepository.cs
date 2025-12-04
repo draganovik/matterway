@@ -1,12 +1,12 @@
 using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainDiscount = Matterway.Catalog.Api.Domain.Entities.Discount;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Discount;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDiscount;
 
 public sealed class DiscountRepository(CatalogDb context) : IDiscountRepository
 {
-    public async Task<IReadOnlyCollection<DomainDiscount>> CreateManyAsync(IEnumerable<DomainDiscount> discounts,
+    public async Task<IReadOnlyCollection<Discount>> CreateManyAsync(IEnumerable<Discount> discounts,
         CancellationToken cancellationToken = default)
     {
         var discountList = discounts.ToList();
@@ -31,7 +31,7 @@ public sealed class DiscountRepository(CatalogDb context) : IDiscountRepository
         });
     }
 
-    public async Task<IReadOnlyCollection<DomainDiscount>> GetByCodeAsync(string code, ESupportedCurrency currency,
+    public async Task<IReadOnlyCollection<Discount>> GetByCodeAsync(string code, ESupportedCurrency currency,
         CancellationToken cancellationToken = default)
     {
         return await context.Discount
@@ -40,8 +40,8 @@ public sealed class DiscountRepository(CatalogDb context) : IDiscountRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<DomainDiscount>> ReplaceAsync(string code, ESupportedCurrency currency,
-        IEnumerable<DomainDiscount> discounts, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Discount>> ReplaceAsync(string code, ESupportedCurrency currency,
+        IEnumerable<Discount> discounts, CancellationToken cancellationToken = default)
     {
         var discountList = discounts.ToList();
         if (discountList.Count == 0) return [];

@@ -1,13 +1,12 @@
-using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
 
 public sealed class ProductRepository(CatalogDb context)
     : IProductRepository
 {
-    public async Task<DomainProduct?> Create(DomainProduct requestModel, CancellationToken cancellationToken = default)
+    public async Task<Product?> Create(Product requestModel, CancellationToken cancellationToken = default)
     {
         context.Product.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
@@ -77,7 +76,7 @@ public sealed class ProductRepository(CatalogDb context)
         });
     }
 
-    public async Task<DomainProduct?> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Product?> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
         return await context.Product
@@ -98,7 +97,7 @@ public sealed class ProductRepository(CatalogDb context)
         return await productQuery.CountAsync(cancellationToken);
     }
 
-    public async Task<ICollection<DomainProduct>> Query(
+    public async Task<ICollection<Product>> Query(
         int pageIndex,
         int pageSize,
         string? filter,
@@ -116,7 +115,7 @@ public sealed class ProductRepository(CatalogDb context)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProduct?> UpdateAsync(DomainProduct request, CancellationToken cancellationToken = default)
+    public async Task<Product?> UpdateAsync(Product request, CancellationToken cancellationToken = default)
     {
         context.Product.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);

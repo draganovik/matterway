@@ -1,20 +1,20 @@
-using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
+using Matterway.Catalog.Api.Domain.Entities;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductImageRepository
 {
-    Task<ICollection<DomainProductImage>> Query(int pageIndex, int pageSize,
+    Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
+    Task<ProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
         CancellationToken cancellationToken = default);
 
-    Task<DomainProductImage?> GetById(Guid parentId, Guid id, CancellationToken cancellationToken = default);
+    Task<ProductImage?> GetById(Guid parentId, Guid id, CancellationToken cancellationToken = default);
 
-    Task<DomainProductImage?> Create(DomainProductImage requestModel, CancellationToken cancellationToken = default);
+    Task<ProductImage?> Create(ProductImage requestModel, CancellationToken cancellationToken = default);
 
-    Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex,
+    Task<ProductImage?> UpdateAsync(ProductImage request, int targetOrderIndex,
         CancellationToken cancellationToken = default);
 
     Task<bool> Delete(Guid parentId, int orderIndex, CancellationToken cancellationToken = default);

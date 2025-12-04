@@ -1,11 +1,11 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductSpecification;
 
 public sealed class ProductSpecificationRepository(CatalogDb context) : IProductSpecificationRepository
 {
-    public async Task<DomainProductSpecification?> Create(DomainProductSpecification requestModel,
+    public async Task<ProductSpecification?> Create(ProductSpecification requestModel,
         CancellationToken cancellationToken = default)
     {
         context.ProductSpecification.Add(requestModel);
@@ -30,7 +30,7 @@ public sealed class ProductSpecificationRepository(CatalogDb context) : IProduct
         return affected == 1;
     }
 
-    public async Task<DomainProductSpecification?> GetByKey(Guid productId, string specificationSlug,
+    public async Task<ProductSpecification?> GetByKey(Guid productId, string specificationSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductSpecification
@@ -45,7 +45,7 @@ public sealed class ProductSpecificationRepository(CatalogDb context) : IProduct
         return await context.ProductSpecification.CountAsync(cancellationToken);
     }
 
-    public async Task<ICollection<DomainProductSpecification>> Query(int pageIndex, int pageSize,
+    public async Task<ICollection<ProductSpecification>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductSpecification.Include(ps => ps.Product).Include(ps => ps.Specification)
@@ -55,8 +55,8 @@ public sealed class ProductSpecificationRepository(CatalogDb context) : IProduct
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductSpecification?> UpdateAsync(Guid productId, string specificationSlug,
-        DomainProductSpecification request, CancellationToken cancellationToken = default)
+    public async Task<ProductSpecification?> UpdateAsync(Guid productId, string specificationSlug,
+        ProductSpecification request, CancellationToken cancellationToken = default)
     {
         context.ProductSpecification.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);

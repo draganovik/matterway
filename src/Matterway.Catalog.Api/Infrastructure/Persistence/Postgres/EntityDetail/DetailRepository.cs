@@ -1,14 +1,14 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainDetail = Matterway.Catalog.Api.Domain.Entities.Detail;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDetail;
 
 public sealed class DetailRepository(CatalogDb context) : IDetailRepository
 {
     private const int MaxLimit = 50;
     private const int DefaultLimit = 10;
 
-    public async Task<ICollection<DomainDetail>> QueryAsync(string? titleLike, int limit,
+    public async Task<ICollection<Detail>> QueryAsync(string? titleLike, int limit,
         CancellationToken cancellationToken = default)
     {
         var normalizedLimit = Math.Clamp(limit <= 0 ? DefaultLimit : limit, 1, MaxLimit);
@@ -27,17 +27,17 @@ public sealed class DetailRepository(CatalogDb context) : IDetailRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainDetail?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<Detail?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
         return await context.Detail.AsNoTracking()
             .FirstOrDefaultAsync(d => d.Slug == slug, cancellationToken);
     }
 
-    public async Task<DomainDetail?> UpsertAsync(DomainDetail requestModel,
+    public async Task<Detail?> UpsertAsync(Detail requestModel,
         CancellationToken cancellationToken = default)
     {
         var normalizedSlug = requestModel.Slug.Trim().ToLower();
-        requestModel = new DomainDetail
+        requestModel = new Detail
         {
             Slug = normalizedSlug,
             Title = requestModel.Title.Trim()
@@ -52,7 +52,7 @@ public sealed class DetailRepository(CatalogDb context) : IDetailRepository
         if (existing is null)
         {
             if (!await context.AttributeSlug.AnyAsync(a => a.Slug == normalizedSlug, cancellationToken))
-                context.AttributeSlug.Add(new Domain.Entities.AttributeSlug { Slug = normalizedSlug });
+                context.AttributeSlug.Add(new AttributeSlug { Slug = normalizedSlug });
 
             context.Detail.Add(requestModel);
         }

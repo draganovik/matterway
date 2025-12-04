@@ -1,14 +1,14 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductSpecification;
 
-internal sealed class ProductSpecificationEntityTypeConfiguration : IEntityTypeConfiguration<DomainProductSpecification>
+internal sealed class ProductSpecificationEntityTypeConfiguration : IEntityTypeConfiguration<ProductSpecification>
 {
-    public void Configure(EntityTypeBuilder<DomainProductSpecification> builder)
+    public void Configure(EntityTypeBuilder<ProductSpecification> builder)
     {
-        builder.ToTable(nameof(DomainProductSpecification));
+        builder.ToTable(nameof(ProductSpecification));
 
         builder.HasKey(ps => new { ps.ProductId, ps.SpecificationSlug });
 
@@ -30,79 +30,79 @@ internal sealed class ProductSpecificationEntityTypeConfiguration : IEntityTypeC
             .HasForeignKey(ps => ps.ProductId);
 
         builder.HasData(
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 SpecificationSlug = "power",
                 Value = 24m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 SpecificationSlug = "width",
                 Value = 84m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 SpecificationSlug = "height",
                 Value = 84m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 SpecificationSlug = "depth",
                 Value = 28m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 SpecificationSlug = "screen-size",
                 Value = 2.0m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 SpecificationSlug = "battery-size",
                 Value = 3000m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 SpecificationSlug = "weight",
                 Value = 400m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 SpecificationSlug = "power",
                 Value = 9m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 SpecificationSlug = "weight",
                 Value = 72m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 SpecificationSlug = "weight",
                 Value = 970m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 SpecificationSlug = "power",
                 Value = 15m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 SpecificationSlug = "power",
                 Value = 8m
             },
-            new DomainProductSpecification
+            new ProductSpecification
             {
                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 SpecificationSlug = "weight",

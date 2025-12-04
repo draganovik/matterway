@@ -14,18 +14,18 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "DomainAttributeSlug",
+                name: "AttributeSlug",
                 columns: table => new
                 {
                     Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainAttributeSlug", x => x.Slug);
+                    table.PrimaryKey("PK_AttributeSlug", x => x.Slug);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProduct",
+                name: "Product",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -38,11 +38,11 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProduct", x => x.Id);
+                    table.PrimaryKey("PK_Product", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainDetail",
+                name: "Detail",
                 columns: table => new
                 {
                     Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
@@ -50,17 +50,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainDetail", x => x.Slug);
+                    table.PrimaryKey("PK_Detail", x => x.Slug);
                     table.ForeignKey(
-                        name: "FK_DomainDetail_DomainAttributeSlug_Slug",
+                        name: "FK_Detail_AttributeSlug_Slug",
                         column: x => x.Slug,
-                        principalTable: "DomainAttributeSlug",
+                        principalTable: "AttributeSlug",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainSpecification",
+                name: "Specification",
                 columns: table => new
                 {
                     Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
@@ -69,17 +69,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainSpecification", x => x.Slug);
+                    table.PrimaryKey("PK_Specification", x => x.Slug);
                     table.ForeignKey(
-                        name: "FK_DomainSpecification_DomainAttributeSlug_Slug",
+                        name: "FK_Specification_AttributeSlug_Slug",
                         column: x => x.Slug,
-                        principalTable: "DomainAttributeSlug",
+                        principalTable: "AttributeSlug",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainPrice",
+                name: "Price",
                 columns: table => new
                 {
                     Currency = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
@@ -88,17 +88,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainPrice", x => new { x.ProductId, x.Currency });
+                    table.PrimaryKey("PK_Price", x => new { x.ProductId, x.Currency });
                     table.ForeignKey(
-                        name: "FK_DomainPrice_DomainProduct_ProductId",
+                        name: "FK_Price_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "DomainProduct",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProductImage",
+                name: "ProductImage",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -109,17 +109,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductImage", x => new { x.Id, x.ProductId });
+                    table.PrimaryKey("PK_ProductImage", x => new { x.Id, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_DomainProductImage_DomainProduct_ProductId",
+                        name: "FK_ProductImage_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "DomainProduct",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProductDetail",
+                name: "ProductDetail",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -128,23 +128,23 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductDetail", x => new { x.ProductId, x.DetailSlug });
+                    table.PrimaryKey("PK_ProductDetail", x => new { x.ProductId, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_DomainProductDetail_DomainDetail_DetailSlug",
+                        name: "FK_ProductDetail_Detail_DetailSlug",
                         column: x => x.DetailSlug,
-                        principalTable: "DomainDetail",
+                        principalTable: "Detail",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DomainProductDetail_DomainProduct_ProductId",
+                        name: "FK_ProductDetail_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "DomainProduct",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainProductSpecification",
+                name: "ProductSpecification",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -153,23 +153,23 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainProductSpecification", x => new { x.ProductId, x.SpecificationSlug });
+                    table.PrimaryKey("PK_ProductSpecification", x => new { x.ProductId, x.SpecificationSlug });
                     table.ForeignKey(
-                        name: "FK_DomainProductSpecification_DomainProduct_ProductId",
+                        name: "FK_ProductSpecification_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "DomainProduct",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DomainProductSpecification_DomainSpecification_Specificatio~",
+                        name: "FK_ProductSpecification_Specification_SpecificationSlug",
                         column: x => x.SpecificationSlug,
-                        principalTable: "DomainSpecification",
+                        principalTable: "Specification",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DomainDiscount",
+                name: "Discount",
                 columns: table => new
                 {
                     Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
@@ -181,17 +181,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DomainDiscount", x => new { x.Code, x.ProductId, x.Currency });
+                    table.PrimaryKey("PK_Discount", x => new { x.Code, x.ProductId, x.Currency });
                     table.ForeignKey(
-                        name: "FK_DomainDiscount_DomainPrice_ProductId_Currency",
+                        name: "FK_Discount_Price_ProductId_Currency",
                         columns: x => new { x.ProductId, x.Currency },
-                        principalTable: "DomainPrice",
+                        principalTable: "Price",
                         principalColumns: new[] { "ProductId", "Currency" },
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainAttributeSlug",
+                table: "AttributeSlug",
                 column: "Slug",
                 values: new object[]
                 {
@@ -226,7 +226,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainProduct",
+                table: "Product",
                 columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "ProductCode", "Title", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -238,7 +238,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainDetail",
+                table: "Detail",
                 columns: new[] { "Slug", "Title" },
                 values: new object[,]
                 {
@@ -263,7 +263,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainPrice",
+                table: "Price",
                 columns: new[] { "Currency", "ProductId", "Amount" },
                 values: new object[,]
                 {
@@ -275,7 +275,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainProductImage",
+                table: "ProductImage",
                 columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl", "OrderIndex" },
                 values: new object[,]
                 {
@@ -287,7 +287,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainSpecification",
+                table: "Specification",
                 columns: new[] { "Slug", "Title", "Unit" },
                 values: new object[,]
                 {
@@ -304,12 +304,12 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainDiscount",
+                table: "Discount",
                 columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
                 values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
-                table: "DomainProductDetail",
+                table: "ProductDetail",
                 columns: new[] { "DetailSlug", "ProductId", "Value" },
                 values: new object[,]
                 {
@@ -327,7 +327,7 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "DomainProductSpecification",
+                table: "ProductSpecification",
                 columns: new[] { "ProductId", "SpecificationSlug", "Value" },
                 values: new object[,]
                 {
@@ -347,36 +347,36 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainAttributeSlug_Slug",
-                table: "DomainAttributeSlug",
+                name: "IX_AttributeSlug_Slug",
+                table: "AttributeSlug",
                 column: "Slug",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainDiscount_ProductId_Currency",
-                table: "DomainDiscount",
+                name: "IX_Discount_ProductId_Currency",
+                table: "Discount",
                 columns: new[] { "ProductId", "Currency" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProduct_ProductCode",
-                table: "DomainProduct",
+                name: "IX_Product_ProductCode",
+                table: "Product",
                 column: "ProductCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProductDetail_DetailSlug",
-                table: "DomainProductDetail",
+                name: "IX_ProductDetail_DetailSlug",
+                table: "ProductDetail",
                 column: "DetailSlug");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProductImage_ProductId_OrderIndex",
-                table: "DomainProductImage",
+                name: "IX_ProductImage_ProductId_OrderIndex",
+                table: "ProductImage",
                 columns: new[] { "ProductId", "OrderIndex" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DomainProductSpecification_SpecificationSlug",
-                table: "DomainProductSpecification",
+                name: "IX_ProductSpecification_SpecificationSlug",
+                table: "ProductSpecification",
                 column: "SpecificationSlug");
         }
 
@@ -384,31 +384,31 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DomainDiscount");
+                name: "Discount");
 
             migrationBuilder.DropTable(
-                name: "DomainProductDetail");
+                name: "ProductDetail");
 
             migrationBuilder.DropTable(
-                name: "DomainProductImage");
+                name: "ProductImage");
 
             migrationBuilder.DropTable(
-                name: "DomainProductSpecification");
+                name: "ProductSpecification");
 
             migrationBuilder.DropTable(
-                name: "DomainPrice");
+                name: "Price");
 
             migrationBuilder.DropTable(
-                name: "DomainDetail");
+                name: "Detail");
 
             migrationBuilder.DropTable(
-                name: "DomainSpecification");
+                name: "Specification");
 
             migrationBuilder.DropTable(
-                name: "DomainProduct");
+                name: "Product");
 
             migrationBuilder.DropTable(
-                name: "DomainAttributeSlug");
+                name: "AttributeSlug");
         }
     }
 }

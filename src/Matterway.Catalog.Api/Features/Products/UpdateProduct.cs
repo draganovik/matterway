@@ -76,27 +76,11 @@ public class UpdateProduct : IEndpoint
 
     public static void MapUpdate(Product entity, UpdateProductRequest request)
     {
-        entity.ProductCode = request.ProductCode ?? entity.ProductCode;
-        entity.Title = request.Title ?? entity.Title;
-        entity.Description = request.Description ?? entity.Description;
-        entity.IsAvailable = request.IsAvailable;
-        entity.UpdatedAt = DateTime.UtcNow;
+        entity.UpdateDetails(request.ProductCode, request.Title, request.Description);
+        entity.SetAvailability(request.IsAvailable);
 
         if (request.Price is not null)
-        {
-            var price = entity.Prices
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD);
-
-            if (price != null)
-                price.Amount = request.Price.Value;
-            else
-                entity.Prices.Add(new Price
-                {
-                    ProductId = entity.Id,
-                    Currency = ESupportedCurrency.RSD,
-                    Amount = request.Price.Value
-                });
-        }
+            entity.SetPrice(ESupportedCurrency.RSD, request.Price.Value);
     }
 
     public static UpdateProductResponse MapToResponse(Product entity)

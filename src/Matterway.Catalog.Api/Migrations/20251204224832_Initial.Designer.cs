@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDb))]
-    [Migration("20251203224123_Initial")]
+    [Migration("20251204224832_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,7 +36,7 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("DomainAttributeSlug", (string)null);
+                    b.ToTable("AttributeSlug", (string)null);
 
                     b.HasData(
                         new
@@ -166,7 +166,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasKey("Slug");
 
-                    b.ToTable("DomainDetail", (string)null);
+                    b.ToTable("Detail", (string)null);
 
                     b.HasData(
                         new
@@ -286,7 +286,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("ProductId", "Currency");
 
-                    b.ToTable("DomainDiscount", (string)null);
+                    b.ToTable("Discount", (string)null);
 
                     b.HasData(
                         new
@@ -314,7 +314,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasKey("ProductId", "Currency");
 
-                    b.ToTable("DomainPrice", (string)null);
+                    b.ToTable("Price", (string)null);
 
                     b.HasData(
                         new
@@ -384,7 +384,7 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasIndex("ProductCode")
                         .IsUnique();
 
-                    b.ToTable("DomainProduct", (string)null);
+                    b.ToTable("Product", (string)null);
 
                     b.HasData(
                         new
@@ -457,7 +457,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("DetailSlug");
 
-                    b.ToTable("DomainProductDetail", (string)null);
+                    b.ToTable("ProductDetail", (string)null);
 
                     b.HasData(
                         new
@@ -554,7 +554,7 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasIndex("ProductId", "OrderIndex")
                         .IsUnique();
 
-                    b.ToTable("DomainProductImage", (string)null);
+                    b.ToTable("ProductImage", (string)null);
 
                     b.HasData(
                         new
@@ -616,7 +616,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("SpecificationSlug");
 
-                    b.ToTable("DomainProductSpecification", (string)null);
+                    b.ToTable("ProductSpecification", (string)null);
 
                     b.HasData(
                         new
@@ -716,7 +716,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasKey("Slug");
 
-                    b.ToTable("DomainSpecification", (string)null);
+                    b.ToTable("Specification", (string)null);
 
                     b.HasData(
                         new

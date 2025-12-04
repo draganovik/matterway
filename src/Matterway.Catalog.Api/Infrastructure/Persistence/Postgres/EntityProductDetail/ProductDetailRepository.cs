@@ -1,11 +1,11 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductDetail;
 
 public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailRepository
 {
-    public async Task<DomainProductDetail?> Create(DomainProductDetail requestModel,
+    public async Task<ProductDetail?> Create(ProductDetail requestModel,
         CancellationToken cancellationToken = default)
     {
         context.ProductDetail.Add(requestModel);
@@ -27,7 +27,7 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         return affected == 1;
     }
 
-    public async Task<DomainProductDetail?> GetByKey(Guid productId, string detailSlug,
+    public async Task<ProductDetail?> GetByKey(Guid productId, string detailSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetail
@@ -41,7 +41,7 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
         return await context.ProductDetail.CountAsync(cancellationToken);
     }
 
-    public async Task<ICollection<DomainProductDetail>> Query(int pageIndex, int pageSize,
+    public async Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetail.Include(pd => pd.Product).Include(pd => pd.Detail).AsNoTracking()
@@ -50,7 +50,7 @@ public sealed class ProductDetailRepository(CatalogDb context) : IProductDetailR
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductDetail?> UpdateAsync(Guid productId, string detailSlug, DomainProductDetail request,
+    public async Task<ProductDetail?> UpdateAsync(Guid productId, string detailSlug, ProductDetail request,
         CancellationToken cancellationToken = default)
     {
         context.ProductDetail.Update(request);

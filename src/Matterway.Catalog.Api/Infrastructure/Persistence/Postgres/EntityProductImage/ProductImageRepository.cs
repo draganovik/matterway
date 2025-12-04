@@ -1,11 +1,11 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductImage;
 
 public sealed class ProductImageRepository(CatalogDb context) : IProductImageRepository
 {
-    public async Task<DomainProductImage?> Create(DomainProductImage requestModel, CancellationToken cancellationToken)
+    public async Task<ProductImage?> Create(ProductImage requestModel, CancellationToken cancellationToken)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
@@ -84,7 +84,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
         });
     }
 
-    public async Task<DomainProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
+    public async Task<ProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
         CancellationToken cancellationToken = default)
     {
         return await
@@ -92,7 +92,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
                 cancellationToken);
     }
 
-    public async Task<DomainProductImage?> GetById(Guid parentId, Guid id,
+    public async Task<ProductImage?> GetById(Guid parentId, Guid id,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId,
@@ -104,7 +104,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
         return await context.ProductImage.CountAsync(cancellationToken);
     }
 
-    public async Task<ICollection<DomainProductImage>> Query(int pageIndex, int pageSize,
+    public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductImage.AsNoTracking()
@@ -116,7 +116,7 @@ public sealed class ProductImageRepository(CatalogDb context) : IProductImageRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainProductImage?> UpdateAsync(DomainProductImage request, int targetOrderIndex,
+    public async Task<ProductImage?> UpdateAsync(ProductImage request, int targetOrderIndex,
         CancellationToken cancellationToken = default)
     {
         var strategy = context.Database.CreateExecutionStrategy();

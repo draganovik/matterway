@@ -1,9 +1,10 @@
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 
-namespace Matterway.Catalog.Api.Domain;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
 
 /// <summary>
 /// RSQL-powered filtering helpers for <see cref="Product"/> queries.

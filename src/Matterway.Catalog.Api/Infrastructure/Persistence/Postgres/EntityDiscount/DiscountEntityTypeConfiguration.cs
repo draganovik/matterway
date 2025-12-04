@@ -1,14 +1,15 @@
+using Matterway.Catalog.Api.Domain;
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DomainDiscount = Matterway.Catalog.Api.Domain.Entities.Discount;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Discount;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDiscount;
 
-internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration<DomainDiscount>
+internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration<Discount>
 {
-    public void Configure(EntityTypeBuilder<DomainDiscount> builder)
+    public void Configure(EntityTypeBuilder<Discount> builder)
     {
-        builder.ToTable(nameof(DomainDiscount));
+        builder.ToTable(nameof(Discount));
 
         builder.HasKey(d => new { d.Code, d.ProductId, d.Currency });
 
@@ -29,14 +30,14 @@ internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration
             .HasForeignKey(d => new { d.ProductId, d.Currency });
 
         builder.HasData(
-            new DomainDiscount
+            new Discount
             {
                 Code = "WINTER25",
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                Currency = ESupportedCurrency.RSD,
                 Percentage = 0.25m,
                 ValidFrom = new DateTime(2025, 11, 20).ToUniversalTime(),
                 ValidTo = new DateTime(2026, 3, 20).ToUniversalTime()
-            }
-        );
+            });
     }
 }

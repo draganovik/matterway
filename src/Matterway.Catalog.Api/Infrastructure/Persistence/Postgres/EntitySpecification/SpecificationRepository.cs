@@ -1,14 +1,14 @@
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainSpecification = Matterway.Catalog.Api.Domain.Entities.Specification;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Specification;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntitySpecification;
 
 public sealed class SpecificationRepository(CatalogDb context) : ISpecificationRepository
 {
     private const int MaxLimit = 50;
     private const int DefaultLimit = 10;
 
-    public async Task<ICollection<DomainSpecification>> QueryAsync(string? titleLike, int limit,
+    public async Task<ICollection<Specification>> QueryAsync(string? titleLike, int limit,
         CancellationToken cancellationToken = default)
     {
         var normalizedLimit = Math.Clamp(limit <= 0 ? DefaultLimit : limit, 1, MaxLimit);
@@ -27,18 +27,18 @@ public sealed class SpecificationRepository(CatalogDb context) : ISpecificationR
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DomainSpecification?> GetBySlugAsync(string slug,
+    public async Task<Specification?> GetBySlugAsync(string slug,
         CancellationToken cancellationToken = default)
     {
         return await context.Specification.AsNoTracking()
             .FirstOrDefaultAsync(s => s.Slug == slug, cancellationToken);
     }
 
-    public async Task<DomainSpecification?> UpsertAsync(DomainSpecification requestModel,
+    public async Task<Specification?> UpsertAsync(Specification requestModel,
         CancellationToken cancellationToken = default)
     {
         var normalizedSlug = requestModel.Slug.Trim().ToLower();
-        requestModel = new DomainSpecification
+        requestModel = new Specification
         {
             Slug = normalizedSlug,
             Title = requestModel.Title.Trim(),
@@ -54,7 +54,7 @@ public sealed class SpecificationRepository(CatalogDb context) : ISpecificationR
         if (existing is null)
         {
             if (!await context.AttributeSlug.AnyAsync(a => a.Slug == normalizedSlug, cancellationToken))
-                context.AttributeSlug.Add(new Domain.Entities.AttributeSlug { Slug = normalizedSlug });
+                context.AttributeSlug.Add(new AttributeSlug { Slug = normalizedSlug });
 
             context.Specification.Add(requestModel);
         }

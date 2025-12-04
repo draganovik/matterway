@@ -8,5 +8,5 @@ public class Price
     public required Guid ProductId { get; init; }
     public Product? Product { get; init; }
 
-    public readonly List<Discount> Discounts = [];
+    public List<Discount> Discounts { get; } = [];
 }

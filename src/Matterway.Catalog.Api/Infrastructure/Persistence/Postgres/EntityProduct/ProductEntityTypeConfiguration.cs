@@ -1,15 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Matterway.Catalog.Api.Domain.Entities;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
 
-using DomainProduct = Domain.Entities.Product;
-
-internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<DomainProduct>
+internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<Product>
 {
-    public void Configure(EntityTypeBuilder<DomainProduct> builder)
+    public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable(nameof(DomainProduct));
+        builder.ToTable(nameof(Product));
 
         builder.HasKey(p => p.Id);
 
@@ -51,7 +50,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
             .HasForeignKey(pi => pi.ProductId);
 
         builder.HasData(
-            new DomainProduct
+            new Product
             {
                 Id = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 Title = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
@@ -62,7 +61,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 ProductCode = "PH002",
                 IsAvailable = true
             },
-            new DomainProduct
+            new Product
             {
                 Id = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 CreatedAt = new DateTime(2024, 6, 2, 14, 30, 0, DateTimeKind.Utc),
@@ -73,7 +72,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 ProductCode = "NT003",
                 IsAvailable = true
             },
-            new DomainProduct
+            new Product
             {
                 Id = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 Title = "August Wi-Fi Smart Lock Pro",
@@ -84,7 +83,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 ProductCode = "AL001",
                 IsAvailable = true
             },
-            new DomainProduct
+            new Product
             {
                 Id = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 Title = "Amazon Echo (4th Gen)",
@@ -95,7 +94,7 @@ internal sealed class ProductEntityTypeConfiguration : IEntityTypeConfiguration<
                 ProductCode = "AE004",
                 IsAvailable = true
             },
-            new DomainProduct
+            new Product
             {
                 Id = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 Title = "Ring Spotlight Cam",
