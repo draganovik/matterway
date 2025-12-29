@@ -1,11 +1,12 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Specification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDiscount;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductImage;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductSpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntitySpecification;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Application;
@@ -24,6 +25,7 @@ public static class PersistenceRegistration
                 options.UseNpgsql(postgresConnectionString,
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );
+            builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
             builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             builder.Services.AddScoped<IDetailRepository, DetailRepository>();
             builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();

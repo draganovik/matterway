@@ -11,6 +11,25 @@ const route = useRoute();
 const router = useRouter();
 const product = ref<ProductModel | null>(null);
 
+const hasDiscount = computed(
+  () =>
+    (product.value?.discount?.percentage ?? 0) > 0 &&
+    (product.value?.basePrice ?? 0) > (product.value?.price ?? 0),
+);
+
+const discountPercentLabel = computed(() => {
+  if (!hasDiscount.value) return null;
+  return Math.round((product.value?.discount?.percentage ?? 0) * 100);
+});
+
+const displayPrice = computed(
+  () => product.value?.price ?? product.value?.basePrice ?? 0,
+);
+
+const displayBasePrice = computed(
+  () => product.value?.basePrice ?? product.value?.price ?? 0,
+);
+
 const formatDate = (value?: string | Date | null) => {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
@@ -241,8 +260,22 @@ onMounted(async () => {
         </template>
       </div>
       <div class="border-y border-slate-200 py-4 dark:border-slate-700">
-        <p class="text-3xl font-semibold text-slate-900 dark:text-slate-100">
-          {{ formatMoney(product.price || 0) }}
+        <div class="flex items-center gap-3">
+          <p class="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+            {{ formatMoney(displayPrice || 0) }}
+          </p>
+          <span
+            v-if="hasDiscount"
+            class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
+          >
+            -{{ discountPercentLabel }}%
+          </span>
+        </div>
+        <p
+          v-if="hasDiscount"
+          class="text-sm text-slate-500 line-through dark:text-slate-400"
+        >
+          {{ formatMoney(displayBasePrice || 0) }}
         </p>
       </div>
     </section>

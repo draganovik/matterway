@@ -134,7 +134,7 @@ export const useCatalogStore = defineStore("catalog", {
           body: JSON.stringify({
             productCode: product.productCode,
             title: product.title,
-            price: product.price,
+            price: product.price ?? product.basePrice,
             description: product.description,
             isAvailable: product.isAvailable,
           }),
@@ -146,7 +146,11 @@ export const useCatalogStore = defineStore("catalog", {
           product.productCode =
             payload.productCode ?? payload.code ?? product.productCode;
           product.title = payload.title ?? product.title;
-          product.price = payload.price ?? product.price;
+          product.basePrice =
+            payload.basePrice ?? payload.price ?? product.basePrice;
+          product.price =
+            payload.price ?? payload.basePrice ?? product.price;
+          product.discount = payload.discount ?? product.discount ?? null;
           product.description = payload.description ?? product.description;
           product.createdAt = payload.createdAt ?? product.createdAt;
           product.updatedAt = payload.updatedAt ?? product.updatedAt;
@@ -196,7 +200,7 @@ export const useCatalogStore = defineStore("catalog", {
           body: JSON.stringify({
             productCode: product.productCode,
             title: product.title,
-            price: product.price,
+            price: product.price ?? product.basePrice,
             description: product.description,
             isAvailable: product.isAvailable,
           }),
@@ -217,6 +221,11 @@ export const useCatalogStore = defineStore("catalog", {
           product.id = payload.id ?? product.id;
           product.productCode =
             payload.productCode ?? payload.code ?? product.productCode;
+          product.basePrice =
+            payload.basePrice ?? payload.price ?? product.basePrice;
+          product.price =
+            payload.price ?? payload.basePrice ?? product.price;
+          product.discount = payload.discount ?? null;
           product.createdAt = payload.createdAt ?? product.createdAt;
           product.updatedAt = payload.updatedAt ?? product.updatedAt;
           product.isAvailable = payload.isAvailable ?? product.isAvailable;

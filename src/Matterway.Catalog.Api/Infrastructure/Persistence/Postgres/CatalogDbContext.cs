@@ -1,40 +1,36 @@
-﻿using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Detail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Discount;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Price;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Product;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.ProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.Specification;
+﻿using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityAttributeSlug;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDiscount;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityPrice;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductDetail;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductImage;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductSpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntitySpecification;
+using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using DomainProduct = Matterway.Catalog.Api.Domain.Entities.Product;
-using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
-using DomainProductImage = Matterway.Catalog.Api.Domain.Entities.ProductImage;
-using DomainPrice = Matterway.Catalog.Api.Domain.Entities.Price;
-using DomainDetail = Matterway.Catalog.Api.Domain.Entities.Detail;
-using DomainDiscount = Matterway.Catalog.Api.Domain.Entities.Discount;
-using DomainProductSpecification = Matterway.Catalog.Api.Domain.Entities.ProductSpecification;
-using DomainSpecification = Matterway.Catalog.Api.Domain.Entities.Specification;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
 
 public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
 {
-    public DbSet<DomainDetail> Detail { get; set; }
+    public DbSet<AttributeSlug> AttributeSlug { get; set; }
 
-    public DbSet<DomainDiscount> Discount { get; set; }
+    public DbSet<Detail> Detail { get; set; }
 
-    public DbSet<DomainProductDetail> ProductDetail { get; set; }
+    public DbSet<Discount> Discount { get; set; }
 
-    public DbSet<DomainProductImage> ProductImage { get; set; }
+    public DbSet<ProductDetail> ProductDetail { get; set; }
 
-    public DbSet<DomainProduct> Product { get; set; }
+    public DbSet<ProductImage> ProductImage { get; set; }
 
-    public DbSet<DomainProductSpecification> ProductSpecification { get; set; }
+    public DbSet<Product> Product { get; set; }
 
-    public DbSet<DomainPrice> Price { get; set; }
+    public DbSet<ProductSpecification> ProductSpecification { get; set; }
 
-    public DbSet<DomainSpecification> Specification { get; set; }
+    public DbSet<Price> Price { get; set; }
+
+    public DbSet<Specification> Specification { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,5 +42,6 @@ public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
         modelBuilder.ApplyConfiguration(new ProductSpecificationEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new PriceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new SpecificationEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new AttributeSlugEntityTypeConfiguration());
     }
 }

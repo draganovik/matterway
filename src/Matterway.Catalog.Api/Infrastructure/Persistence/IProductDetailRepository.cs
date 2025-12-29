@@ -1,18 +1,18 @@
-using DomainProductDetail = Matterway.Catalog.Api.Domain.Entities.ProductDetail;
+using Matterway.Catalog.Api.Domain.Entities;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public interface IProductDetailRepository
 {
-    Task<ICollection<DomainProductDetail>> Query(int pageIndex, int pageSize,
+    Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<DomainProductDetail?> GetByKey(Guid productId, string detailSlug,
+    Task<ProductDetail?> GetByKey(Guid productId, string detailSlug,
         CancellationToken cancellationToken = default);
 
-    Task<DomainProductDetail?> Create(DomainProductDetail requestModel, CancellationToken cancellationToken = default);
+    Task<ProductDetail?> Create(ProductDetail requestModel, CancellationToken cancellationToken = default);
 
-    Task<DomainProductDetail?> UpdateAsync(Guid productId, string detailSlug, DomainProductDetail request,
+    Task<ProductDetail?> UpdateAsync(Guid productId, string detailSlug, ProductDetail request,
         CancellationToken cancellationToken = default);
 
     Task<bool> Delete(Guid productId, string detailSlug, CancellationToken cancellationToken = default);

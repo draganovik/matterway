@@ -27,7 +27,9 @@ public class CatalogServiceBroker : ICatalogServiceBroker
             {
                 PropertyNameCaseInsensitive = true
             };
-            return JsonSerializer.Deserialize<Product>(content, options);
+            var product = JsonSerializer.Deserialize<Product>(content, options);
+
+            return product;
         }
 
         return null;

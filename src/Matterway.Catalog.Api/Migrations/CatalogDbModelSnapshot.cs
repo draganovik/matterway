@@ -22,6 +22,134 @@ namespace Matterway.Catalog.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", b =>
+                {
+                    b.Property<string>("Slug")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("AttributeSlug", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Slug = "audio"
+                        },
+                        new
+                        {
+                            Slug = "audio-quality"
+                        },
+                        new
+                        {
+                            Slug = "battery"
+                        },
+                        new
+                        {
+                            Slug = "brand"
+                        },
+                        new
+                        {
+                            Slug = "camera"
+                        },
+                        new
+                        {
+                            Slug = "color"
+                        },
+                        new
+                        {
+                            Slug = "color-temperature"
+                        },
+                        new
+                        {
+                            Slug = "compatibility"
+                        },
+                        new
+                        {
+                            Slug = "connectivity"
+                        },
+                        new
+                        {
+                            Slug = "display"
+                        },
+                        new
+                        {
+                            Slug = "features"
+                        },
+                        new
+                        {
+                            Slug = "material"
+                        },
+                        new
+                        {
+                            Slug = "model"
+                        },
+                        new
+                        {
+                            Slug = "operating-system"
+                        },
+                        new
+                        {
+                            Slug = "ports"
+                        },
+                        new
+                        {
+                            Slug = "processor"
+                        },
+                        new
+                        {
+                            Slug = "resolution"
+                        },
+                        new
+                        {
+                            Slug = "video-quality"
+                        },
+                        new
+                        {
+                            Slug = "battery-size"
+                        },
+                        new
+                        {
+                            Slug = "depth"
+                        },
+                        new
+                        {
+                            Slug = "height"
+                        },
+                        new
+                        {
+                            Slug = "power"
+                        },
+                        new
+                        {
+                            Slug = "ram-size"
+                        },
+                        new
+                        {
+                            Slug = "refresh-rate"
+                        },
+                        new
+                        {
+                            Slug = "screen-size"
+                        },
+                        new
+                        {
+                            Slug = "storage"
+                        },
+                        new
+                        {
+                            Slug = "weight"
+                        },
+                        new
+                        {
+                            Slug = "width"
+                        });
+                });
+
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
                 {
                     b.Property<string>("Slug")
@@ -35,7 +163,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasKey("Slug");
 
-                    b.ToTable("DomainDetail", (string)null);
+                    b.ToTable("Detail", (string)null);
 
                     b.HasData(
                         new
@@ -142,10 +270,6 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<string>("Currency")
                         .HasColumnType("character varying(3)");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
                     b.Property<decimal>("Percentage")
                         .HasColumnType("numeric");
 
@@ -159,7 +283,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("ProductId", "Currency");
 
-                    b.ToTable("DomainDiscount", (string)null);
+                    b.ToTable("Discount", (string)null);
 
                     b.HasData(
                         new
@@ -167,8 +291,7 @@ namespace Matterway.Catalog.Api.Migrations
                             Code = "WINTER25",
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             Currency = "RSD",
-                            Description = "Winter 2025 Discount",
-                            Percentage = 25m,
+                            Percentage = 0.25m,
                             ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -183,43 +306,43 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)");
 
-                    b.Property<double>("Amount")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
 
                     b.HasKey("ProductId", "Currency");
 
-                    b.ToTable("DomainPrice", (string)null);
+                    b.ToTable("Price", (string)null);
 
                     b.HasData(
                         new
                         {
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             Currency = "RSD",
-                            Amount = 4999.0
+                            Amount = 4999m
                         },
                         new
                         {
                             ProductId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                             Currency = "RSD",
-                            Amount = 24999.0
+                            Amount = 24999m
                         },
                         new
                         {
                             ProductId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                             Currency = "RSD",
-                            Amount = 27999.0
+                            Amount = 27999m
                         },
                         new
                         {
                             ProductId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                             Currency = "RSD",
-                            Amount = 9999.0
+                            Amount = 9999m
                         },
                         new
                         {
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                             Currency = "RSD",
-                            Amount = 19999.0
+                            Amount = 19999m
                         });
                 });
 
@@ -258,7 +381,7 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasIndex("ProductCode")
                         .IsUnique();
 
-                    b.ToTable("DomainProduct", (string)null);
+                    b.ToTable("Product", (string)null);
 
                     b.HasData(
                         new
@@ -331,7 +454,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("DetailSlug");
 
-                    b.ToTable("DomainProductDetail", (string)null);
+                    b.ToTable("ProductDetail", (string)null);
 
                     b.HasData(
                         new
@@ -428,7 +551,7 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasIndex("ProductId", "OrderIndex")
                         .IsUnique();
 
-                    b.ToTable("DomainProductImage", (string)null);
+                    b.ToTable("ProductImage", (string)null);
 
                     b.HasData(
                         new
@@ -490,7 +613,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("SpecificationSlug");
 
-                    b.ToTable("DomainProductSpecification", (string)null);
+                    b.ToTable("ProductSpecification", (string)null);
 
                     b.HasData(
                         new
@@ -590,7 +713,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasKey("Slug");
 
-                    b.ToTable("DomainSpecification", (string)null);
+                    b.ToTable("Specification", (string)null);
 
                     b.HasData(
                         new
@@ -653,6 +776,15 @@ namespace Matterway.Catalog.Api.Migrations
                             Title = "Width",
                             Unit = "millimeters"
                         });
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
+                {
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
+                        .WithMany()
+                        .HasForeignKey("Slug")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Discount", b =>
@@ -724,6 +856,15 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Specification");
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Specification", b =>
+                {
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
+                        .WithMany()
+                        .HasForeignKey("Slug")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Price", b =>

@@ -37,30 +37,31 @@ package "Catalog" {
   class Discount {
     +code: String
     +productId: UUID
-    +currency: SupportedCurrency
-    +percentage: Integer
+    +currency: ESupportedCurrency
+    +percentage: Decimal
     +validFrom: DateTime
-    +validTo: DateTime
+    +validTo: DateTime?
   }
 
   class Price {
     +productId: UUID
-    +currency: SupportedCurrency
-    +amount: Money
+    +currency: ESupportedCurrency
+    +amount: Decimal
   }
 
-  enum SupportedCurrency {
+  enum ESupportedCurrency {
     RSD
     EUR
   }
 
   class Product {
     +id: UUID
-    +sku: String
+    +productCode: String
     +title: String
     +description: String
     +isAvailable: Boolean
-    +addedOn: DateTime
+    +createdAt: DateTime
+    +updatedAt: DateTime
   }
 
   class ProductDetail {
@@ -74,6 +75,10 @@ package "Catalog" {
     +title: String
   }
 
+  class AttributeSlug {
+    +slug: String
+  }
+
   class ProductSpecification {
     +productId: UUID
     +specificationSlug: String
@@ -83,7 +88,7 @@ package "Catalog" {
   class Specification {
     +slug: String
     +title: String
-    +unit: String
+    +unit: String?
   }
 
   class ProductImage {
@@ -91,7 +96,7 @@ package "Catalog" {
     +productId: UUID
     +orderIndex: Integer
     +imageUrl: String
-    +imageAlt: String
+    +imageAlt: String?
   }
 }
 
@@ -262,7 +267,7 @@ Session "0..*" --> "1" SystemUser : systemUserId
 ' Customers
 Customer "1" --> "1" SystemUser : systemUserId
 Customer "0..1" --> "1" Address : primaryAddressId
-CartItem "0..*" --> "1" Customer : customerId
+CartItem "0..*" -up-> "1" Customer : customerId
 CartItem "0..*" --> "1" Product : productId
 
 ' Catalog
@@ -273,9 +278,17 @@ ProductDetail "0..*" -up-> "1" Detail : detailSlug
 ProductSpecification "0..*" --> "1" Product : productId
 ProductSpecification "0..*" -up-> "1" Specification : specificationSlug
 ProductImage "0..*" --> "1" Product : productId
+Detail --> AttributeSlug : slug (PK/FK)
+Specification --> AttributeSlug : slug (PK/FK)
+
+note bottom of AttributeSlug
+  Shared, unique slug namespace
+  for Detail & Specification
+  (lowercase normalized)
+end note
 
 ' Sales
-SaleRecord "0..*" --> "1" Customer : customerId
+SaleRecord "0..*" -down-> "1" Customer : customerId
 SaleRecordItem "0..*" --> "1" SaleRecord : orderId
 SaleRecordItem "0..*" --> "1" Product : productId
 SaleRecordStatus "0..*" --> "1" SaleRecord : orderId
@@ -283,20 +296,20 @@ SaleRecordDeliveryInfo "1" --> "1" SaleRecord : saleRecordId
 
 ' Inventory
 InventoryBatch "0..*" --> "1" Warehouse : warehouseId
-InventoryBatch "0..*" -up-> "1" Product : productId
+InventoryBatch "0..*" --> "1" Product : productId
 StockReservation "0..*" -up-> "1" SaleRecord : orderId
 StockReservationItem "0..*" -up-> "1" StockReservation : reservationId
 StockReservationItem "0..*" --> "0..1" InventoryBatch : inventoryBatchNo
 
 ' Finances
-Payment "0..*" --> "1" SaleRecord : orderId
-PaymentStatus "0..*" --> "1" Payment : paymentId
+Payment "0..*" -up-> "1" SaleRecord : orderId
+PaymentStatus "0..*" -up-> "1" Payment : paymentId
 
 ' =======================
 ' CROSS-BOUNDARY NOTES (events/flows)
 ' =======================
 
 note "Flow (happy path):\n1) Customer -> Sales: Place order\n2) Sales -> Inventory: Request stock reservation\n3) Inventory -> Sales: StockReserved\n4) Sales -> Finances: Initiate/Authorize payment\n5) Finances -> Sales: PaymentCaptured\n6) Sales -> Inventory: Fulfillment request\n7) Inventory -> Sales: SaleRecordDeliveryInfoFulfilled" as N1
-N1 .r. SaleRecord
+N1 .l. SaleRecord
 
 @enduml

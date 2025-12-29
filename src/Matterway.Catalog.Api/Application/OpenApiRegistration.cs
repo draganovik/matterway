@@ -33,7 +33,13 @@ public static class OpenApiRegistration
                         .EndpointMetadata.OfType<AllowAnonymousAttribute>()
                         .Any();
                     if (isAnonymous) return Task.CompletedTask;
+
                     operation.Security ??= new List<OpenApiSecurityRequirement>();
+                    var bearerReference = new OpenApiSecuritySchemeReference("Bearer", null, null);
+                    operation.Security.Add(new OpenApiSecurityRequirement
+                    {
+                        { bearerReference, [] }
+                    });
 
                     return Task.CompletedTask;
                 });
