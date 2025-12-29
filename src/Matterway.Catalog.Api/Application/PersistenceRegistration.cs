@@ -1,11 +1,11 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityDiscount;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityProduct;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntityProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntitySpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecificationEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Application;

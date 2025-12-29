@@ -5,7 +5,7 @@ using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCartItem;
+using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 

@@ -3,7 +3,7 @@ using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.EntitySpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Features.Specifications;

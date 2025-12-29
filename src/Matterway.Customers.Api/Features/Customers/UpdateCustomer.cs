@@ -5,7 +5,7 @@ using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
