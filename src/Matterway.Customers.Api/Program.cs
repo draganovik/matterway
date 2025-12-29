@@ -1,5 +1,7 @@
-﻿using Matterway.Customers.Api.Extensions;
+﻿using System.Text.Json.Serialization;
+using Matterway.Customers.Api.Application;
 using Matterway.ServiceDefaults;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -7,37 +9,36 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
-builder.AddServiceDefaults();
-
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", true,
         true)
     .AddEnvironmentVariables();
 
-builder.Services.AddProblemDetails();
-builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
-
-builder.ConfigureAuthentication();
-builder.Services.ConfigureDatabase(builder.Configuration);
-builder.Services.ConfigureRepositories();
-builder.Services.ConfigureFeatures();
-
-builder.Services.ConfigureMapper();
-builder.Services.ConfigureJsonOptions();
-
-builder.Services.ConfigureOpenApi();
-builder.Services.ConfigureApiVersioning();
-//builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddValidation();
-builder.ConfigureCors();
+builder.AddServiceDefaults();
+
+builder
+    .ConfigureProblemDetails()
+    .ConfigureApiVersioning()
+    .ConfigureOpenApi()
+    .ConfigureCors();
+
+builder
+    .ConfigureAuthentication()
+    .ConfigureCatalogIntegration()
+    .ConfigurePersistence()
+    .ConfigureFeatures();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-
 app.UseExceptionHandler();
+app.MapDefaultEndpoints();
 app.UseStatusCodePages();
 app.UseCors();
 
