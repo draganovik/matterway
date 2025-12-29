@@ -50,7 +50,7 @@ public class UpdateDiscount : IEndpoint
                 Detail = "At least one productId is required."
             });
 
-        var existing = await discountRepository.GetByCodeAsync(code, request.Currency, cancellationToken);
+        var existing = await discountRepository.GetBy(code, request.Currency, cancellationToken);
         if (existing.Count == 0) return TypedResults.NotFound();
 
         var newDiscounts = MapToEntities(code, request, validFrom, validTo).ToList();
@@ -58,7 +58,7 @@ public class UpdateDiscount : IEndpoint
         IReadOnlyCollection<Discount> updated;
         try
         {
-            updated = await discountRepository.ReplaceAsync(code, request.Currency, newDiscounts, cancellationToken);
+            updated = await discountRepository.Update(code, request.Currency, newDiscounts, cancellationToken);
         }
         catch (InvalidOperationException ex)
         {

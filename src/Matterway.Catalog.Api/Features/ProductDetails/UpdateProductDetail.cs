@@ -33,12 +33,12 @@ public class UpdateProductDetail : IEndpoint
             IProductDetailRepository productDetailRepository,
             CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, detailSlug, cancellationToken);
+        var entity = await productDetailRepository.GetBy(productId, detailSlug, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
 
-        var updated = await productDetailRepository.UpdateAsync(productId, detailSlug, entity, cancellationToken);
+        var updated = await productDetailRepository.Update(productId, detailSlug, entity, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 

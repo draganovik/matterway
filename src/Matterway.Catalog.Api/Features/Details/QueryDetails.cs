@@ -28,7 +28,7 @@ public class QueryDetails : IEndpoint
         IDetailRepository detailRepository,
         CancellationToken cancellationToken)
     {
-        var entities = await detailRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
+        var entities = await detailRepository.Query(request.TitleLike, request.Limit, cancellationToken);
         var response = entities.Select(MapToResponse).ToList();
         return TypedResults.Ok<ICollection<QueryDetailResponse>>(response);
     }

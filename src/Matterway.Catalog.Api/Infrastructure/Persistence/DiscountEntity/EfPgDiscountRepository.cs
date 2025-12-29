@@ -6,7 +6,7 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 
 public sealed class EfPgDiscountRepository(CatalogDb context) : IDiscountRepository
 {
-    public async Task<IReadOnlyCollection<Discount>> CreateManyAsync(IEnumerable<Discount> discounts,
+    public async Task<IReadOnlyCollection<Discount>> CreateBulk(IEnumerable<Discount> discounts,
         CancellationToken cancellationToken = default)
     {
         var discountList = discounts.ToList();
@@ -31,7 +31,7 @@ public sealed class EfPgDiscountRepository(CatalogDb context) : IDiscountReposit
         });
     }
 
-    public async Task<IReadOnlyCollection<Discount>> GetByCodeAsync(string code, ESupportedCurrency currency,
+    public async Task<IReadOnlyCollection<Discount>> GetBy(string code, ESupportedCurrency currency,
         CancellationToken cancellationToken = default)
     {
         return await context.Discount
@@ -40,7 +40,7 @@ public sealed class EfPgDiscountRepository(CatalogDb context) : IDiscountReposit
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Discount>> ReplaceAsync(string code, ESupportedCurrency currency,
+    public async Task<IReadOnlyCollection<Discount>> Update(string code, ESupportedCurrency currency,
         IEnumerable<Discount> discounts, CancellationToken cancellationToken = default)
     {
         var discountList = discounts.ToList();
@@ -69,7 +69,7 @@ public sealed class EfPgDiscountRepository(CatalogDb context) : IDiscountReposit
         });
     }
 
-    public async Task<int> DeleteByCodeAsync(string code, CancellationToken cancellationToken = default)
+    public async Task<int> Delete(string code, CancellationToken cancellationToken = default)
     {
         return await context.Discount
             .Where(d => d.Code == code)

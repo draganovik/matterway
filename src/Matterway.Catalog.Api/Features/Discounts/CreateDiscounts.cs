@@ -55,7 +55,7 @@ public class CreateDiscounts : IEndpoint
         IReadOnlyCollection<Discount> created;
         try
         {
-            created = await discountRepository.CreateManyAsync(discounts, cancellationToken);
+            created = await discountRepository.CreateBulk(discounts, cancellationToken);
         }
         catch (InvalidOperationException ex)
         {

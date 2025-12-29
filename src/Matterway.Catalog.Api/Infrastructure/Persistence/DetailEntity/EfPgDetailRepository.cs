@@ -8,7 +8,7 @@ public sealed class EfPgDetailRepository(CatalogDb context) : IDetailRepository
     private const int MaxLimit = 50;
     private const int DefaultLimit = 10;
 
-    public async Task<ICollection<Detail>> QueryAsync(string? titleLike, int limit,
+    public async Task<ICollection<Detail>> Query(string? titleLike, int limit,
         CancellationToken cancellationToken = default)
     {
         var normalizedLimit = Math.Clamp(limit <= 0 ? DefaultLimit : limit, 1, MaxLimit);
@@ -27,13 +27,13 @@ public sealed class EfPgDetailRepository(CatalogDb context) : IDetailRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Detail?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<Detail?> GetBy(string slug, CancellationToken cancellationToken = default)
     {
         return await context.Detail.AsNoTracking()
             .FirstOrDefaultAsync(d => d.Slug == slug, cancellationToken);
     }
 
-    public async Task<Detail?> UpsertAsync(Detail requestModel,
+    public async Task<Detail?> Upsert(Detail requestModel,
         CancellationToken cancellationToken = default)
     {
         var normalizedSlug = requestModel.Slug.Trim().ToLower();
@@ -69,7 +69,7 @@ public sealed class EfPgDetailRepository(CatalogDb context) : IDetailRepository
             .FirstOrDefaultAsync(d => d.Slug == requestModel.Slug, cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)
     {
         var normalizedSlug = slug.Trim().ToLower();
         var inUse = await context.ProductDetail.AnyAsync(pd => pd.DetailSlug == normalizedSlug, cancellationToken);

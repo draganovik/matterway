@@ -5,7 +5,7 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
 {
-    public async Task<ICollection<CartItem>> QueryForSystemUserId(Guid systemUserId, int pageIndex, int pageSize)
+    public async Task<ICollection<CartItem>> QueryForSuid(Guid systemUserId, int pageIndex, int pageSize)
     {
         return await context.CartItem.Where(x => x.Customer != null && x.Customer.SystemUserId == systemUserId)
             .AsNoTracking()
@@ -37,7 +37,7 @@ public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
         return affected == 1;
     }
 
-    public async Task<CartItem?> GetById(Guid id, Guid productId)
+    public async Task<CartItem?> GetBy(Guid id, Guid productId)
     {
         return await context.CartItem.FirstOrDefaultAsync(x => x.CustomerId == id && x.ProductId == productId);
     }

@@ -27,18 +27,13 @@ public sealed class EfPgProductDetailRepository(CatalogDb context) : IProductDet
         return affected == 1;
     }
 
-    public async Task<ProductDetail?> GetByKey(Guid productId, string detailSlug,
+    public async Task<ProductDetail?> GetBy(Guid productId, string detailSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductDetail
             .Include(pd => pd.Product)
             .Include(pd => pd.Detail)
             .FirstOrDefaultAsync(pd => pd.ProductId == productId && pd.DetailSlug == detailSlug, cancellationToken);
-    }
-
-    public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
-    {
-        return await context.ProductDetail.CountAsync(cancellationToken);
     }
 
     public async Task<ICollection<ProductDetail>> Query(int pageIndex, int pageSize,
@@ -50,7 +45,7 @@ public sealed class EfPgProductDetailRepository(CatalogDb context) : IProductDet
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ProductDetail?> UpdateAsync(Guid productId, string detailSlug, ProductDetail request,
+    public async Task<ProductDetail?> Update(Guid productId, string detailSlug, ProductDetail request,
         CancellationToken cancellationToken = default)
     {
         context.ProductDetail.Update(request);

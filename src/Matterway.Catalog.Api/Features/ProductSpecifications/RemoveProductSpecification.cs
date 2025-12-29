@@ -28,7 +28,7 @@ public class RemoveProductSpecification : IEndpoint
         IProductSpecificationRepository repository,
         CancellationToken cancellationToken)
     {
-        var entity = await repository.GetByKey(productId, specificationSlug, cancellationToken);
+        var entity = await repository.GetBy(productId, specificationSlug, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 

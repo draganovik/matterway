@@ -4,13 +4,13 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 
 public interface ISpecificationRepository
 {
-    Task<ICollection<Specification>> QueryAsync(string? titleLike, int limit,
+    Task<ICollection<Specification>> Query(string? titleLike, int limit,
         CancellationToken cancellationToken = default);
 
-    Task<Specification?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+    Task<Specification?> GetBy(string slug, CancellationToken cancellationToken = default);
 
-    Task<Specification?> UpsertAsync(Specification requestModel,
+    Task<Specification?> Upsert(Specification requestModel,
         CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default);
+    Task<bool> Delete(string slug, CancellationToken cancellationToken = default);
 }

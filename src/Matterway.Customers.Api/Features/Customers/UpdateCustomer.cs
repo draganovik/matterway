@@ -37,7 +37,7 @@ public class UpdateCustomer : IEndpoint
         if (userRole == ERequestClaimsRole.Customer && request.SystemUserId != systemUserId)
             return TypedResults.Forbid();
 
-        var entity = await customerRepository.GetById(id);
+        var entity = await customerRepository.GetBy(id);
         if (entity is null)
             return TypedResults.NotFound();
 

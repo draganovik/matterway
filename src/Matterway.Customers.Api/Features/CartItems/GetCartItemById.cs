@@ -28,7 +28,7 @@ public class GetCartItemById : IEndpoint
         Guid productId,
         ICartItemRepository cartItemRepository)
     {
-        return await cartItemRepository.GetById(id, productId)
+        return await cartItemRepository.GetBy(id, productId)
             is CartItem value
             ? TypedResults.Ok(MapToResponse(value))
             : TypedResults.NotFound();

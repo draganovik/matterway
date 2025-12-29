@@ -12,9 +12,9 @@ public interface ICustomerRepository
 
     Task<bool> Delete(Guid id);
 
-    Task<Customer?> GetById(Guid id);
+    Task<Customer?> GetBy(Guid id);
 
-    Task<Customer?> GetBySystemUserId(Guid systemUserId);
+    Task<Customer?> GetBySuid(Guid systemUserId);
 
     Task<int> Count();
 }

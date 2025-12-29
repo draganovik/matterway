@@ -76,7 +76,7 @@ public sealed class EfPgProductRepository(CatalogDb context)
         });
     }
 
-    public async Task<Product?> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Product?> GetBy(Guid id, CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
         return await context.Product
@@ -90,7 +90,7 @@ public sealed class EfPgProductRepository(CatalogDb context)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<int> GetTotalEntities(string? filter,
+    public async Task<int> Count(string? filter,
         CancellationToken cancellationToken = default)
     {
         var productQuery = context.Product.AsQueryable().ApplyProductRsql(filter);
@@ -115,7 +115,7 @@ public sealed class EfPgProductRepository(CatalogDb context)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Product?> UpdateAsync(Product request, CancellationToken cancellationToken = default)
+    public async Task<Product?> Update(Product request, CancellationToken cancellationToken = default)
     {
         context.Product.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);

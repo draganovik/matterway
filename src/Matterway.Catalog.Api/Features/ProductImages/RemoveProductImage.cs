@@ -30,7 +30,7 @@ public class RemoveProductImage : IEndpoint
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex, cancellationToken);
+        var entity = await productImageRepository.GetBy(productId, orderIndex, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 

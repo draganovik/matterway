@@ -37,12 +37,12 @@ public class EfPgCustomerRepository(CustomersDb context) : ICustomerRepository
         return affected == 1;
     }
 
-    public async Task<Customer?> GetById(Guid id)
+    public async Task<Customer?> GetBy(Guid id)
     {
         return await context.Customer.FindAsync(id);
     }
 
-    public async Task<Customer?> GetBySystemUserId(Guid systemUserId)
+    public async Task<Customer?> GetBySuid(Guid systemUserId)
     {
         return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == systemUserId);
     }

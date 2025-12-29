@@ -37,7 +37,7 @@ public class QueryCartItems : IEndpoint
             return TypedResults.Forbid();
 
         var total = await cartItemRepository.Count(systemUserId);
-        var entities = await cartItemRepository.QueryForSystemUserId(systemUserId, pagingQuery.Page,
+        var entities = await cartItemRepository.QueryForSuid(systemUserId, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);

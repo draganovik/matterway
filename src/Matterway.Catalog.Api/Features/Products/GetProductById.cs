@@ -24,7 +24,7 @@ public class GetProductById : IEndpoint
         IProductRepository productRepository,
         CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetById(id, cancellationToken);
+        var product = await productRepository.GetBy(id, cancellationToken);
 
         if (product == null) return TypedResults.NotFound();
 

@@ -28,7 +28,7 @@ public class DeleteProduct : IEndpoint
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetById(id, cancellationToken);
+        var product = await productRepository.GetBy(id, cancellationToken);
 
         if (product is null) return TypedResults.NotFound();
 

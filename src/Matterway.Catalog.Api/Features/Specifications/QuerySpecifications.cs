@@ -29,7 +29,7 @@ public class QuerySpecifications : IEndpoint
         CancellationToken cancellationToken)
     {
         var entities =
-            await specificationRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
+            await specificationRepository.Query(request.TitleLike, request.Limit, cancellationToken);
         var response = entities.Select(MapToResponse).ToList();
         return TypedResults.Ok<ICollection<QuerySpecificationResponse>>(response);
     }

@@ -41,7 +41,7 @@ public class QueryProducts : IEndpoint
             HttpContext httpContext, LinkGenerator linkGenerator, IProductRepository productRepository,
             CancellationToken cancellationToken)
     {
-        var total = await productRepository.GetTotalEntities(queryParameters.Filter, cancellationToken);
+        var total = await productRepository.Count(queryParameters.Filter, cancellationToken);
         if (total == 0)
             return TypedResults.NoContent();
 

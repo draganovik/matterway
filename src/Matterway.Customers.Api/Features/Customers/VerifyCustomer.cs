@@ -30,7 +30,7 @@ public class VerifyCustomer : IEndpoint
     {
         if (customerId.HasValue)
         {
-            var customer = await customerRepository.GetById(customerId.Value);
+            var customer = await customerRepository.GetBy(customerId.Value);
             return customer != null
                 ? TypedResults.Ok(MapToResponse(customer))
                 : TypedResults.NotFound();
@@ -38,7 +38,7 @@ public class VerifyCustomer : IEndpoint
 
         if (systemUserId.HasValue)
         {
-            var customer = await customerRepository.GetBySystemUserId(systemUserId.Value);
+            var customer = await customerRepository.GetBySuid(systemUserId.Value);
             return customer != null
                 ? TypedResults.Ok(MapToResponse(customer))
                 : TypedResults.NotFound();

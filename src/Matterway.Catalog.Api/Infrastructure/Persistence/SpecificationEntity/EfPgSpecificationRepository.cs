@@ -8,7 +8,7 @@ public sealed class EfPgSpecificationRepository(CatalogDb context) : ISpecificat
     private const int MaxLimit = 50;
     private const int DefaultLimit = 10;
 
-    public async Task<ICollection<Specification>> QueryAsync(string? titleLike, int limit,
+    public async Task<ICollection<Specification>> Query(string? titleLike, int limit,
         CancellationToken cancellationToken = default)
     {
         var normalizedLimit = Math.Clamp(limit <= 0 ? DefaultLimit : limit, 1, MaxLimit);
@@ -27,14 +27,14 @@ public sealed class EfPgSpecificationRepository(CatalogDb context) : ISpecificat
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Specification?> GetBySlugAsync(string slug,
+    public async Task<Specification?> GetBy(string slug,
         CancellationToken cancellationToken = default)
     {
         return await context.Specification.AsNoTracking()
             .FirstOrDefaultAsync(s => s.Slug == slug, cancellationToken);
     }
 
-    public async Task<Specification?> UpsertAsync(Specification requestModel,
+    public async Task<Specification?> Upsert(Specification requestModel,
         CancellationToken cancellationToken = default)
     {
         var normalizedSlug = requestModel.Slug.Trim().ToLower();
@@ -72,7 +72,7 @@ public sealed class EfPgSpecificationRepository(CatalogDb context) : ISpecificat
             .FirstOrDefaultAsync(s => s.Slug == requestModel.Slug, cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)
     {
         var normalizedSlug = slug.Trim().ToLower();
         var inUse = await context.ProductSpecification.AnyAsync(ps => ps.SpecificationSlug == normalizedSlug,

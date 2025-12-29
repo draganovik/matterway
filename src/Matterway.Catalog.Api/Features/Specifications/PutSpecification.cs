@@ -40,7 +40,7 @@ public class PutSpecification : IEndpoint
                 Title = "Slug is required",
                 Status = StatusCodes.Status400BadRequest
             });
-        var existing = await repository.GetBySlugAsync(normalizedSlug, cancellationToken);
+        var existing = await repository.GetBy(normalizedSlug, cancellationToken);
 
         var entity = new Specification
         {
@@ -49,7 +49,7 @@ public class PutSpecification : IEndpoint
             Unit = request.Unit?.Trim()
         };
 
-        var saved = await repository.UpsertAsync(entity, cancellationToken);
+        var saved = await repository.Upsert(entity, cancellationToken);
         if (saved is null)
             return TypedResults.BadRequest(new ProblemDetails
             {

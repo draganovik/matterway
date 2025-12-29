@@ -27,7 +27,7 @@ public class GetCustomerById : IEndpoint
         Guid id,
         ICustomerRepository customerRepository)
     {
-        return await customerRepository.GetById(id)
+        return await customerRepository.GetBy(id)
             is Customer value
             ? TypedResults.Ok(MapToResponse(value))
             : TypedResults.NotFound();

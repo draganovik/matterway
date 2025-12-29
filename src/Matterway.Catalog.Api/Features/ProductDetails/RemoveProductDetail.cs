@@ -28,7 +28,7 @@ public class RemoveProductDetail : IEndpoint
         IProductDetailRepository productDetailRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, detailSlug, cancellationToken);
+        var entity = await productDetailRepository.GetBy(productId, detailSlug, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 

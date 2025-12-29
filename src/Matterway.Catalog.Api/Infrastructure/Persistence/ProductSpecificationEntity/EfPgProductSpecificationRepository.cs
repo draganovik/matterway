@@ -30,7 +30,7 @@ public sealed class EfPgProductSpecificationRepository(CatalogDb context) : IPro
         return affected == 1;
     }
 
-    public async Task<ProductSpecification?> GetByKey(Guid productId, string specificationSlug,
+    public async Task<ProductSpecification?> GetBy(Guid productId, string specificationSlug,
         CancellationToken cancellationToken = default)
     {
         return await context.ProductSpecification
@@ -40,22 +40,7 @@ public sealed class EfPgProductSpecificationRepository(CatalogDb context) : IPro
                 cancellationToken);
     }
 
-    public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
-    {
-        return await context.ProductSpecification.CountAsync(cancellationToken);
-    }
-
-    public async Task<ICollection<ProductSpecification>> Query(int pageIndex, int pageSize,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.ProductSpecification.Include(ps => ps.Product).Include(ps => ps.Specification)
-            .AsNoTracking()
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<ProductSpecification?> UpdateAsync(Guid productId, string specificationSlug,
+    public async Task<ProductSpecification?> Update(Guid productId, string specificationSlug,
         ProductSpecification request, CancellationToken cancellationToken = default)
     {
         context.ProductSpecification.Update(request);

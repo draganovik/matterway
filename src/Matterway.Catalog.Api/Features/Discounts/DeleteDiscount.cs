@@ -27,7 +27,7 @@ public class DeleteDiscount : IEndpoint
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
     {
-        var deletedCount = await discountRepository.DeleteByCodeAsync(code, cancellationToken);
+        var deletedCount = await discountRepository.Delete(code, cancellationToken);
 
         if (deletedCount == 0) return TypedResults.NotFound();
 

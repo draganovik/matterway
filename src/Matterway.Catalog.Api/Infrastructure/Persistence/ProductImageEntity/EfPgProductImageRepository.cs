@@ -84,7 +84,7 @@ public sealed class EfPgProductImageRepository(CatalogDb context) : IProductImag
         });
     }
 
-    public async Task<ProductImage?> GetByOrderIndex(Guid parentId, int orderIndex,
+    public async Task<ProductImage?> GetBy(Guid parentId, int orderIndex,
         CancellationToken cancellationToken = default)
     {
         return await
@@ -92,31 +92,7 @@ public sealed class EfPgProductImageRepository(CatalogDb context) : IProductImag
                 cancellationToken);
     }
 
-    public async Task<ProductImage?> GetById(Guid parentId, Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.ProductImage.FirstOrDefaultAsync(x => x.Id == id && x.ProductId == parentId,
-            cancellationToken);
-    }
-
-    public async Task<int> GetTotalEntities(CancellationToken cancellationToken = default)
-    {
-        return await context.ProductImage.CountAsync(cancellationToken);
-    }
-
-    public async Task<ICollection<ProductImage>> Query(int pageIndex, int pageSize,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.ProductImage.AsNoTracking()
-            .Include(x => x.Product)
-            .OrderBy(x => x.ProductId)
-            .ThenBy(x => x.OrderIndex)
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<ProductImage?> UpdateAsync(ProductImage request, int targetOrderIndex,
+    public async Task<ProductImage?> Update(ProductImage request, int targetOrderIndex,
         CancellationToken cancellationToken = default)
     {
         var strategy = context.Database.CreateExecutionStrategy();
