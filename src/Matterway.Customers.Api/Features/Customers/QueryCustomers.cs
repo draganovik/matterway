@@ -1,39 +1,38 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
+using FastEndpoints;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class QueryCustomers : IEndpoint
+public class QueryCustomers(ICustomerRepository customerRepository, LinkGenerator linkGenerator) :
+    Endpoint<PaginationRequestParameters, PaginationResponse<QueryCustomers.CustomerResponse>>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapGet("Customers", Handler)
-            .WithName("QueryCustomers").WithSummary("Query Customers.")
-            .WithTags(nameof(Customer))
-            .Produces<PaginationResponse<CustomerResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Get("/customers");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("QueryCustomers")
+                .WithSummary("Query Customers.")
+                .WithTags(nameof(Customer))
+                .Produces<PaginationResponse<CustomerResponse>>()
+                .Produces(StatusCodes.Status204NoContent)
+                .ProducesValidationProblem()
+                .RequireAuthorization(policy => policy.RequireRole(
+                    nameof(ERequestClaimsRole.Admin),
+                    nameof(ERequestClaimsRole.Manager)));
+        });
     }
 
-    private static async Task<Results<Ok<PaginationResponse<CustomerResponse>>, NoContent, ValidationProblem>>
-        Handler([AsParameters] PaginationRequestParameters pagingQuery,
-            HttpContext httpContext,
-            LinkGenerator linkGenerator,
-            ICustomerRepository customerRepository,
-            CancellationToken cancellationToken)
+    public override async Task HandleAsync(PaginationRequestParameters request, CancellationToken cancellationToken)
     {
         var total = await customerRepository.Count(cancellationToken);
-        var entities = await customerRepository.Query(pagingQuery.Page, pagingQuery.PageSize, cancellationToken);
-        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCustomers");
+        var entities = await customerRepository.Query(request.Page, request.PageSize, cancellationToken);
+        var baseUri = linkGenerator.GetUriByName(HttpContext, "QueryCustomers");
 
         var response = entities
             .Select(MapToResponse)
@@ -42,13 +41,17 @@ public class QueryCustomers : IEndpoint
         var paginationResponse = PaginationResponse<CustomerResponse>.Create(
             response,
             total,
-            pagingQuery.Page,
-            pagingQuery.PageSize,
+            request.Page,
+            request.PageSize,
             baseUri);
 
-        return entities.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        if (!entities.Any())
+        {
+            await Send.NoContentAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(paginationResponse, cancellationToken);
     }
 
     public record CustomerResponse

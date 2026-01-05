@@ -1,51 +1,59 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class VerifyCustomer : IEndpoint
+public class VerifyCustomer(ICustomerRepository customerRepository) :
+    Endpoint<VerifyCustomer.VerifyCustomerRequest, VerifyCustomer.CustomerResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapGet("Customers/VerifyBy", Handler)
-            .WithName("VerifyCustomer").WithSummary("Verify Customer by id or system user id.")
-            .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status400BadRequest)
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Get("/customers/verifyby");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("VerifyCustomer")
+                .WithSummary("Verify Customer by id or system user id.")
+                .WithTags(nameof(Customer))
+                .Produces<CustomerResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .Produces(StatusCodes.Status400BadRequest)
+                .AllowAnonymous();
+        });
     }
 
-    private static async Task<Results<Ok<CustomerResponse>, NotFound, BadRequest>> Handler(
-        [FromQuery]
-        Guid? customerId,
-        [FromQuery]
-        Guid? systemUserId,
-        ICustomerRepository customerRepository,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(VerifyCustomerRequest request, CancellationToken cancellationToken)
     {
-        if (customerId.HasValue)
+        if (request.CustomerId.HasValue)
         {
-            var customer = await customerRepository.GetBy(customerId.Value, cancellationToken);
-            return customer != null
-                ? TypedResults.Ok(MapToResponse(customer))
-                : TypedResults.NotFound();
+            var customer = await customerRepository.GetBy(request.CustomerId.Value, cancellationToken);
+            if (customer is null)
+            {
+                await Send.NotFoundAsync(cancellationToken);
+                return;
+            }
+
+            await Send.OkAsync(MapToResponse(customer), cancellationToken);
+            return;
         }
 
-        if (systemUserId.HasValue)
+        if (request.SystemUserId.HasValue)
         {
-            var customer = await customerRepository.GetBySuid(systemUserId.Value, cancellationToken);
-            return customer != null
-                ? TypedResults.Ok(MapToResponse(customer))
-                : TypedResults.NotFound();
+            var customer = await customerRepository.GetBySuid(request.SystemUserId.Value, cancellationToken);
+            if (customer is null)
+            {
+                await Send.NotFoundAsync(cancellationToken);
+                return;
+            }
+
+            await Send.OkAsync(MapToResponse(customer), cancellationToken);
+            return;
         }
 
-        return TypedResults.BadRequest();
+        AddError("Either 'customerId' or 'systemUserId' must be provided.");
+        ThrowIfAnyErrors();
     }
 
     public record CustomerResponse
@@ -66,6 +74,13 @@ public class VerifyCustomer : IEndpoint
         public DateOnly BirthDate { get; init; }
 
         public Guid? DefaultAddressId { get; init; }
+    }
+
+    public record VerifyCustomerRequest
+    {
+        public Guid? CustomerId { get; init; }
+
+        public Guid? SystemUserId { get; init; }
     }
 
     private static CustomerResponse MapToResponse(Customer entity)

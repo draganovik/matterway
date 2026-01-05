@@ -1,65 +1,67 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using FluentValidation.Results;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class CreateCustomer : IEndpoint
+public class CreateCustomer(ICustomerRepository customerRepository) :
+    Endpoint<CreateCustomer.CustomerRequest, CreateCustomer.CustomerResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapPost("Customers", Handler)
-            .WithName("CreateCustomer").WithSummary("Create a Customer.")
-            .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Post("/customers");
+        Version(1);
+
+        Options(options =>
+        {
+            options.WithName("CreateCustomer")
+                .WithSummary("Create a Customer.")
+                .WithTags(nameof(Customer))
+                .Produces<CustomerResponse>(StatusCodes.Status201Created)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .Produces(StatusCodes.Status403Forbidden)
+                .RequireAuthorization();
+        });
     }
 
-    private static async Task<Results<Created<CustomerResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>
-        Handler(CustomerRequest request,
-            HttpContext httpContext,
-            LinkGenerator linkGenerator,
-            ICustomerRepository customerRepository,
-            CancellationToken cancellationToken)
+    public override async Task HandleAsync(CustomerRequest request, CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
-
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(User, out var userContext))
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
         var newEntity = MapToEntity(request);
 
-        if (userRole == ERequestClaimsRole.Customer && newEntity.SystemUserId != systemUserId)
-            return TypedResults.Forbid();
+        if (userContext.Role == ERequestClaimsRole.Customer && newEntity.SystemUserId != userContext.SystemUserId)
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
         newEntity.Id = newEntity.SystemUserId;
 
         var createdCustomer = await customerRepository.Create(newEntity, cancellationToken);
         if (createdCustomer is null)
         {
-            var problemDetails = new ProblemDetails
+            var errors = new List<ValidationFailure>
             {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Cannot create entity"
+                new(string.Empty, "Cannot create entity")
             };
-            return TypedResults.BadRequest(problemDetails);
+            await HttpContext.Response.SendErrorsAsync(errors, StatusCodes.Status400BadRequest, null,
+                cancellationToken);
+            return;
         }
 
-        var location = linkGenerator.GetUriByName(httpContext, "GetCustomerById",
-            new { id = createdCustomer.Id });
-
-        return TypedResults.Created(location, MapToResponse(createdCustomer));
+        await Send.CreatedAtAsync<GetCustomerById>(
+            new { id = createdCustomer.Id },
+            MapToResponse(createdCustomer),
+            cancellation: cancellationToken);
     }
 
     public record CustomerRequest

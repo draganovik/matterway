@@ -1,39 +1,44 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
-public class GetCartItemById : IEndpoint
+public class GetCartItemById(ICartItemRepository cartItemRepository) :
+    EndpointWithoutRequest<GetCartItemById.CartItemResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapGet("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
-            .WithName("GetCartItemById").WithSummary("Get CartItem by id.")
-            .WithTags(nameof(CartItem))
-            .Produces<CartItemResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Get("/customers/{id:guid}/cartitems/{productId:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("GetCartItemById")
+                .WithSummary("Get CartItem by id.")
+                .WithTags(nameof(CartItem))
+                .Produces<CartItemResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .RequireAuthorization(policy => policy.RequireRole(
+                    nameof(ERequestClaimsRole.Admin),
+                    nameof(ERequestClaimsRole.Manager)));
+        });
     }
 
-    private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
-        Guid id,
-        Guid productId,
-        ICartItemRepository cartItemRepository,
-        HttpContext httpContext,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(CancellationToken cancellationToken)
     {
-        var entity = await cartItemRepository.GetBy(id, productId, cancellationToken);
-        if (entity == null) return TypedResults.NotFound();
+        var id = Route<Guid>("id");
+        var productId = Route<Guid>("productId");
 
-        return TypedResults.Ok(MapToResponse(entity));
+        var entity = await cartItemRepository.GetBy(id, productId, cancellationToken);
+        if (entity == null)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(MapToResponse(entity), cancellationToken);
     }
 
     public record CartItemResponse

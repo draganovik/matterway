@@ -1,46 +1,52 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
+using FastEndpoints;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class UpdateCustomer : IEndpoint
+public class UpdateCustomer(ICustomerRepository customerRepository) :
+    Endpoint<UpdateCustomer.CustomerRequest, UpdateCustomer.CustomerResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapPatch("Customers/{id:guid}", Handler)
-            .WithName("UpdateCustomer").WithSummary("Update Customer by id.")
-            .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Patch("/customers/{id:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("UpdateCustomer")
+                .WithSummary("Update Customer by id.")
+                .WithTags(nameof(Customer))
+                .Produces<CustomerResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .Produces(StatusCodes.Status403Forbidden)
+                .RequireAuthorization();
+        });
     }
 
-    private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid id,
-        CustomerRequest request,
-        HttpContext httpContext,
-        ICustomerRepository customerRepository,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(CustomerRequest request, CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(User, out var userContext))
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        if (userContext.Role == ERequestClaimsRole.Customer && request.SystemUserId != userContext.SystemUserId)
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        if (userRole == ERequestClaimsRole.Customer && request.SystemUserId != systemUserId)
-            return TypedResults.Forbid();
-
+        var id = Route<Guid>("id");
         var entity = await customerRepository.GetBy(id, cancellationToken);
         if (entity is null)
-            return TypedResults.NotFound();
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
 
         entity.UpdateDetails(
             request.FirstName,
@@ -49,9 +55,13 @@ public class UpdateCustomer : IEndpoint
             request.DefaultAddressId);
 
         var updated = await customerRepository.Update(entity, cancellationToken);
-        return updated is not null
-            ? TypedResults.Ok(MapToResponse(updated))
-            : TypedResults.NotFound();
+        if (updated is null)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(MapToResponse(updated), cancellationToken);
     }
 
     public record CustomerRequest

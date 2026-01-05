@@ -1,37 +1,43 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class GetCustomerById : IEndpoint
+public class GetCustomerById(ICustomerRepository customerRepository) :
+    EndpointWithoutRequest<GetCustomerById.CustomerResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapGet("Customers/{id:guid}", Handler)
-            .WithName("GetCustomerById").WithSummary("Get Customer by id.")
-            .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Get("/customers/{id:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("GetCustomerById")
+                .WithSummary("Get Customer by id.")
+                .WithTags(nameof(Customer))
+                .Produces<CustomerResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .RequireAuthorization(policy => policy.RequireRole(
+                    nameof(ERequestClaimsRole.Admin),
+                    nameof(ERequestClaimsRole.Manager)));
+        });
     }
 
-    private static async Task<Results<Ok<CustomerResponse>, NotFound>> Handler(
-        Guid id,
-        ICustomerRepository customerRepository,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(CancellationToken cancellationToken)
     {
-        return await customerRepository.GetBy(id, cancellationToken)
-            is Customer value
-            ? TypedResults.Ok(MapToResponse(value))
-            : TypedResults.NotFound();
+        var id = Route<Guid>("id");
+
+        var customer = await customerRepository.GetBy(id, cancellationToken);
+        if (customer is null)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(MapToResponse(customer), cancellationToken);
     }
 
     public record CustomerResponse

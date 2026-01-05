@@ -1,51 +1,59 @@
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Application;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
-public class DeleteCartItem : IEndpoint
+public class DeleteCartItem(ICartItemRepository cartItemRepository) :
+    EndpointWithoutRequest<DeleteCartItem.DeleteCartItemResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapDelete("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
-            .WithName("DeleteCartItem").WithSummary("Delete CartItem.")
-            .WithTags(nameof(CartItem))
-            .Produces<DeleteCartItemResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Delete("/customers/{id:guid}/cartitems/{productId:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("DeleteCartItem")
+                .WithSummary("Delete CartItem.")
+                .WithTags(nameof(CartItem))
+                .Produces<DeleteCartItemResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .RequireAuthorization();
+        });
     }
 
-    private static async Task<Results<Ok<DeleteCartItemResponse>, NotFound, ForbidHttpResult>> Handler(
-        Guid id,
-        Guid productId,
-        HttpContext httpContext,
-        ICartItemRepository cartItemRepository,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(User, out var userContext))
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        var customerId = Route<Guid>("id");
+        var productId = Route<Guid>("productId");
 
-        if (userRole == ERequestClaimsRole.Customer && id != systemUserId) return TypedResults.Forbid();
+        if (userContext.Role == ERequestClaimsRole.Customer && customerId != userContext.SystemUserId)
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        var isDeleted = await cartItemRepository.Delete(id, productId, cancellationToken);
-        return isDeleted
-            ? TypedResults.Ok(new DeleteCartItemResponse
-            {
-                CustomerId = id,
-                ProductId = productId
-            })
-            : TypedResults.NotFound();
+        var isDeleted = await cartItemRepository.Delete(customerId, productId, cancellationToken);
+        if (!isDeleted)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(new DeleteCartItemResponse
+        {
+            CustomerId = customerId,
+            ProductId = productId
+        }, cancellationToken);
     }
 
     public record DeleteCartItemResponse

@@ -1,5 +1,4 @@
-using Asp.Versioning;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using FastEndpoints;
 using Scalar.AspNetCore;
 
 namespace Matterway.Customers.Api.Application;
@@ -8,49 +7,9 @@ public static class EndpointRegistration
 {
     extension(IHostApplicationBuilder builder)
     {
-        public IHostApplicationBuilder ConfigureApiVersioning()
+        public IHostApplicationBuilder ConfigureFastEndpoints()
         {
-            builder.Services.AddApiVersioning(options =>
-                {
-                    options.DefaultApiVersion = new ApiVersion(1, 0);
-                    options.AssumeDefaultVersionWhenUnspecified = true;
-                    options.ReportApiVersions = true;
-                    options.ApiVersionReader = new UrlSegmentApiVersionReader();
-                })
-                .AddApiExplorer(options =>
-                {
-                    options.GroupNameFormat = "'v'VVV";
-                    options.SubstituteApiVersionInUrl = true;
-                });
-
-            return builder;
-        }
-
-        public IHostApplicationBuilder ConfigureFeatures()
-        {
-            var uniqueTypes = new HashSet<Type>();
-
-            var serviceDescriptors = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly =>
-                {
-                    try
-                    {
-                        return assembly.DefinedTypes;
-                    }
-                    catch
-                    {
-                        return [];
-                    } // avoid ReflectionTypeLoadException
-                })
-                .Where(type =>
-                    type is { IsAbstract: false, IsInterface: false } &&
-                    type.IsAssignableTo(typeof(IEndpoint)) &&
-                    uniqueTypes.Add(type.AsType()))
-                .Select(type =>
-                    ServiceDescriptor.Transient(typeof(IEndpoint), type.AsType()))
-                .ToArray();
-
-            builder.Services.TryAddEnumerable(serviceDescriptors);
+            builder.Services.AddFastEndpoints();
 
             return builder;
         }
@@ -58,24 +17,15 @@ public static class EndpointRegistration
 
     extension(WebApplication app)
     {
-        public WebApplication ApplyEndpoints()
+        public WebApplication UseFastEndpointsWithDefaults()
         {
-            var versionSet = app.NewApiVersionSet()
-                .HasApiVersion(new ApiVersion(1, 0))
-                .ReportApiVersions()
-                .Build();
-
-            var apiGroup = app.MapGroup("/api")
-                .DisableAntiforgery();
-
-            var versionedApiGroup = apiGroup
-                .MapGroup("/v{version:apiVersion}")
-                .WithApiVersionSet(versionSet);
-
-            var endpoints = app.Services
-                .GetRequiredService<IEnumerable<IEndpoint>>();
-
-            foreach (var endpoint in endpoints) endpoint.MapEndpoint(versionedApiGroup);
+            app.UseFastEndpoints(config =>
+            {
+                config.Endpoints.RoutePrefix = "api";
+                config.Versioning.Prefix = "v";
+                config.Versioning.PrependToRoute = true;
+                config.Versioning.DefaultVersion = 1;
+            });
 
             return app;
         }

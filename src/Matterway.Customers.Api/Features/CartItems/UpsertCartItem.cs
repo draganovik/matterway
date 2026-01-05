@@ -1,65 +1,73 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Asp.Versioning;
+using FastEndpoints;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using FluentValidation.Results;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
-public class UpsertCartItem : IEndpoint
+public class UpsertCartItem(ICartItemRepository cartItemRepository, ICatalogClient catalogClient) :
+    Endpoint<UpsertCartItem.CartItemRequest, UpsertCartItem.CartItemResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapPut("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
-            .WithName("UpsertCartItemById").WithSummary("Upsert CartItem.")
-            .WithTags(nameof(CartItem))
-            .Produces<CartItemResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Put("/customers/{id:guid}/cartitems/{productId:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("UpsertCartItemById")
+                .WithSummary("Upsert CartItem.")
+                .WithTags(nameof(CartItem))
+                .Produces<CartItemResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .RequireAuthorization();
+        });
     }
 
-    private static async Task<
-            Results<Ok<CartItemResponse>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>>
-        Handler(Guid id,
-            Guid productId,
-            CartItemRequest request,
-            HttpContext httpContext,
-            ICartItemRepository cartItemRepository,
-            ICatalogClient catalogClient,
-            CancellationToken cancellationToken)
+    public override async Task HandleAsync(CartItemRequest request, CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(User, out var userContext))
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        var customerId = Route<Guid>("id");
+        var productId = Route<Guid>("productId");
 
-        if (userRole == ERequestClaimsRole.Customer && id != systemUserId) return TypedResults.Forbid();
+        if (userContext.Role == ERequestClaimsRole.Customer && customerId != userContext.SystemUserId)
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
         var product = await catalogClient.GetProductById(productId, cancellationToken);
-        if (product is null) return TypedResults.NotFound();
+        if (product is null)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
 
         var resolvedPrice = product.Price ?? product.BasePrice;
         if (resolvedPrice is null)
-            return TypedResults.BadRequest(new ProblemDetails
+        {
+            var errors = new List<ValidationFailure>
             {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Product price is unavailable."
-            });
+                new(string.Empty, "Product price is unavailable.")
+            };
+            await HttpContext.Response.SendErrorsAsync(errors, StatusCodes.Status400BadRequest, null,
+                cancellationToken);
+            return;
+        }
 
         var entity = new CartItem
         {
-            CustomerId = id,
+            CustomerId = customerId,
             ProductId = productId,
             Quantity = request.Quantity,
             ProductName = product.Title,
@@ -69,18 +77,22 @@ public class UpsertCartItem : IEndpoint
         try
         {
             var stored = await cartItemRepository.Upsert(entity, cancellationToken);
-            return stored is not null
-                ? TypedResults.Ok(MapToResponse(stored))
-                : TypedResults.NotFound();
+            if (stored is null)
+            {
+                await Send.NotFoundAsync(cancellationToken);
+                return;
+            }
+
+            await Send.OkAsync(MapToResponse(stored), cancellationToken);
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(new ProblemDetails
+            var errors = new List<ValidationFailure>
             {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = ex.Message
-            });
+                new(string.Empty, ex.Message)
+            };
+            await HttpContext.Response.SendErrorsAsync(errors, StatusCodes.Status400BadRequest, null,
+                cancellationToken);
         }
     }
 

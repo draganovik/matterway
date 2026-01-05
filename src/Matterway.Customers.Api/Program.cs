@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FastEndpoints;
 using Matterway.Customers.Api.Application;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
@@ -25,7 +26,6 @@ builder.AddServiceDefaults();
 
 builder
     .ConfigureProblemDetails()
-    .ConfigureApiVersioning()
     .ConfigureOpenApi()
     .ConfigureCors();
 
@@ -33,7 +33,7 @@ builder
     .ConfigureAuthentication()
     .ConfigureCatalogIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureFastEndpoints();
 
 var app = builder.Build();
 
@@ -44,13 +44,12 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseFastEndpointsWithDefaults();
 
 if (app.Environment.IsDevelopment())
 {
     app.ApplyOpenApi();
     app.ApplyScalar();
 }
-
-app.ApplyEndpoints();
 
 app.Run();

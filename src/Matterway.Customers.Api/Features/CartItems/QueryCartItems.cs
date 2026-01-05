@@ -1,58 +1,60 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
+using FastEndpoints;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
-public class QueryCartItems : IEndpoint
+public class QueryCartItems(ICartItemRepository cartItemRepository, LinkGenerator linkGenerator) :
+    Endpoint<PaginationRequestParameters, PaginationResponse<QueryCartItems.CartItemResponse>>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapGet("Customers/CartItems", Handler)
-            .WithName("QueryCartItems").WithSummary("Query CartItems.")
-            .WithTags(nameof(CartItem))
-            .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status204NoContent)
-            .RequireAuthorization()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Customer)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Get("/customers/cartitems");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("QueryCartItems")
+                .WithSummary("Query CartItems.")
+                .WithTags(nameof(CartItem))
+                .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status204NoContent)
+                .Produces(StatusCodes.Status403Forbidden)
+                .RequireAuthorization(policy => policy.RequireRole(
+                    nameof(ERequestClaimsRole.Customer)));
+        });
     }
 
-    private static async Task<Results<Ok<PaginationResponse<CartItemResponse>>, NoContent, ForbidHttpResult>>
-        Handler(
-            [AsParameters]
-            PaginationRequestParameters pagingQuery,
-            HttpContext httpContext,
-            LinkGenerator linkGenerator,
-            ICartItemRepository cartItemRepository)
+    public override async Task HandleAsync(PaginationRequestParameters request, CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(User, out var userContext))
+        {
+            await Send.ForbiddenAsync(cancellationToken);
+            return;
+        }
 
-        var total = await cartItemRepository.Count(systemUserId);
-        var entities = await cartItemRepository.QueryForSuid(systemUserId, pagingQuery.Page,
-            pagingQuery.PageSize);
+        var total = await cartItemRepository.Count(userContext.SystemUserId);
+        var entities = await cartItemRepository.QueryForSuid(userContext.SystemUserId, request.Page, request.PageSize);
 
-        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
+        var baseUri = linkGenerator.GetUriByName(HttpContext, "QueryCartItems", null);
         var response = entities.Select(MapToResponse).ToList();
 
         var paginationResponse = PaginationResponse<CartItemResponse>.Create(
             response,
             total,
-            pagingQuery.Page,
-            pagingQuery.PageSize,
+            request.Page,
+            request.PageSize,
             baseUri);
 
-        return entities.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        if (!entities.Any())
+        {
+            await Send.NoContentAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(paginationResponse, cancellationToken);
     }
 
     public record CartItemResponse

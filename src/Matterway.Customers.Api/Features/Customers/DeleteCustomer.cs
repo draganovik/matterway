@@ -1,40 +1,45 @@
-using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using FastEndpoints;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
-public class DeleteCustomer : IEndpoint
+public class DeleteCustomer(ICustomerRepository customerRepository) :
+    EndpointWithoutRequest<DeleteCustomer.DeleteCustomerResponse>
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public override void Configure()
     {
-        app.MapDelete("Customers/{id:guid}", Handler)
-            .WithName("DeleteCustomer").WithSummary("Delete Customer by id.")
-            .WithTags(nameof(Customer))
-            .Produces<DeleteCustomerResponse>()
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+        Delete("/customers/{id:guid}");
+        Version(1);
+        Options(options =>
+        {
+            options.WithName("DeleteCustomer")
+                .WithSummary("Delete Customer by id.")
+                .WithTags(nameof(Customer))
+                .Produces<DeleteCustomerResponse>()
+                .Produces(StatusCodes.Status404NotFound)
+                .RequireAuthorization(policy => policy.RequireRole(
+                    nameof(ERequestClaimsRole.Admin),
+                    nameof(ERequestClaimsRole.Manager)));
+        });
     }
 
-    private static async Task<Results<Ok<DeleteCustomerResponse>, NotFound>> Handler(
-        Guid id,
-        ICustomerRepository customerRepository,
-        CancellationToken cancellationToken)
+    public override async Task HandleAsync(CancellationToken cancellationToken)
     {
+        var id = Route<Guid>("id");
         var isDeleted = await customerRepository.Delete(id, cancellationToken);
-        return isDeleted
-            ? TypedResults.Ok(new DeleteCustomerResponse
-            {
-                Id = id,
-                Message = "Customer removed successfully."
-            })
-            : TypedResults.NotFound();
+        if (!isDeleted)
+        {
+            await Send.NotFoundAsync(cancellationToken);
+            return;
+        }
+
+        await Send.OkAsync(new DeleteCustomerResponse
+        {
+            Id = id,
+            Message = "Customer removed successfully."
+        }, cancellationToken);
     }
 
     public record DeleteCustomerResponse
