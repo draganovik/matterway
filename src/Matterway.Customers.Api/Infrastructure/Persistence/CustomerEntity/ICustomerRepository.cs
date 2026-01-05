@@ -4,17 +4,17 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 public interface ICustomerRepository
 {
-    Task<Customer?> Create(Customer requestModel);
+    Task<Customer?> Create(Customer requestModel, CancellationToken cancellationToken = default);
 
-    Task<ICollection<Customer>> Query(int pageIndex, int pageSize);
+    Task<ICollection<Customer>> Query(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
 
-    Task<Customer?> Update(Customer entity);
+    Task<Customer?> Update(Customer entity, CancellationToken cancellationToken = default);
 
-    Task<bool> Delete(Guid id);
+    Task<bool> Delete(Guid id, CancellationToken cancellationToken = default);
 
-    Task<Customer?> GetBy(Guid id);
+    Task<Customer?> GetBy(Guid id, CancellationToken cancellationToken = default);
 
-    Task<Customer?> GetBySuid(Guid systemUserId);
+    Task<Customer?> GetBySuid(Guid systemUserId, CancellationToken cancellationToken = default);
 
-    Task<int> Count();
+    Task<int> Count(CancellationToken cancellationToken = default);
 }

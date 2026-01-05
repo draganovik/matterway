@@ -4,13 +4,14 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 public interface ICartItemRepository
 {
-    Task<ICollection<CartItem>> QueryForSuid(Guid systemUserId, int pageIndex, int pageSize);
+    Task<ICollection<CartItem>> QueryForSuid(Guid systemUserId, int pageIndex, int pageSize,
+        CancellationToken cancellationToken = default);
 
-    Task<CartItem?> Upsert(CartItem requestModel);
+    Task<CartItem?> Upsert(CartItem requestModel, CancellationToken cancellationToken = default);
 
-    Task<bool> Delete(Guid id, Guid productId);
+    Task<bool> Delete(Guid id, Guid productId, CancellationToken cancellationToken = default);
 
-    Task<CartItem?> GetBy(Guid id, Guid productId);
+    Task<CartItem?> GetBy(Guid id, Guid productId, CancellationToken cancellationToken = default);
 
-    Task<int> Count(Guid systemUserId);
+    Task<int> Count(Guid systemUserId, CancellationToken cancellationToken = default);
 }

@@ -14,7 +14,7 @@ public class DeleteCustomer : IEndpoint
         app.MapDelete("Customers/{id:guid}", Handler)
             .WithName("DeleteCustomer").WithSummary("Delete Customer by id.")
             .WithTags(nameof(Customer))
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<DeleteCustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(ERequestClaimsRole.Admin),
@@ -22,11 +22,24 @@ public class DeleteCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<NoContent, NotFound>> Handler(
+    private static async Task<Results<Ok<DeleteCustomerResponse>, NotFound>> Handler(
         Guid id,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        CancellationToken cancellationToken)
     {
-        var isDeleted = await customerRepository.Delete(id);
-        return isDeleted ? TypedResults.NoContent() : TypedResults.NotFound();
+        var isDeleted = await customerRepository.Delete(id, cancellationToken);
+        return isDeleted
+            ? TypedResults.Ok(new DeleteCustomerResponse
+            {
+                Id = id,
+                Message = "Customer removed successfully."
+            })
+            : TypedResults.NotFound();
+    }
+
+    public record DeleteCustomerResponse
+    {
+        public Guid Id { get; init; }
+        public string Message { get; init; } = "Customer removed successfully.";
     }
 }

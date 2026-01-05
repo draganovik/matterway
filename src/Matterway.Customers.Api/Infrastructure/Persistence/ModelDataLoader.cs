@@ -38,7 +38,7 @@ public static class ModelDataLoader
                 CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                 ProductId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 ProductName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
-                UnitPrice = 4999,
+                UnitPrice = 4999m,
                 Quantity = 3
             },
             new CartItem
@@ -46,7 +46,7 @@ public static class ModelDataLoader
                 CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                 ProductId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 ProductName = "Ring Spotlight Cam",
-                UnitPrice = 19999,
+                UnitPrice = 19999m,
                 Quantity = 1
             }
         );

@@ -19,8 +19,8 @@ namespace Matterway.Customers.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SystemUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     DefaultAddressId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
@@ -33,15 +33,16 @@ namespace Matterway.Customers.Api.Migrations
                 name: "CartItem",
                 columns: table => new
                 {
-                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
-                    UnitPrice = table.Column<double>(type: "double precision", nullable: false),
-                    ProductName = table.Column<string>(type: "text", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
+                    ProductName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CartItem", x => new { x.CustomerId, x.ProductId });
+                    table.CheckConstraint("CK_CartItem_Quantity", "\"Quantity\" >= 1");
                     table.ForeignKey(
                         name: "FK_CartItem_Customer_CustomerId",
                         column: x => x.CustomerId,
@@ -64,9 +65,14 @@ namespace Matterway.Customers.Api.Migrations
                 columns: new[] { "CustomerId", "ProductId", "ProductName", "Quantity", "UnitPrice" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", 1, 19999.0 },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", 3, 4999.0 }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", 1, 19999m },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", 3, 4999m }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartItem_CustomerId",
+                table: "CartItem",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customer_SystemUserId",

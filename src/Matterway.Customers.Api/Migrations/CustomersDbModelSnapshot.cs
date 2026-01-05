@@ -17,7 +17,7 @@ namespace Matterway.Customers.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -32,17 +32,24 @@ namespace Matterway.Customers.Api.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<double>("UnitPrice")
-                        .HasColumnType("double precision");
+                    b.Property<decimal?>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.HasKey("CustomerId", "ProductId");
 
-                    b.ToTable("CartItem");
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CartItem", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CartItem_Quantity", "\"Quantity\" >= 1");
+                        });
 
                     b.HasData(
                         new
@@ -51,7 +58,7 @@ namespace Matterway.Customers.Api.Migrations
                             ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
                             ProductName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
                             Quantity = 3,
-                            UnitPrice = 4999.0
+                            UnitPrice = 4999m
                         },
                         new
                         {
@@ -59,7 +66,7 @@ namespace Matterway.Customers.Api.Migrations
                             ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                             ProductName = "Ring Spotlight Cam",
                             Quantity = 1,
-                            UnitPrice = 19999.0
+                            UnitPrice = 19999m
                         });
                 });
 
@@ -77,11 +84,13 @@ namespace Matterway.Customers.Api.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<Guid>("SystemUserId")
                         .HasColumnType("uuid");
@@ -91,7 +100,7 @@ namespace Matterway.Customers.Api.Migrations
                     b.HasIndex("SystemUserId")
                         .IsUnique();
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
 
                     b.HasData(
                         new

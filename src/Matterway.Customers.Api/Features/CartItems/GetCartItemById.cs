@@ -15,7 +15,7 @@ public class GetCartItemById : IEndpoint
         app.MapGet("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
             .WithName("GetCartItemById").WithSummary("Get CartItem by id.")
             .WithTags(nameof(CartItem))
-            .Produces<CartItemResponse>(StatusCodes.Status200OK)
+            .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(ERequestClaimsRole.Admin),
@@ -26,12 +26,14 @@ public class GetCartItemById : IEndpoint
     private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
         Guid id,
         Guid productId,
-        ICartItemRepository cartItemRepository)
+        ICartItemRepository cartItemRepository,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
     {
-        return await cartItemRepository.GetBy(id, productId)
-            is CartItem value
-            ? TypedResults.Ok(MapToResponse(value))
-            : TypedResults.NotFound();
+        var entity = await cartItemRepository.GetBy(id, productId, cancellationToken);
+        if (entity == null) return TypedResults.NotFound();
+
+        return TypedResults.Ok(MapToResponse(entity));
     }
 
     public record CartItemResponse
@@ -50,8 +52,8 @@ public class GetCartItemById : IEndpoint
         public int Quantity { get; init; }
 
         [Required]
-        [Range(0.01, double.MaxValue)]
-        public double UnitPrice { get; init; }
+        [Range(typeof(decimal), "0.01", "2147483647")]
+        public decimal? UnitPrice { get; init; }
     }
 
     private static CartItemResponse MapToResponse(CartItem entity)

@@ -71,8 +71,8 @@ public class QueryCartItems : IEndpoint
         public int Quantity { get; init; }
 
         [Required]
-        [Range(0.01, double.MaxValue)]
-        public double UnitPrice { get; init; }
+        [Range(0.01, int.MaxValue)]
+        public decimal? UnitPrice { get; init; }
     }
 
     private static CartItemResponse MapToResponse(CartItem entity)

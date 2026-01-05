@@ -8,7 +8,8 @@ internal sealed class CartItemEntityTypeConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
-        builder.ToTable(nameof(CartItem), tb => { tb.HasCheckConstraint("CK_CartItem_Quantity", "[Quantity] >= 1"); });
+        builder.ToTable(nameof(CartItem),
+            tb => { tb.HasCheckConstraint("CK_CartItem_Quantity", "\"Quantity\" >= 1"); });
 
         // Use composite key: each customer has at most one cart item per product
         builder.HasKey(ci => new { ci.CustomerId, ci.ProductId });
@@ -17,9 +18,8 @@ internal sealed class CartItemEntityTypeConfiguration : IEntityTypeConfiguration
         builder.Property(ci => ci.Quantity)
             .IsRequired();
 
-        // UnitPrice: required, set precision (best-effort mapping)
+        // UnitPrice: optional to align with nullable prices, set precision (best-effort mapping)
         builder.Property(ci => ci.UnitPrice)
-            .IsRequired()
             .HasPrecision(18, 2);
 
         // ProductName: required with a reasonable max length

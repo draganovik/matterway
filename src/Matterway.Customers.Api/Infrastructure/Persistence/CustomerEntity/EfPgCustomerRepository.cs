@@ -5,50 +5,52 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 public class EfPgCustomerRepository(CustomersDb context) : ICustomerRepository
 {
-    public async Task<Customer?> Create(Customer requestModel)
+    public async Task<Customer?> Create(Customer requestModel, CancellationToken cancellationToken = default)
     {
         context.Customer.Add(requestModel);
-        var affected = await context.SaveChangesAsync();
-        if (affected == 1) return await context.Customer.FindAsync(requestModel.Id);
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        if (affected == 1) return await context.Customer.FindAsync([requestModel.Id], cancellationToken);
         return null;
     }
 
-    public async Task<ICollection<Customer>> Query(int pageIndex, int pageSize)
+    public async Task<ICollection<Customer>> Query(int pageIndex, int pageSize,
+        CancellationToken cancellationToken = default)
     {
         return await context.Customer.AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Customer?> Update(Customer entity)
+    public async Task<Customer?> Update(Customer entity, CancellationToken cancellationToken = default)
     {
         context.Customer.Update(entity);
-        var affected = await context.SaveChangesAsync();
-        if (affected == 1) return await context.Customer.FindAsync(entity.Id);
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        if (affected == 1) return await context.Customer.FindAsync([entity.Id], cancellationToken);
         return null;
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<bool> Delete(Guid id, CancellationToken cancellationToken = default)
     {
         var affected = await context.Customer
             .Where(model => model.Id == id)
-            .ExecuteDeleteAsync();
+            .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<Customer?> GetBy(Guid id)
+    public async Task<Customer?> GetBy(Guid id, CancellationToken cancellationToken = default)
     {
-        return await context.Customer.FindAsync(id);
+        return await context.Customer.FindAsync([id], cancellationToken);
     }
 
-    public async Task<Customer?> GetBySuid(Guid systemUserId)
+    public async Task<Customer?> GetBySuid(Guid systemUserId, CancellationToken cancellationToken = default)
     {
-        return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == systemUserId);
+        return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == systemUserId,
+            cancellationToken);
     }
 
-    public Task<int> Count()
+    public Task<int> Count(CancellationToken cancellationToken = default)
     {
-        return context.Customer.CountAsync();
+        return context.Customer.CountAsync(cancellationToken);
     }
 }
