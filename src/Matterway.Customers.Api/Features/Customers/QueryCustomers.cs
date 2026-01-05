@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
@@ -15,7 +15,7 @@ public class QueryCustomers : IEndpoint
         app.MapGet("Customers", Handler)
             .WithName("QueryCustomers").WithSummary("Query Customers.")
             .WithTags(nameof(Customer))
-            .Produces<PaginationResponse<CustomerResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<CustomerResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy => policy.RequireRole(
@@ -28,11 +28,12 @@ public class QueryCustomers : IEndpoint
         Handler([AsParameters] PaginationRequestParameters pagingQuery,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            CancellationToken cancellationToken)
     {
-        var total = await customerRepository.Count();
-        var entities = await customerRepository.Query(pagingQuery.Page, pagingQuery.PageSize);
-        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCustomers", null);
+        var total = await customerRepository.Count(cancellationToken);
+        var entities = await customerRepository.Query(pagingQuery.Page, pagingQuery.PageSize, cancellationToken);
+        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCustomers");
 
         var response = entities
             .Select(MapToResponse)

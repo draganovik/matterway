@@ -1,6 +1,6 @@
 using Matterway.Customers.Api.Infrastructure.Persistence;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCartItem;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Customers.Api.Application;

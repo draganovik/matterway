@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,7 +32,7 @@ public class UpdateProductImage : IEndpoint
         IProductImageRepository productImageRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex, cancellationToken);
+        var entity = await productImageRepository.GetBy(productId, orderIndex, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
@@ -41,7 +41,7 @@ public class UpdateProductImage : IEndpoint
 
         if (targetOrderIndex < 0) targetOrderIndex = 0;
 
-        var updated = await productImageRepository.UpdateAsync(entity, targetOrderIndex, cancellationToken);
+        var updated = await productImageRepository.Update(entity, targetOrderIndex, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 

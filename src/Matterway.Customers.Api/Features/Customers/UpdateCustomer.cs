@@ -5,7 +5,7 @@ using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -16,7 +16,7 @@ public class UpdateCustomer : IEndpoint
         app.MapPatch("Customers/{id:guid}", Handler)
             .WithName("UpdateCustomer").WithSummary("Update Customer by id.")
             .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>(StatusCodes.Status200OK)
+            .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization()
             .MapToApiVersion(new ApiVersion(1, 0));
@@ -25,7 +25,8 @@ public class UpdateCustomer : IEndpoint
     private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid id,
         CustomerRequest request,
         HttpContext httpContext,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        CancellationToken cancellationToken)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
@@ -37,7 +38,7 @@ public class UpdateCustomer : IEndpoint
         if (userRole == ERequestClaimsRole.Customer && request.SystemUserId != systemUserId)
             return TypedResults.Forbid();
 
-        var entity = await customerRepository.GetById(id);
+        var entity = await customerRepository.GetBy(id, cancellationToken);
         if (entity is null)
             return TypedResults.NotFound();
 
@@ -47,7 +48,7 @@ public class UpdateCustomer : IEndpoint
             request.BirthDate,
             request.DefaultAddressId);
 
-        var updated = await customerRepository.Update(entity);
+        var updated = await customerRepository.Update(entity, cancellationToken);
         return updated is not null
             ? TypedResults.Ok(MapToResponse(updated))
             : TypedResults.NotFound();

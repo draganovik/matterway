@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Discounts;
@@ -27,7 +27,7 @@ public class DeleteDiscount : IEndpoint
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
     {
-        var deletedCount = await discountRepository.DeleteByCodeAsync(code, cancellationToken);
+        var deletedCount = await discountRepository.Delete(code, cancellationToken);
 
         if (deletedCount == 0) return TypedResults.NotFound();
 

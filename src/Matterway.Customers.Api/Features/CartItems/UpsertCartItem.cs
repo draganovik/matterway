@@ -5,7 +5,7 @@ using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCartItem;
+using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +21,7 @@ public class UpsertCartItem : IEndpoint
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .RequireAuthorization()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
@@ -47,18 +48,27 @@ public class UpsertCartItem : IEndpoint
         var product = await catalogClient.GetProductById(productId, cancellationToken);
         if (product is null) return TypedResults.NotFound();
 
+        var resolvedPrice = product.Price ?? product.BasePrice;
+        if (resolvedPrice is null)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Product price is unavailable."
+            });
+
         var entity = new CartItem
         {
             CustomerId = id,
             ProductId = productId,
             Quantity = request.Quantity,
             ProductName = product.Title,
-            UnitPrice = product.Price
+            UnitPrice = resolvedPrice
         };
 
         try
         {
-            var stored = await cartItemRepository.Upsert(entity);
+            var stored = await cartItemRepository.Upsert(entity, cancellationToken);
             return stored is not null
                 ? TypedResults.Ok(MapToResponse(stored))
                 : TypedResults.NotFound();
@@ -90,8 +100,8 @@ public class UpsertCartItem : IEndpoint
         public int Quantity { get; init; }
 
         [Required]
-        [Range(0.01, double.MaxValue)]
-        public double UnitPrice { get; init; }
+        [Range(typeof(decimal), "0.01", "2147483647")]
+        public decimal? UnitPrice { get; init; }
     }
 
     public record CartItemRequest

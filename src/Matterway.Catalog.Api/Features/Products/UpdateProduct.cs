@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,12 +31,12 @@ public class UpdateProduct : IEndpoint
         IProductRepository productRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await productRepository.GetById(id, cancellationToken);
+        var entity = await productRepository.GetBy(id, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdate(entity, request);
 
-        var updated = await productRepository.UpdateAsync(entity, cancellationToken);
+        var updated = await productRepository.Update(entity, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 

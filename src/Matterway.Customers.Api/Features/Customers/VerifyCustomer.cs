@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ public class VerifyCustomer : IEndpoint
         app.MapGet("Customers/VerifyBy", Handler)
             .WithName("VerifyCustomer").WithSummary("Verify Customer by id or system user id.")
             .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>(StatusCodes.Status200OK)
+            .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .MapToApiVersion(new ApiVersion(1, 0));
@@ -26,11 +26,12 @@ public class VerifyCustomer : IEndpoint
         Guid? customerId,
         [FromQuery]
         Guid? systemUserId,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        CancellationToken cancellationToken)
     {
         if (customerId.HasValue)
         {
-            var customer = await customerRepository.GetById(customerId.Value);
+            var customer = await customerRepository.GetBy(customerId.Value, cancellationToken);
             return customer != null
                 ? TypedResults.Ok(MapToResponse(customer))
                 : TypedResults.NotFound();
@@ -38,7 +39,7 @@ public class VerifyCustomer : IEndpoint
 
         if (systemUserId.HasValue)
         {
-            var customer = await customerRepository.GetBySystemUserId(systemUserId.Value);
+            var customer = await customerRepository.GetBySuid(systemUserId.Value, cancellationToken);
             return customer != null
                 ? TypedResults.Ok(MapToResponse(customer))
                 : TypedResults.NotFound();

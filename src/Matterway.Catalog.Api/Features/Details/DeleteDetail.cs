@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Features.Details;
@@ -30,10 +30,10 @@ public class DeleteDetail : IEndpoint
         CancellationToken cancellationToken)
     {
         var normalizedSlug = slug.Trim().ToLower();
-        var entity = await repository.GetBySlugAsync(normalizedSlug, cancellationToken);
+        var entity = await repository.GetBy(normalizedSlug, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
-        var deleted = await repository.DeleteAsync(normalizedSlug, cancellationToken);
+        var deleted = await repository.Delete(normalizedSlug, cancellationToken);
         if (!deleted)
             return TypedResults.BadRequest(new ProblemDetails
             {

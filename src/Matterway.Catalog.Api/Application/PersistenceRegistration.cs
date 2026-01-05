@@ -1,12 +1,11 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityDiscount;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProduct;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductDetail;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductImage;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntityProductSpecification;
-using Matterway.Catalog.Api.Infrastructure.Persistence.Postgres.EntitySpecification;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecificationEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Application;
@@ -25,13 +24,13 @@ public static class PersistenceRegistration
                 options.UseNpgsql(postgresConnectionString,
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );
-            builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
-            builder.Services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
-            builder.Services.AddScoped<IDetailRepository, DetailRepository>();
-            builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IProductSpecificationRepository, ProductSpecificationRepository>();
-            builder.Services.AddScoped<ISpecificationRepository, SpecificationRepository>();
+            builder.Services.AddScoped<IDiscountRepository, EfPgDiscountRepository>();
+            builder.Services.AddScoped<IProductDetailRepository, EfPgProductDetailRepository>();
+            builder.Services.AddScoped<IDetailRepository, EfPgDetailRepository>();
+            builder.Services.AddScoped<IProductImageRepository, EfPgProductImageRepository>();
+            builder.Services.AddScoped<IProductRepository, EfPgProductRepository>();
+            builder.Services.AddScoped<IProductSpecificationRepository, EfPgProductSpecificationRepository>();
+            builder.Services.AddScoped<ISpecificationRepository, EfPgSpecificationRepository>();
 
             return builder;
         }

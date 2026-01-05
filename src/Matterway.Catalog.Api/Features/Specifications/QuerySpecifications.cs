@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Specifications;
@@ -29,7 +29,7 @@ public class QuerySpecifications : IEndpoint
         CancellationToken cancellationToken)
     {
         var entities =
-            await specificationRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
+            await specificationRepository.Query(request.TitleLike, request.Limit, cancellationToken);
         var response = entities.Select(MapToResponse).ToList();
         return TypedResults.Ok<ICollection<QuerySpecificationResponse>>(response);
     }

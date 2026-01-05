@@ -6,7 +6,7 @@ using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -27,7 +27,8 @@ public class CreateCustomer : IEndpoint
         Handler(CustomerRequest request,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            CancellationToken cancellationToken)
     {
         var identity = httpContext.User.Identity as ClaimsIdentity;
         if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
@@ -43,7 +44,7 @@ public class CreateCustomer : IEndpoint
 
         newEntity.Id = newEntity.SystemUserId;
 
-        var createdCustomer = await customerRepository.Create(newEntity);
+        var createdCustomer = await customerRepository.Create(newEntity, cancellationToken);
         if (createdCustomer is null)
         {
             var problemDetails = new ProblemDetails

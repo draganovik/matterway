@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Details;
@@ -28,7 +28,7 @@ public class QueryDetails : IEndpoint
         IDetailRepository detailRepository,
         CancellationToken cancellationToken)
     {
-        var entities = await detailRepository.QueryAsync(request.TitleLike, request.Limit, cancellationToken);
+        var entities = await detailRepository.Query(request.TitleLike, request.Limit, cancellationToken);
         var response = entities.Select(MapToResponse).ToList();
         return TypedResults.Ok<ICollection<QueryDetailResponse>>(response);
     }

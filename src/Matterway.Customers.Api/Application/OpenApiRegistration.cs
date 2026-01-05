@@ -35,7 +35,7 @@ public static class OpenApiRegistration
                     if (isAnonymous) return Task.CompletedTask;
 
                     operation.Security ??= new List<OpenApiSecurityRequirement>();
-                    var bearerReference = new OpenApiSecuritySchemeReference("Bearer", null, null);
+                    var bearerReference = new OpenApiSecuritySchemeReference("Bearer");
                     operation.Security.Add(new OpenApiSecurityRequirement
                     {
                         { bearerReference, [] }

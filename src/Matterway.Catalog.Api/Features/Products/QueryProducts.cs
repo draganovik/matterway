@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;
@@ -41,7 +41,7 @@ public class QueryProducts : IEndpoint
             HttpContext httpContext, LinkGenerator linkGenerator, IProductRepository productRepository,
             CancellationToken cancellationToken)
     {
-        var total = await productRepository.GetTotalEntities(queryParameters.Filter, cancellationToken);
+        var total = await productRepository.Count(queryParameters.Filter, cancellationToken);
         if (total == 0)
             return TypedResults.NoContent();
 

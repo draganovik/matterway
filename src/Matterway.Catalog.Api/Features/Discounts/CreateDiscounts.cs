@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,7 +55,7 @@ public class CreateDiscounts : IEndpoint
         IReadOnlyCollection<Discount> created;
         try
         {
-            created = await discountRepository.CreateManyAsync(discounts, cancellationToken);
+            created = await discountRepository.CreateBulk(discounts, cancellationToken);
         }
         catch (InvalidOperationException ex)
         {

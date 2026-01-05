@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -30,7 +30,7 @@ public class RemoveProductImage : IEndpoint
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var entity = await productImageRepository.GetByOrderIndex(productId, orderIndex, cancellationToken);
+        var entity = await productImageRepository.GetBy(productId, orderIndex, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 

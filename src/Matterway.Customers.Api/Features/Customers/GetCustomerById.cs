@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCustomer;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
@@ -15,7 +15,7 @@ public class GetCustomerById : IEndpoint
         app.MapGet("Customers/{id:guid}", Handler)
             .WithName("GetCustomerById").WithSummary("Get Customer by id.")
             .WithTags(nameof(Customer))
-            .Produces<CustomerResponse>(StatusCodes.Status200OK)
+            .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
                 nameof(ERequestClaimsRole.Admin),
@@ -25,9 +25,10 @@ public class GetCustomerById : IEndpoint
 
     private static async Task<Results<Ok<CustomerResponse>, NotFound>> Handler(
         Guid id,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        CancellationToken cancellationToken)
     {
-        return await customerRepository.GetById(id)
+        return await customerRepository.GetBy(id, cancellationToken)
             is Customer value
             ? TypedResults.Ok(MapToResponse(value))
             : TypedResults.NotFound();

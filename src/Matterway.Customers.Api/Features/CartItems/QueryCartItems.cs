@@ -5,7 +5,7 @@ using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.EntityCartItem;
+using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
@@ -37,7 +37,7 @@ public class QueryCartItems : IEndpoint
             return TypedResults.Forbid();
 
         var total = await cartItemRepository.Count(systemUserId);
-        var entities = await cartItemRepository.QueryForSystemUserId(systemUserId, pagingQuery.Page,
+        var entities = await cartItemRepository.QueryForSuid(systemUserId, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
@@ -71,8 +71,8 @@ public class QueryCartItems : IEndpoint
         public int Quantity { get; init; }
 
         [Required]
-        [Range(0.01, double.MaxValue)]
-        public double UnitPrice { get; init; }
+        [Range(0.01, int.MaxValue)]
+        public decimal? UnitPrice { get; init; }
     }
 
     private static CartItemResponse MapToResponse(CartItem entity)

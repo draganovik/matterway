@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -28,7 +28,7 @@ public class DeleteProduct : IEndpoint
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetById(id, cancellationToken);
+        var product = await productRepository.GetBy(id, cancellationToken);
 
         if (product is null) return TypedResults.NotFound();
 

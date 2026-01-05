@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Products;
@@ -24,7 +24,7 @@ public class GetProductById : IEndpoint
         IProductRepository productRepository,
         CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetById(id, cancellationToken);
+        var product = await productRepository.GetBy(id, cancellationToken);
 
         if (product == null) return TypedResults.NotFound();
 

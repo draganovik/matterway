@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.ProductDetails;
@@ -28,7 +28,7 @@ public class RemoveProductDetail : IEndpoint
         IProductDetailRepository productDetailRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await productDetailRepository.GetByKey(productId, detailSlug, cancellationToken);
+        var entity = await productDetailRepository.GetBy(productId, detailSlug, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 
