@@ -32,12 +32,10 @@ public class QueryCartItems : IEndpoint
             LinkGenerator linkGenerator,
             ICartItemRepository cartItemRepository)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
-        var total = await cartItemRepository.Count(systemUserId);
-        var entities = await cartItemRepository.QueryForSuid(systemUserId, pagingQuery.Page,
+        var total = await cartItemRepository.Count(userContext.SystemUserId);
+        var entities = await cartItemRepository.QueryForSuid(userContext.SystemUserId, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
@@ -50,9 +48,9 @@ public class QueryCartItems : IEndpoint
             pagingQuery.PageSize,
             baseUri);
 
-        return entities.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        if (entities.Count == 0) return TypedResults.NoContent();
+
+        return TypedResults.Ok(paginationResponse);
     }
 
     public record CartItemResponse

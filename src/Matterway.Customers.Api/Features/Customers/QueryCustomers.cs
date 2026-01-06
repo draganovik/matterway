@@ -46,9 +46,9 @@ public class QueryCustomers : IEndpoint
             pagingQuery.PageSize,
             baseUri);
 
-        return entities.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        if (entities.Count == 0) TypedResults.NoContent();
+
+        return TypedResults.Ok(paginationResponse);
     }
 
     public record CustomerResponse

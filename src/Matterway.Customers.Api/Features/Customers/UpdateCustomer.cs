@@ -28,14 +28,9 @@ public class UpdateCustomer : IEndpoint
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
-
-        if (userRole == ERequestClaimsRole.Customer && request.SystemUserId != systemUserId)
+        if (userContext.Role == ERequestClaimsRole.Customer && request.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
         var entity = await customerRepository.GetBy(id, cancellationToken);
@@ -49,9 +44,9 @@ public class UpdateCustomer : IEndpoint
             request.DefaultAddressId);
 
         var updated = await customerRepository.Update(entity, cancellationToken);
-        return updated is not null
-            ? TypedResults.Ok(MapToResponse(updated))
-            : TypedResults.NotFound();
+        if (updated is null) return TypedResults.NotFound();
+
+        return TypedResults.Ok(MapToResponse(updated));
     }
 
     public record CustomerRequest

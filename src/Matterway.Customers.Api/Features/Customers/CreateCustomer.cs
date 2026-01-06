@@ -30,16 +30,11 @@ public class CreateCustomer : IEndpoint
             ICustomerRepository customerRepository,
             CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
-
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
         var newEntity = MapToEntity(request);
 
-        if (userRole == ERequestClaimsRole.Customer && newEntity.SystemUserId != systemUserId)
+        if (userContext.Role == ERequestClaimsRole.Customer && newEntity.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
         newEntity.Id = newEntity.SystemUserId;

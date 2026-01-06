@@ -28,13 +28,13 @@ public class DeleteCustomer : IEndpoint
         CancellationToken cancellationToken)
     {
         var isDeleted = await customerRepository.Delete(id, cancellationToken);
-        return isDeleted
-            ? TypedResults.Ok(new DeleteCustomerResponse
-            {
-                Id = id,
-                Message = "Customer removed successfully."
-            })
-            : TypedResults.NotFound();
+        if (!isDeleted) TypedResults.NotFound();
+
+        return TypedResults.Ok(new DeleteCustomerResponse
+        {
+            Id = id,
+            Message = "Customer removed successfully."
+        });
     }
 
     public record DeleteCustomerResponse

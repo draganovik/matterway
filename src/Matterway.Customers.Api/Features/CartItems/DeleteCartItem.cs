@@ -12,7 +12,7 @@ public class DeleteCartItem : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
+        app.MapDelete("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("DeleteCartItem").WithSummary("Delete CartItem.")
             .WithTags(nameof(CartItem))
             .Produces<DeleteCartItemResponse>()
@@ -23,29 +23,24 @@ public class DeleteCartItem : IEndpoint
     }
 
     private static async Task<Results<Ok<DeleteCartItemResponse>, NotFound, ForbidHttpResult>> Handler(
-        Guid id,
+        Guid customerId,
         Guid productId,
         HttpContext httpContext,
         ICartItemRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+        if (!UserContext.TryGet(httpContext.User, out var userContext) ||
+            (userContext.Role == ERequestClaimsRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        var isDeleted = await cartItemRepository.Delete(customerId, productId, cancellationToken);
+        if (!isDeleted) return TypedResults.NotFound();
 
-        if (userRole == ERequestClaimsRole.Customer && id != systemUserId) return TypedResults.Forbid();
-
-        var isDeleted = await cartItemRepository.Delete(id, productId, cancellationToken);
-        return isDeleted
-            ? TypedResults.Ok(new DeleteCartItemResponse
-            {
-                CustomerId = id,
-                ProductId = productId
-            })
-            : TypedResults.NotFound();
+        return TypedResults.Ok(new DeleteCartItemResponse
+        {
+            CustomerId = customerId,
+            ProductId = productId
+        });
     }
 
     public record DeleteCartItemResponse

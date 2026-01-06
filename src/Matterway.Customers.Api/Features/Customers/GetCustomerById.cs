@@ -12,7 +12,7 @@ public class GetCustomerById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("Customers/{id:guid}", Handler)
+        app.MapGet("Customers/{customerId:guid}", Handler)
             .WithName("GetCustomerById").WithSummary("Get Customer by id.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
@@ -24,14 +24,13 @@ public class GetCustomerById : IEndpoint
     }
 
     private static async Task<Results<Ok<CustomerResponse>, NotFound>> Handler(
-        Guid id,
+        Guid customerId,
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        return await customerRepository.GetBy(id, cancellationToken)
-            is Customer value
-            ? TypedResults.Ok(MapToResponse(value))
-            : TypedResults.NotFound();
+        var entity = await customerRepository.GetBy(customerId, cancellationToken);
+        if (entity is null) return TypedResults.NotFound();
+        return TypedResults.Ok(MapToResponse(entity));
     }
 
     public record CustomerResponse
