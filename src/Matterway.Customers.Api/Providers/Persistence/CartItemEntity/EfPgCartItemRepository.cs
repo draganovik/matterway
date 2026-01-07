@@ -8,7 +8,7 @@ public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
     public async Task<ICollection<CartItem>> QueryForSuid(Guid systemUserId, int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await context.CartItem.Where(x => x.Customer != null && x.Customer.SystemUserId == systemUserId)
+        return await context.CartItem.Where(x => x.Customer != null && x.Customer.Id == systemUserId)
             .AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -47,7 +47,7 @@ public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
 
     public async Task<int> Count(Guid systemUserId, CancellationToken cancellationToken = default)
     {
-        return await context.CartItem.Where(x => x.Customer != null && x.Customer.SystemUserId == systemUserId)
+        return await context.CartItem.Where(x => x.Customer != null && x.Customer.Id == systemUserId)
             .CountAsync(cancellationToken);
     }
 }

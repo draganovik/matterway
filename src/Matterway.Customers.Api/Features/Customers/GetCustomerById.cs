@@ -36,9 +36,6 @@ public class GetCustomerById : IEndpoint
     public record CustomerResponse
     {
         [Required]
-        public Guid Id { get; init; }
-
-        [Required]
         public Guid SystemUserId { get; init; }
 
         [Required]
@@ -57,8 +54,7 @@ public class GetCustomerById : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

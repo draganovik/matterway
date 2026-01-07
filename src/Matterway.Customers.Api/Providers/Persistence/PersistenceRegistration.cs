@@ -1,3 +1,4 @@
+using Matterway.Customers.Api.Providers.Persistence.AddressEntity;
 using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public static class PersistenceRegistration
 
             builder.Services.AddScoped<ICustomerRepository, EfPgCustomerRepository>();
             builder.Services.AddScoped<ICartItemRepository, EfPgCartItemRepository>();
+            builder.Services.AddScoped<IAddressRepository, EfPgAddressRepository>();
 
             return builder;
         }

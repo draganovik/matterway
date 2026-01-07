@@ -11,7 +11,7 @@ public class DeleteCustomer : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("Customers/{id:guid}", Handler)
+        app.MapDelete("Customers/{systemUserId:guid}", Handler)
             .WithName("DeleteCustomer").WithSummary("Delete Customer by id.")
             .WithTags(nameof(Customer))
             .Produces<DeleteCustomerResponse>()
@@ -23,16 +23,16 @@ public class DeleteCustomer : IEndpoint
     }
 
     private static async Task<Results<Ok<DeleteCustomerResponse>, NotFound>> Handler(
-        Guid id,
+        Guid systemUserId,
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        var isDeleted = await customerRepository.Delete(id, cancellationToken);
+        var isDeleted = await customerRepository.Delete(systemUserId, cancellationToken);
         if (!isDeleted) TypedResults.NotFound();
 
         return TypedResults.Ok(new DeleteCustomerResponse
         {
-            Id = id,
+            Id = systemUserId,
             Message = "Customer removed successfully."
         });
     }

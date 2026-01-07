@@ -16,7 +16,7 @@ public static class ModelDataLoader
                 FirstName = "Stefan",
                 LastName = "Stefanov",
                 BirthDate = new DateOnly(1980, 1, 1),
-                SystemUserId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3")
+                DefaultAddressId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5")
             },
             new Customer
             {
@@ -24,7 +24,7 @@ public static class ModelDataLoader
                 FirstName = "Mara",
                 LastName = "Jakov",
                 BirthDate = new DateOnly(2000, 5, 5),
-                SystemUserId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4")
+                DefaultAddressId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6")
             }
         );
 
@@ -48,6 +48,35 @@ public static class ModelDataLoader
                 ProductName = "Ring Spotlight Cam",
                 UnitPrice = 19999m,
                 Quantity = 1
+            }
+        );
+
+        #endregion
+
+        #region Adresses data
+
+        modelBuilder.Entity<Address>().HasData(
+            new Address
+            {
+                Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"),
+                CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
+                Country = "Serbia",
+                City = "Novi Sad",
+                ZipCode = "21000",
+                AddressLine1 = "Futog",
+                AddressLine2 = "23b",
+                ContactPhone = "+381601234567"
+            },
+            new Address
+            {
+                Id = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"),
+                CustomerId = Guid.Parse("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
+                Country = "Serbia",
+                City = "Beograd",
+                ZipCode = "11000",
+                AddressLine1 = "Kralja Milana",
+                AddressLine2 = "34/10",
+                ContactPhone = "++381676543210"
             }
         );
 

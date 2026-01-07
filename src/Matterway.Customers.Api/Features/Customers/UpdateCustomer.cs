@@ -12,7 +12,7 @@ public class UpdateCustomer : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("Customers/{id:guid}", Handler)
+        app.MapPatch("Customers/{systemUserId:guid}", Handler)
             .WithName("UpdateCustomer").WithSummary("Update Customer by id.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
@@ -21,7 +21,7 @@ public class UpdateCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid id,
+    private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid systemUserId,
         CustomerRequest request,
         HttpContext httpContext,
         ICustomerRepository customerRepository,
@@ -32,7 +32,7 @@ public class UpdateCustomer : IEndpoint
         if (userContext.Role == ERequestRole.Customer && request.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
-        var entity = await customerRepository.GetBy(id, cancellationToken);
+        var entity = await customerRepository.GetBy(systemUserId, cancellationToken);
         if (entity is null)
             return TypedResults.NotFound();
 
@@ -68,9 +68,6 @@ public class UpdateCustomer : IEndpoint
     public record CustomerResponse
     {
         [Required]
-        public Guid Id { get; init; }
-
-        [Required]
         public Guid SystemUserId { get; init; }
 
         [Required]
@@ -89,8 +86,7 @@ public class UpdateCustomer : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

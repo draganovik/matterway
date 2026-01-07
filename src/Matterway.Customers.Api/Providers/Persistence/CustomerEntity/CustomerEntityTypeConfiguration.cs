@@ -13,13 +13,6 @@ internal sealed class CustomerEntityTypeConfiguration : IEntityTypeConfiguration
         // Primary key
         builder.HasKey(c => c.Id);
 
-        // Unique SystemUserId
-        builder.HasIndex(c => c.SystemUserId)
-            .IsUnique();
-
-        builder.Property(c => c.SystemUserId)
-            .IsRequired();
-
         builder.Property(c => c.FirstName)
             .IsRequired()
             .HasMaxLength(100);

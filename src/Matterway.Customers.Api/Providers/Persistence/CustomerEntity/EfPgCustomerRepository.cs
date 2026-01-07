@@ -45,7 +45,7 @@ public class EfPgCustomerRepository(CustomersDb context) : ICustomerRepository
 
     public async Task<Customer?> GetBySuid(Guid systemUserId, CancellationToken cancellationToken = default)
     {
-        return await context.Customer.FirstOrDefaultAsync(model => model.SystemUserId == systemUserId,
+        return await context.Customer.FirstOrDefaultAsync(model => model.Id == systemUserId,
             cancellationToken);
     }
 

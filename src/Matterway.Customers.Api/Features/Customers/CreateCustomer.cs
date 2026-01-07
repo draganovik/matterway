@@ -33,10 +33,8 @@ public class CreateCustomer : IEndpoint
 
         var newEntity = MapToEntity(request);
 
-        if (userContext.Role == ERequestRole.Customer && newEntity.SystemUserId != userContext.SystemUserId)
+        if (userContext.Role == ERequestRole.Customer && newEntity.Id != userContext.SystemUserId)
             return TypedResults.Forbid();
-
-        newEntity.Id = newEntity.SystemUserId;
 
         var createdCustomer = await customerRepository.Create(newEntity, cancellationToken);
         if (createdCustomer is null)
@@ -76,9 +74,6 @@ public class CreateCustomer : IEndpoint
     public record CustomerResponse
     {
         [Required]
-        public Guid Id { get; init; }
-
-        [Required]
         public Guid SystemUserId { get; init; }
 
         [Required]
@@ -97,7 +92,7 @@ public class CreateCustomer : IEndpoint
     {
         return new Customer
         {
-            SystemUserId = request.SystemUserId,
+            Id = request.SystemUserId,
             FirstName = request.FirstName,
             LastName = request.LastName,
             BirthDate = request.BirthDate,
@@ -109,8 +104,7 @@ public class CreateCustomer : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

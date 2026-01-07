@@ -3,7 +3,6 @@ namespace Matterway.Customers.Api.Domain.Entities;
 public class Customer
 {
     public Guid Id { get; set; }
-    public Guid SystemUserId { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public DateOnly BirthDate { get; set; }

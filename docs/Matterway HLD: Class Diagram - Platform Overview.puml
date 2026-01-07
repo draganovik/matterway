@@ -103,10 +103,12 @@ package "Catalog" {
 package "Customers" {
   class Address {
     +id: UUID
+    +customerId: UUID
     +country: String
     +city: String
-    +zip: String
-    +street: String
+    +zipCode: String
+    +addressLine1: String
+    +addressLine2: String
     +contactPhone: String
   }
 
@@ -118,12 +120,12 @@ package "Customers" {
   }
 
   class Customer {
-    +systemUserId: UUID
+    +Suid: UUID
     +firstName: String
     +lastName: String
     +email: String
     +phone: String
-    +primaryAddressId: UUID
+    +defaultAddressId: UUID
   }
 }
 
