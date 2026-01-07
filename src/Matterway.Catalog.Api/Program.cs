@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Matterway.Catalog.Api.Application;
+using Matterway.Catalog.Api.Infrastructure;
+using Matterway.Catalog.Api.Providers.Persistence;
+using Matterway.Catalog.Api.Providers.Storage;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
@@ -9,14 +11,12 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
-// Configure environment-specific settings
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", true,
         true)
     .AddEnvironmentVariables();
 
-// Configure JSON options
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

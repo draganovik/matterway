@@ -3,8 +3,8 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
-using Matterway.Catalog.Api.Infrastructure.Storage;
+using Matterway.Catalog.Api.Providers.Persistence.ProductImageEntity;
+using Matterway.Catalog.Api.Providers.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,8 +21,8 @@ public class AddProductImage : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Accepts<AddProductImageRequest>("multipart/form-data")
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
