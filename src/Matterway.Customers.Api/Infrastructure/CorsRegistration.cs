@@ -1,6 +1,6 @@
 using Matterway.ServiceDefaults;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Infrastructure;
 
 public static class CorsRegistration
 {

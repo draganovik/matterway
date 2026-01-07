@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Brokers.Catalog;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,8 +35,8 @@ public class UpsertCartItem : IEndpoint
             ICatalogClient catalogClient,
             CancellationToken cancellationToken)
     {
-        if (!UserContext.TryGet(httpContext.User, out var userContext) ||
-            (userContext.Role == ERequestClaimsRole.Customer && customerId != userContext.SystemUserId))
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
+            (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
 
         var product = await catalogClient.GetProductById(productId, cancellationToken);

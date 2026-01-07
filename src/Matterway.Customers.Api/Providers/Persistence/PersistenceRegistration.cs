@@ -1,9 +1,8 @@
-using Matterway.Customers.Api.Infrastructure.Persistence;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Providers.Persistence;
 
 public static class PersistenceRegistration
 {

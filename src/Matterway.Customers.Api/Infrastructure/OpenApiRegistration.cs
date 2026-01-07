@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Infrastructure;
 
 public static class OpenApiRegistration
 {

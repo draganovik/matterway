@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -18,8 +18,8 @@ public class GetCartItemById : IEndpoint
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

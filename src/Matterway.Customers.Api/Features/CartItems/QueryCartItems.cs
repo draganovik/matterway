@@ -3,9 +3,8 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
@@ -20,7 +19,7 @@ public class QueryCartItems : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization()
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Customer)))
+                nameof(ERequestRole.Customer)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -32,7 +31,7 @@ public class QueryCartItems : IEndpoint
             LinkGenerator linkGenerator,
             ICartItemRepository cartItemRepository)
     {
-        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
         var total = await cartItemRepository.Count(userContext.SystemUserId);
         var entities = await cartItemRepository.QueryForSuid(userContext.SystemUserId, pagingQuery.Page,

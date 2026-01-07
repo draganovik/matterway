@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Infrastructure;
 
 public static class AuthRegistration
 {

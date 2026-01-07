@@ -3,10 +3,9 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -30,11 +29,11 @@ public class CreateCustomer : IEndpoint
             ICustomerRepository customerRepository,
             CancellationToken cancellationToken)
     {
-        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
         var newEntity = MapToEntity(request);
 
-        if (userContext.Role == ERequestClaimsRole.Customer && newEntity.SystemUserId != userContext.SystemUserId)
+        if (userContext.Role == ERequestRole.Customer && newEntity.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
         newEntity.Id = newEntity.SystemUserId;

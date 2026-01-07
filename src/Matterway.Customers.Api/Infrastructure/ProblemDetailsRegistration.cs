@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Infrastructure;
 
 public static class ProblemDetailsRegistration
 {

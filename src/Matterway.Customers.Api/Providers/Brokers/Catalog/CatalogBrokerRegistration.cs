@@ -1,9 +1,8 @@
-using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.ServiceDefaults;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Providers.Brokers.Catalog;
 
-public static class CatalogIntegrationRegistration
+public static class CatalogBrokerRegistration
 {
     extension(IHostApplicationBuilder builder)
     {

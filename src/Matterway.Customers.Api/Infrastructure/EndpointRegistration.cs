@@ -1,8 +1,9 @@
 using Asp.Versioning;
+using Matterway.Customers.Api.Application;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Scalar.AspNetCore;
 
-namespace Matterway.Customers.Api.Application;
+namespace Matterway.Customers.Api.Infrastructure;
 
 public static class EndpointRegistration
 {

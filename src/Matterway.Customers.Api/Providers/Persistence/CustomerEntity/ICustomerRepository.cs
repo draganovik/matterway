@@ -1,6 +1,6 @@
 using Matterway.Customers.Api.Domain.Entities;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 
 public interface ICustomerRepository
 {

@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using Matterway.Customers.Api.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence;
+namespace Matterway.Customers.Api.Providers.Persistence;
 
 public static class ModelDataLoader
 {

@@ -2,7 +2,7 @@ using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 
 internal sealed class CartItemEntityTypeConfiguration : IEntityTypeConfiguration<CartItem>
 {

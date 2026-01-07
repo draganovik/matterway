@@ -2,7 +2,7 @@ using System.Runtime.Serialization;
 
 namespace Matterway.Customers.Api.Domain;
 
-public enum ERequestClaimsRole
+public enum ERequestRole
 {
     [EnumMember(Value = "Admin")]
     Admin = 0,

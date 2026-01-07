@@ -2,7 +2,7 @@ using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 
 internal sealed class CustomerEntityTypeConfiguration : IEntityTypeConfiguration<Customer>
 {

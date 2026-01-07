@@ -1,6 +1,6 @@
 using Matterway.Customers.Api.Domain.Entities;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 
 public interface ICartItemRepository
 {

@@ -1,9 +1,9 @@
 ﻿using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence;
+namespace Matterway.Customers.Api.Providers.Persistence;
 
 public class CustomersDb(DbContextOptions<CustomersDb> options) : DbContext(options)
 {

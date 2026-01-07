@@ -1,4 +1,4 @@
-namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
+namespace Matterway.Customers.Api.Providers.Brokers.Catalog;
 
 public interface ICatalogClient
 {

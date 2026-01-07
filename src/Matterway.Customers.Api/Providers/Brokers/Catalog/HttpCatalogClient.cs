@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
+namespace Matterway.Customers.Api.Providers.Brokers.Catalog;
 
 public class HttpCatalogClient(HttpClient httpClient) : ICatalogClient
 {

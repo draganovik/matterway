@@ -1,7 +1,7 @@
 using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 
 public class EfPgCustomerRepository(CustomersDb context) : ICustomerRepository
 {

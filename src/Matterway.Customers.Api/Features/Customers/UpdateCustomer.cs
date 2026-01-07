@@ -3,9 +3,8 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -28,9 +27,9 @@ public class UpdateCustomer : IEndpoint
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        if (!UserContext.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
-        if (userContext.Role == ERequestClaimsRole.Customer && request.SystemUserId != userContext.SystemUserId)
+        if (userContext.Role == ERequestRole.Customer && request.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
         var entity = await customerRepository.GetBy(id, cancellationToken);

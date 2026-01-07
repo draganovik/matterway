@@ -1,7 +1,7 @@
 using Matterway.Customers.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+namespace Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 
 public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
 {
