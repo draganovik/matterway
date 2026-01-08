@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence.ProductImageEntity;
 
-public sealed class EfPgProductImageRepository(CatalogDb context) : IProductImageRepository
+public sealed class EfPgProductImageRepository(CatalogDbComposer context) : IProductImageRepository
 {
     public async Task<ProductImage?> Create(ProductImage requestModel, CancellationToken cancellationToken)
     {

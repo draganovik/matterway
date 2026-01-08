@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Customers.Api.Providers.Persistence;
 
-public class CustomersDb(DbContextOptions<CustomersDb> options) : DbContext(options)
+public class CustomersDbComposer(DbContextOptions<CustomersDbComposer> options) : DbContext(options)
 {
     public DbSet<Customer> Customer { get; set; }
 

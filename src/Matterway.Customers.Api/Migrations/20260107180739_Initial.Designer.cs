@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Matterway.Customers.Api.Migrations
 {
-    [DbContext(typeof(CustomersDb))]
+    [DbContext(typeof(CustomersDbComposer))]
     [Migration("20260107180739_Initial")]
     partial class Initial
     {

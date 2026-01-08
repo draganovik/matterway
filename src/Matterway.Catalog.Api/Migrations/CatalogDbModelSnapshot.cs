@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Matterway.Catalog.Api.Migrations
 {
-    [DbContext(typeof(CatalogDb))]
+    [DbContext(typeof(CatalogDbComposer))]
     partial class CatalogDbModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

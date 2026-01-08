@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence;
 
-public class CatalogDb(DbContextOptions<CatalogDb> options) : DbContext(options)
+public class CatalogDbComposer(DbContextOptions<CatalogDbComposer> options) : DbContext(options)
 {
     public DbSet<Product> Product { get; set; }
 

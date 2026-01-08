@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence.ProductEntity;
 
-public sealed class EfPgProductRepository(CatalogDb context)
+public sealed class EfPgProductRepository(CatalogDbComposer context)
     : IProductRepository
 {
     public async Task<Product?> Create(Product requestModel, CancellationToken cancellationToken = default)

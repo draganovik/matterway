@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence.DiscountEntity;
 
-public sealed class EfPgDiscountRepository(CatalogDb context) : IDiscountRepository
+public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscountRepository
 {
     public async Task<IReadOnlyCollection<Discount>> CreateBulk(IEnumerable<Discount> discounts,
         CancellationToken cancellationToken = default)

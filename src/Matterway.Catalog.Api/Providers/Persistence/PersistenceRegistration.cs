@@ -19,7 +19,7 @@ public static class PersistenceRegistration
                                            throw new InvalidOperationException(
                                                "Connection string 'CatalogDb' not found.");
 
-            builder.Services.AddDbContext<CatalogDb>(options =>
+            builder.Services.AddDbContext<CatalogDbComposer>(options =>
                 options.UseNpgsql(postgresConnectionString,
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );

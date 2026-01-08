@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 
-public class EfPgCartItemRepository(CustomersDb context) : ICartItemRepository
+public class EfPgCartItemRepository(CustomersDbComposer context) : ICartItemRepository
 {
     public async Task<ICollection<CartItem>> QueryForSuid(Guid systemUserId, int pageIndex, int pageSize,
         CancellationToken cancellationToken = default)

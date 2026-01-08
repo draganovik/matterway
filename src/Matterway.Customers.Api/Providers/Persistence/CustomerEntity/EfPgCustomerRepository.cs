@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 
-public class EfPgCustomerRepository(CustomersDb context) : ICustomerRepository
+public class EfPgCustomerRepository(CustomersDbComposer context) : ICustomerRepository
 {
     public async Task<Customer?> Create(Customer requestModel, CancellationToken cancellationToken = default)
     {

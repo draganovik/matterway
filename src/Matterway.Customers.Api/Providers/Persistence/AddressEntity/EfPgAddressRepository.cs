@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Customers.Api.Providers.Persistence.AddressEntity;
 
-public class EfPgAddressRepository(CustomersDb context) : IAddressRepository
+public class EfPgAddressRepository(CustomersDbComposer context) : IAddressRepository
 {
     public async Task<Address?> GetById(Guid id, CancellationToken cancellationToken = default)
     {

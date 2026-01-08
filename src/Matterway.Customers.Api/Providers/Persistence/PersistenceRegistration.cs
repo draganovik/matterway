@@ -15,7 +15,7 @@ public static class PersistenceRegistration
                                    throw new InvalidOperationException(
                                        "Connection string 'CustomersDb' not found.");
 
-            builder.Services.AddDbContext<CustomersDb>(options =>
+            builder.Services.AddDbContext<CustomersDbComposer>(options =>
                 options.UseNpgsql(connectionString, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
 
             builder.Services.AddScoped<ICustomerRepository, EfPgCustomerRepository>();

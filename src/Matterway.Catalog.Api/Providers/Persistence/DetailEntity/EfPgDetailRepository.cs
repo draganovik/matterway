@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence.DetailEntity;
 
-public sealed class EfPgDetailRepository(CatalogDb context) : IDetailRepository
+public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRepository
 {
     private const int MaxLimit = 50;
     private const int DefaultLimit = 10;
