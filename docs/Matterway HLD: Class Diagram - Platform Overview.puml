@@ -7,29 +7,37 @@ hide circle
 ' =======================
 
 package "Identity" {
-  enum SystemUserType {
-    Customer
-    Employee
+  enum EIdentityRole {
     Admin
+    Manager
+    Customer
   }
 
   class SystemUser {
     +id: UUID
-    +type: SystemUserType
     +email: String
+    +userName: String
     +passwordHash: String
-    +createdAt: DateTime
-    +updatedAt: DateTime
+    +securityStamp: String
+    +created: DateTime
   }
 
-  class Session {
+  class IdentityRole {
     +id: UUID
-    +systemUserId: UUID
-    +token: String
-    +refreshToken: String
-    +createdAt: DateTime
-    +tokenExpiresAt: DateTime
-    +refreshExpiresAt: DateTime
+    +name: String
+    +normalizedName: String
+  }
+
+  class IdentityUserRole {
+    +userId: UUID
+    +roleId: UUID
+  }
+
+  class IdentityUserClaim {
+    +id: Integer
+    +userId: UUID
+    +type: String
+    +value: String
   }
 }
 
@@ -264,11 +272,13 @@ package "Finances" {
 ' =======================
 
 ' Identity
-Session "0..*" --> "1" SystemUser : systemUserId
+SystemUser "0..*" --> "1" Customer : id
+SystemUser "1" -- "0..*" IdentityUserClaim
+SystemUser "1" -- "0..*" IdentityUserRole
+IdentityUserRole "0..*" -- "1" IdentityRole
 
 ' Customers
-Customer "1" --> "1" SystemUser : systemUserId
-Customer "0..1" --> "1" Address : primaryAddressId
+Customer "0..1" --> "1" Address : defaultAddressId
 CartItem "0..*" -up-> "1" Customer : customerId
 CartItem "0..*" --> "1" Product : productId
 

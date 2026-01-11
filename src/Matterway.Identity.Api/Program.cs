@@ -1,5 +1,8 @@
-using Matterway.Identity.Api.Extensions;
+using System.Text.Json.Serialization;
+using Matterway.Identity.Api.Infrastructure;
+using Matterway.Identity.Api.Providers.Persistence;
 using Matterway.ServiceDefaults;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -16,22 +19,25 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddProblemDetails();
-builder.Services.Configure<RouteHandlerOptions>(o => { o.ThrowOnBadRequest = false; });
+builder.Services.Configure<RouteHandlerOptions>(options => { options.ThrowOnBadRequest = false; });
 
-builder.Services.ConfigureAuthentication(builder.Configuration);
-builder.Services.ConfigureDatabase(builder.Configuration);
-builder.Services.ConfigureRepositories();
-builder.Services.ConfigureFeatures();
-
-builder.Services.ConfigureMapper();
-builder.Services.ConfigureJsonOptions();
-
-builder.Services.ConfigureOpenApi();
-builder.Services.ConfigureApiVersioning();
-//builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddValidation();
-builder.ConfigureCors();
+
+builder
+    .ConfigureAuthentication()
+    .ConfigureIdentity()
+    .ConfigurePersistence()
+    .ConfigureFeatures();
+
+builder
+    .ConfigureOpenApi()
+    .ConfigureApiVersioning()
+    .ConfigureCors();
 
 var app = builder.Build();
 

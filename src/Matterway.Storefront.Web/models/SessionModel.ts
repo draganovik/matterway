@@ -4,4 +4,5 @@ export default class SessionModel {
   tokenType!: string;
   created!: string;
   expires!: string;
+  refreshExpires!: string;
 }

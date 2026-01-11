@@ -53,7 +53,7 @@ export const useCartStore = defineStore("cart", {
       if (findItem && findItem.quantity > 1) {
         findItem.quantity--;
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${findItem?.productId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${findItem?.productId}`,
           {
             method: "PUT",
             body: JSON.stringify({ quantity: findItem.quantity }),
@@ -64,7 +64,7 @@ export const useCartStore = defineStore("cart", {
           (item) => item.productId !== product.id,
         );
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${product.id}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${product.id}`,
           {
             method: "DELETE",
           },
@@ -88,7 +88,7 @@ export const useCartStore = defineStore("cart", {
       );
 
       await request(
-        `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${currentItem?.productId}`,
+        `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${currentItem?.productId}`,
         {
           method: "PUT",
           body: JSON.stringify({ quantity: currentItem?.quantity }),
@@ -100,7 +100,7 @@ export const useCartStore = defineStore("cart", {
       const session = useSessionStore();
       this.cartItems.forEach(async (item) => {
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.nameid}/CartItems/${item.productId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${item.productId}`,
           {
             method: "DELETE",
           },
