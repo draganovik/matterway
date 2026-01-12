@@ -32,7 +32,7 @@ const pay = async () => {
         amount: totalPrice.value,
         ...addressData.value,
         items: cartItems.value,
-        userId: session.getTokenData?.nameid,
+        userId: session.getTokenData?.sub,
       }),
     });
     if (response.ok) {

@@ -55,8 +55,8 @@ export const useSessionStore = defineStore("session", {
   actions: {
     async login(credentials: LoginModel) {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
-      const response = await fetch(`${baseUrl}/create`, {
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
+      const response = await fetch(`${baseUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,9 +72,9 @@ export const useSessionStore = defineStore("session", {
 
     async logout() {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
-      const response = await request(`${baseUrl}/revoke`, {
-        method: "DELETE",
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
+      const response = await request(`${baseUrl}/logout`, {
+        method: "POST",
       });
       if (response.ok) {
         const cartStore = useCartStore();
@@ -84,7 +84,7 @@ export const useSessionStore = defineStore("session", {
     },
     async refreshToken() {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Sessions`;
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
       const response = await fetch(`${baseUrl}/refresh`, {
         method: "POST",
         headers: {
@@ -94,7 +94,6 @@ export const useSessionStore = defineStore("session", {
         credentials: "include",
         body: JSON.stringify({
           refreshToken: this.session?.refreshToken,
-          tokenType: this.session?.tokenType,
         }),
       });
       const data = await response.json();

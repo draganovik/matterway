@@ -7,29 +7,37 @@ hide circle
 ' =======================
 
 package "Identity" {
-  enum SystemUserType {
-    Customer
-    Employee
+  enum EIdentityRole {
     Admin
+    Manager
+    Customer
   }
 
   class SystemUser {
     +id: UUID
-    +type: SystemUserType
     +email: String
+    +userName: String
     +passwordHash: String
-    +createdAt: DateTime
-    +updatedAt: DateTime
+    +securityStamp: String
+    +created: DateTime
   }
 
-  class Session {
+  class IdentityRole {
     +id: UUID
-    +systemUserId: UUID
-    +token: String
-    +refreshToken: String
-    +createdAt: DateTime
-    +tokenExpiresAt: DateTime
-    +refreshExpiresAt: DateTime
+    +name: String
+    +normalizedName: String
+  }
+
+  class IdentityUserRole {
+    +userId: UUID
+    +roleId: UUID
+  }
+
+  class IdentityUserClaim {
+    +id: Integer
+    +userId: UUID
+    +type: String
+    +value: String
   }
 }
 
@@ -79,6 +87,12 @@ package "Catalog" {
     +slug: String
   }
 
+  note top of AttributeSlug
+  Shared, unique slug namespace
+  for Detail & Specification
+  (lowercase normalized)
+  end note
+
   class ProductSpecification {
     +productId: UUID
     +specificationSlug: String
@@ -112,13 +126,6 @@ package "Customers" {
     +contactPhone: String
   }
 
-  ' Cart is customer-experience (pre-purchase)
-  class CartItem {
-    +customerId: UUID
-    +productId: UUID
-    +quantity: Integer
-  }
-
   class Customer {
     +Suid: UUID
     +firstName: String
@@ -127,11 +134,18 @@ package "Customers" {
     +phone: String
     +defaultAddressId: UUID
   }
+
+  class CartItem {
+    +customerId: UUID
+    +productId: UUID
+    +quantity: Integer
+  }
+
 }
 
 package "Sales" {
 
-  class SaleRecordDeliveryInfo {
+  class OrderDeliveryInfo {
     +referenceId: String
     +updatedAt: DateTime
     +deliveryCountry: String
@@ -140,23 +154,33 @@ package "Sales" {
     +deliveryStreet: String
     +deliveryPhone: String
   }
-  class SaleRecord {
+  class Order {
     +referenceId: String
     +customerId: UUID
     +currency: String
     +totalAmount: Money
     +placedAt: DateTime
     +deliveryAddressId: UUID
-    +type: SaleRecordType
+    +type: OrderType
   }
 
-  enum SaleRecordType {
+  note right of Order
+    Flow (happy path)
+    Customer -> Sales: Place order
+    Sales -> Inventory: Request stock reservation
+    Inventory -> Sales: StockReserved
+    Sales: Initiate/Authorize payment
+    Sales: PaymentCaptured
+    Sales -> Inventory: Fulfillment request
+    Inventory -> Sales: OrderDeliveryInfoFulfilled
+  end note
+
+  enum OrderType {
     Retail
     Ecommerce
-    Wholesale
   }
 
-  class SaleRecordItem {
+  class OrderItem {
     +referenceId: String
     +productId: UUID
     +title: String
@@ -165,7 +189,7 @@ package "Sales" {
     +appliedDiscountId: UUID
   }
 
-  enum SaleRecordStatusType {
+  enum OrderStatusType {
     Pending
     AwaitingPayment
     PaymentAuthorized
@@ -176,61 +200,14 @@ package "Sales" {
     Cancelled
   }
 
-  class SaleRecordStatus {
+  class OrderStatus {
     +id: Integer
     +referenceId: String
     +changedAt: DateTime
-    +status: SaleRecordStatusType
+    +status: OrderStatusType
     +description: String
   }
-}
 
-package "Inventory" {
-  class Warehouse {
-    +id: UUID
-    +warehouseCode: String
-    +title: String
-    +description: String
-    +country: String
-    +city: String
-    +zip: String
-    +street: String
-  }
-
-  class InventoryBatch {
-    +inventoryBatchNo: String
-    +warehouseId: UUID
-    +productId: UUID
-    +batchSize: Integer
-    +available: Integer
-    +registeredAt: DateTime
-  }
-
-  ' Reservation bridges Sales<->Inventory
-  class StockReservation {
-    +id: UUID
-    +referenceId: String
-    +createdAt: DateTime
-    +expiresAt: DateTime
-    +status: ReservationStatus
-  }
-
-  enum ReservationStatus {
-    Requested
-    Reserved
-    Released
-    Failed
-  }
-
-  class StockReservationItem {
-    +reservationId: UUID
-    +productId: UUID
-    +quantity: Integer
-    +inventoryBatchNo: String
-  }
-}
-
-package "Finances" {
   class Payment {
     +id: UUID
     +referenceId: String
@@ -255,8 +232,43 @@ package "Finances" {
     Failed
     Refunded
   }
+}
 
-  ' Invoicing/Receivables could be added here
+package "Inventory" {
+  class Warehouse {
+    +id: UUID
+    +warehouseCode: String
+    +title: String
+    +description: String
+    +country: String
+    +city: String
+    +zip: String
+    +street: String
+  }
+
+  class ArticleStock {
+    +articleStockId: UUID
+    +warehouseId: UUID
+    +productId: UUID
+    +batchSize: Integer
+    +available: Integer
+    +registeredAt: DateTime
+  }
+
+  enum ReservationStatus {
+    Requested
+    Reserved
+    Released
+    Failed
+  }
+
+  class ArticleStockReservation {
+    +articleStockId: UUID
+    +orderId: UUID
+    +quantity: Integer
+    +createdAt: DateTime
+    +expiresAt: DateTime
+  }
 }
 
 ' =======================
@@ -264,54 +276,39 @@ package "Finances" {
 ' =======================
 
 ' Identity
-Session "0..*" --> "1" SystemUser : systemUserId
+SystemUser "0..*" -- "1" Customer : id
+SystemUser "1" -- "0..*" IdentityUserClaim
+SystemUser "1" -- "0..*" IdentityUserRole
+IdentityUserRole "0..*" -- "1" IdentityRole
 
 ' Customers
-Customer "1" --> "1" SystemUser : systemUserId
-Customer "0..1" --> "1" Address : primaryAddressId
-CartItem "0..*" -up-> "1" Customer : customerId
-CartItem "0..*" --> "1" Product : productId
+Customer "0..1" -d- "1" Address : defaultAddressId
+CartItem "0..*" -u- "1" Customer : customerId
+CartItem "0..*" -- "1" Product : productId
 
 ' Catalog
-Price "1..*" --> "1" Product : productId
-Discount "0..*" --> "1" Price : (productId, currency)
-ProductDetail "0..*" --> "1" Product : productId
-ProductDetail "0..*" -up-> "1" Detail : detailSlug
-ProductSpecification "0..*" --> "1" Product : productId
-ProductSpecification "0..*" -up-> "1" Specification : specificationSlug
-ProductImage "0..*" --> "1" Product : productId
-Detail --> AttributeSlug : slug (PK/FK)
-Specification --> AttributeSlug : slug (PK/FK)
-
-note bottom of AttributeSlug
-  Shared, unique slug namespace
-  for Detail & Specification
-  (lowercase normalized)
-end note
+Price "1..*" -- "1" Product : productId
+Discount "0..*" -- "1" Price : (productId, currency)
+ProductDetail "0..*" -- "1" Product : productId
+ProductDetail "0..*" -- "1" Detail : detailSlug
+ProductSpecification "0..*" -- "1" Product : productId
+ProductSpecification "0..*" -- "1" Specification : specificationSlug
+ProductImage "0..*" -- "1" Product : productId
+Detail -- AttributeSlug : slug (PK/FK)
+Specification -- AttributeSlug : slug (PK/FK)
 
 ' Sales
-SaleRecord "0..*" -down-> "1" Customer : customerId
-SaleRecordItem "0..*" --> "1" SaleRecord : orderId
-SaleRecordItem "0..*" --> "1" Product : productId
-SaleRecordStatus "0..*" --> "1" SaleRecord : orderId
-SaleRecordDeliveryInfo "1" --> "1" SaleRecord : saleRecordId
+Order "0..*" -- "1" Customer : customerId
+OrderItem "0..*" -- "1" Order : orderId
+OrderItem "0..*" -- "1" Product : productId
+OrderStatus "0..*" -- "1" Order : orderId
+OrderDeliveryInfo "1" -- "1" Order : OrderId
+Payment "0..*" -- "1" Order : orderId
+PaymentStatus "0..*" -- "1" Payment : paymentId
 
 ' Inventory
-InventoryBatch "0..*" --> "1" Warehouse : warehouseId
-InventoryBatch "0..*" --> "1" Product : productId
-StockReservation "0..*" -up-> "1" SaleRecord : orderId
-StockReservationItem "0..*" -up-> "1" StockReservation : reservationId
-StockReservationItem "0..*" --> "0..1" InventoryBatch : inventoryBatchNo
-
-' Finances
-Payment "0..*" -up-> "1" SaleRecord : orderId
-PaymentStatus "0..*" -up-> "1" Payment : paymentId
-
-' =======================
-' CROSS-BOUNDARY NOTES (events/flows)
-' =======================
-
-note "Flow (happy path):\n1) Customer -> Sales: Place order\n2) Sales -> Inventory: Request stock reservation\n3) Inventory -> Sales: StockReserved\n4) Sales -> Finances: Initiate/Authorize payment\n5) Finances -> Sales: PaymentCaptured\n6) Sales -> Inventory: Fulfillment request\n7) Inventory -> Sales: SaleRecordDeliveryInfoFulfilled" as N1
-N1 .l. SaleRecord
-
+ArticleStock "0..*" -- "1" Warehouse : warehouseId
+ArticleStock "0..*" -- "1" Product : productId
+ArticleStockReservation "0..*" -- "1" ArticleStock : articleStockId
+ArticleStockReservation "0..*" -right- "1" Order : orderId
 @enduml
