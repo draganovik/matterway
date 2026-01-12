@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +12,7 @@ public class VerifyCustomer : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("Customers/VerifyBy", Handler)
+        app.MapGet("Customers/VerifyBy/{customerId:guid}", Handler)
             .WithName("VerifyCustomer").WithSummary("Verify Customer by id or system user id.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
@@ -22,37 +22,18 @@ public class VerifyCustomer : IEndpoint
     }
 
     private static async Task<Results<Ok<CustomerResponse>, NotFound, BadRequest>> Handler(
-        [FromQuery]
-        Guid? customerId,
-        [FromQuery]
-        Guid? systemUserId,
+        Guid customerId,
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        if (customerId.HasValue)
-        {
-            var customer = await customerRepository.GetBy(customerId.Value, cancellationToken);
-            return customer != null
-                ? TypedResults.Ok(MapToResponse(customer))
-                : TypedResults.NotFound();
-        }
-
-        if (systemUserId.HasValue)
-        {
-            var customer = await customerRepository.GetBySuid(systemUserId.Value, cancellationToken);
-            return customer != null
-                ? TypedResults.Ok(MapToResponse(customer))
-                : TypedResults.NotFound();
-        }
-
-        return TypedResults.BadRequest();
+        var customer = await customerRepository.GetBySuid(customerId, cancellationToken);
+        return customer != null
+            ? TypedResults.Ok(MapToResponse(customer))
+            : TypedResults.NotFound();
     }
 
     public record CustomerResponse
     {
-        [Required]
-        public Guid Id { get; init; }
-
         [Required]
         public Guid SystemUserId { get; init; }
 
@@ -72,8 +53,7 @@ public class VerifyCustomer : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

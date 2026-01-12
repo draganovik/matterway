@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Brokers.Catalog;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +14,7 @@ public class UpsertCartItem : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
+        app.MapPut("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("UpsertCartItemById").WithSummary("Upsert CartItem.")
             .WithTags(nameof(CartItem))
             .Produces<CartItemResponse>()
@@ -28,7 +27,7 @@ public class UpsertCartItem : IEndpoint
 
     private static async Task<
             Results<Ok<CartItemResponse>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>>
-        Handler(Guid id,
+        Handler(Guid customerId,
             Guid productId,
             CartItemRequest request,
             HttpContext httpContext,
@@ -36,14 +35,9 @@ public class UpsertCartItem : IEndpoint
             ICatalogClient catalogClient,
             CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
+            (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
-
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
-
-        if (userRole == ERequestClaimsRole.Customer && id != systemUserId) return TypedResults.Forbid();
 
         var product = await catalogClient.GetProductById(productId, cancellationToken);
         if (product is null) return TypedResults.NotFound();
@@ -59,7 +53,7 @@ public class UpsertCartItem : IEndpoint
 
         var entity = new CartItem
         {
-            CustomerId = id,
+            CustomerId = customerId,
             ProductId = productId,
             Quantity = request.Quantity,
             ProductName = product.Title,

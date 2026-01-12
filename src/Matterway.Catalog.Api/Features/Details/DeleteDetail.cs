@@ -3,7 +3,7 @@ using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
+using Matterway.Catalog.Api.Providers.Persistence.DetailEntity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Features.Details;
@@ -19,8 +19,8 @@ public class DeleteDetail : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

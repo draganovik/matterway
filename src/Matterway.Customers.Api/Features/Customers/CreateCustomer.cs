@@ -3,10 +3,9 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -30,19 +29,12 @@ public class CreateCustomer : IEndpoint
             ICustomerRepository customerRepository,
             CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
-            return TypedResults.Forbid();
-
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
         var newEntity = MapToEntity(request);
 
-        if (userRole == ERequestClaimsRole.Customer && newEntity.SystemUserId != systemUserId)
+        if (userContext.Role == ERequestRole.Customer && newEntity.Id != userContext.SystemUserId)
             return TypedResults.Forbid();
-
-        newEntity.Id = newEntity.SystemUserId;
 
         var createdCustomer = await customerRepository.Create(newEntity, cancellationToken);
         if (createdCustomer is null)
@@ -82,9 +74,6 @@ public class CreateCustomer : IEndpoint
     public record CustomerResponse
     {
         [Required]
-        public Guid Id { get; init; }
-
-        [Required]
         public Guid SystemUserId { get; init; }
 
         [Required]
@@ -103,7 +92,7 @@ public class CreateCustomer : IEndpoint
     {
         return new Customer
         {
-            SystemUserId = request.SystemUserId,
+            Id = request.SystemUserId,
             FirstName = request.FirstName,
             LastName = request.LastName,
             BirthDate = request.BirthDate,
@@ -115,8 +104,7 @@ public class CreateCustomer : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

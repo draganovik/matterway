@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
@@ -19,8 +19,8 @@ public class QueryCustomers : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -46,16 +46,13 @@ public class QueryCustomers : IEndpoint
             pagingQuery.PageSize,
             baseUri);
 
-        return entities.Any()
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        if (entities.Count == 0) TypedResults.NoContent();
+
+        return TypedResults.Ok(paginationResponse);
     }
 
     public record CustomerResponse
     {
-        [Required]
-        public Guid Id { get; init; }
-
         [Required]
         public Guid SystemUserId { get; init; }
 
@@ -75,8 +72,7 @@ public class QueryCustomers : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

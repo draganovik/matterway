@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Infrastructure\Brokers\"/>
+        <Folder Include="Providers\Brokers\"/>
     </ItemGroup>
 
     <PropertyGroup>

@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
+using Matterway.Catalog.Api.Providers.Persistence.SpecificationEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Specifications;
@@ -17,8 +17,8 @@ public class QuerySpecifications : IEndpoint
             .WithTags(nameof(Specification))
             .Produces<ICollection<QuerySpecificationResponse>>()
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

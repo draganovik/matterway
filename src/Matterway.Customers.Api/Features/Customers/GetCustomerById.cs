@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
@@ -12,33 +12,29 @@ public class GetCustomerById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("Customers/{id:guid}", Handler)
+        app.MapGet("Customers/{customerId:guid}", Handler)
             .WithName("GetCustomerById").WithSummary("Get Customer by id.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<CustomerResponse>, NotFound>> Handler(
-        Guid id,
+        Guid customerId,
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        return await customerRepository.GetBy(id, cancellationToken)
-            is Customer value
-            ? TypedResults.Ok(MapToResponse(value))
-            : TypedResults.NotFound();
+        var entity = await customerRepository.GetBy(customerId, cancellationToken);
+        if (entity is null) return TypedResults.NotFound();
+        return TypedResults.Ok(MapToResponse(entity));
     }
 
     public record CustomerResponse
     {
-        [Required]
-        public Guid Id { get; init; }
-
         [Required]
         public Guid SystemUserId { get; init; }
 
@@ -58,8 +54,7 @@ public class GetCustomerById : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

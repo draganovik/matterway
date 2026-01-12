@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -12,25 +12,24 @@ public class GetCartItemById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
+        app.MapGet("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("GetCartItemById").WithSummary("Get CartItem by id.")
             .WithTags(nameof(CartItem))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestClaimsRole.Admin),
-                nameof(ERequestClaimsRole.Manager)))
+                nameof(ERequestRole.Admin),
+                nameof(ERequestRole.Manager)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
-        Guid id,
+        Guid customerId,
         Guid productId,
         ICartItemRepository cartItemRepository,
-        HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        var entity = await cartItemRepository.GetBy(id, productId, cancellationToken);
+        var entity = await cartItemRepository.GetBy(customerId, productId, cancellationToken);
         if (entity == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(entity));

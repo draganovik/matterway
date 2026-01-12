@@ -2,9 +2,8 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CartItemEntity;
 
 namespace Matterway.Customers.Api.Features.CartItems;
 
@@ -12,7 +11,7 @@ public class DeleteCartItem : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("Customers/{id:guid}/CartItems/{productId:guid}", Handler)
+        app.MapDelete("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("DeleteCartItem").WithSummary("Delete CartItem.")
             .WithTags(nameof(CartItem))
             .Produces<DeleteCartItemResponse>()
@@ -23,29 +22,24 @@ public class DeleteCartItem : IEndpoint
     }
 
     private static async Task<Results<Ok<DeleteCartItemResponse>, NotFound, ForbidHttpResult>> Handler(
-        Guid id,
+        Guid customerId,
         Guid productId,
         HttpContext httpContext,
         ICartItemRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
+            (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
+        var isDeleted = await cartItemRepository.Delete(customerId, productId, cancellationToken);
+        if (!isDeleted) return TypedResults.NotFound();
 
-        if (userRole == ERequestClaimsRole.Customer && id != systemUserId) return TypedResults.Forbid();
-
-        var isDeleted = await cartItemRepository.Delete(id, productId, cancellationToken);
-        return isDeleted
-            ? TypedResults.Ok(new DeleteCartItemResponse
-            {
-                CustomerId = id,
-                ProductId = productId
-            })
-            : TypedResults.NotFound();
+        return TypedResults.Ok(new DeleteCartItemResponse
+        {
+            CustomerId = customerId,
+            ProductId = productId
+        });
     }
 
     public record DeleteCartItemResponse

@@ -3,9 +3,8 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
+using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
-using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 
 namespace Matterway.Customers.Api.Features.Customers;
 
@@ -13,7 +12,7 @@ public class UpdateCustomer : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("Customers/{id:guid}", Handler)
+        app.MapPatch("Customers/{systemUserId:guid}", Handler)
             .WithName("UpdateCustomer").WithSummary("Update Customer by id.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
@@ -22,23 +21,18 @@ public class UpdateCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid id,
+    private static async Task<Results<Ok<CustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid systemUserId,
         CustomerRequest request,
         HttpContext httpContext,
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        var identity = httpContext.User.Identity as ClaimsIdentity;
-        if (!Guid.TryParse(identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var systemUserId))
+        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+
+        if (userContext.Role == ERequestRole.Customer && request.SystemUserId != userContext.SystemUserId)
             return TypedResults.Forbid();
 
-        if (!Enum.TryParse(identity?.FindFirst(ClaimTypes.Role)?.Value, out ERequestClaimsRole userRole))
-            return TypedResults.Forbid();
-
-        if (userRole == ERequestClaimsRole.Customer && request.SystemUserId != systemUserId)
-            return TypedResults.Forbid();
-
-        var entity = await customerRepository.GetBy(id, cancellationToken);
+        var entity = await customerRepository.GetBy(systemUserId, cancellationToken);
         if (entity is null)
             return TypedResults.NotFound();
 
@@ -49,9 +43,9 @@ public class UpdateCustomer : IEndpoint
             request.DefaultAddressId);
 
         var updated = await customerRepository.Update(entity, cancellationToken);
-        return updated is not null
-            ? TypedResults.Ok(MapToResponse(updated))
-            : TypedResults.NotFound();
+        if (updated is null) return TypedResults.NotFound();
+
+        return TypedResults.Ok(MapToResponse(updated));
     }
 
     public record CustomerRequest
@@ -74,9 +68,6 @@ public class UpdateCustomer : IEndpoint
     public record CustomerResponse
     {
         [Required]
-        public Guid Id { get; init; }
-
-        [Required]
         public Guid SystemUserId { get; init; }
 
         [Required]
@@ -95,8 +86,7 @@ public class UpdateCustomer : IEndpoint
     {
         return new CustomerResponse
         {
-            Id = entity.Id,
-            SystemUserId = entity.SystemUserId,
+            SystemUserId = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             BirthDate = entity.BirthDate,

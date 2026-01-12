@@ -1,5 +1,5 @@
 export default class JwtModel {
-  nameid!: string;
+  sub!: string;
   role!: string;
   nbf!: number;
   exp!: number;
