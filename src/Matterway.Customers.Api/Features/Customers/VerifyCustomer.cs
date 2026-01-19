@@ -4,7 +4,6 @@ using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Customers.Api.Features.Customers;
 

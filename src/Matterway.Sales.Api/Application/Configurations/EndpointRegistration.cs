@@ -1,11 +1,4 @@
 using Asp.Versioning;
-using Matterway.Sales.Api.Features.Orders.AddOrderStatus;
-using Matterway.Sales.Api.Features.Orders.CreateOrder;
-using Matterway.Sales.Api.Features.Orders.GetOrderById;
-using Matterway.Sales.Api.Features.Orders.QueryOrders;
-using Matterway.Sales.Api.Features.Payments.GetPaymentById;
-using Matterway.Sales.Api.Features.Payments.QueryPayments;
-using Matterway.Sales.Api.Features.Payments.RegisterPayment;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Scalar.AspNetCore;
 
@@ -58,13 +51,6 @@ public static class EndpointRegistration
                 .ToArray();
 
             builder.Services.TryAddEnumerable(serviceDescriptors);
-            builder.Services.AddTransient<CreateOrderService>();
-            builder.Services.AddTransient<AddOrderStatusService>();
-            builder.Services.AddTransient<GetOrderByIdService>();
-            builder.Services.AddTransient<QueryOrdersService>();
-            builder.Services.AddTransient<RegisterPaymentService>();
-            builder.Services.AddTransient<GetPaymentByIdService>();
-            builder.Services.AddTransient<QueryPaymentsService>();
 
             return builder;
         }

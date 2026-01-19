@@ -40,7 +40,7 @@ public static class EndpointRegistration
                     catch
                     {
                         return [];
-                    } // avoid ReflectionTypeLoadException
+                    }
                 })
                 .Where(type =>
                     type is { IsAbstract: false, IsInterface: false } &&

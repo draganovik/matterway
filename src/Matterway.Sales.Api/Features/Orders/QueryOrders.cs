@@ -1,50 +1,49 @@
 using Asp.Versioning;
 using Matterway.Sales.Api.Application;
 using Matterway.Sales.Api.Domain.Entities;
-using Matterway.Sales.Api.Features.Orders.CreateOrder;
+using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Matterway.Sales.Api.Features.Orders.QueryOrders;
+namespace Matterway.Sales.Api.Features.Orders;
 
-public class QueryOrdersEndpoint : IEndpoint
+public class QueryOrders : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("Orders", Handler)
             .WithName("QueryOrders").WithSummary("Query Orders.")
             .WithTags(nameof(Order))
-            .Produces<PaginationResponse<OrderResponse>>()
+            .Produces<PaginationResponse<CreateOrder.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<PaginationResponse<OrderResponse>>, NoContent, ValidationProblem>>
+    private static async Task<Results<Ok<PaginationResponse<CreateOrder.OrderResponse>>, NoContent, ValidationProblem>>
         Handler([AsParameters] QueryOrdersParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            QueryOrdersService queryOrdersService,
+            IOrderRepository orderRepository,
             CancellationToken cancellationToken)
     {
-        var command = new QueryOrdersCommand(
-            queryParameters.Page,
-            queryParameters.PageSize,
-            queryParameters.CustomerId);
-
-        var total = await queryOrdersService.CountAsync(command, cancellationToken);
+        var total = await orderRepository.Count(queryParameters.CustomerId, cancellationToken);
         if (total == 0)
             return TypedResults.NoContent();
 
-        var entities = await queryOrdersService.QueryAsync(command, cancellationToken);
+        var entities = await orderRepository.Query(
+            queryParameters.Page,
+            queryParameters.PageSize,
+            queryParameters.CustomerId,
+            cancellationToken);
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "QueryOrders");
+            "QueryOrders",
+            null);
 
-        var results = entities.Select(CreateOrderMapper.MapToResponse).ToList();
+        var results = entities.Select(CreateOrder.MapToResponse).ToList();
 
-        var paginationResponse = PaginationResponse<OrderResponse>.Create(
+        var paginationResponse = PaginationResponse<CreateOrder.OrderResponse>.Create(
             results,
             total,
             queryParameters.Page,
@@ -52,5 +51,10 @@ public class QueryOrdersEndpoint : IEndpoint
             location);
 
         return TypedResults.Ok(paginationResponse);
+    }
+
+    public sealed record QueryOrdersParameters : PaginationRequestParameters
+    {
+        public Guid? CustomerId { get; init; }
     }
 }
