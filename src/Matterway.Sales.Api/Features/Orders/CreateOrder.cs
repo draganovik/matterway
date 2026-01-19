@@ -72,6 +72,22 @@ public class CreateOrder : IEndpoint
                 Status = StatusCodes.Status400BadRequest
             });
 
+        if (customersResult.Order.OrderId != orderId)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Customer order mismatch.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Customer order id does not match the Sales order id."
+            });
+
+        if (customersResult.Order.CustomerId != request.CustomerId)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Customer order mismatch.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Customer id does not match the Sales order request."
+            });
+
         if (customersResult.Order.Items.Count == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {

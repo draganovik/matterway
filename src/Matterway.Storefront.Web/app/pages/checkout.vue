@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type Ref } from "vue";
+import { computed, onMounted, type Ref } from "vue";
 import { useCartStore } from "@stores/cart";
 import { useSessionStore } from "@stores/session";
 import AddressModel from "#models/AddressModel";
@@ -17,6 +17,40 @@ const cartItems = computed(() => cart.getCartItems);
 const totalItems = computed(() => cart.getTotalItemCount);
 const totalPrice = computed(() => cart.getTotalPrice);
 
+const loadDefaultAddress = async () => {
+  const customerId = session.getTokenData?.sub;
+  if (!customerId) return;
+
+  try {
+    const response = await request(
+      `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${customerId}/Address`,
+      { method: "GET" },
+    );
+    const address = await response.json();
+
+    if (!addressData.value.street && address.addressLine1) {
+      addressData.value.street = address.addressLine1;
+    }
+    if (!addressData.value.residence && address.addressLine2) {
+      addressData.value.residence = address.addressLine2;
+    }
+    if (!addressData.value.city && address.city) {
+      addressData.value.city = address.city;
+    }
+    if (!addressData.value.zipCode && address.zipCode) {
+      addressData.value.zipCode = address.zipCode;
+    }
+    if (!addressData.value.country && address.country) {
+      addressData.value.country = address.country;
+    }
+    if (!addressData.value.contactPhone && address.contactPhone) {
+      addressData.value.contactPhone = address.contactPhone;
+    }
+  } catch {
+    // Ignore missing default address or auth mismatch.
+  }
+};
+
 const pay = async () => {
   if (!addressData.value.validate()) {
     return;
@@ -31,12 +65,12 @@ const pay = async () => {
           customerId: session.getTokenData?.sub,
           type: "Ecommerce",
           deliveryInfo: {
-            country: "Serbia",
+            country: addressData.value.country || "Serbia",
             city: addressData.value.city,
             zipCode: addressData.value.zipCode,
             addressLine1: addressData.value.street,
             addressLine2: addressData.value.residence,
-            contactPhone: undefined,
+            contactPhone: addressData.value.contactPhone || undefined,
           },
         }),
       },
@@ -67,6 +101,10 @@ const pay = async () => {
 
 useHead({
   title: "Kupovina",
+});
+
+onMounted(() => {
+  loadDefaultAddress();
 });
 
 definePageMeta({
