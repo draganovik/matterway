@@ -7,7 +7,7 @@
       <thead class="text-xs uppercase text-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="bg-gray-50 px-6 py-3 dark:bg-gray-800">
-            Referentni broj
+            Broj porudžbine
           </th>
           <th scope="col" class="px-6 py-3">Broj artikala</th>
           <th
@@ -15,7 +15,7 @@
             scope="col"
             class="bg-gray-50 px-6 py-3 dark:bg-gray-800"
           >
-            Kupac
+            Adresa
           </th>
           <th scope="col" class="px-6 py-3">Ukupna cena</th>
         </tr>
@@ -23,21 +23,21 @@
       <tbody>
         <tr
           v-for="order in orders"
-          :key="order.referenceNumber"
+          :key="order.id"
           class="border-b border-gray-200 dark:border-gray-700"
         >
           <th
             scope="row"
             class="whitespace-nowrap bg-gray-50 px-6 py-4 font-medium text-gray-900 dark:bg-gray-800 dark:text-white"
           >
-            {{ order["referenceNumber"] }}
+            {{ order["id"] }}
           </th>
           <td class="px-6 py-4">
             <ol class="list-decimal">
-              <li class="mx-2 p-1" v-for="item in order.orderItems">
+              <li class="mx-2 p-1" v-for="item in order.items">
                 <b
                   ><span class="text-blue-500">{{ item["quantity"] }} X </span>
-                  {{ item["productName"] }}</b
+                  {{ item["productTitle"] }}</b
                 >
               </li>
             </ol>
@@ -46,9 +46,9 @@
             v-if="sessionStore.getTokenData?.role != 'Customer'"
             class="bg-gray-50 px-6 py-4 dark:bg-gray-800"
           >
-            {{ order.address?.receiverName }}
+            {{ order.deliveryInfo?.addressLine1 ?? "-" }}
           </td>
-          <td class="px-6 py-4">{{ formatMoney(order.total || 0) }}</td>
+          <td class="px-6 py-4">{{ formatMoney(order.totalAmount || 0) }}</td>
         </tr>
       </tbody>
     </table>
@@ -65,17 +65,17 @@
 
 <script lang="ts">
 class Order {
-  referenceNumber?: string;
-  orderItems?: OrderItem[];
-  address?: Address;
-  total?: number;
+  id?: string;
+  items?: OrderItem[];
+  deliveryInfo?: DeliveryInfo;
+  totalAmount?: number;
 }
 class OrderItem {
   quantity?: number;
-  productName?: string;
+  productTitle?: string;
 }
-class Address {
-  receiverName?: string;
+class DeliveryInfo {
+  addressLine1?: string;
 }
 </script>
 
@@ -90,10 +90,22 @@ const config = useRuntimeConfig();
 const getOrders = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const response = await request(
-    `${config.public.orderingApiBaseUrl}/api/v1/Orders?page=1&pageSize=10`,
+    `${config.public.customersApiBaseUrl}/api/v1.0/Customers/Orders?page=1&pageSize=10`,
     {},
   );
-  orders.value = (await response.json()).data.reverse();
+  if (response.status === 204) {
+    orders.value = [];
+    return;
+  }
+  const payload = await response.json();
+  orders.value = (payload.data || []).map((order: any) => ({
+    id: order.orderId,
+    totalAmount: order.totalAmount,
+    items: (order.items || []).map((item: any) => ({
+      quantity: item.quantity,
+      productTitle: item.productName,
+    })),
+  }));
 };
 onMounted(() => {
   getOrders();

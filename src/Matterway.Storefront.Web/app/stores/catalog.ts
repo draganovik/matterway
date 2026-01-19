@@ -148,8 +148,7 @@ export const useCatalogStore = defineStore("catalog", {
           product.title = payload.title ?? product.title;
           product.basePrice =
             payload.basePrice ?? payload.price ?? product.basePrice;
-          product.price =
-            payload.price ?? payload.basePrice ?? product.price;
+          product.price = payload.price ?? payload.basePrice ?? product.price;
           product.discount = payload.discount ?? product.discount ?? null;
           product.description = payload.description ?? product.description;
           product.createdAt = payload.createdAt ?? product.createdAt;
@@ -223,8 +222,7 @@ export const useCatalogStore = defineStore("catalog", {
             payload.productCode ?? payload.code ?? product.productCode;
           product.basePrice =
             payload.basePrice ?? payload.price ?? product.basePrice;
-          product.price =
-            payload.price ?? payload.basePrice ?? product.price;
+          product.price = payload.price ?? payload.basePrice ?? product.price;
           product.discount = payload.discount ?? null;
           product.createdAt = payload.createdAt ?? product.createdAt;
           product.updatedAt = payload.updatedAt ?? product.updatedAt;

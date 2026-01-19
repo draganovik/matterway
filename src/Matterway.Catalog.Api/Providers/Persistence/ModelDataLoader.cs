@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Providers.Persistence;
 

@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 
 namespace Matterway.Common.Mapping;
 

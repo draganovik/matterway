@@ -27,9 +27,9 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
 ## Highlights
 
 - **Composable Storefront** – Built with Nuxt 3, Pinia, Tailwind, and Flowbite for a fast, responsive shopping experience.
-- **Domain-Driven Services** – Each core capability (catalog, customers, ordering, identity, payments, inventory) is isolated in its own .NET service.
+- **Domain-Driven Services** – Each core capability (catalog, customers, sales, identity, inventory) is isolated in its own .NET service.
 - **Modern API Surface** – ASP.NET Minimal APIs, versioned endpoints, Swagger/Scalar documentation, and structured pagination utilities.
-- **Secure & Extensible** – Centralized identity service with JWT auth, shared infrastructure SDK (`Matterway.Common`), and Stripe checkout integration.
+- **Secure & Extensible** – Centralized identity service with JWT auth, shared service defaults, and Stripe checkout integration.
 - **Developer-Friendly** – Docker-first workflow, database provisioning scripts, and consistent naming conventions across the stack.
 
 ---
@@ -44,15 +44,14 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
                                          │
                            API Gateway / BFF (future-ready)
                                          │
- ┌──────────────┬──────────────┬─────────┼──────────┬──────────────┬──────────────┐
- │ Catalog.Api   │ Customers.Api│ Identity.Api │ Ordering.Api │ Payments.Api │ Inventory.Api │
- │ Product data  │ Customer mesh│ Auth & JWT   │ Orders & cart│ Stripe, billing│ Stock control │
- └──────┬────────┴──────┬───────┴──────┬─────┴──────┬─────────────┴───────┬────────┘
-        │               │              │            │                     │
+ ┌──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
+ │ Catalog.Api  │ Customers.Api│ Identity.Api │ Sales.Api    │ Inventory.Api │
+ │ Product data │ Customer mesh│ Auth & JWT   │ Orders & pay │ Stock control │
+ └──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
                               PostgreSQL cluster (dockerized)
 ```
 
-Shared cross-cutting concerns are packaged inside `Matterway.Common` and imported by each service.
+Shared defaults live in `Matterway.ServiceDefaults`; legacy utilities remain in `Matterway.Common` for older services.
 
 ---
 
@@ -102,7 +101,7 @@ cd ../..
 docker-compose up --build
 ```
 
-The storefront will be available at `http://localhost:3001`, while the APIs are exposed on ports `2001-2006`. Scalar or Swagger UI for each service can be accessed via `/swagger` once the containers are up.
+The storefront will be available at `http://localhost:3001`, while the APIs are exposed on ports `2001-2005`. Scalar or Swagger UI for each service can be accessed via `/swagger` once the containers are up.
 
 > Prefer running services individually? Each API is a standalone ASP.NET Minimal API – use `dotnet watch run --project src/<Service>.Api` and Nuxt’s `npm run dev` for the storefront.
 
@@ -116,8 +115,7 @@ src/
 ├─ Customers.Api/      # Customer accounts & carts
 ├─ Identity.Api/       # Identity, sessions, JWT issuance
 ├─ Inventory.Api/      # Inventory tracking
-├─ Ordering.Api/       # Order orchestration
-├─ Payments.Api/       # Payments & Stripe integration
+├─ Sales.Api/          # Orders & payments
 ├─ Matterway.Common/  # Shared contracts, brokers, helpers
 └─ Matterway.Storefront.Web/     # Nuxt storefront
 scripts/               # Migration & database automation (sh/cmd)
@@ -134,8 +132,7 @@ docker-compose.yml     # Multi-service orchestration
 | Customers.Api    | 2002 | Customer profiles, carts, and onboarding flows |
 | Identity.Api     | 2003 | Token introspection, session lifecycle, user roles |
 | Inventory.Api    | 2004 | Stock levels, warehouse sync (stub for expansion) |
-| Ordering.Api     | 2005 | Order processing, order history, addresses |
-| Payments.Api     | 2006 | Payment intents, Stripe webhook processing |
+| Sales.Api        | 2005 | Order creation (cart snapshot), lifecycle tracking, payments |
 | Matterway.Storefront.Web   | 3001 | Nuxt storefront (SSR build) |
 
 Each service ships with dedicated features (endpoints, mapping profiles, repositories) following a consistent folder structure.

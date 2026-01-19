@@ -7,6 +7,7 @@ import CardPaymentModel from "#models/CardPaymentModel";
 
 const cart = useCartStore();
 const session = useSessionStore();
+const config = useRuntimeConfig();
 
 const paymentData: Ref<CardPaymentModel> = ref(new CardPaymentModel());
 const addressData: Ref<AddressModel> = ref(new AddressModel());
@@ -22,6 +23,26 @@ const pay = async () => {
   }
   isProcessingPayment.value = true;
   try {
+    const salesOrderResponse = await request(
+      `${config.public.salesApiBaseUrl}/api/v1/Orders`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          customerId: session.getTokenData?.sub,
+          type: "Ecommerce",
+          deliveryInfo: {
+            country: "Serbia",
+            city: addressData.value.city,
+            zipCode: addressData.value.zipCode,
+            addressLine1: addressData.value.street,
+            addressLine2: addressData.value.residence,
+            contactPhone: undefined,
+          },
+        }),
+      },
+    );
+    const salesOrder = await salesOrderResponse.json();
+
     const response = await fetch("/api/payments", {
       method: "POST",
       headers: {
@@ -29,9 +50,9 @@ const pay = async () => {
       },
       body: JSON.stringify({
         ...paymentData.value,
-        amount: totalPrice.value,
+        amount: salesOrder.totalAmount ?? totalPrice.value,
         ...addressData.value,
-        items: cartItems.value,
+        orderId: salesOrder.id,
         userId: session.getTokenData?.sub,
       }),
     });

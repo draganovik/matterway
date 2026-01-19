@@ -4,7 +4,7 @@ using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Providers.Brokers.Catalog;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +16,7 @@ public class UpsertCartItem : IEndpoint
     {
         app.MapPut("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("UpsertCartItemById").WithSummary("Upsert CartItem.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -31,7 +31,7 @@ public class UpsertCartItem : IEndpoint
             Guid productId,
             CartItemRequest request,
             HttpContext httpContext,
-            ICartItemRepository cartItemRepository,
+            ICustomerArticleRepository cartItemRepository,
             ICatalogClient catalogClient,
             CancellationToken cancellationToken)
     {
@@ -51,7 +51,7 @@ public class UpsertCartItem : IEndpoint
                 Detail = "Product price is unavailable."
             });
 
-        var entity = new CartItem
+        var entity = new CustomerArticle
         {
             CustomerId = customerId,
             ProductId = productId,
@@ -62,7 +62,7 @@ public class UpsertCartItem : IEndpoint
 
         try
         {
-            var stored = await cartItemRepository.Upsert(entity, cancellationToken);
+            var stored = await cartItemRepository.UpsertCartItem(entity, cancellationToken);
             return stored is not null
                 ? TypedResults.Ok(MapToResponse(stored))
                 : TypedResults.NotFound();
@@ -105,7 +105,7 @@ public class UpsertCartItem : IEndpoint
         public int Quantity { get; init; }
     }
 
-    private static CartItemResponse MapToResponse(CartItem entity)
+    private static CartItemResponse MapToResponse(CustomerArticle entity)
     {
         return new CartItemResponse
         {

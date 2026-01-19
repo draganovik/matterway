@@ -28,6 +28,9 @@ export default class StripeEventWebhookModel {
       latest_charge: null | string;
       livemode: boolean;
       metadata: any;
+      billing_details?: {
+        phone?: string;
+      };
       shipping: StripeShipping;
       next_action: null | object;
       transfer_data: null | object;

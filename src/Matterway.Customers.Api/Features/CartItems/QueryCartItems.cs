@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -14,7 +14,7 @@ public class QueryCartItems : IEndpoint
     {
         app.MapGet("Customers/CartItems", Handler)
             .WithName("QueryCartItems").WithSummary("Query CartItems.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization()
@@ -29,12 +29,12 @@ public class QueryCartItems : IEndpoint
             PaginationRequestParameters pagingQuery,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            ICartItemRepository cartItemRepository)
+            ICustomerArticleRepository cartItemRepository)
     {
         if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
 
-        var total = await cartItemRepository.Count(userContext.SystemUserId);
-        var entities = await cartItemRepository.QueryForSuid(userContext.SystemUserId, pagingQuery.Page,
+        var total = await cartItemRepository.CountCart(userContext.SystemUserId);
+        var entities = await cartItemRepository.QueryCart(userContext.SystemUserId, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
@@ -72,7 +72,7 @@ public class QueryCartItems : IEndpoint
         public decimal? UnitPrice { get; init; }
     }
 
-    private static CartItemResponse MapToResponse(CartItem entity)
+    private static CartItemResponse MapToResponse(CustomerArticle entity)
     {
         return new CartItemResponse
         {

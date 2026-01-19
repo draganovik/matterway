@@ -1,5 +1,5 @@
-using Minio;
 using Microsoft.Extensions.Options;
+using Minio;
 
 namespace Matterway.Catalog.Api.Providers.Storage.Minio;
 

@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -14,7 +14,7 @@ public class GetCartItemById : IEndpoint
     {
         app.MapGet("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("GetCartItemById").WithSummary("Get CartItem by id.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy => policy.RequireRole(
@@ -26,10 +26,10 @@ public class GetCartItemById : IEndpoint
     private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
         Guid customerId,
         Guid productId,
-        ICartItemRepository cartItemRepository,
+        ICustomerArticleRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await cartItemRepository.GetBy(customerId, productId, cancellationToken);
+        var entity = await cartItemRepository.GetCartItem(customerId, productId, cancellationToken);
         if (entity == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(entity));
@@ -55,7 +55,7 @@ public class GetCartItemById : IEndpoint
         public decimal? UnitPrice { get; init; }
     }
 
-    private static CartItemResponse MapToResponse(CartItem entity)
+    private static CartItemResponse MapToResponse(CustomerArticle entity)
     {
         return new CartItemResponse
         {

@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Matterway.Customers.Api.Application;
 using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Providers.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -13,7 +13,7 @@ public class DeleteCartItem : IEndpoint
     {
         app.MapDelete("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
             .WithName("DeleteCartItem").WithSummary("Delete CartItem.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<DeleteCartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status403Forbidden)
@@ -25,14 +25,14 @@ public class DeleteCartItem : IEndpoint
         Guid customerId,
         Guid productId,
         HttpContext httpContext,
-        ICartItemRepository cartItemRepository,
+        ICustomerArticleRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
         if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
             (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
 
-        var isDeleted = await cartItemRepository.Delete(customerId, productId, cancellationToken);
+        var isDeleted = await cartItemRepository.DeleteCartItem(customerId, productId, cancellationToken);
         if (!isDeleted) return TypedResults.NotFound();
 
         return TypedResults.Ok(new DeleteCartItemResponse

@@ -1,11 +1,11 @@
-using Matterway.Common.Mapping;
-using Matterway.Common.Services.Brokers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Matterway.Common.Mapping;
+using Matterway.Common.Services.Brokers;
 using Matterway.ServiceDefaults;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
+using Microsoft.Extensions.Options;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using Microsoft.Extensions.Options;
 
 namespace Matterway.Catalog.Api.Providers.Storage.Minio;
 

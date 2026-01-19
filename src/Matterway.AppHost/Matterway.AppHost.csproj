@@ -21,8 +21,7 @@
         <ProjectReference Include="..\Matterway.Customers.Api\Matterway.Customers.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Identity.Api\Matterway.Identity.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Inventory.Api\Matterway.Inventory.Api.csproj"/>
-        <ProjectReference Include="..\Matterway.Ordering.Api\Matterway.Ordering.Api.csproj"/>
-        <ProjectReference Include="..\Matterway.Payments.Api\Matterway.Payments.Api.csproj"/>
+        <ProjectReference Include="..\Matterway.Sales.Api\Matterway.Sales.Api.csproj"/>
     </ItemGroup>
 
 </Project>

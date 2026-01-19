@@ -1,5 +1,5 @@
-﻿using Matterway.Common.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Matterway.Common.Models;
 
 namespace Matterway.Common.Services.Brokers;
 
