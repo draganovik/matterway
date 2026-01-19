@@ -9,13 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matterway.Customers.Api", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matterway.Catalog.Api", "src\Matterway.Catalog.Api\Matterway.Catalog.Api.csproj", "{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matterway.Inventory.Api", "src\Matterway.Inventory.Api\Matterway.Inventory.Api.csproj", "{466FC858-72D2-463D-A28F-821975CAAADB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matterway.Sales.Api", "src\Matterway.Sales.Api\Matterway.Sales.Api.csproj", "{D67D18DD-10CA-4098-85DC-202382287E81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{D0CF30CA-7702-4469-BA16-595A8775BE13}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Matterway.Common", "src\Matterway.Common\Matterway.Common.shproj", "{4549DB7E-893D-4010-BC0E-C7D3F01923B5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matterway.AppHost", "src\Matterway.AppHost\Matterway.AppHost.csproj", "{B1352B8F-5F52-4398-8F78-4D745D6FC0AC}"
 EndProject
@@ -39,10 +35,6 @@ Global
 		{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{466FC858-72D2-463D-A28F-821975CAAADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{466FC858-72D2-463D-A28F-821975CAAADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{466FC858-72D2-463D-A28F-821975CAAADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{466FC858-72D2-463D-A28F-821975CAAADB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D67D18DD-10CA-4098-85DC-202382287E81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D67D18DD-10CA-4098-85DC-202382287E81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D67D18DD-10CA-4098-85DC-202382287E81}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,17 +55,9 @@ Global
 		{3B1B1FB7-7B20-4D3D-8A91-065516A4C961} = {D0CF30CA-7702-4469-BA16-595A8775BE13}
 		{E33ABBB8-19FA-451E-A7CA-3F4B8DD731B8} = {D0CF30CA-7702-4469-BA16-595A8775BE13}
 		{E3C3541A-6E43-4F14-AB8B-B8DB33F7B73F} = {D0CF30CA-7702-4469-BA16-595A8775BE13}
-		{466FC858-72D2-463D-A28F-821975CAAADB} = {D0CF30CA-7702-4469-BA16-595A8775BE13}
 		{D67D18DD-10CA-4098-85DC-202382287E81} = {D0CF30CA-7702-4469-BA16-595A8775BE13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8816C948-94CF-491F-B427-7E5018A97F68}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Matterway.Common\Matterway.Common.projitems*{3b1b1fb7-7b20-4d3d-8a91-065516a4c961}*SharedItemsImports = 5
-		src\Matterway.Common\Matterway.Common.projitems*{4549db7e-893d-4010-bc0e-c7d3f01923b5}*SharedItemsImports = 13
-		src\Matterway.Common\Matterway.Common.projitems*{466fc858-72d2-463d-a28f-821975caaadb}*SharedItemsImports = 5
-		src\Matterway.Common\Matterway.Common.projitems*{e33abbb8-19fa-451e-a7ca-3f4b8dd731b8}*SharedItemsImports = 5
-		src\Matterway.Common\Matterway.Common.projitems*{e3c3541a-6e43-4f14-ab8b-b8db33f7b73f}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

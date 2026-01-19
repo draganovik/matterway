@@ -89,16 +89,6 @@ var customersApi = builder.AddProject<Matterway_Customers_Api>("customers-api")
         service.Ports = ["2002:8080"];
     });
 
-// Setup Inventory API
-var inventoryApi = builder.AddProject<Matterway_Inventory_Api>("inventory-api")
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2004:8080"];
-    });
-
 // Setup Sales API
 var salesApi = builder.AddProject<Matterway_Sales_Api>("sales-api")
     .WithReference(salesDb)
@@ -130,13 +120,11 @@ var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.W
 ConfigureApiJwtSettings(catalogApi);
 ConfigureApiJwtSettings(customersApi);
 ConfigureApiJwtSettings(identityApi);
-ConfigureApiJwtSettings(inventoryApi);
 ConfigureApiJwtSettings(salesApi);
 
 ConfigureApiCorsOrigins(catalogApi);
 ConfigureApiCorsOrigins(customersApi);
 ConfigureApiCorsOrigins(identityApi);
-ConfigureApiCorsOrigins(inventoryApi);
 ConfigureApiCorsOrigins(salesApi);
 
 // Run the application

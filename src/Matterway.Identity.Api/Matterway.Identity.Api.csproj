@@ -34,10 +34,4 @@
         <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
     </ItemGroup>
 
-    <Import Project="..\Matterway.Common\Matterway.Common.projitems" Label="Shared"/>
-
-    <ItemGroup>
-        <Compile Remove="..\Matterway.Common\Mapping\ValidationProfile.cs"/>
-    </ItemGroup>
-
 </Project>
