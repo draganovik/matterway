@@ -33,6 +33,10 @@
         <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Infrastructure\"/>
+    </ItemGroup>
+
     <PropertyGroup>
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
     </PropertyGroup>

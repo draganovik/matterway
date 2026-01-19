@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Matterway.Sales.Api.Infrastructure;
-using Matterway.Sales.Api.Providers.Brokers.Customers;
-using Matterway.Sales.Api.Providers.Persistence;
+using Matterway.Sales.Api.Application.Configurations;
+using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
+using Matterway.Sales.Api.Infrastructure.Persistence;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
