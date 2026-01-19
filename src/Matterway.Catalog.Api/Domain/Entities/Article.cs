@@ -6,14 +6,15 @@ public class Article
     public required string ArticleCode { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
+    public decimal BasePrice { get; set; }
     public bool IsAvailable { get; set; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public List<Price> Prices { get; } = [];
     public List<ArticleDetail> ArticleDetails { get; } = [];
     public List<ArticleSpecification> ArticleSpecifications { get; } = [];
     public List<ArticleImage> ArticleImages { get; } = [];
+    public List<Discount> Discounts { get; } = [];
 
     public void UpdateDetails(string? articleCode, string? title, string? description)
     {
@@ -35,49 +36,28 @@ public class Article
         Touch();
     }
 
-    public void SetPrice(ESupportedCurrency currency, decimal amount)
+    public void SetBasePrice(decimal amount)
     {
         if (amount <= 0)
             throw new ArgumentOutOfRangeException(nameof(amount), "Price amount must be greater than zero.");
 
-        var price = Prices.FirstOrDefault(p => p.Currency == currency);
-        if (price is null)
-        {
-            price = new Price { ArticleId = Id, Currency = currency, Amount = amount };
-            Prices.Add(price);
-        }
-        else
-        {
-            price.Amount = amount;
-        }
-
+        BasePrice = amount;
         Touch();
     }
 
-    public decimal? GetBasePrice(ESupportedCurrency currency)
+    public decimal GetFinalPrice(DateTime? now = null)
     {
-        return Prices.FirstOrDefault(p => p.Currency == currency)?.Amount;
+        var discount = GetLatestActiveDiscount(now);
+        if (discount is null) return BasePrice;
+
+        return BasePrice * (1 - discount.Percentage);
     }
 
-    public decimal? GetFinalPrice(ESupportedCurrency currency)
-    {
-        var basePrice = GetBasePrice(currency);
-        if (basePrice is null) return null;
-
-        var discount = GetLatestActiveDiscount(currency);
-
-        if (discount is null) return basePrice;
-
-        return basePrice.Value * (1 - discount.Percentage);
-    }
-
-    public Discount? GetLatestActiveDiscount(ESupportedCurrency currency, DateTime? now = null)
+    public Discount? GetLatestActiveDiscount(DateTime? now = null)
     {
         var referenceTime = now ?? DateTime.UtcNow;
 
-        return Prices
-            .FirstOrDefault(p => p.Currency == currency)?
-            .Discounts
+        return Discounts
             .Where(d => d.ValidFrom <= referenceTime && (d.ValidTo == null || d.ValidTo >= referenceTime))
             .OrderByDescending(d => d.Percentage)
             .ThenByDescending(d => d.ValidFrom)

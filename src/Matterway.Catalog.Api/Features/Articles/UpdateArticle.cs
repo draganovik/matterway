@@ -53,8 +53,8 @@ public class UpdateArticle : IEndpoint
         [MinLength(1, ErrorMessage = "Title cannot be empty if provided.")]
         public string? Title { get; init; }
 
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
-        public decimal? Price { get; init; }
+        [Range(0.01, double.MaxValue, ErrorMessage = "Base price must be greater than zero.")]
+        public decimal? BasePrice { get; init; }
 
         [MinLength(1, ErrorMessage = "Description cannot be empty if provided.")]
         public string? Description { get; init; }
@@ -67,6 +67,7 @@ public class UpdateArticle : IEndpoint
         public Guid Id { get; init; }
         public string? ArticleCode { get; init; }
         public string? Title { get; init; }
+        public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
         public string? Description { get; init; }
         public DateTime? CreatedAt { get; init; }
@@ -79,8 +80,8 @@ public class UpdateArticle : IEndpoint
         entity.UpdateDetails(request.ArticleCode, request.Title, request.Description);
         entity.SetAvailability(request.IsAvailable);
 
-        if (request.Price is not null)
-            entity.SetPrice(ESupportedCurrency.RSD, request.Price.Value);
+        if (request.BasePrice is not null)
+            entity.SetBasePrice(request.BasePrice.Value);
     }
 
     public static UpdateArticleResponse MapToResponse(Article entity)
@@ -90,9 +91,8 @@ public class UpdateArticle : IEndpoint
             Id = entity.Id,
             ArticleCode = entity.ArticleCode,
             Title = entity.Title,
-            Price = entity.Prices?
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Amount,
+            BasePrice = entity.BasePrice,
+            Price = entity.GetFinalPrice(),
             Description = entity.Description,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

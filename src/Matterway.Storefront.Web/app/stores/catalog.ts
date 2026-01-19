@@ -134,7 +134,7 @@ export const useCatalogStore = defineStore("catalog", {
           body: JSON.stringify({
             articleCode: article.articleCode,
             title: article.title,
-            price: article.price ?? article.basePrice,
+            basePrice: article.basePrice ?? article.price,
             description: article.description,
             isAvailable: article.isAvailable,
           }),
@@ -199,7 +199,7 @@ export const useCatalogStore = defineStore("catalog", {
           body: JSON.stringify({
             articleCode: article.articleCode,
             title: article.title,
-            price: article.price ?? article.basePrice,
+            basePrice: article.basePrice ?? article.price,
             description: article.description,
             isAvailable: article.isAvailable,
           }),

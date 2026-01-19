@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -80,9 +79,9 @@ public class GetArticleById : IEndpoint
 
     public static GetArticleByIdResponse MapToResponse(Article entity)
     {
-        var basePrice = entity.GetBasePrice(ESupportedCurrency.RSD);
-        var price = entity.GetFinalPrice(ESupportedCurrency.RSD);
-        var discount = entity.GetLatestActiveDiscount(ESupportedCurrency.RSD);
+        var basePrice = entity.BasePrice;
+        var price = entity.GetFinalPrice();
+        var discount = entity.GetLatestActiveDiscount();
         return new GetArticleByIdResponse
         {
             Id = entity.Id,

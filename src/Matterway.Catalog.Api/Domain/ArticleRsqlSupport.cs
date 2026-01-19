@@ -62,17 +62,13 @@ public static class ArticleRsqlSupport
             ["code"] = ArticleFieldRule.Text(p => p.ArticleCode),
             ["description"] = ArticleFieldRule.Text(p => p.Description),
             ["price"] = ArticleFieldRule.Number(p =>
-                p.Prices
-                    .Where(price => price.Currency == ESupportedCurrency.RSD)
-                    .Select(price => (decimal?)(
-                        price.Amount *
-                        (1 - price.Discounts
-                            .Where(d => d.ValidFrom <= DateTime.UtcNow &&
-                                        (d.ValidTo == null || d.ValidTo >= DateTime.UtcNow))
-                            .OrderByDescending(d => d.Percentage)
-                            .Select(d => d.Percentage)
-                            .FirstOrDefault())))
-                    .FirstOrDefault() ?? 0),
+                p.BasePrice *
+                (1 - p.Discounts
+                    .Where(d => d.ValidFrom <= DateTime.UtcNow &&
+                                (d.ValidTo == null || d.ValidTo >= DateTime.UtcNow))
+                    .OrderByDescending(d => d.Percentage)
+                    .Select(d => d.Percentage)
+                    .FirstOrDefault())),
             ["available"] = ArticleFieldRule.Bool(p => p.IsAvailable)
         };
 

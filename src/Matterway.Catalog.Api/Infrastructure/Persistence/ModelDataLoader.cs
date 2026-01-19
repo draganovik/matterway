@@ -1,4 +1,3 @@
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +19,8 @@ public static class ModelDataLoader
                 Description =
                     "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
                 ArticleCode = "PH002",
-                IsAvailable = true
+                IsAvailable = true,
+                BasePrice = 4999
             },
             new Article
             {
@@ -31,7 +31,8 @@ public static class ModelDataLoader
                 Description =
                     "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
                 ArticleCode = "NT003",
-                IsAvailable = true
+                IsAvailable = true,
+                BasePrice = 24999
             },
             new Article
             {
@@ -42,7 +43,8 @@ public static class ModelDataLoader
                 Description =
                     "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
                 ArticleCode = "AL001",
-                IsAvailable = true
+                IsAvailable = true,
+                BasePrice = 27999
             },
             new Article
             {
@@ -53,7 +55,8 @@ public static class ModelDataLoader
                 Description =
                     "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
                 ArticleCode = "AE004",
-                IsAvailable = true
+                IsAvailable = true,
+                BasePrice = 9999
             },
             new Article
             {
@@ -64,44 +67,8 @@ public static class ModelDataLoader
                 Description =
                     "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
                 ArticleCode = "RS001",
-                IsAvailable = true
-            }
-        );
-
-        #endregion
-
-        #region Prices data
-
-        modelBuilder.Entity<Price>().HasData(
-            new Price
-            {
-                ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                Currency = ESupportedCurrency.RSD,
-                Amount = 4999
-            },
-            new Price
-            {
-                ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                Currency = ESupportedCurrency.RSD,
-                Amount = 24999
-            },
-            new Price
-            {
-                ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                Currency = ESupportedCurrency.RSD,
-                Amount = 27999
-            },
-            new Price
-            {
-                ArticleId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                Currency = ESupportedCurrency.RSD,
-                Amount = 9999
-            },
-            new Price
-            {
-                ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                Currency = ESupportedCurrency.RSD,
-                Amount = 19999
+                IsAvailable = true,
+                BasePrice = 19999
             }
         );
 
@@ -114,7 +81,6 @@ public static class ModelDataLoader
             {
                 Code = "WINTER25",
                 ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                Currency = ESupportedCurrency.RSD,
                 Percentage = 0.25m,
                 ValidFrom = new DateTime(2025, 11, 20).ToUniversalTime(),
                 ValidTo = new DateTime(2026, 3, 20).ToUniversalTime()

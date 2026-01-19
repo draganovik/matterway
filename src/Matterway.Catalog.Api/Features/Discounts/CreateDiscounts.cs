@@ -104,8 +104,6 @@ public class CreateDiscounts : IEndpoint
 
         public DateTime? ValidTo { get; init; }
 
-        public ESupportedCurrency Currency { get; init; } = ESupportedCurrency.RSD;
-
         [Required]
         [MinLength(1, ErrorMessage = "At least one articleId is required.")]
         public required ICollection<Guid> ArticleIds { get; init; }
@@ -118,7 +116,6 @@ public class CreateDiscounts : IEndpoint
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
         public Guid ArticleId { get; init; }
-        public ESupportedCurrency Currency { get; init; }
     }
 
     private static IEnumerable<Discount> MapToEntities(CreateDiscountRequest request, DateTime validFromUtc,
@@ -132,8 +129,7 @@ public class CreateDiscounts : IEndpoint
                 Percentage = request.Percentage,
                 ValidFrom = validFromUtc,
                 ValidTo = validToUtc,
-                ArticleId = articleId,
-                Currency = request.Currency
+                ArticleId = articleId
             });
     }
 
@@ -145,8 +141,7 @@ public class CreateDiscounts : IEndpoint
             Percentage = discount.Percentage,
             ValidFrom = discount.ValidFrom,
             ValidTo = discount.ValidTo,
-            ArticleId = discount.ArticleId,
-            Currency = discount.Currency
+            ArticleId = discount.ArticleId
         };
     }
 }

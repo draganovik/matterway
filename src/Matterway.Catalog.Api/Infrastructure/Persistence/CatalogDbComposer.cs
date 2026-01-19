@@ -2,7 +2,6 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence.AttributeSlugEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.PriceEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
@@ -16,7 +15,6 @@ public class CatalogDbComposer(DbContextOptions<CatalogDbComposer> options) : Db
 {
     public DbSet<Article> Article { get; set; }
 
-    public DbSet<Price> Price { get; set; }
     public DbSet<Discount> Discount { get; set; }
     public DbSet<ArticleImage> ArticleImage { get; set; }
 
@@ -32,7 +30,6 @@ public class CatalogDbComposer(DbContextOptions<CatalogDbComposer> options) : Db
     {
         modelBuilder.ApplyConfiguration(new ArticleEntityTypeConfiguration());
 
-        modelBuilder.ApplyConfiguration(new PriceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ArticleImageEntityTypeConfiguration());
 

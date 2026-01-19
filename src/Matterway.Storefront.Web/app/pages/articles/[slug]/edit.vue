@@ -699,7 +699,7 @@ onMounted(async () => {
               >Cena (RSD)</span
             >
             <input
-              v-model.number="article.price"
+              v-model.number="article.basePrice"
               type="number"
               min="0"
               step="0.01"

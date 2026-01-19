@@ -27,6 +27,10 @@ internal sealed class ArticleEntityTypeConfiguration : IEntityTypeConfiguration<
             .HasMaxLength(1000)
             .IsRequired();
 
+        builder.Property(p => p.BasePrice)
+            .HasPrecision(18, 2)
+            .IsRequired();
+
         builder.Property(p => p.CreatedAt)
             .IsRequired();
 
@@ -47,5 +51,9 @@ internal sealed class ArticleEntityTypeConfiguration : IEntityTypeConfiguration<
         builder.HasMany(p => p.ArticleImages)
             .WithOne(pi => pi.Article)
             .HasForeignKey(pi => pi.ArticleId);
+
+        builder.HasMany(p => p.Discounts)
+            .WithOne(d => d.Article)
+            .HasForeignKey(d => d.ArticleId);
     }
 }

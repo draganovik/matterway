@@ -50,7 +50,7 @@ public class UpdateDiscount : IEndpoint
                 Detail = "At least one articleId is required."
             });
 
-        var existing = await discountRepository.GetBy(code, request.Currency, cancellationToken);
+        var existing = await discountRepository.GetBy(code, cancellationToken);
         if (existing.Count == 0) return TypedResults.NotFound();
 
         var newDiscounts = MapToEntities(code, request, validFrom, validTo).ToList();
@@ -58,7 +58,7 @@ public class UpdateDiscount : IEndpoint
         IReadOnlyCollection<Discount> updated;
         try
         {
-            updated = await discountRepository.Update(code, request.Currency, newDiscounts, cancellationToken);
+            updated = await discountRepository.Update(code, newDiscounts, cancellationToken);
         }
         catch (InvalidOperationException ex)
         {
@@ -85,8 +85,6 @@ public class UpdateDiscount : IEndpoint
 
         public DateTime? ValidTo { get; init; }
 
-        public ESupportedCurrency Currency { get; init; } = ESupportedCurrency.RSD;
-
         [Required]
         [MinLength(1, ErrorMessage = "At least one articleId is required.")]
         public required ICollection<Guid> ArticleIds { get; init; }
@@ -99,7 +97,6 @@ public class UpdateDiscount : IEndpoint
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
         public Guid ArticleId { get; init; }
-        public ESupportedCurrency Currency { get; init; }
     }
 
     private static IEnumerable<Discount> MapToEntities(string code, UpdateDiscountRequest request,
@@ -114,8 +111,7 @@ public class UpdateDiscount : IEndpoint
                 Percentage = request.Percentage,
                 ValidFrom = validFromUtc,
                 ValidTo = validToUtc,
-                ArticleId = articleId,
-                Currency = request.Currency
+                ArticleId = articleId
             });
     }
 
@@ -127,8 +123,7 @@ public class UpdateDiscount : IEndpoint
             Percentage = entity.Percentage,
             ValidFrom = entity.ValidFrom,
             ValidTo = entity.ValidTo,
-            ArticleId = entity.ArticleId,
-            Currency = entity.Currency
+            ArticleId = entity.ArticleId
         };
     }
 }

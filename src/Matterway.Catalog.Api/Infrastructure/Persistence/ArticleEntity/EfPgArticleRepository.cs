@@ -13,7 +13,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected > 0)
             return await context.Article
-                .Include(x => x.Prices)
+                .Include(x => x.Discounts)
                 .Include(x => x.ArticleDetails!)
                 .ThenInclude(pd => pd!.Detail)
                 .Include(x => x.ArticleSpecifications!)
@@ -40,10 +40,6 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
                     return false;
                 }
 
-                await context.Price
-                    .Where(model => model.ArticleId == id)
-                    .ExecuteDeleteAsync(cancellationToken);
-
                 await context.ArticleImage
                     .Where(model => model.ArticleId == id)
                     .ExecuteDeleteAsync(cancellationToken);
@@ -53,6 +49,10 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 await context.ArticleSpecification
+                    .Where(model => model.ArticleId == id)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                await context.Discount
                     .Where(model => model.ArticleId == id)
                     .ExecuteDeleteAsync(cancellationToken);
 
@@ -81,8 +81,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
     {
         var now = DateTime.UtcNow;
         return await context.Article
-            .Include(x => x.Prices)
-            .ThenInclude(p => p.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
+            .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
             .Include(x => x.ArticleDetails!)
             .ThenInclude(pd => pd!.Detail)
             .Include(x => x.ArticleSpecifications!)
@@ -107,8 +106,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         var articleQuery = context.Article.AsQueryable().ApplyArticleRsql(filter);
         var now = DateTime.UtcNow;
         return await articleQuery
-            .Include(x => x.Prices)
-            .ThenInclude(p => p.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
+            .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
             .AsNoTracking()
             .Include(x => x.ArticleImages).AsNoTracking()
             .Skip((pageIndex - 1) * pageSize)
@@ -122,6 +120,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected > 0)
             return await context.Article
+                .Include(x => x.Discounts)
                 .Include(x => x.ArticleDetails!)
                 .ThenInclude(pd => pd.Detail)
                 .Include(x => x.ArticleSpecifications)

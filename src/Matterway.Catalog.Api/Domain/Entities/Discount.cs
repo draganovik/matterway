@@ -8,6 +8,5 @@ public class Discount
     public DateTime? ValidTo { get; set; }
 
     public required Guid ArticleId { get; init; }
-    public required ESupportedCurrency Currency { get; init; }
-    public Price? Price { get; init; }
+    public Article? Article { get; init; }
 }

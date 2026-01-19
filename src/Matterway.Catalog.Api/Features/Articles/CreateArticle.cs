@@ -64,8 +64,8 @@ public class CreateArticle : IEndpoint
         public required string Title { get; init; }
 
         [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
-        public required decimal Price { get; init; }
+        [Range(0.01, double.MaxValue, ErrorMessage = "Base price must be greater than zero.")]
+        public required decimal BasePrice { get; init; }
 
         [Required]
         public required string Description { get; init; }
@@ -78,6 +78,7 @@ public class CreateArticle : IEndpoint
         public Guid Id { get; init; }
         public string? ArticleCode { get; init; }
         public string? Title { get; init; }
+        public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
         public string? Description { get; init; }
         public DateTime? CreatedAt { get; init; }
@@ -93,7 +94,7 @@ public class CreateArticle : IEndpoint
             Title = request.Title,
             Description = request.Description
         };
-        article.SetPrice(ESupportedCurrency.RSD, request.Price);
+        article.SetBasePrice(request.BasePrice);
         article.SetAvailability(request.IsAvailable);
         return article;
     }
@@ -105,9 +106,8 @@ public class CreateArticle : IEndpoint
             Id = entity.Id,
             ArticleCode = entity.ArticleCode,
             Title = entity.Title,
-            Price = entity.Prices?
-                .FirstOrDefault(p => p.Currency == ESupportedCurrency.RSD)?
-                .Amount,
+            BasePrice = entity.BasePrice,
+            Price = entity.GetFinalPrice(),
             Description = entity.Description,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

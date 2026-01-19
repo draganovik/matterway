@@ -1,4 +1,3 @@
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,17 +30,17 @@ public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscoun
         });
     }
 
-    public async Task<IReadOnlyCollection<Discount>> GetBy(string code, ESupportedCurrency currency,
+    public async Task<IReadOnlyCollection<Discount>> GetBy(string code,
         CancellationToken cancellationToken = default)
     {
         return await context.Discount
-            .Include(d => d.Price)
-            .Where(d => d.Code == code && d.Currency == currency)
+            .Include(d => d.Article)
+            .Where(d => d.Code == code)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Discount>> Update(string code, ESupportedCurrency currency,
-        IEnumerable<Discount> discounts, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Discount>> Update(string code, IEnumerable<Discount> discounts,
+        CancellationToken cancellationToken = default)
     {
         var discountList = discounts.ToList();
         if (discountList.Count == 0) return [];
@@ -53,7 +52,7 @@ public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscoun
             try
             {
                 await context.Discount
-                    .Where(d => d.Code == code && d.Currency == currency)
+                    .Where(d => d.Code == code)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 await context.Discount.AddRangeAsync(discountList, cancellationToken);
