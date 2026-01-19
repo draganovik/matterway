@@ -1,10 +1,10 @@
 <Solution>
-  <Folder Name="/Services/">
-    <Project Path="src/Matterway.Catalog.Api/Matterway.Catalog.Api.csproj" />
-    <Project Path="src/Matterway.Customers.Api/Matterway.Customers.Api.csproj" />
-    <Project Path="src/Matterway.Identity.Api/Matterway.Identity.Api.csproj" />
-    <Project Path="src/Matterway.Sales.Api/Matterway.Sales.Api.csproj" />
-  </Folder>
-  <Project Path="src/Matterway.AppHost/Matterway.AppHost.csproj" />
-  <Project Path="src/Matterway.ServiceDefaults/Matterway.ServiceDefaults.csproj" />
+    <Folder Name="/Services/">
+        <Project Path="src/Matterway.Catalog.Api/Matterway.Catalog.Api.csproj"/>
+        <Project Path="src/Matterway.Customers.Api/Matterway.Customers.Api.csproj"/>
+        <Project Path="src/Matterway.Identity.Api/Matterway.Identity.Api.csproj"/>
+        <Project Path="src/Matterway.Sales.Api/Matterway.Sales.Api.csproj"/>
+    </Folder>
+    <Project Path="src/Matterway.AppHost/Matterway.AppHost.csproj"/>
+    <Project Path="src/Matterway.ServiceDefaults/Matterway.ServiceDefaults.csproj"/>
 </Solution>

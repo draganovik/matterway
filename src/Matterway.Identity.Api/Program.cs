@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using Matterway.Identity.Api.Infrastructure;
-using Matterway.Identity.Api.Providers.Persistence;
+using Matterway.Identity.Api.Application.Configurations;
+using Matterway.Identity.Api.Infrastructure.Persistence;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 

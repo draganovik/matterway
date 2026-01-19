@@ -34,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Providers\Brokers\"/>
+        <Folder Include="Infrastructure\"/>
     </ItemGroup>
 
     <PropertyGroup>
