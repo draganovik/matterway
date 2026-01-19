@@ -16,7 +16,7 @@ internal sealed class CustomerArticleEntityTypeConfiguration : IEntityTypeConfig
         builder.Property(article => article.CustomerId)
             .IsRequired();
 
-        builder.Property(article => article.ProductId)
+        builder.Property(article => article.ArticleId)
             .IsRequired();
 
         builder.Property(article => article.OrderId)
@@ -28,7 +28,7 @@ internal sealed class CustomerArticleEntityTypeConfiguration : IEntityTypeConfig
         builder.Property(article => article.UnitPrice)
             .HasPrecision(18, 2);
 
-        builder.Property(article => article.ProductName)
+        builder.Property(article => article.ArticleName)
             .IsRequired()
             .HasMaxLength(200);
 
@@ -44,11 +44,11 @@ internal sealed class CustomerArticleEntityTypeConfiguration : IEntityTypeConfig
 
         builder.HasIndex(article => article.CustomerId);
 
-        builder.HasIndex(article => new { article.CustomerId, article.ProductId, article.OrderId })
+        builder.HasIndex(article => new { article.CustomerId, article.ArticleId, article.OrderId })
             .IsUnique()
             .HasFilter("\"OrderId\" IS NOT NULL");
 
-        builder.HasIndex(article => new { article.CustomerId, article.ProductId })
+        builder.HasIndex(article => new { article.CustomerId, article.ArticleId })
             .IsUnique()
             .HasFilter("\"OrderId\" IS NULL");
     }

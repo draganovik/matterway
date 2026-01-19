@@ -38,7 +38,7 @@ public class DeleteSpecification : IEndpoint
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot delete specification",
-                Detail = "Specification is referenced by one or more products.",
+                Detail = "Specification is referenced by one or more articles.",
                 Status = StatusCodes.Status400BadRequest
             });
 

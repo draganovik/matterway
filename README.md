@@ -46,7 +46,7 @@ Matterway is a full-stack e-commerce platform for smart-home, homelab, server, a
                                          │
  ┌──────────────┬──────────────┬──────────────┬──────────────┐
  │ Catalog.Api  │ Customers.Api│ Identity.Api │ Sales.Api    │
- │ Product data │ Customer mesh│ Auth & JWT   │ Orders & pay │
+ │ Article data │ Customer mesh│ Auth & JWT   │ Orders & pay │
  └──────────────┴──────────────┴──────────────┴──────────────┘
                               PostgreSQL cluster (dockerized)
 ```
@@ -111,7 +111,7 @@ The storefront will be available at `http://localhost:3001`, while the APIs are 
 
 ```
 src/
-├─ Catalog.Api/        # Product catalog service
+├─ Catalog.Api/        # Article catalog service
 ├─ Customers.Api/      # Customer accounts & carts
 ├─ Identity.Api/       # Identity, sessions, JWT issuance
 ├─ Sales.Api/          # Orders & payments
@@ -126,7 +126,7 @@ docker-compose.yml     # Multi-service orchestration
 
 | Service          | Port | Description |
 | ---------------- | ---- | ----------- |
-| Catalog.Api      | 2001 | Product listings, imagery, filtering, pagination |
+| Catalog.Api      | 2001 | Article listings, imagery, filtering, pagination |
 | Customers.Api    | 2002 | Customer profiles, carts, and onboarding flows |
 | Identity.Api     | 2003 | Token introspection, session lifecycle, user roles |
 | Sales.Api        | 2005 | Order creation (cart snapshot), lifecycle tracking, payments |

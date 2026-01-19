@@ -3,10 +3,10 @@ using Matterway.Catalog.Api.Infrastructure.Persistence.AttributeSlugEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.PriceEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecificationEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleSpecificationEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,35 +14,35 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence;
 
 public class CatalogDbComposer(DbContextOptions<CatalogDbComposer> options) : DbContext(options)
 {
-    public DbSet<Product> Product { get; set; }
+    public DbSet<Article> Article { get; set; }
 
     public DbSet<Price> Price { get; set; }
     public DbSet<Discount> Discount { get; set; }
-    public DbSet<ProductImage> ProductImage { get; set; }
+    public DbSet<ArticleImage> ArticleImage { get; set; }
 
     public DbSet<AttributeSlug> AttributeSlug { get; set; }
 
     public DbSet<Detail> Detail { get; set; }
-    public DbSet<ProductDetail> ProductDetail { get; set; }
+    public DbSet<ArticleDetail> ArticleDetail { get; set; }
 
     public DbSet<Specification> Specification { get; set; }
-    public DbSet<ProductSpecification> ProductSpecification { get; set; }
+    public DbSet<ArticleSpecification> ArticleSpecification { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new ProductEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ArticleEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new PriceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountEntityTypeConfiguration());
-        modelBuilder.ApplyConfiguration(new ProductImageEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ArticleImageEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new AttributeSlugEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new DetailEntityTypeConfiguration());
-        modelBuilder.ApplyConfiguration(new ProductDetailEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ArticleDetailEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new SpecificationEntityTypeConfiguration());
-        modelBuilder.ApplyConfiguration(new ProductSpecificationEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ArticleSpecificationEntityTypeConfiguration());
 
         ModelDataLoader.InitializeDemo(modelBuilder);
     }

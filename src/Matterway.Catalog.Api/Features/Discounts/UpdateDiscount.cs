@@ -14,7 +14,7 @@ public class UpdateDiscount : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("Discounts/{code}", Handle)
-            .WithName("UpdateDiscount").WithSummary("Replace a discount across product ids.")
+            .WithName("UpdateDiscount").WithSummary("Replace a discount across article ids.")
             .WithTags(nameof(Discount))
             .Produces<UpdatedDiscountResponse>()
             .Produces(StatusCodes.Status404NotFound)
@@ -42,12 +42,12 @@ public class UpdateDiscount : IEndpoint
                 Detail = "ValidTo must be greater than or equal to ValidFrom."
             });
 
-        if (request.ProductIds.Count == 0)
+        if (request.ArticleIds.Count == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot update discounts",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "At least one productId is required."
+                Detail = "At least one articleId is required."
             });
 
         var existing = await discountRepository.GetBy(code, request.Currency, cancellationToken);
@@ -88,8 +88,8 @@ public class UpdateDiscount : IEndpoint
         public ESupportedCurrency Currency { get; init; } = ESupportedCurrency.RSD;
 
         [Required]
-        [MinLength(1, ErrorMessage = "At least one productId is required.")]
-        public required ICollection<Guid> ProductIds { get; init; }
+        [MinLength(1, ErrorMessage = "At least one articleId is required.")]
+        public required ICollection<Guid> ArticleIds { get; init; }
     }
 
     public record UpdatedDiscountResponse
@@ -98,7 +98,7 @@ public class UpdateDiscount : IEndpoint
         public decimal Percentage { get; init; }
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
         public ESupportedCurrency Currency { get; init; }
     }
 
@@ -106,15 +106,15 @@ public class UpdateDiscount : IEndpoint
         DateTime validFromUtc,
         DateTime? validToUtc)
     {
-        return request.ProductIds
+        return request.ArticleIds
             .Distinct()
-            .Select(productId => new Discount
+            .Select(articleId => new Discount
             {
                 Code = code,
                 Percentage = request.Percentage,
                 ValidFrom = validFromUtc,
                 ValidTo = validToUtc,
-                ProductId = productId,
+                ArticleId = articleId,
                 Currency = request.Currency
             });
     }
@@ -127,7 +127,7 @@ public class UpdateDiscount : IEndpoint
             Percentage = entity.Percentage,
             ValidFrom = entity.ValidFrom,
             ValidTo = entity.ValidTo,
-            ProductId = entity.ProductId,
+            ArticleId = entity.ArticleId,
             Currency = entity.Currency
         };
     }

@@ -2,7 +2,7 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-const string productImagesBucket = "product-images";
+const string articleImagesBucket = "article-images";
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
@@ -32,7 +32,7 @@ var customersDb = postgres.AddDatabase("CustomersDb");
 var identityDb = postgres.AddDatabase("IdentityDb");
 var salesDb = postgres.AddDatabase("SalesDb");
 
-// Setup MinIO for product image storage
+// Setup MinIO for article image storage
 var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
@@ -70,7 +70,7 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
 catalogApi
     .WaitFor(minio)
     .WithReference(minio.GetEndpoint("http"))
-    .WithEnvironment("ImageStorage__Bucket", productImagesBucket)
+    .WithEnvironment("ImageStorage__Bucket", articleImagesBucket)
     .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__AccessKey", minioUser)

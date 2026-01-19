@@ -104,12 +104,12 @@ public class CreateOrder : IEndpoint
                 Detail = "Order items must include unit prices."
             });
 
-        if (customersResult.Order.Items.Any(item => string.IsNullOrWhiteSpace(item.ProductName)))
+        if (customersResult.Order.Items.Any(item => string.IsNullOrWhiteSpace(item.ArticleName)))
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Order items must include product titles."
+                Detail = "Order items must include article titles."
             });
 
         var order = MapToEntity(request, customersResult.Order);
@@ -184,8 +184,8 @@ public class CreateOrder : IEndpoint
     public record OrderItemResponse
     {
         public Guid Id { get; init; }
-        public Guid ProductId { get; init; }
-        public string? ProductTitle { get; init; }
+        public Guid ArticleId { get; init; }
+        public string? ArticleTitle { get; init; }
         public decimal UnitPrice { get; init; }
         public int Quantity { get; init; }
     }
@@ -244,8 +244,8 @@ public class CreateOrder : IEndpoint
         order.Items.AddRange(customerOrder.Items.Select(item => new OrderItem
         {
             OrderId = order.Id,
-            ProductId = item.ProductId,
-            ProductTitle = item.ProductName?.Trim() ?? string.Empty,
+            ArticleId = item.ArticleId,
+            ArticleTitle = item.ArticleName?.Trim() ?? string.Empty,
             UnitPrice = item.UnitPrice ?? 0m,
             Quantity = item.Quantity
         }));
@@ -307,8 +307,8 @@ public class CreateOrder : IEndpoint
             Items = entity.Items.Select(item => new OrderItemResponse
             {
                 Id = item.Id,
-                ProductId = item.ProductId,
-                ProductTitle = item.ProductTitle,
+                ArticleId = item.ArticleId,
+                ArticleTitle = item.ArticleTitle,
                 UnitPrice = item.UnitPrice,
                 Quantity = item.Quantity
             }).ToList(),

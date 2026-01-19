@@ -37,7 +37,7 @@
               <li class="mx-2 p-1" v-for="item in order.items">
                 <b
                   ><span class="text-blue-500">{{ item["quantity"] }} X </span>
-                  {{ item["productTitle"] }}</b
+                  {{ item["articleTitle"] }}</b
                 >
               </li>
             </ol>
@@ -72,7 +72,7 @@ class Order {
 }
 class OrderItem {
   quantity?: number;
-  productTitle?: string;
+  articleTitle?: string;
 }
 class DeliveryInfo {
   addressLine1?: string;
@@ -103,7 +103,7 @@ const getOrders = async () => {
     totalAmount: order.totalAmount,
     items: (order.items || []).map((item: any) => ({
       quantity: item.quantity,
-      productTitle: item.productName,
+      articleTitle: item.articleName,
     })),
   }));
 };

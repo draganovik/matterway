@@ -84,7 +84,7 @@ services:
       Jwt__Issuer: "http://identity-api:${IDENTITY_API_PORT}"
       Jwt__Audience: "http://identity-api:${IDENTITY_API_PORT}"
       services__storefront-web__http__0: "http://storefront-web:3000"
-      ImageStorage__Bucket: "product-images"
+      ImageStorage__Bucket: "article-images"
       ImageStorage__Endpoint: "http://minio:9000"
       ImageStorage__PublicBaseUrl: "http://localhost:19000"
       ImageStorage__AccessKey: "${MINIO_ROOT_USER}"

@@ -11,13 +11,13 @@ defineProps<{
   <ul class="space-y-4">
     <li
       v-for="item in items"
-      :key="item.productId"
+      :key="item.articleId"
       class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-blue-200 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
     >
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="space-y-1">
           <p class="text-base font-semibold text-slate-900 dark:text-white">
-            {{ item.productName }}
+            {{ item.articleName }}
           </p>
           <p class="text-sm text-slate-500 dark:text-slate-400">
             Jedinična cena: {{ formatMoney(item.unitPrice || 0) }}
@@ -42,8 +42,8 @@ defineProps<{
           </span>
         </span>
         <NuxtLink
-          v-if="item.productId"
-          :to="`/products/${item.productId}`"
+          v-if="item.articleId"
+          :to="`/articles/${item.articleId}`"
           class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-300"
         >
           Detalji proizvoda

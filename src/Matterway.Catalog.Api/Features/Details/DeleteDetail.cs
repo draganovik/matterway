@@ -38,7 +38,7 @@ public class DeleteDetail : IEndpoint
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot delete detail",
-                Detail = "Detail is referenced by one or more products.",
+                Detail = "Detail is referenced by one or more articles.",
                 Status = StatusCodes.Status400BadRequest
             });
 

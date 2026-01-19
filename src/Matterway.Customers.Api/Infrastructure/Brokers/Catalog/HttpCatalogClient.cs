@@ -4,9 +4,9 @@ namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 
 public class HttpCatalogClient(HttpClient httpClient) : ICatalogClient
 {
-    public async Task<CatalogClientGetProductByIdResponse?> GetProductById(Guid id, CancellationToken cancellationToken)
+    public async Task<CatalogClientGetArticleByIdResponse?> GetArticleById(Guid id, CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/Products/{id}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/Articles/{id}");
         var response = await httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode) return null;
 
@@ -16,7 +16,7 @@ public class HttpCatalogClient(HttpClient httpClient) : ICatalogClient
             PropertyNameCaseInsensitive = true
         };
 
-        return await JsonSerializer.DeserializeAsync<CatalogClientGetProductByIdResponse>(contentStream, options,
+        return await JsonSerializer.DeserializeAsync<CatalogClientGetArticleByIdResponse>(contentStream, options,
             cancellationToken);
     }
 }

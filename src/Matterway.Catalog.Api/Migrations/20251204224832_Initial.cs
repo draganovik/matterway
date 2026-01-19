@@ -25,11 +25,11 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Article",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     IsAvailable = table.Column<bool>(type: "boolean", nullable: false),
@@ -38,7 +38,7 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.PrimaryKey("PK_Article", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,85 +83,85 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: table => new
                 {
                     Currency = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Price", x => new { x.ProductId, x.Currency });
+                    table.PrimaryKey("PK_Price", x => new { x.ArticleId, x.Currency });
                     table.ForeignKey(
-                        name: "FK_Price_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
+                        name: "FK_Price_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImage",
+                name: "ArticleImage",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderIndex = table.Column<int>(type: "integer", nullable: false),
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageAlt = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImage", x => new { x.Id, x.ProductId });
+                    table.PrimaryKey("PK_ArticleImage", x => new { x.Id, x.ArticleId });
                     table.ForeignKey(
-                        name: "FK_ProductImage_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
+                        name: "FK_ArticleImage_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductDetail",
+                name: "ArticleDetail",
                 columns: table => new
                 {
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     DetailSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Value = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductDetail", x => new { x.ProductId, x.DetailSlug });
+                    table.PrimaryKey("PK_ArticleDetail", x => new { x.ArticleId, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_ProductDetail_Detail_DetailSlug",
+                        name: "FK_ArticleDetail_Detail_DetailSlug",
                         column: x => x.DetailSlug,
                         principalTable: "Detail",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductDetail_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
+                        name: "FK_ArticleDetail_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductSpecification",
+                name: "ArticleSpecification",
                 columns: table => new
                 {
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     SpecificationSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductSpecification", x => new { x.ProductId, x.SpecificationSlug });
+                    table.PrimaryKey("PK_ArticleSpecification", x => new { x.ArticleId, x.SpecificationSlug });
                     table.ForeignKey(
-                        name: "FK_ProductSpecification_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
+                        name: "FK_ArticleSpecification_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductSpecification_Specification_SpecificationSlug",
+                        name: "FK_ArticleSpecification_Specification_SpecificationSlug",
                         column: x => x.SpecificationSlug,
                         principalTable: "Specification",
                         principalColumn: "Slug",
@@ -173,7 +173,7 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: table => new
                 {
                     Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     Currency = table.Column<string>(type: "character varying(3)", nullable: false),
                     Percentage = table.Column<decimal>(type: "numeric", nullable: false),
                     ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -181,12 +181,12 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Discount", x => new { x.Code, x.ProductId, x.Currency });
+                    table.PrimaryKey("PK_Discount", x => new { x.Code, x.ArticleId, x.Currency });
                     table.ForeignKey(
-                        name: "FK_Discount_Price_ProductId_Currency",
-                        columns: x => new { x.ProductId, x.Currency },
+                        name: "FK_Discount_Price_ArticleId_Currency",
+                        columns: x => new { x.ArticleId, x.Currency },
                         principalTable: "Price",
-                        principalColumns: new[] { "ProductId", "Currency" },
+                        principalColumns: new[] { "ArticleId", "Currency" },
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -226,8 +226,8 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Product",
-                columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "ProductCode", "Title", "UpdatedAt" },
+                table: "Article",
+                columns: new[] { "Id", "CreatedAt", "Description", "IsAvailable", "ArticleCode", "Title", "UpdatedAt" },
                 values: new object[,]
                 {
                     { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc), "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.", true, "AL001", "August Wi-Fi Smart Lock Pro", new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc) },
@@ -264,7 +264,7 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "Price",
-                columns: new[] { "Currency", "ProductId", "Amount" },
+                columns: new[] { "Currency", "ArticleId", "Amount" },
                 values: new object[,]
                 {
                     { "RSD", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), 27999m },
@@ -275,14 +275,14 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "ProductImage",
-                columns: new[] { "Id", "ProductId", "ImageAlt", "ImageUrl", "OrderIndex" },
+                table: "ArticleImage",
+                columns: new[] { "Id", "ArticleId", "ImageAlt", "ImageUrl", "OrderIndex" },
                 values: new object[,]
                 {
-                    { new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/product-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/product-24529407541337-media.jpg", 0 },
+                    { new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/article-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/article-24529407541337-media.jpg", 0 },
                     { new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
-                    { new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/productImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
-                    { new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/productImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
+                    { new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/articleImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
+                    { new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/articleImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
                     { new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
                 });
 
@@ -305,12 +305,12 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "Discount",
-                columns: new[] { "Code", "Currency", "ProductId", "Percentage", "ValidFrom", "ValidTo" },
+                columns: new[] { "Code", "Currency", "ArticleId", "Percentage", "ValidFrom", "ValidTo" },
                 values: new object[] { "WINTER25", "RSD", new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
-                table: "ProductDetail",
-                columns: new[] { "DetailSlug", "ProductId", "Value" },
+                table: "ArticleDetail",
+                columns: new[] { "DetailSlug", "ArticleId", "Value" },
                 values: new object[,]
                 {
                     { "battery", new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
@@ -327,8 +327,8 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "ProductSpecification",
-                columns: new[] { "ProductId", "SpecificationSlug", "Value" },
+                table: "ArticleSpecification",
+                columns: new[] { "ArticleId", "SpecificationSlug", "Value" },
                 values: new object[,]
                 {
                     { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery-size", 3000m },
@@ -353,30 +353,30 @@ namespace Matterway.Catalog.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discount_ProductId_Currency",
+                name: "IX_Discount_ArticleId_Currency",
                 table: "Discount",
-                columns: new[] { "ProductId", "Currency" });
+                columns: new[] { "ArticleId", "Currency" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_ProductCode",
-                table: "Product",
-                column: "ProductCode",
+                name: "IX_Article_ArticleCode",
+                table: "Article",
+                column: "ArticleCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductDetail_DetailSlug",
-                table: "ProductDetail",
+                name: "IX_ArticleDetail_DetailSlug",
+                table: "ArticleDetail",
                 column: "DetailSlug");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId_OrderIndex",
-                table: "ProductImage",
-                columns: new[] { "ProductId", "OrderIndex" },
+                name: "IX_ArticleImage_ArticleId_OrderIndex",
+                table: "ArticleImage",
+                columns: new[] { "ArticleId", "OrderIndex" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductSpecification_SpecificationSlug",
-                table: "ProductSpecification",
+                name: "IX_ArticleSpecification_SpecificationSlug",
+                table: "ArticleSpecification",
                 column: "SpecificationSlug");
         }
 
@@ -387,13 +387,13 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "Discount");
 
             migrationBuilder.DropTable(
-                name: "ProductDetail");
+                name: "ArticleDetail");
 
             migrationBuilder.DropTable(
-                name: "ProductImage");
+                name: "ArticleImage");
 
             migrationBuilder.DropTable(
-                name: "ProductSpecification");
+                name: "ArticleSpecification");
 
             migrationBuilder.DropTable(
                 name: "Price");
@@ -405,7 +405,7 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "Specification");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Article");
 
             migrationBuilder.DropTable(
                 name: "AttributeSlug");

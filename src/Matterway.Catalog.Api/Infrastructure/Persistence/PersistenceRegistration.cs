@@ -1,9 +1,9 @@
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductDetailEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductImageEntity;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ProductSpecificationEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleSpecificationEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,11 +24,11 @@ public static class PersistenceRegistration
                     npgsqlOptions => { npgsqlOptions.EnableRetryOnFailure(); })
             );
             builder.Services.AddScoped<IDiscountRepository, EfPgDiscountRepository>();
-            builder.Services.AddScoped<IProductDetailRepository, EfPgProductDetailRepository>();
+            builder.Services.AddScoped<IArticleDetailRepository, EfPgArticleDetailRepository>();
             builder.Services.AddScoped<IDetailRepository, EfPgDetailRepository>();
-            builder.Services.AddScoped<IProductImageRepository, EfPgProductImageRepository>();
-            builder.Services.AddScoped<IProductRepository, EfPgProductRepository>();
-            builder.Services.AddScoped<IProductSpecificationRepository, EfPgProductSpecificationRepository>();
+            builder.Services.AddScoped<IArticleImageRepository, EfPgArticleImageRepository>();
+            builder.Services.AddScoped<IArticleRepository, EfPgArticleRepository>();
+            builder.Services.AddScoped<IArticleSpecificationRepository, EfPgArticleSpecificationRepository>();
             builder.Services.AddScoped<ISpecificationRepository, EfPgSpecificationRepository>();
 
             return builder;

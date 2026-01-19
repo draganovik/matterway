@@ -58,10 +58,10 @@ public class QueryCartItems : IEndpoint
         public Guid CustomerId { get; init; }
 
         [Required]
-        public string? ProductName { get; init; }
+        public string? ArticleName { get; init; }
 
         [Required]
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -77,8 +77,8 @@ public class QueryCartItems : IEndpoint
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ProductId = entity.ProductId,
-            ProductName = entity.ProductName,
+            ArticleId = entity.ArticleId,
+            ArticleName = entity.ArticleName,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

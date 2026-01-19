@@ -78,8 +78,8 @@ namespace Matterway.Customers.Api.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
-                    ProductName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
@@ -121,7 +121,7 @@ namespace Matterway.Customers.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "CustomerArticle",
-                columns: new[] { "Id", "CustomerId", "OrderId", "ProductId", "ProductName", "Quantity", "UnitPrice" },
+                columns: new[] { "Id", "CustomerId", "OrderId", "ArticleId", "ArticleName", "Quantity", "UnitPrice" },
                 values: new object[,]
                 {
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", 3, 4999m },
@@ -140,16 +140,16 @@ namespace Matterway.Customers.Api.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerArticle_CustomerId_ProductId",
+                name: "IX_CustomerArticle_CustomerId_ArticleId",
                 table: "CustomerArticle",
-                columns: new[] { "CustomerId", "ProductId" },
+                columns: new[] { "CustomerId", "ArticleId" },
                 unique: true,
                 filter: "\"OrderId\" IS NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerArticle_CustomerId_ProductId_OrderId",
+                name: "IX_CustomerArticle_CustomerId_ArticleId_OrderId",
                 table: "CustomerArticle",
-                columns: new[] { "CustomerId", "ProductId", "OrderId" },
+                columns: new[] { "CustomerId", "ArticleId", "OrderId" },
                 unique: true,
                 filter: "\"OrderId\" IS NOT NULL");
 

@@ -3,7 +3,7 @@
 import { defineStore } from "pinia";
 import CartItemModel from "#models/CartItemModel";
 import { useSessionStore } from "@stores/session";
-import ProductModel from "#models/ProductModel";
+import ArticleModel from "#models/ArticleModel";
 
 interface CartState {
   cartItems: CartItemModel[];
@@ -19,13 +19,13 @@ export const useCartStore = defineStore("cart", {
     getCartItems(): CartItemModel[] {
       return this.cartItems;
     },
-    isProductInCart(): (productId: string) => boolean {
-      return (productId: string) =>
-        this.cartItems?.some((item) => item.productId === productId);
+    isArticleInCart(): (articleId: string) => boolean {
+      return (articleId: string) =>
+        this.cartItems?.some((item) => item.articleId === articleId);
     },
-    countProductsInCart(): (productId: string) => number {
-      return (productId: string) =>
-        this.cartItems?.find((item) => item.productId === productId)
+    countArticlesInCart(): (articleId: string) => number {
+      return (articleId: string) =>
+        this.cartItems?.find((item) => item.articleId === articleId)
           ?.quantity || 0;
     },
     getTotalPrice(): number {
@@ -44,16 +44,16 @@ export const useCartStore = defineStore("cart", {
   },
 
   actions: {
-    async removeFromCart(product: ProductModel) {
+    async removeFromCart(article: ArticleModel) {
       const config = useRuntimeConfig();
       const session = useSessionStore();
       const findItem = this.cartItems.find(
-        (item) => item.productId === product.id,
+        (item) => item.articleId === article.id,
       );
       if (findItem && findItem.quantity > 1) {
         findItem.quantity--;
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${findItem?.productId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${findItem?.articleId}`,
           {
             method: "PUT",
             body: JSON.stringify({ quantity: findItem.quantity }),
@@ -61,34 +61,34 @@ export const useCartStore = defineStore("cart", {
         );
       } else {
         this.cartItems = this.cartItems.filter(
-          (item) => item.productId !== product.id,
+          (item) => item.articleId !== article.id,
         );
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${product.id}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${article.id}`,
           {
             method: "DELETE",
           },
         );
       }
     },
-    async addToCart(product: ProductModel) {
+    async addToCart(article: ArticleModel) {
       const config = useRuntimeConfig();
       const session = useSessionStore();
 
-      // if product exist in cart set quantity to +1, else add product to cart
-      if (this.cartItems?.some((item) => item.productId === product.id)) {
-        this.cartItems.find((item) => item.productId === product.id)!
+      // if article exist in cart set quantity to +1, else add article to cart
+      if (this.cartItems?.some((item) => item.articleId === article.id)) {
+        this.cartItems.find((item) => item.articleId === article.id)!
           .quantity++;
       } else {
-        this.cartItems?.push(new CartItemModel(product));
+        this.cartItems?.push(new CartItemModel(article));
       }
 
       const currentItem = this.cartItems?.find(
-        (item) => item.productId === product.id,
+        (item) => item.articleId === article.id,
       );
 
       await request(
-        `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${currentItem?.productId}`,
+        `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${currentItem?.articleId}`,
         {
           method: "PUT",
           body: JSON.stringify({ quantity: currentItem?.quantity }),
@@ -100,7 +100,7 @@ export const useCartStore = defineStore("cart", {
       const session = useSessionStore();
       this.cartItems.forEach(async (item) => {
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${item.productId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${item.articleId}`,
           {
             method: "DELETE",
           },

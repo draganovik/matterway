@@ -140,8 +140,8 @@ public class CreateCustomerOrder : IEndpoint
 
     public record CustomerArticleResponse
     {
-        public Guid ProductId { get; init; }
-        public string? ProductName { get; init; }
+        public Guid ArticleId { get; init; }
+        public string? ArticleName { get; init; }
         public decimal? UnitPrice { get; init; }
         public int Quantity { get; init; }
     }
@@ -174,8 +174,8 @@ public class CreateCustomerOrder : IEndpoint
     {
         var items = order.Items.Select(item => new CustomerArticleResponse
         {
-            ProductId = item.ProductId,
-            ProductName = item.ProductName,
+            ArticleId = item.ArticleId,
+            ArticleName = item.ArticleName,
             UnitPrice = item.UnitPrice,
             Quantity = item.Quantity
         }).ToList();

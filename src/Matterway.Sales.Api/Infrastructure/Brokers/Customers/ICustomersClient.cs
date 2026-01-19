@@ -52,8 +52,8 @@ public sealed record CustomersDeliveryInfoResponse
 
 public sealed record CustomersOrderItemResponse
 {
-    public Guid ProductId { get; init; }
-    public string? ProductName { get; init; }
+    public Guid ArticleId { get; init; }
+    public string? ArticleName { get; init; }
     public decimal? UnitPrice { get; init; }
     public int Quantity { get; init; }
 }

@@ -11,8 +11,8 @@ internal sealed class PriceEntityTypeConfiguration : IEntityTypeConfiguration<Pr
     {
         builder.ToTable(nameof(Price));
 
-        builder.HasKey(p => new { p.ProductId, p.Currency });
-        builder.Property(p => p.ProductId);
+        builder.HasKey(p => new { p.ArticleId, p.Currency });
+        builder.Property(p => p.ArticleId);
 
         builder.Property(p => p.Currency)
             .HasMaxLength(3)
@@ -22,8 +22,8 @@ internal sealed class PriceEntityTypeConfiguration : IEntityTypeConfiguration<Pr
         builder.Property(p => p.Amount)
             .IsRequired();
 
-        builder.HasOne(p => p.Product)
+        builder.HasOne(p => p.Article)
             .WithMany(p => p.Prices)
-            .HasForeignKey(p => p.ProductId);
+            .HasForeignKey(p => p.ArticleId);
     }
 }

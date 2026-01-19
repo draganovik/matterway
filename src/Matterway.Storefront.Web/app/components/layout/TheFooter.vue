@@ -5,7 +5,7 @@ const year = new Date().getFullYear();
 
 const quickLinks = [
   { label: "Naslovna", to: "/" },
-  { label: "Proizvodi", to: "/products" },
+  { label: "Proizvodi", to: "/articles" },
   { label: "Kontakt", to: "/#kontakt" },
   { label: "Politika privatnosti", to: "/privacy" },
 ];

@@ -56,8 +56,8 @@ namespace Matterway.Sales.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductTitle = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleTitle = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false)
                 },

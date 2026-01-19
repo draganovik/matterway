@@ -16,7 +16,7 @@ const showMobileSearch = ref(false);
 const searchInput = ref<HTMLInputElement | null>(null);
 
 const navLinks = [
-  { label: "Proizvodi", to: "/products" },
+  { label: "Proizvodi", to: "/articles" },
   { label: "Kolekcije", to: "/#kolekcije" },
   { label: "Najnovije", to: "/#najnovije" },
 ];
@@ -38,9 +38,9 @@ const submitSearch = () => {
   if (!value) return;
 
   router.push({
-    path: "/products",
+    path: "/articles",
     query: {
-      productName: value,
+      articleName: value,
     },
   });
 

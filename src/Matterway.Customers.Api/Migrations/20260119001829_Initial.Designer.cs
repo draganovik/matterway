@@ -153,10 +153,10 @@ namespace Matterway.Customers.Api.Migrations
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("ArticleId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ProductName")
+                    b.Property<string>("ArticleName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -174,11 +174,11 @@ namespace Matterway.Customers.Api.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("CustomerId", "ProductId")
+                    b.HasIndex("CustomerId", "ArticleId")
                         .IsUnique()
                         .HasFilter("\"OrderId\" IS NULL");
 
-                    b.HasIndex("CustomerId", "ProductId", "OrderId")
+                    b.HasIndex("CustomerId", "ArticleId", "OrderId")
                         .IsUnique()
                         .HasFilter("\"OrderId\" IS NOT NULL");
 
@@ -192,8 +192,8 @@ namespace Matterway.Customers.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"),
                             CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            ProductId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            ProductName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
+                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
                             Quantity = 3,
                             UnitPrice = 4999m
                         },
@@ -201,8 +201,8 @@ namespace Matterway.Customers.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
                             CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
-                            ProductId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            ProductName = "Ring Spotlight Cam",
+                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleName = "Ring Spotlight Cam",
                             Quantity = 1,
                             UnitPrice = 19999m
                         });

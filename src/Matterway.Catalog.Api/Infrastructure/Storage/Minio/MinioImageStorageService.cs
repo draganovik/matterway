@@ -11,14 +11,14 @@ public sealed class MinioImageStorageService(
 {
     private readonly ImageStorageOptions _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-    public async Task<ImageStorageUploadResult> UploadAsync(Guid productId, Guid imageId, IFormFile file,
+    public async Task<ImageStorageUploadResult> UploadAsync(Guid articleId, Guid imageId, IFormFile file,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(file);
 
         if (file.Length == 0) throw new InvalidOperationException("Cannot upload an empty file.");
 
-        var objectName = BuildObjectName(productId, imageId);
+        var objectName = BuildObjectName(articleId, imageId);
 
         await using var stream = file.OpenReadStream();
         var putObjectArgs = new PutObjectArgs()
@@ -35,9 +35,9 @@ public sealed class MinioImageStorageService(
         return new ImageStorageUploadResult(imageId, BuildPublicUrl(objectName));
     }
 
-    public async Task DeleteAsync(Guid productId, Guid imageId, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid articleId, Guid imageId, CancellationToken cancellationToken = default)
     {
-        var objectName = BuildObjectName(productId, imageId);
+        var objectName = BuildObjectName(articleId, imageId);
         var client = clientFactory.CreateClient();
         var removeArgs = new RemoveObjectArgs()
             .WithBucket(_options.Bucket)
@@ -53,9 +53,9 @@ public sealed class MinioImageStorageService(
         }
     }
 
-    private static string BuildObjectName(Guid productId, Guid imageId)
+    private static string BuildObjectName(Guid articleId, Guid imageId)
     {
-        return $"{productId:D}/{imageId:N}";
+        return $"{articleId:D}/{imageId:N}";
     }
 
     private string BuildPublicUrl(string objectName)

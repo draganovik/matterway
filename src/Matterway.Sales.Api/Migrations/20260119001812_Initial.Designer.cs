@@ -101,10 +101,10 @@ namespace Matterway.Sales.Api.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("ArticleId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ProductTitle")
+                    b.Property<string>("ArticleTitle")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");

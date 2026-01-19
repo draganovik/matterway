@@ -14,7 +14,7 @@ public class CreateDiscounts : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("Discounts", Handle)
-            .WithName("CreateDiscounts").WithSummary("Create discount codes for multiple products.")
+            .WithName("CreateDiscounts").WithSummary("Create discount codes for multiple articles.")
             .WithTags(nameof(Discount))
             .Produces<CreatedDiscountResponse[]>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -42,12 +42,12 @@ public class CreateDiscounts : IEndpoint
                 Detail = "ValidTo must be greater than or equal to ValidFrom."
             });
 
-        if (request.ProductIds is null || request.ProductIds.Count == 0)
+        if (request.ArticleIds is null || request.ArticleIds.Count == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot create discounts",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "At least one productId is required."
+                Detail = "At least one articleId is required."
             });
 
         var discounts = MapToEntities(request, validFrom, validTo).ToList();
@@ -77,10 +77,10 @@ public class CreateDiscounts : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "GetProductById",
+            "GetArticleById",
             new
             {
-                id = created.First().ProductId
+                id = created.First().ArticleId
             });
 
         var response = created.Select(MapToResponse).ToArray();
@@ -107,8 +107,8 @@ public class CreateDiscounts : IEndpoint
         public ESupportedCurrency Currency { get; init; } = ESupportedCurrency.RSD;
 
         [Required]
-        [MinLength(1, ErrorMessage = "At least one productId is required.")]
-        public required ICollection<Guid> ProductIds { get; init; }
+        [MinLength(1, ErrorMessage = "At least one articleId is required.")]
+        public required ICollection<Guid> ArticleIds { get; init; }
     }
 
     public record CreatedDiscountResponse
@@ -117,22 +117,22 @@ public class CreateDiscounts : IEndpoint
         public decimal Percentage { get; init; }
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
         public ESupportedCurrency Currency { get; init; }
     }
 
     private static IEnumerable<Discount> MapToEntities(CreateDiscountRequest request, DateTime validFromUtc,
         DateTime? validToUtc)
     {
-        return request.ProductIds
+        return request.ArticleIds
             .Distinct()
-            .Select(productId => new Discount
+            .Select(articleId => new Discount
             {
                 Code = request.Code,
                 Percentage = request.Percentage,
                 ValidFrom = validFromUtc,
                 ValidTo = validToUtc,
-                ProductId = productId,
+                ArticleId = articleId,
                 Currency = request.Currency
             });
     }
@@ -145,7 +145,7 @@ public class CreateDiscounts : IEndpoint
             Percentage = discount.Percentage,
             ValidFrom = discount.ValidFrom,
             ValidTo = discount.ValidTo,
-            ProductId = discount.ProductId,
+            ArticleId = discount.ArticleId,
             Currency = discount.Currency
         };
     }

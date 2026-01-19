@@ -6,8 +6,8 @@ public class OrderItem
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
 
-    public Guid ProductId { get; set; }
-    public required string ProductTitle { get; set; } = string.Empty;
+    public Guid ArticleId { get; set; }
+    public required string ArticleTitle { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
 }

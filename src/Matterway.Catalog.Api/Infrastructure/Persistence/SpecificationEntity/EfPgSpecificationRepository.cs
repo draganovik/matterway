@@ -75,7 +75,7 @@ public sealed class EfPgSpecificationRepository(CatalogDbComposer context) : ISp
     public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)
     {
         var normalizedSlug = slug.Trim().ToLower();
-        var inUse = await context.ProductSpecification.AnyAsync(ps => ps.SpecificationSlug == normalizedSlug,
+        var inUse = await context.ArticleSpecification.AnyAsync(ps => ps.SpecificationSlug == normalizedSlug,
             cancellationToken);
         if (inUse) return false;
 

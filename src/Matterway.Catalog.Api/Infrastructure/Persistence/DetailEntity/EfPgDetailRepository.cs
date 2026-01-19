@@ -72,7 +72,7 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
     public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)
     {
         var normalizedSlug = slug.Trim().ToLower();
-        var inUse = await context.ProductDetail.AnyAsync(pd => pd.DetailSlug == normalizedSlug, cancellationToken);
+        var inUse = await context.ArticleDetail.AnyAsync(pd => pd.DetailSlug == normalizedSlug, cancellationToken);
         if (inUse) return false;
 
         var entity = await context.Detail.FirstOrDefaultAsync(d => d.Slug == normalizedSlug, cancellationToken);

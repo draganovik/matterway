@@ -14,7 +14,7 @@ public class UpsertCartItem : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
+        app.MapPut("Customers/{customerId:guid}/CartItems/{articleId:guid}", Handler)
             .WithName("UpsertCartItemById").WithSummary("Upsert CartItem.")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
@@ -28,7 +28,7 @@ public class UpsertCartItem : IEndpoint
     private static async Task<
             Results<Ok<CartItemResponse>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>>
         Handler(Guid customerId,
-            Guid productId,
+            Guid articleId,
             CartItemRequest request,
             HttpContext httpContext,
             ICustomerArticleRepository cartItemRepository,
@@ -39,24 +39,24 @@ public class UpsertCartItem : IEndpoint
             (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
             return TypedResults.Forbid();
 
-        var product = await catalogClient.GetProductById(productId, cancellationToken);
-        if (product is null) return TypedResults.NotFound();
+        var article = await catalogClient.GetArticleById(articleId, cancellationToken);
+        if (article is null) return TypedResults.NotFound();
 
-        var resolvedPrice = product.Price ?? product.BasePrice;
+        var resolvedPrice = article.Price ?? article.BasePrice;
         if (resolvedPrice is null)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Product price is unavailable."
+                Detail = "Article price is unavailable."
             });
 
         var entity = new CustomerArticle
         {
             CustomerId = customerId,
-            ProductId = productId,
+            ArticleId = articleId,
             Quantity = request.Quantity,
-            ProductName = product.Title,
+            ArticleName = article.Title,
             UnitPrice = resolvedPrice
         };
 
@@ -84,10 +84,10 @@ public class UpsertCartItem : IEndpoint
         public Guid CustomerId { get; init; }
 
         [Required]
-        public string? ProductName { get; init; }
+        public string? ArticleName { get; init; }
 
         [Required]
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -110,8 +110,8 @@ public class UpsertCartItem : IEndpoint
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ProductId = entity.ProductId,
-            ProductName = entity.ProductName,
+            ArticleId = entity.ArticleId,
+            ArticleName = entity.ArticleName,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };
