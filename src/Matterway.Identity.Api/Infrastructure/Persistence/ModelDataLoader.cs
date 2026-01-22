@@ -1,5 +1,6 @@
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
+using Matterway.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +10,7 @@ public static class ModelDataLoader
 {
     public static void InitializeDemo(ModelBuilder modelBuilder)
     {
-        var adminRoleId = new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811");
-        var managerRoleId = new Guid("35a11f01-15f0-4110-8efc-f81e537b0c94");
+        var employeeRoleId = new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811");
         var customerRoleId = new Guid("c4c29ba9-3b22-416f-8a37-8a7c3d6ed1f9");
 
         var adminUserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1");
@@ -23,17 +23,10 @@ public static class ModelDataLoader
         modelBuilder.Entity<IdentityRole<Guid>>().HasData(
             new IdentityRole<Guid>
             {
-                Id = adminRoleId,
-                Name = nameof(EIdentityRole.Admin),
-                NormalizedName = nameof(EIdentityRole.Admin).ToUpperInvariant(),
+                Id = employeeRoleId,
+                Name = nameof(EIdentityRole.Employee),
+                NormalizedName = nameof(EIdentityRole.Employee).ToUpperInvariant(),
                 ConcurrencyStamp = "f9f0b98d-7d9e-48d8-86c5-9a13ebf1c81a"
-            },
-            new IdentityRole<Guid>
-            {
-                Id = managerRoleId,
-                Name = nameof(EIdentityRole.Manager),
-                NormalizedName = nameof(EIdentityRole.Manager).ToUpperInvariant(),
-                ConcurrencyStamp = "ea4804c9-5cc8-4a56-9a06-3f7d76715a56"
             },
             new IdentityRole<Guid>
             {
@@ -104,12 +97,12 @@ public static class ModelDataLoader
             new IdentityUserRole<Guid>
             {
                 UserId = adminUserId,
-                RoleId = adminRoleId
+                RoleId = employeeRoleId
             },
             new IdentityUserRole<Guid>
             {
                 UserId = managerUserId,
-                RoleId = managerRoleId
+                RoleId = employeeRoleId
             },
             new IdentityUserRole<Guid>
             {
@@ -120,6 +113,68 @@ public static class ModelDataLoader
             {
                 UserId = customer02UserId,
                 RoleId = customerRoleId
+            });
+
+        #endregion
+
+        #region User permission data
+
+        modelBuilder.Entity<IdentityUserClaim<Guid>>().HasData(
+            new IdentityUserClaim<Guid>
+            {
+                Id = 1,
+                UserId = adminUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("identity", PermissionLevel.Administrator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 2,
+                UserId = adminUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("catalog", PermissionLevel.Administrator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 3,
+                UserId = adminUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("customers", PermissionLevel.Administrator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 4,
+                UserId = adminUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("sales", PermissionLevel.Administrator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 5,
+                UserId = managerUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("identity", PermissionLevel.Operator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 6,
+                UserId = managerUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("catalog", PermissionLevel.Operator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 7,
+                UserId = managerUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("customers", PermissionLevel.Operator)
+            },
+            new IdentityUserClaim<Guid>
+            {
+                Id = 8,
+                UserId = managerUserId,
+                ClaimType = PermissionClaims.ClaimType,
+                ClaimValue = PermissionClaims.Format("sales", PermissionLevel.Operator)
             });
 
         #endregion

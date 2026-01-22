@@ -19,9 +19,8 @@ public class UpdateArticleImage : IEndpoint
             .Produces<UpdateArticleImageResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

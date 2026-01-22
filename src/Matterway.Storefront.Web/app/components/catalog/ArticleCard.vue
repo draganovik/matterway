@@ -44,10 +44,7 @@ const availabilityClasses = computed(() =>
     : "border-red-200 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200",
 );
 
-const canManage = computed(() => {
-  const role = session.getTokenData?.role;
-  return role === "Admin" || role === "Manager";
-});
+const canManage = computed(() => session.hasPermission("catalog", "operator"));
 
 const articleLink = computed(() => `/articles/${props.article.id}`);
 

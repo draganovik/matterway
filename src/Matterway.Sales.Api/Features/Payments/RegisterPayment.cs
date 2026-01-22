@@ -21,6 +21,8 @@ public class RegisterPayment : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

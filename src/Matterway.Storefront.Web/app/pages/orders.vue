@@ -11,7 +11,7 @@
           </th>
           <th scope="col" class="px-6 py-3">Broj artikala</th>
           <th
-            v-if="sessionStore.getTokenData?.role != 'Customer'"
+            v-if="sessionStore.isEmployee"
             scope="col"
             class="bg-gray-50 px-6 py-3 dark:bg-gray-800"
           >
@@ -43,7 +43,7 @@
             </ol>
           </td>
           <td
-            v-if="sessionStore.getTokenData?.role != 'Customer'"
+            v-if="sessionStore.isEmployee"
             class="bg-gray-50 px-6 py-4 dark:bg-gray-800"
           >
             {{ order.deliveryInfo?.addressLine1 ?? "-" }}

@@ -18,9 +18,8 @@ public class GetSystemUserById : IEndpoint
             .WithTags("SystemUsers")
             .Produces<GetSystemUserByIdResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(EIdentityRole.Admin),
-                nameof(EIdentityRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

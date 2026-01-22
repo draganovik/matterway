@@ -16,9 +16,8 @@ public class QuerySpecifications : IEndpoint
             .WithName("QuerySpecifications").WithSummary("Query available specifications.")
             .WithTags(nameof(Specification))
             .Produces<ICollection<QuerySpecificationResponse>>()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

@@ -1,13 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Matterway.Identity.Api.Domain;
 using Matterway.ServiceDefaults.Authorization;
 
-namespace Matterway.Identity.Api.Application;
+namespace Matterway.Sales.Api.Application;
 
 public static class RequestIdentity
 {
-    public const string ServiceName = "identity";
+    public const string ServiceName = "sales";
+    private const string CustomerRoleName = "Customer";
 
     public static Guid? GetIdentifier(ClaimsPrincipal? principal)
     {
@@ -20,17 +20,17 @@ public static class RequestIdentity
     public static bool IsCustomer(ClaimsPrincipal? principal)
     {
         var roleValue = principal?.FindFirstValue(ClaimTypes.Role);
-        return Enum.TryParse(roleValue, true, out EIdentityRole role) && role == EIdentityRole.Customer;
+        return string.Equals(roleValue, CustomerRoleName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool AsObserver(ClaimsPrincipal? principal)
+    {
+        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Observer);
     }
 
     public static bool AsOperator(ClaimsPrincipal? principal)
     {
         return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Operator);
-    }
-
-    public static bool AsAdministrator(ClaimsPrincipal? principal)
-    {
-        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Administrator);
     }
 
     private static string? GetSubjectValue(ClaimsPrincipal principal)

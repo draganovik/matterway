@@ -16,9 +16,8 @@ public class QueryDetails : IEndpoint
             .WithName("QueryDetails").WithSummary("Query available detail definitions.")
             .WithTags(nameof(Detail))
             .Produces<ICollection<QueryDetailResponse>>()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

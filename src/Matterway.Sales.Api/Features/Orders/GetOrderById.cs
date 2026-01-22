@@ -15,6 +15,8 @@ public class GetOrderById : IEndpoint
             .WithTags(nameof(Order))
             .Produces<CreateOrder.OrderResponse>()
             .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

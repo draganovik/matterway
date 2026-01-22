@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -22,7 +21,9 @@ public class CreateCustomerOrder : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireAssertion(context =>
+                RequestIdentity.IsCustomer(context.User) ||
+                RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -37,8 +38,7 @@ public class CreateCustomerOrder : IEndpoint
             ICustomerOrderRepository customerOrderRepository,
             CancellationToken cancellationToken)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
-            (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
+        if (!RequestIdentity.CanManageOwnedResource(httpContext.User, customerId))
             return TypedResults.Forbid();
 
         if (request.OrderId == Guid.Empty)

@@ -16,9 +16,8 @@ public class RemoveArticleDetail : IEndpoint
             .WithTags(nameof(ArticleDetail))
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

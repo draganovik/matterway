@@ -23,7 +23,9 @@ public class CreateOrder : IEndpoint
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesValidationProblem()
-            .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireAssertion(context =>
+                RequestIdentity.IsCustomer(context.User) ||
+                RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

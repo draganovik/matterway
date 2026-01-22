@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -17,9 +16,8 @@ public class QueryCartItems : IEndpoint
             .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
-            .RequireAuthorization()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Customer)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -31,10 +29,11 @@ public class QueryCartItems : IEndpoint
             LinkGenerator linkGenerator,
             ICustomerArticleRepository cartItemRepository)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        var customerId = RequestIdentity.GetIdentifier(httpContext.User);
+        if (customerId is null) return TypedResults.Forbid();
 
-        var total = await cartItemRepository.CountCart(userContext.SystemUserId);
-        var entities = await cartItemRepository.QueryCart(userContext.SystemUserId, pagingQuery.Page,
+        var total = await cartItemRepository.CountCart(customerId.Value);
+        var entities = await cartItemRepository.QueryCart(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);

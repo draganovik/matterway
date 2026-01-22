@@ -16,6 +16,8 @@ public class QueryOrders : IEndpoint
             .Produces<PaginationResponse<CreateOrder.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -16,9 +15,8 @@ public class DeleteCustomer : IEndpoint
             .WithTags(nameof(Customer))
             .Produces<DeleteCustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

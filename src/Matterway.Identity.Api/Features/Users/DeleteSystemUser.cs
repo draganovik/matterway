@@ -16,8 +16,8 @@ public class DeleteSystemUser : IEndpoint
             .WithTags("SystemUsers")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(EIdentityRole.Admin)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsAdministrator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

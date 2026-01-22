@@ -165,8 +165,7 @@ namespace Matterway.Identity.Api.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("35a11f01-15f0-4110-8efc-f81e537b0c94"), "ea4804c9-5cc8-4a56-9a06-3f7d76715a56", "Manager", "MANAGER" },
-                    { new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811"), "f9f0b98d-7d9e-48d8-86c5-9a13ebf1c81a", "Admin", "ADMIN" },
+                    { new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811"), "f9f0b98d-7d9e-48d8-86c5-9a13ebf1c81a", "Employee", "EMPLOYEE" },
                     { new Guid("c4c29ba9-3b22-416f-8a37-8a7c3d6ed1f9"), "a40b1c8b-7f9f-4cbb-9de8-8c79d9f0dd8e", "Customer", "CUSTOMER" }
                 });
 
@@ -177,8 +176,23 @@ namespace Matterway.Identity.Api.Migrations
                 {
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), 0, "3d5f0a44-e0f6-4b13-8a06-1dc8db48fe74", new DateTime(2021, 9, 9, 10, 10, 10, 0, DateTimeKind.Utc), "mladen@matterway.local", false, false, null, "MLADEN@MATTERWAY.LOCAL", "MLADEN@MATTERWAY.LOCAL", "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw==", null, false, "4a1f3895-9229-45c9-9fcb-7b8f2a9f46b3", false, "mladen@matterway.local" },
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"), 0, "cb6a7ad6-7c4c-4bb6-bce5-8aa4d1bf7b58", new DateTime(2022, 10, 10, 11, 11, 11, 0, DateTimeKind.Utc), "jelena@matterway.local", false, false, null, "JELENA@MATTERWAY.LOCAL", "JELENA@MATTERWAY.LOCAL", "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg==", null, false, "bf0cb1b8-d485-4fdd-8a89-fb70120dbd9f", false, "jelena@matterway.local" },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), 0, "f53e60a2-c944-4622-af21-b3afa3d7a00c", new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc), "stefan999@mail.local", false, false, null, "STEFAN999@MAIL.LOCAL", "STEFAN999@MAIL.LOCAL", "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==", null, false, "019bada3-b4dc-7155-baca-576dd9914d57", false, "stefan999@mail.local" },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), 0, "a5a2a12e-e523-46bd-8810-f0a5ad84e3fa", new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc), "stefan999@mail.local", false, false, null, "STEFAN999@MAIL.LOCAL", "STEFAN999@MAIL.LOCAL", "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==", null, false, "019bada3-b4dc-7155-baca-576dd9914d57", false, "stefan999@mail.local" },
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), 0, "3b9f3e46-3c3c-4f04-9b6f-4fe90f0a8c80", new DateTime(2024, 2, 20, 9, 30, 0, 0, DateTimeKind.Utc), "marag@mail.local", false, false, null, "MARAG@MAIL.LOCAL", "MARAG@MAIL.LOCAL", "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q==", null, false, "8ca7016d-0e4d-4b92-96cb-c964d7d8f9c1", false, "marag@mail.local" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserClaims",
+                columns: new[] { "Id", "ClaimType", "ClaimValue", "UserId" },
+                values: new object[,]
+                {
+                    { 1, "perm", "identity:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 2, "perm", "catalog:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 3, "perm", "customers:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 4, "perm", "sales:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 5, "perm", "identity:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
+                    { 6, "perm", "catalog:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
+                    { 7, "perm", "customers:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
+                    { 8, "perm", "sales:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") }
                 });
 
             migrationBuilder.InsertData(
@@ -187,7 +201,7 @@ namespace Matterway.Identity.Api.Migrations
                 values: new object[,]
                 {
                     { new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
-                    { new Guid("35a11f01-15f0-4110-8efc-f81e537b0c94"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
+                    { new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
                     { new Guid("c4c29ba9-3b22-416f-8a37-8a7c3d6ed1f9"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3") },
                     { new Guid("c4c29ba9-3b22-416f-8a37-8a7c3d6ed1f9"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4") }
                 });

@@ -50,6 +50,40 @@ export const useSessionStore = defineStore("session", {
       }
       return null;
     },
+    getPermissions(): string[] {
+      const token = this.getTokenData;
+      const perm = token?.perm;
+      if (Array.isArray(perm)) return perm;
+      if (typeof perm === "string") return [perm];
+      return [];
+    },
+    isEmployee(): boolean {
+      return this.getTokenData?.role === "Employee";
+    },
+    hasPermission(): (
+      service: string,
+      minimumLevel?: "observer" | "operator" | "administrator",
+    ) => boolean {
+      return (service, minimumLevel = "observer") => {
+        const levels = {
+          observer: 0,
+          operator: 1,
+          administrator: 2,
+        };
+        const required = levels[minimumLevel];
+        const normalizedService = service.toLowerCase();
+
+        return this.getPermissions.some((permValue) => {
+          const [permService, permLevel] = permValue.split(":", 2);
+          if (!permService || !permLevel) return false;
+          if (permService.toLowerCase() !== normalizedService) return false;
+          const normalizedLevel =
+            permLevel.toLowerCase() as keyof typeof levels;
+          if (levels[normalizedLevel] === undefined) return false;
+          return levels[normalizedLevel] >= required;
+        });
+      };
+    },
   },
 
   actions: {

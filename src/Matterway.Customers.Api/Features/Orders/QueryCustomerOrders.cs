@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerOrderEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -18,9 +17,8 @@ public class QueryCustomerOrders : IEndpoint
             .Produces<PaginationResponse<CustomerOrderResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Customer)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -32,10 +30,11 @@ public class QueryCustomerOrders : IEndpoint
             LinkGenerator linkGenerator,
             ICustomerOrderRepository customerOrderRepository)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        var customerId = RequestIdentity.GetIdentifier(httpContext.User);
+        if (customerId is null) return TypedResults.Forbid();
 
-        var total = await customerOrderRepository.CountForCustomer(userContext.SystemUserId);
-        var entities = await customerOrderRepository.QueryForCustomer(userContext.SystemUserId, pagingQuery.Page,
+        var total = await customerOrderRepository.CountForCustomer(customerId.Value);
+        var entities = await customerOrderRepository.QueryForCustomer(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCustomerOrders", null);

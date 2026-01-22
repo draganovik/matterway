@@ -15,6 +15,8 @@ public class GetPaymentById : IEndpoint
             .WithTags(nameof(Payment))
             .Produces<RegisterPayment.PaymentResponse>()
             .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

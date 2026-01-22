@@ -10,6 +10,9 @@ const userCartStore = useCartStore();
 const route = useRoute();
 const router = useRouter();
 const article = ref<ArticleModel | null>(null);
+const canManage = computed(() =>
+  sessionStore.hasPermission("catalog", "operator"),
+);
 
 const hasDiscount = computed(
   () =>
@@ -206,12 +209,7 @@ onMounted(async () => {
         </div>
       </div>
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <template
-          v-if="
-            sessionStore.getTokenData?.role != 'Admin' &&
-            sessionStore.getTokenData?.role != 'Manager'
-          "
-        >
+        <template v-if="!canManage">
           <button
             @click="userCartStore.addToCart(article)"
             type="button"

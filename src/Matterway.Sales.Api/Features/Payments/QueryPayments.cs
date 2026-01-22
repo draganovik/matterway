@@ -16,6 +16,8 @@ public class QueryPayments : IEndpoint
             .Produces<PaginationResponse<RegisterPayment.PaymentResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

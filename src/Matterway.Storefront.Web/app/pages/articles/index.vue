@@ -75,10 +75,9 @@ const totalPages = computed(() => catalogMeta.value?.totalPages ?? 0);
 const totalCount = computed(() => catalogMeta.value?.totalCount ?? 0);
 const articles = computed(() => catalogStore.catalog ?? []);
 const isLoading = computed(() => catalogStore.catalog === null);
-const canManage = computed(() => {
-  const role = sessionStore.getTokenData?.role;
-  return role === "Admin" || role === "Manager";
-});
+const canManage = computed(() =>
+  sessionStore.hasPermission("catalog", "operator"),
+);
 const pageOptions = [9, 12, 18];
 const detailFilterOptions = supportedDetailFilters;
 const specificationFilterOptions = supportedSpecificationFilters;

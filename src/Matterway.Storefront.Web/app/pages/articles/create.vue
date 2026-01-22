@@ -29,7 +29,7 @@ useHead({
 
 definePageMeta({
   middleware: ["auth"],
-  authOnlyRoles: ["Admin", "Manager"],
+  authOnlyPerms: ["catalog:operator", "catalog:administrator"],
 });
 </script>
 

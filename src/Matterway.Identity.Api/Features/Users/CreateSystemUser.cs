@@ -33,15 +33,23 @@ public class CreateSystemUser : IEndpoint
             UserManager<SystemUser> userManager,
             RoleManager<IdentityRole<Guid>> roleManager)
     {
-        var requestIdentityExists = RequestIdentity
-            .TryGet(httpContext.User, out var requestIdentity);
+        var requestIdentityExists = RequestIdentity.GetIdentifier(httpContext.User) is not null;
 
-        if (!requestIdentityExists && request.Role != EIdentityRole.Customer)
+        var requestedRole = request.Role ?? EIdentityRole.Customer;
+
+        if (!requestIdentityExists && requestedRole != EIdentityRole.Customer)
             return TypedResults.Forbid();
 
-        if (requestIdentityExists && requestIdentity.Role != EIdentityRole.Admin &&
-            request.Role != EIdentityRole.Customer)
-            return TypedResults.BadRequest(CreateProblemDetails("Only Admin can create non-Customer users"));
+        if (requestIdentityExists)
+        {
+            if (requestedRole == EIdentityRole.Employee &&
+                !RequestIdentity.AsAdministrator(httpContext.User))
+                return TypedResults.Forbid();
+
+            if (requestedRole == EIdentityRole.Customer &&
+                !RequestIdentity.AsOperator(httpContext.User))
+                return TypedResults.Forbid();
+        }
 
         var systemUser = new SystemUser
         {
@@ -54,7 +62,7 @@ public class CreateSystemUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 createResult.Errors.Select(error => error.Description))));
 
-        var role = request.Role ?? EIdentityRole.Customer;
+        var role = requestedRole;
         var roleResult = await IdentityRoleAdapter.SetPrimaryRoleAsync(userManager, roleManager, systemUser, role);
         if (!roleResult.Succeeded)
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",

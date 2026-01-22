@@ -128,7 +128,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f53e60a2-c944-4622-af21-b3afa3d7a00c",
+                            ConcurrencyStamp = "a5a2a12e-e523-46bd-8810-f0a5ad84e3fa",
                             Created = new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc),
                             Email = "stefan999@mail.local",
                             EmailConfirmed = false,
@@ -191,15 +191,8 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811"),
                             ConcurrencyStamp = "f9f0b98d-7d9e-48d8-86c5-9a13ebf1c81a",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("35a11f01-15f0-4110-8efc-f81e537b0c94"),
-                            ConcurrencyStamp = "ea4804c9-5cc8-4a56-9a06-3f7d76715a56",
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
@@ -256,6 +249,64 @@ namespace Matterway.Identity.Api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserClaims", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ClaimType = "perm",
+                            ClaimValue = "identity:administrator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ClaimType = "perm",
+                            ClaimValue = "catalog:administrator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ClaimType = "perm",
+                            ClaimValue = "customers:administrator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ClaimType = "perm",
+                            ClaimValue = "sales:administrator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ClaimType = "perm",
+                            ClaimValue = "identity:operator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2")
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ClaimType = "perm",
+                            ClaimValue = "catalog:operator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2")
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ClaimType = "perm",
+                            ClaimValue = "customers:operator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2")
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ClaimType = "perm",
+                            ClaimValue = "sales:operator",
+                            UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -302,7 +353,7 @@ namespace Matterway.Identity.Api.Migrations
                         new
                         {
                             UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"),
-                            RoleId = new Guid("35a11f01-15f0-4110-8efc-f81e537b0c94")
+                            RoleId = new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811")
                         },
                         new
                         {
