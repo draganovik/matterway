@@ -1,194 +1,102 @@
-
 # Matterway Smart Infrastructure Store
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-0f766e.svg)](https://choosealicense.com/licenses/mit/) ![Status](https://img.shields.io/badge/status-alpha-f97316.svg) ![Built with .NET](https://img.shields.io/badge/.NET-10.0-512bd4.svg) ![Nuxt](https://img.shields.io/badge/Nuxt-3-00dc82.svg)
+Matterway is a full-stack e-commerce platform for smart-home, homelab, server, and networking gear. It runs on a modular .NET microservice stack with a Nuxt storefront, and keeps catalog pricing simple with a single base price in RSD.
 
-Matterway is a full-stack e-commerce platform for smart-home, homelab, server, and networking equipment. It combines a modular microservice architecture with a modern Vue/Nuxt storefront, giving teams a solid foundation for selling premium infrastructure gear online.
+## At a glance
 
-> _“Matterway brings enterprise-grade network hardware, edge devices, and smart-home kits together under one cohesive shopping experience.”_
+- Modular services: catalog, customers, identity, sales
+- Nuxt 4 storefront with Pinia, Tailwind, and Flowbite
+- ASP.NET Minimal APIs with versioning and OpenAPI
+- Docker and .NET Aspire orchestration
+- Catalog prices are stored as a single base price in RSD; discounts apply on top
 
----
+## Architecture
 
-## Table of Contents
+Shared defaults live in `src/Matterway.ServiceDefaults`.
 
-1. [Highlights](#highlights)
-2. [System Architecture](#system-architecture)
-3. [Technology Stack](#technology-stack)
-4. [Getting Started](#getting-started)
-5. [Project Structure](#project-structure)
-6. [Service Catalog](#service-catalog)
-7. [Database & Migrations](#database--migrations)
-8. [Developer Tooling](#developer-tooling)
-9. [Contributing](#contributing)
-10. [License](#license)
+## Services
 
----
+| Service | Port | Purpose |
+| --- | --- | --- |
+| Catalog.Api | 2001 | Article listings, imagery, filtering, discounts |
+| Customers.Api | 2002 | Customer profiles, carts, address book |
+| Identity.Api | 2003 | Identity, sessions, JWT issuance |
+| Sales.Api | 2005 | Order creation, lifecycle, payments |
+| Matterway.Storefront.Web | 3001 | Nuxt storefront (SSR build) |
 
-## Highlights
+## Pricing model
 
-- **Composable Storefront** – Built with Nuxt 3, Pinia, Tailwind, and Flowbite for a fast, responsive shopping experience.
-- **Domain-Driven Services** – Each core capability (catalog, customers, ordering, identity, payments, inventory) is isolated in its own .NET service.
-- **Modern API Surface** – ASP.NET Minimal APIs, versioned endpoints, Swagger/Scalar documentation, and structured pagination utilities.
-- **Secure & Extensible** – Centralized identity service with JWT auth, shared infrastructure SDK (`Matterway.Common`), and Stripe checkout integration.
-- **Developer-Friendly** – Docker-first workflow, database provisioning scripts, and consistent naming conventions across the stack.
+- Each article stores a single `BasePrice` in RSD.
+- The API computes `Price` by applying the best active discount (if any).
+- RSQL filtering uses the final computed price.
 
----
-
-## System Architecture
-
-```
-                            ┌───────────────────────────┐
-                            │        Storefront         │
-                            │   (Nuxt 3 / Tailwind)     │
-                            └────────────┬──────────────┘
-                                         │
-                           API Gateway / BFF (future-ready)
-                                         │
- ┌──────────────┬──────────────┬─────────┼──────────┬──────────────┬──────────────┐
- │ Catalog.Api   │ Customers.Api│ Identity.Api │ Ordering.Api │ Payments.Api │ Inventory.Api │
- │ Product data  │ Customer mesh│ Auth & JWT   │ Orders & cart│ Stripe, billing│ Stock control │
- └──────┬────────┴──────┬───────┴──────┬─────┴──────┬─────────────┴───────┬────────┘
-        │               │              │            │                     │
-                              PostgreSQL cluster (dockerized)
-```
-
-Shared cross-cutting concerns are packaged inside `Matterway.Common` and imported by each service.
-
----
-
-## Technology Stack
-
-| Layer            | Technology |
-| ---------------- | ---------- |
-| Frontend         | Nuxt 3, Vue 3, Pinia, Tailwind CSS, Flowbite, Stripe |
-| APIs / Services  | ASP.NET 10 Minimal APIs, Entity Framework Core, Swashbuckle, Scalar |
-| Identity & Auth  | JWT Bearer, custom identity service |
-| Data Layer       | PostgreSQL (containerized via .NET Aspire) |
-| DevOps & Infra   | Docker Compose, .NET CLI, EF Core migrations |
-| Tooling          | Prettier, TypeScript, AutoMapper, Scalar UI |
-
----
-
-## Getting Started
+## Quickstart
 
 ### Prerequisites
 
 - Docker Desktop 4.x (or Docker Engine 24+)
-- .NET SDK 10.0 (Preview) – aligns with the current `net10.0` target
-- Node.js 18+ (for local Nuxt development)
+- .NET SDK 10.0 (preview, see `global.json`)
+- Node.js 18+ for storefront development
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/draganovik/Matterway.git
-cd Matterway
-```
-
-### 2. Bootstrap the environment
+### 1) Restore dependencies
 
 ```bash
-# restore .NET workloads
-dotnet restore Matterway.sln
-
-# install frontend dependencies
+dotnet restore Matterway.slnx
 cd src/Matterway.Storefront.Web
 npm install
 cd ../..
 ```
 
-### 3. Launch the stack with Docker
+### 2) Run the full stack with Aspire
 
 ```bash
-docker-compose up --build
+dotnet run --project src/Matterway.AppHost
 ```
 
-The storefront will be available at `http://localhost:3001`, while the APIs are exposed on ports `2001-2006`. Scalar or Swagger UI for each service can be accessed via `/swagger` once the containers are up.
+The storefront is exposed at `http://localhost:3001`. APIs are on ports `2001-2003` and `2005`. Swagger/Scalar is available at `/swagger` on each API.
 
-> Prefer running services individually? Each API is a standalone ASP.NET Minimal API – use `dotnet watch run --project src/<Service>.Api` and Nuxt’s `npm run dev` for the storefront.
+### 3) Run services individually (optional)
 
----
+```bash
+dotnet watch run --project src/Matterway.Catalog.Api
+dotnet watch run --project src/Matterway.Customers.Api
+dotnet watch run --project src/Matterway.Identity.Api
+dotnet watch run --project src/Matterway.Sales.Api
+cd src/Matterway.Storefront.Web && npm run dev
+```
 
-## Project Structure
+## Project structure
 
 ```
 src/
-├─ Catalog.Api/        # Product catalog service
-├─ Customers.Api/      # Customer accounts & carts
-├─ Identity.Api/       # Identity, sessions, JWT issuance
-├─ Inventory.Api/      # Inventory tracking
-├─ Ordering.Api/       # Order orchestration
-├─ Payments.Api/       # Payments & Stripe integration
-├─ Matterway.Common/  # Shared contracts, brokers, helpers
-└─ Matterway.Storefront.Web/     # Nuxt storefront
-scripts/               # Migration & database automation (sh/cmd)
-docker-compose.yml     # Multi-service orchestration
+├─ Matterway.AppHost/             # .NET Aspire host
+├─ Matterway.Catalog.Api/         # Article catalog service
+├─ Matterway.Customers.Api/       # Customers, carts, addresses
+├─ Matterway.Identity.Api/        # Identity, roles, JWT issuance
+├─ Matterway.Sales.Api/           # Orders and payments
+├─ Matterway.Storefront.Web/      # Nuxt storefront
+└─ Matterway.ServiceDefaults/     # Shared API defaults
+scripts/                          # Database + migrations helpers
 ```
 
----
+## Database and migrations
 
-## Service Catalog
-
-| Service          | Port | Description |
-| ---------------- | ---- | ----------- |
-| Catalog.Api      | 2001 | Product listings, imagery, filtering, pagination |
-| Customers.Api    | 2002 | Customer profiles, carts, and onboarding flows |
-| Identity.Api     | 2003 | Token introspection, session lifecycle, user roles |
-| Inventory.Api    | 2004 | Stock levels, warehouse sync (stub for expansion) |
-| Ordering.Api     | 2005 | Order processing, order history, addresses |
-| Payments.Api     | 2006 | Payment intents, Stripe webhook processing |
-| Matterway.Storefront.Web   | 3001 | Nuxt storefront (SSR build) |
-
-Each service ships with dedicated features (endpoints, mapping profiles, repositories) following a consistent folder structure.
-
----
-
-## Database & Migrations
-
-All EF Core migrations/scripts live under `scripts/`. The helpers accept both `.sh` (Unix) and `.cmd` (Windows) workflows.
+Helper scripts in `scripts/` manage database lifecycle and EF migrations:
 
 ```bash
-# from repo root
 cd scripts
-
-# wipe & recreate databases
 ./databases_drop.sh
-
-# regenerate migrations (shared conventions)
 ./migrations_remove.sh
 ./migrations_add.sh
-
-# apply migrations
 ./databases_update.sh
 ```
 
-On Windows run the matching `.cmd` files. Each script iterates over `src/*.Api` automatically—no manual path tweaks required.
+On Windows, use the matching `.cmd` files.
 
----
+## Docs
 
-## Developer Tooling
-
-- **Code Quality**: Prettier for the frontend, dotnet format recommended for APIs.
-- **API Documentation**: Swagger/Scalar is auto-registered; run any service and browse `/swagger`.
-- **Testing (roadmap)**: Unit/integration test harnesses will be staged as the domain stabilizes.
-- **Conventions**: Services share DTOs/helpers via `Matterway.Common`. Keep shared logic in that library to avoid duplication.
-
----
-
-## Contributing
-
-We welcome contributions that improve the storefront experience, extend microservice capabilities, or tighten DevOps workflows.
-
-1. Fork the repo and create a feature branch.
-2. Follow existing naming conventions (`<Domain>.Api` etc.).
-3. Add or update documentation when altering public contracts.
-4. Submit a PR with a clear description of changes and test notes.
-
----
+- High-level design diagram: `docs/Matterway HLD: Class Diagram - Platform Overview.puml`
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE.txt).
-
----
-
-Maintained by [@draganovik](https://github.com/draganovik). Reach out for partnership opportunities or to explore how Matterway can power your smart infrastructure storefront. 🚀
+This project is licensed under the MIT License. See `LICENSE.txt`.

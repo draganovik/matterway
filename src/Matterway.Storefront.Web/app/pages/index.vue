@@ -15,12 +15,12 @@ onMounted(() => {
 });
 
 const isLoading = computed(() => catalogStore.catalog === null);
-const featuredProducts = computed(() =>
+const featuredArticles = computed(() =>
   (catalogStore.catalog ?? []).slice(0, 4),
 );
 const heroStats = computed(() => {
   const items = catalogStore.catalog ?? [];
-  const available = items.filter((product) => product.isAvailable).length;
+  const available = items.filter((article) => article.isAvailable).length;
   return [
     {
       label: "Proizvoda u ponudi",
@@ -35,14 +35,14 @@ const collections = featuredCollections;
 
 const handleCategoryClick = (category: { query?: string }) => {
   router.push({
-    path: "/products",
+    path: "/articles",
     query: {
-      productName: category.query || undefined,
+      articleName: category.query || undefined,
     },
   });
 };
 
-const goToProducts = () => router.push("/products");
+const goToArticles = () => router.push("/articles");
 </script>
 
 <template>
@@ -77,7 +77,7 @@ const goToProducts = () => router.push("/products");
             <button
               type="button"
               class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition hover:bg-blue-50"
-              @click="goToProducts"
+              @click="goToArticles"
             >
               <span>Pregledaj ponudu</span>
               <Icon
@@ -145,7 +145,7 @@ const goToProducts = () => router.push("/products");
           </p>
         </div>
         <NuxtLink
-          to="/products"
+          to="/articles"
           class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline dark:text-blue-300"
         >
           Pogledaj sve
@@ -158,19 +158,19 @@ const goToProducts = () => router.push("/products");
       </div>
       <div class="mt-6">
         <div v-if="isLoading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ProductCartSkeleton v-for="n in 4" :key="`product-skeleton-${n}`" />
+          <ArticleCartSkeleton v-for="n in 4" :key="`article-skeleton-${n}`" />
         </div>
         <div
-          v-else-if="featuredProducts.length === 0"
+          v-else-if="featuredArticles.length === 0"
           class="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
         >
           Trenutno nema dostupnih proizvoda. Svratite uskoro ponovo.
         </div>
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ProductCard
-            v-for="product in featuredProducts"
-            :key="product.id"
-            :product="product"
+          <ArticleCard
+            v-for="article in featuredArticles"
+            :key="article.id"
+            :article="article"
           />
         </div>
       </div>

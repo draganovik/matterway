@@ -4,6 +4,8 @@ export default class AddressModel {
   street: string;
   city: string;
   zipCode: string;
+  country?: string;
+  contactPhone?: string;
   note?: string;
 
   constructor(data?: Partial<AddressModel>) {
@@ -12,6 +14,8 @@ export default class AddressModel {
     this.street = data?.street ?? "";
     this.city = data?.city ?? "";
     this.zipCode = data?.zipCode ?? "";
+    this.country = data?.country ?? "";
+    this.contactPhone = data?.contactPhone ?? "";
     this.note = data?.note ?? "";
   }
 

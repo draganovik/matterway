@@ -3,7 +3,7 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Providers.Persistence.SpecificationEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.SpecificationEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Specifications;
@@ -16,9 +16,8 @@ public class QuerySpecifications : IEndpoint
             .WithName("QuerySpecifications").WithSummary("Query available specifications.")
             .WithTags(nameof(Specification))
             .Produces<ICollection<QuerySpecificationResponse>>()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

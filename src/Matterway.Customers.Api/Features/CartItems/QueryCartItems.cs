@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -14,12 +13,11 @@ public class QueryCartItems : IEndpoint
     {
         app.MapGet("Customers/CartItems", Handler)
             .WithName("QueryCartItems").WithSummary("Query CartItems.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
-            .RequireAuthorization()
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Customer)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -29,12 +27,13 @@ public class QueryCartItems : IEndpoint
             PaginationRequestParameters pagingQuery,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            ICartItemRepository cartItemRepository)
+            ICustomerArticleRepository cartItemRepository)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
+        var customerId = RequestIdentity.GetIdentifier(httpContext.User);
+        if (customerId is null) return TypedResults.Forbid();
 
-        var total = await cartItemRepository.Count(userContext.SystemUserId);
-        var entities = await cartItemRepository.QueryForSuid(userContext.SystemUserId, pagingQuery.Page,
+        var total = await cartItemRepository.CountCart(customerId.Value);
+        var entities = await cartItemRepository.QueryCart(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
@@ -58,10 +57,10 @@ public class QueryCartItems : IEndpoint
         public Guid CustomerId { get; init; }
 
         [Required]
-        public string? ProductName { get; init; }
+        public string? ArticleName { get; init; }
 
         [Required]
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -72,13 +71,13 @@ public class QueryCartItems : IEndpoint
         public decimal? UnitPrice { get; init; }
     }
 
-    private static CartItemResponse MapToResponse(CartItem entity)
+    private static CartItemResponse MapToResponse(CustomerArticle entity)
     {
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ProductId = entity.ProductId,
-            ProductName = entity.ProductName,
+            ArticleId = entity.ArticleId,
+            ArticleName = entity.ArticleName,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

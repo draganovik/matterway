@@ -1,20 +1,9 @@
-import { payWithStripe } from "#services/stripeService";
-import AddressModel from "#models/AddressModel";
-import CartItemModel from "#models/CartItemModel";
 import StripeEventWebhookModel from "#models/StripeEventWebhookModel";
 
 const config = useRuntimeConfig();
 
 export default defineEventHandler(async (event) => {
   const stripeEvent: StripeEventWebhookModel = await readBody(event);
-  const stripeAddress = stripeEvent.data?.object.shipping.address;
-  console.log(stripeAddress);
-  const address: AddressModel = new AddressModel();
-  address.receiverName = stripeEvent.data?.object.shipping.name!;
-  address.residence = stripeAddress?.line2!;
-  address.street = stripeAddress?.line1!;
-  address.city = stripeAddress?.city!;
-  address.zipCode = stripeAddress?.postal_code!;
 
   switch (stripeEvent.type) {
     case "payment_intent.created":
@@ -24,17 +13,7 @@ export default defineEventHandler(async (event) => {
       console.log("succeeded");
       return { success: true, message: "Payment succeeded" };
     case "charge.succeeded":
-      const createdAddress: any = await postAddress(address);
-      console.log("address: ", createdAddress);
-      const createdOrder = await postOrder(
-        stripeEvent.data?.object.metadata.client_id!,
-        createdAddress.id,
-      );
-      console.log("order: ", createdOrder);
-      let payment = await postPayment(stripeEvent, createdOrder);
-      console.log("payment created");
-      await postOrderItems(stripeEvent, createdOrder);
-      console.log("chargeed");
+      const payment = await postPayment(stripeEvent);
       return { success: true, message: "Data received", data: { payment } };
     default:
       throw createError({
@@ -44,33 +23,18 @@ export default defineEventHandler(async (event) => {
   }
 });
 
-const postAddress = async (address: AddressModel) => {
-  const response = await fetch(
-    `${config.serverOrderingApiBaseUrl}/api/v1/Addresses`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        accept: "application/json",
-      },
-      body: JSON.stringify(address),
-    },
-  );
-  if (response.ok) {
-    console.log("--------------------");
-    const data = await response.json();
-    console.log(data);
-    console.log("--------------------");
-    return await data;
+const postPayment = async (event: StripeEventWebhookModel) => {
+  const orderId = event.data?.object.metadata.order_id;
+  if (!orderId) {
+    console.error("[stripe] missing order_id metadata");
+    return null;
   }
-  console.log(await response.json());
-  return null;
-};
+  const amount = event.data?.object.amount! / 100;
+  const referenceId =
+    event.data?.object.metadata.reference_id ?? createReferenceId();
 
-const postOrder = async (userId: string, addressId: string) => {
-  console.log("ADDRESS", userId, addressId);
   const response = await fetch(
-    `${config.serverOrderingApiBaseUrl}/api/v1/Orders`,
+    `${config.serverSalesApiBaseUrl}/api/v1/Payments`,
     {
       method: "POST",
       headers: {
@@ -78,79 +42,25 @@ const postOrder = async (userId: string, addressId: string) => {
         accept: "application/json",
       },
       body: JSON.stringify({
-        customerId: userId,
-        deliveryAddressId: addressId,
+        orderId,
+        provider: "Stripe",
+        referenceId,
+        amount,
+        status: "Charged",
+        createdAt: new Date(event.data?.object.created! * 1000),
       }),
     },
   );
-  console.log(response);
-  if (response.ok) {
-    console.log("--------------------");
-    const data = await response.json();
-    console.log(data);
-    console.log("--------------------");
-    return await data;
+
+  if (!response.ok) {
+    console.error("[stripe] failed to register payment", await response.text());
+    return null;
   }
+
+  return await response.json();
 };
 
-const postPayment = async (event: StripeEventWebhookModel, order: any) => {
-  const response = await fetch(
-    `${config.serverPaymentsApiBaseUrl}/api/v1/Payments`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        accept: "application/json",
-      },
-      body: JSON.stringify({
-        referenceNumber: order.referenceNumber + "-0000",
-        paymentDate: new Date(event.data?.object.created! * 1000),
-        paymentAmount: event.data?.object.amount! / 100,
-        cardNumber: "0000-0000-0000-0000",
-        cardHolder: "string",
-        expirationDate: "12/30",
-        securityCode: "000",
-        paymentState: "Processed",
-      }),
-    },
-  );
-  if (response.ok) {
-    console.log("--------------------");
-    const data = await response.json();
-    console.log(data);
-    console.log("--------------------");
-    return await data;
-  }
-};
-
-class OrderItems {
-  id?: string;
-  quantity?: number;
-}
-
-const postOrderItems = async (event: StripeEventWebhookModel, order: any) => {
-  const items: OrderItems[] = JSON.parse(event.data?.object.metadata.items!);
-  console.log(items);
-  items.forEach(async (item) => {
-    const response = await fetch(
-      `${config.serverOrderingApiBaseUrl}/api/v1/Orders/${order.id}/Items/${item.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-        },
-        body: JSON.stringify({
-          quantity: item.quantity,
-        }),
-      },
-    );
-    console.log(response);
-    if (response.ok) {
-      console.log("--------------------");
-      const data = await response.json();
-      console.log(data);
-      console.log("--------------------");
-    }
-  });
+const createReferenceId = () => {
+  const segment = () => Math.floor(1000 + Math.random() * 9000).toString();
+  return `${segment()}-${segment()}-${segment()}-${segment()}`;
 };

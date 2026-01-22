@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.Customers;
@@ -17,7 +16,9 @@ public class UpdateCustomer : IEndpoint
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireAssertion(context =>
+                RequestIdentity.IsCustomer(context.User) ||
+                RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -27,9 +28,7 @@ public class UpdateCustomer : IEndpoint
         ICustomerRepository customerRepository,
         CancellationToken cancellationToken)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
-
-        if (userContext.Role == ERequestRole.Customer && request.SystemUserId != userContext.SystemUserId)
+        if (!RequestIdentity.CanManageOwnedResource(httpContext.User, request.SystemUserId))
             return TypedResults.Forbid();
 
         var entity = await customerRepository.GetBy(systemUserId, cancellationToken);

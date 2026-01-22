@@ -22,7 +22,7 @@ const subtitle = computed(() =>
     : "Pregledajte proizvode u korpi i nastavite prema blagajni kada budete spremni.",
 );
 
-const goToProducts = () => router.push("/products");
+const goToArticles = () => router.push("/articles");
 const goToCheckout = () => {
   if (!isEmpty.value) {
     router.push("/checkout");
@@ -83,7 +83,7 @@ const goToCheckout = () => {
           <button
             type="button"
             class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            @click="goToProducts"
+            @click="goToArticles"
           >
             <span>Pregledaj proizvode</span>
             <Icon
@@ -113,7 +113,7 @@ const goToCheckout = () => {
         :total-price="totalPrice"
         :is-empty="isEmpty"
         @checkout="goToCheckout"
-        @continue="goToProducts"
+        @continue="goToArticles"
       />
     </div>
   </main>

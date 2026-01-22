@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CartItemEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Customers.Api.Features.CartItems;
@@ -12,24 +11,23 @@ public class GetCartItemById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("Customers/{customerId:guid}/CartItems/{productId:guid}", Handler)
+        app.MapGet("Customers/{customerId:guid}/CartItems/{articleId:guid}", Handler)
             .WithName("GetCartItemById").WithSummary("Get CartItem by id.")
-            .WithTags(nameof(CartItem))
+            .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(ERequestRole.Admin),
-                nameof(ERequestRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
         Guid customerId,
-        Guid productId,
-        ICartItemRepository cartItemRepository,
+        Guid articleId,
+        ICustomerArticleRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await cartItemRepository.GetBy(customerId, productId, cancellationToken);
+        var entity = await cartItemRepository.GetCartItem(customerId, articleId, cancellationToken);
         if (entity == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(entity));
@@ -41,10 +39,10 @@ public class GetCartItemById : IEndpoint
         public Guid CustomerId { get; init; }
 
         [Required]
-        public string? ProductName { get; init; }
+        public string? ArticleName { get; init; }
 
         [Required]
-        public Guid ProductId { get; init; }
+        public Guid ArticleId { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -55,13 +53,13 @@ public class GetCartItemById : IEndpoint
         public decimal? UnitPrice { get; init; }
     }
 
-    private static CartItemResponse MapToResponse(CartItem entity)
+    private static CartItemResponse MapToResponse(CustomerArticle entity)
     {
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ProductId = entity.ProductId,
-            ProductName = entity.ProductName,
+            ArticleId = entity.ArticleId,
+            ArticleName = entity.ArticleName,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

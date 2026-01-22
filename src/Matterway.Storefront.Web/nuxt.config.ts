@@ -41,18 +41,16 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    serverOrderingApiBaseUrl:
-      process.env.SERVER_ORDERING_API_BASE_URL ??
-      process.env.ORDERING_API_BASE_URL,
-    serverPaymentsApiBaseUrl:
-      process.env.SERVER_PAYMENTS_API_BASE_URL ??
-      process.env.PAYMENTS_API_BASE_URL,
+    serverSalesApiBaseUrl:
+      process.env.NUXT_SERVER_SALES_API_BASE_URL ??
+      process.env.SERVER_SALES_API_BASE_URL ??
+      process.env.SALES_API_BASE_URL,
     public: {
       appDomain: "localhost",
       authApiBaseUrl: process.env.AUTH_API_BASE_URL,
       catalogApiBaseUrl: process.env.CATALOG_API_BASE_URL,
       customersApiBaseUrl: process.env.CUSTOMERS_API_BASE_URL,
-      orderingApiBaseUrl: process.env.ORDERING_API_BASE_URL,
+      salesApiBaseUrl: process.env.SALES_API_BASE_URL,
     },
   },
   css: ["@assets/css/main.css"],

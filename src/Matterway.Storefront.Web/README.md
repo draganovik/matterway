@@ -24,7 +24,7 @@ The development server listens on `http://localhost:3000` by default.
 - `tailwind.config.ts` – Tailwind + Flowbite setup
 - `Dockerfile` – Multi-stage production build using Node 20
 
-Forms that previously lived directly in pages (authentication, checkout, product creation) are now extracted into typed components under `app/components/forms`.
+Forms that previously lived directly in pages (authentication, checkout, article creation) are now extracted into typed components under `app/components/forms`.
 
 ## Scripts
 

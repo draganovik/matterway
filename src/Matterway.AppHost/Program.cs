@@ -2,7 +2,7 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-const string productImagesBucket = "product-images";
+const string articleImagesBucket = "article-images";
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
@@ -30,10 +30,9 @@ var postgres = builder.AddPostgres("postgres")
 var catalogDb = postgres.AddDatabase("CatalogDb");
 var customersDb = postgres.AddDatabase("CustomersDb");
 var identityDb = postgres.AddDatabase("IdentityDb");
-var paymentsDb = postgres.AddDatabase("PaymentsDb");
-var orderingDb = postgres.AddDatabase("OrderingDb");
+var salesDb = postgres.AddDatabase("SalesDb");
 
-// Setup MinIO for product image storage
+// Setup MinIO for article image storage
 var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
@@ -71,7 +70,7 @@ var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
 catalogApi
     .WaitFor(minio)
     .WithReference(minio.GetEndpoint("http"))
-    .WithEnvironment("ImageStorage__Bucket", productImagesBucket)
+    .WithEnvironment("ImageStorage__Bucket", articleImagesBucket)
     .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
@@ -90,21 +89,9 @@ var customersApi = builder.AddProject<Matterway_Customers_Api>("customers-api")
         service.Ports = ["2002:8080"];
     });
 
-// Setup Inventory API
-var inventoryApi = builder.AddProject<Matterway_Inventory_Api>("inventory-api")
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2004:8080"];
-    });
-
-// Setup Ordering API
-var orderingApi = builder.AddProject<Matterway_Ordering_Api>("ordering-api")
-    .WithReference(orderingDb)
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithReference(catalogApi.GetEndpoint("http"))
+// Setup Sales API
+var salesApi = builder.AddProject<Matterway_Sales_Api>("sales-api")
+    .WithReference(salesDb)
     .WithReference(customersApi.GetEndpoint("http"))
     .WithExternalHttpEndpoints()
     .PublishAsDockerComposeService((_, service) =>
@@ -113,22 +100,10 @@ var orderingApi = builder.AddProject<Matterway_Ordering_Api>("ordering-api")
         service.Ports = ["2005:8080"];
     });
 
-// Setup Payments API
-var paymentsApi = builder.AddProject<Matterway_Payments_Api>("payments-api")
-    .WithReference(paymentsDb)
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2006:8080"];
-    });
-
 // Setup Storefront Web Application
 var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.Web")
     .WaitFor(catalogApi)
-    .WithEnvironment("NUXT_SERVER_ORDERING_API_BASE_URL", orderingApi.GetEndpoint("http"))
-    .WithEnvironment("NUXT_SERVER_PAYMENTS_API_BASE_URL", paymentsApi.GetEndpoint("http"))
+    .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
     .WithEndpoint("http", e =>
     {
         e.TargetPort = 3000;
@@ -145,16 +120,12 @@ var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.W
 ConfigureApiJwtSettings(catalogApi);
 ConfigureApiJwtSettings(customersApi);
 ConfigureApiJwtSettings(identityApi);
-ConfigureApiJwtSettings(inventoryApi);
-ConfigureApiJwtSettings(orderingApi);
-ConfigureApiJwtSettings(paymentsApi);
+ConfigureApiJwtSettings(salesApi);
 
 ConfigureApiCorsOrigins(catalogApi);
 ConfigureApiCorsOrigins(customersApi);
 ConfigureApiCorsOrigins(identityApi);
-ConfigureApiCorsOrigins(inventoryApi);
-ConfigureApiCorsOrigins(orderingApi);
-ConfigureApiCorsOrigins(paymentsApi);
+ConfigureApiCorsOrigins(salesApi);
 
 // Run the application
 builder.Build().Run();

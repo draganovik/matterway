@@ -2,16 +2,15 @@
 import Stripe from "stripe";
 import AddressModel from "#models/AddressModel";
 import CardPaymentModel from "#models/CardPaymentModel";
-import CartItemModel from "#models/CartItemModel";
-
 // Create a function to handle the payment
 export async function payWithStripe(
   cardPayment: CardPaymentModel,
   address: AddressModel,
   userId: string,
-  items: CartItemModel[],
+  orderId: string,
   secretkey: string,
 ): Promise<string> {
+  const referenceId = createReferenceId();
   // Set up your Stripe API key
   const stripe = new Stripe(secretkey, {
     apiVersion: "2024-06-20",
@@ -48,14 +47,8 @@ export async function payWithStripe(
       },
       metadata: {
         client_id: userId,
-        items: JSON.stringify(
-          items.map((item) => {
-            return {
-              id: item.productId,
-              quantity: item.quantity,
-            };
-          }),
-        ),
+        order_id: orderId,
+        reference_id: referenceId,
         note: address.note || "",
       },
     });
@@ -67,3 +60,8 @@ export async function payWithStripe(
     throw new Error("Payment failed. Please try again.");
   }
 }
+
+const createReferenceId = () => {
+  const segment = () => Math.floor(1000 + Math.random() * 9000).toString();
+  return `${segment()}-${segment()}-${segment()}-${segment()}`;
+};

@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +17,9 @@ public class CreateCustomer : IEndpoint
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireAssertion(context =>
+                RequestIdentity.IsCustomer(context.User) ||
+                RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -29,11 +30,9 @@ public class CreateCustomer : IEndpoint
             ICustomerRepository customerRepository,
             CancellationToken cancellationToken)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext)) return TypedResults.Forbid();
-
         var newEntity = MapToEntity(request);
 
-        if (userContext.Role == ERequestRole.Customer && newEntity.Id != userContext.SystemUserId)
+        if (!RequestIdentity.CanManageOwnedResource(httpContext.User, newEntity.Id))
             return TypedResults.Forbid();
 
         var createdCustomer = await customerRepository.Create(newEntity, cancellationToken);

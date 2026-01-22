@@ -1,23 +1,43 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Matterway.Identity.Api.Domain;
+using Matterway.ServiceDefaults.Authorization;
 
 namespace Matterway.Identity.Api.Application;
 
-public readonly record struct RequestClaims(Guid SystemUserId, EIdentityRole Role);
-
 public static class RequestIdentity
 {
-    public static bool TryGet(ClaimsPrincipal principal, out RequestClaims requestClaims)
+    public const string ServiceName = "identity";
+
+    public static Guid? GetIdentifier(ClaimsPrincipal? principal)
     {
-        requestClaims = default;
+        if (principal is null) return null;
 
-        if (!Guid.TryParse(principal.FindFirstValue(ClaimTypes.NameIdentifier), out var systemUserId))
-            return false;
+        var subject = GetSubjectValue(principal);
+        return Guid.TryParse(subject, out var identifier) ? identifier : null;
+    }
 
-        if (!Enum.TryParse(principal.FindFirstValue(ClaimTypes.Role), out EIdentityRole role))
-            return false;
+    public static bool IsCustomer(ClaimsPrincipal? principal)
+    {
+        var roleValue = principal?.FindFirstValue(ClaimTypes.Role);
+        return Enum.TryParse(roleValue, true, out EIdentityRole role) && role == EIdentityRole.Customer;
+    }
 
-        requestClaims = new RequestClaims(systemUserId, role);
-        return true;
+    public static bool AsOperator(ClaimsPrincipal? principal)
+    {
+        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Operator);
+    }
+
+    public static bool AsAdministrator(ClaimsPrincipal? principal)
+    {
+        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Administrator);
+    }
+
+    private static string? GetSubjectValue(ClaimsPrincipal principal)
+    {
+        var subject = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrWhiteSpace(subject)) return subject;
+
+        return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
     }
 }

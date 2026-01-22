@@ -1,0 +1,171 @@
+<script lang="ts" setup>
+import { computed } from "vue";
+import type ArticleModel from "#models/ArticleModel";
+import { useCartStore } from "@stores/cart";
+import { useSessionStore } from "@stores/session";
+
+const session = useSessionStore();
+
+const userCartStore = useCartStore();
+const props = defineProps<{
+  article: ArticleModel;
+}>();
+
+const heroImage = computed(() => {
+  if (props.article.thumbnailImage?.imageUrl) {
+    return props.article.thumbnailImage;
+  }
+  const images = props.article.articleImages ?? [];
+  if (!images.length) {
+    return null;
+  }
+  const sortedImages = [...images].sort(
+    (a, b) =>
+      (a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+      (b.orderIndex ?? Number.MAX_SAFE_INTEGER),
+  );
+  const candidate = sortedImages[0];
+  if (!candidate?.imageUrl) {
+    return null;
+  }
+  return {
+    imageUrl: candidate.imageUrl,
+    imageAlt: candidate.imageAlt ?? props.article.title,
+  };
+});
+
+const availabilityLabel = computed(() =>
+  props.article.isAvailable ? "Na stanju" : "Nije dostupno",
+);
+
+const availabilityClasses = computed(() =>
+  props.article.isAvailable
+    ? "border-green-200 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-200"
+    : "border-red-200 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200",
+);
+
+const canManage = computed(() => session.hasPermission("catalog", "operator"));
+
+const articleLink = computed(() => `/articles/${props.article.id}`);
+
+const hasDiscount = computed(
+  () =>
+    (props.article.discount?.percentage ?? 0) > 0 &&
+    (props.article.basePrice ?? 0) > (props.article.price ?? 0),
+);
+
+const discountPercentLabel = computed(() => {
+  if (!hasDiscount.value) return null;
+  return Math.round((props.article.discount?.percentage ?? 0) * 100);
+});
+</script>
+<template>
+  <div
+    class="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
+  >
+    <NuxtLink :to="articleLink" class="relative h-56 w-full overflow-hidden">
+      <span
+        v-if="availabilityLabel == 'Nije dostupno'"
+        class="absolute right-1 top-1 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+        :class="availabilityClasses"
+      >
+        {{ availabilityLabel }}
+      </span>
+      <img
+        v-if="heroImage"
+        class="h-full w-full object-cover transition duration-300"
+        :src="heroImage.imageUrl"
+        :alt="heroImage.imageAlt || article.title"
+      />
+      <div
+        v-else
+        class="flex h-full w-full items-center justify-center bg-slate-100 p-[33%] text-slate-400 dark:bg-slate-700/60 dark:text-slate-500"
+      >
+        <Icon
+          name="heroicons-outline:photo"
+          class="text-2xl"
+          aria-hidden="true"
+        />
+      </div>
+    </NuxtLink>
+    <div class="flex flex-1 flex-col gap-5 p-5">
+      <div class="flex flex-col gap-2">
+        <NuxtLink :to="articleLink">
+          <h5
+            class="text-lg font-semibold tracking-tight text-slate-900 transition hover:text-blue-700 dark:text-white dark:hover:text-blue-300"
+          >
+            {{ article.title }}
+          </h5>
+        </NuxtLink>
+        <p class="text-xs uppercase tracking-wide text-slate-400">
+          #{{ article.articleCode }}
+        </p>
+      </div>
+
+      <div class="flex items-baseline justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <p
+              class="text-2xl font-semibold text-slate-900 dark:text-slate-100"
+            >
+              {{ formatMoney(article.price ?? article.basePrice ?? 0) }}
+            </p>
+            <span
+              v-if="hasDiscount"
+              class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
+            >
+              -{{ discountPercentLabel }}%
+            </span>
+          </div>
+          <p
+            v-if="hasDiscount"
+            class="text-sm text-slate-500 line-through dark:text-slate-400"
+          >
+            {{ formatMoney(article.basePrice ?? 0) }}
+          </p>
+        </div>
+        <NuxtLink
+          v-if="canManage"
+          :to="articleLink + '/edit'"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+        >
+          Uredi
+        </NuxtLink>
+      </div>
+
+      <div class="flex flex-1 flex-col justify-end gap-4">
+        <div
+          v-if="!canManage"
+          class="flex flex-wrap items-center justify-between gap-3"
+        >
+          <div
+            v-if="userCartStore.isArticleInCart(article.id)"
+            class="inline-flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+          >
+            U korpi:
+            <span class="text-lg">{{
+              userCartStore.countArticlesInCart(article.id)
+            }}</span>
+          </div>
+          <div class="flex flex-1 items-center justify-end gap-2">
+            <button
+              v-if="userCartStore.isArticleInCart(article.id)"
+              type="button"
+              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-hidden focus:ring-2 focus:ring-red-200 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30 dark:focus:ring-red-800"
+              @click="userCartStore.removeFromCart(article)"
+            >
+              Ukloni
+            </button>
+            <button
+              type="button"
+              class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              @click="userCartStore.addToCart(article)"
+            >
+              Dodaj u korpu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Matterway.Identity.Api.Application;
 using Matterway.Identity.Api.Domain.Entities;
-using Matterway.Identity.Api.Providers.Services.AuthToken;
+using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 

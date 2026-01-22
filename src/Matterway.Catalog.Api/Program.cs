@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Matterway.Catalog.Api.Infrastructure;
-using Matterway.Catalog.Api.Providers.Persistence;
-using Matterway.Catalog.Api.Providers.Storage;
+using Matterway.Catalog.Api.Application.Configurations;
+using Matterway.Catalog.Api.Infrastructure.Persistence;
+using Matterway.Catalog.Api.Infrastructure.Storage;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 

@@ -84,7 +84,7 @@ services:
       Jwt__Issuer: "http://identity-api:${IDENTITY_API_PORT}"
       Jwt__Audience: "http://identity-api:${IDENTITY_API_PORT}"
       services__storefront-web__http__0: "http://storefront-web:3000"
-      ImageStorage__Bucket: "product-images"
+      ImageStorage__Bucket: "article-images"
       ImageStorage__Endpoint: "http://minio:9000"
       ImageStorage__PublicBaseUrl: "http://localhost:19000"
       ImageStorage__AccessKey: "${MINIO_ROOT_USER}"
@@ -120,27 +120,6 @@ services:
       OTEL_SERVICE_NAME: "customers-api"
     ports:
       - "2002:8080"
-    networks:
-      - "aspire"
-    restart: "unless-stopped"
-  inventory-api:
-    image: "${INVENTORY_API_IMAGE}"
-    environment:
-      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
-      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
-      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
-      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
-      HTTP_PORTS: "${INVENTORY_API_PORT}"
-      services__identity-api__http__0: "http://identity-api:${IDENTITY_API_PORT}"
-      Jwt__Key: "${JWTSIGNINGKEY}"
-      Jwt__Issuer: "http://identity-api:${IDENTITY_API_PORT}"
-      Jwt__Audience: "http://identity-api:${IDENTITY_API_PORT}"
-      services__storefront-web__http__0: "http://storefront-web:3000"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://matterway-platform-dashboard:18889"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
-      OTEL_SERVICE_NAME: "inventory-api"
-    ports:
-      - "2004:8080"
     networks:
       - "aspire"
     restart: "unless-stopped"

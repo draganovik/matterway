@@ -21,9 +21,8 @@ public class UpdateSystemUser : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireRole(
-                nameof(EIdentityRole.Admin),
-                nameof(EIdentityRole.Manager)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -34,16 +33,14 @@ public class UpdateSystemUser : IEndpoint
         UserManager<SystemUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager)
     {
-        RequestIdentity
-            .TryGet(httpContext.User, out var requestIdentity);
-
         var user = await userManager.FindByIdAsync(id.ToString());
         if (user is null) return TypedResults.NotFound();
 
         var userRole = await IdentityRoleAdapter.GetPrimaryRoleAsync(userManager, user);
+        var isAdmin = RequestIdentity.AsAdministrator(httpContext.User);
 
-        if (requestIdentity.Role != EIdentityRole.Admin && userRole != EIdentityRole.Customer)
-            return TypedResults.BadRequest(CreateProblemDetails("Managers can only update Customer users"));
+        if (!isAdmin && userRole != EIdentityRole.Customer)
+            return TypedResults.BadRequest(CreateProblemDetails("Operators can only update Customer users"));
 
         if (!string.IsNullOrWhiteSpace(request.Email))
         {

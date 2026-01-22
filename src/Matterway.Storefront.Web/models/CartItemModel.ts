@@ -1,8 +1,8 @@
-import ProductModel from "./ProductModel";
+import ArticleModel from "./ArticleModel";
 
 export default class CartItemModel {
-  productId?: string;
-  productName?: string;
+  articleId?: string;
+  articleName?: string;
   unitPrice?: number;
   quantity: number = 1;
 
@@ -10,9 +10,9 @@ export default class CartItemModel {
     return (this.unitPrice ?? 0) * this.quantity;
   }
 
-  constructor(product: ProductModel) {
-    this.productId = product.id;
-    this.productName = product.title;
-    this.unitPrice = product.price ?? product.basePrice ?? 0;
+  constructor(article: ArticleModel) {
+    this.articleId = article.id;
+    this.articleName = article.title;
+    this.unitPrice = article.price ?? article.basePrice ?? 0;
   }
 }

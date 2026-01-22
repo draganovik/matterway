@@ -37,15 +37,17 @@ export default defineEventHandler(async (event) => {
     city,
     zipCode,
     note,
-    items,
+    orderId,
     userId,
   } = body;
-  // create Order (needs address)
-  // add items to Order from CartItems
-  // start payment intent in Stripe
-  // webhook: Catch init event and create payment
-  // webhook: On different events update payment entity in Payment API
-  // note: use payment intent ID "pi_3NGRh4BZYyXRoS3Y1o41PbK2" as reference number in payment and in Order
+  if (!orderId) {
+    throw createError({
+      statusCode: 400,
+      message: "OrderId is required",
+    });
+  }
+  // create Stripe payment intent
+  // webhook: On charge.succeeded, register payment in Sales
   const payloadSummary = {
     cardNumber,
     expMonth,
@@ -58,7 +60,7 @@ export default defineEventHandler(async (event) => {
     city,
     zipCode,
     note,
-    itemsLength: Array.isArray(items) ? items.length : 0,
+    orderId,
     userId,
   };
   console.log("[payments] received payload", payloadSummary);
@@ -85,13 +87,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  console.log("items", items);
-
   const clientSecret = await payWithStripe(
     cardPayment,
     address,
     userId,
-    items,
+    orderId,
     config.stripeSecretKey,
   );
   return { clientSecret };

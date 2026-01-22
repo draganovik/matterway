@@ -1,9 +1,8 @@
 using Asp.Versioning;
 using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Domain;
 using Matterway.Customers.Api.Domain.Entities;
-using Matterway.Customers.Api.Providers.Persistence.AddressEntity;
-using Matterway.Customers.Api.Providers.Persistence.CustomerEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
+using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +19,9 @@ public class DeleteAddress : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization()
+            .RequireAuthorization(policy => policy.RequireAssertion(context =>
+                RequestIdentity.IsCustomer(context.User) ||
+                RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -33,8 +34,7 @@ public class DeleteAddress : IEndpoint
             IAddressRepository addressRepository,
             CancellationToken cancellationToken)
     {
-        if (!RequestIdentity.TryGet(httpContext.User, out var userContext) ||
-            (userContext.Role == ERequestRole.Customer && customerId != userContext.SystemUserId))
+        if (!RequestIdentity.CanManageOwnedResource(httpContext.User, customerId))
             return TypedResults.Forbid();
 
         var customer = await customerRepository.GetBy(customerId, cancellationToken);
