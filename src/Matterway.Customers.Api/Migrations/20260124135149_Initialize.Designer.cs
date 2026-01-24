@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Customers.Api.Migrations
 {
     [DbContext(typeof(CustomersDbComposer))]
-    [Migration("20260122141328_Initialize")]
+    [Migration("20260124135149_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Matterway.Customers.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);

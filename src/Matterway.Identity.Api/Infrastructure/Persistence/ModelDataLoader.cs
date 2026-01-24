@@ -74,7 +74,8 @@ public static class ModelDataLoader
                 NormalizedUserName = "STEFAN999@MAIL.LOCAL",
                 Created = new DateTime(2023, 4, 12, 12, 10, 0, DateTimeKind.Utc),
                 PasswordHash = "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==",
-                SecurityStamp = "019bada3-b4dc-7155-baca-576dd9914d57"
+                SecurityStamp = "019bada3-b4dc-7155-baca-576dd9914d57",
+                ConcurrencyStamp = "371c6716-8af4-48b7-ac6b-61120c592477"
             },
             new SystemUser
             {

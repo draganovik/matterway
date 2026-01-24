@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Identity.Api.Migrations
 {
     [DbContext(typeof(IdentityDbComposer))]
-    [Migration("20260122161730_Initialize")]
+    [Migration("20260124135153_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Matterway.Identity.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -131,7 +131,7 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "758bc4a4-58db-4224-9851-bde84bcb01c7",
+                            ConcurrencyStamp = "371c6716-8af4-48b7-ac6b-61120c592477",
                             Created = new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc),
                             Email = "stefan999@mail.local",
                             EmailConfirmed = false,

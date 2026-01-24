@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Identity.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -176,7 +176,7 @@ namespace Matterway.Identity.Api.Migrations
                 {
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1"), 0, "3d5f0a44-e0f6-4b13-8a06-1dc8db48fe74", new DateTime(2021, 9, 9, 10, 10, 10, 0, DateTimeKind.Utc), "mladen@matterway.local", false, false, null, "MLADEN@MATTERWAY.LOCAL", "MLADEN@MATTERWAY.LOCAL", "AQAAAAIAAYagAAAAEF0PUBp9R90/+4Ul8J4HdcOJNNv1Ol5W2vIK2ooqOFRTc1vcgJtxBVqWYlONUSjEJw==", null, false, "4a1f3895-9229-45c9-9fcb-7b8f2a9f46b3", false, "mladen@matterway.local" },
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2"), 0, "cb6a7ad6-7c4c-4bb6-bce5-8aa4d1bf7b58", new DateTime(2022, 10, 10, 11, 11, 11, 0, DateTimeKind.Utc), "jelena@matterway.local", false, false, null, "JELENA@MATTERWAY.LOCAL", "JELENA@MATTERWAY.LOCAL", "AQAAAAIAAYagAAAAEJru7jHMkz3Cdn5rk9dTj3umC8lMLv0XfkY1k5PXeuh2VkwiazogHTe8IoEhYWr6rg==", null, false, "bf0cb1b8-d485-4fdd-8a89-fb70120dbd9f", false, "jelena@matterway.local" },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), 0, "a5a2a12e-e523-46bd-8810-f0a5ad84e3fa", new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc), "stefan999@mail.local", false, false, null, "STEFAN999@MAIL.LOCAL", "STEFAN999@MAIL.LOCAL", "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==", null, false, "019bada3-b4dc-7155-baca-576dd9914d57", false, "stefan999@mail.local" },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), 0, "371c6716-8af4-48b7-ac6b-61120c592477", new DateTime(2023, 4, 12, 12, 10, 0, 0, DateTimeKind.Utc), "stefan999@mail.local", false, false, null, "STEFAN999@MAIL.LOCAL", "STEFAN999@MAIL.LOCAL", "AQAAAAIAAYagAAAAEFSn2wwtXMTkX5P1GglolnIwSI7iauwvIgZXlrTih7oTJ/FWJkY/CXmdNCR4ZJKAug==", null, false, "019bada3-b4dc-7155-baca-576dd9914d57", false, "stefan999@mail.local" },
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), 0, "3b9f3e46-3c3c-4f04-9b6f-4fe90f0a8c80", new DateTime(2024, 2, 20, 9, 30, 0, 0, DateTimeKind.Utc), "marag@mail.local", false, false, null, "MARAG@MAIL.LOCAL", "MARAG@MAIL.LOCAL", "AQAAAAIAAYagAAAAEEPDW3c2GRf473Cn5iK6pW8vBqQuPvei43fnIK+WbTaixjrzkd/mMyXGIp2+IoDI8Q==", null, false, "8ca7016d-0e4d-4b92-96cb-c964d7d8f9c1", false, "marag@mail.local" }
                 });
 

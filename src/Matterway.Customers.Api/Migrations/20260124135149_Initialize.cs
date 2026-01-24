@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Matterway.Customers.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -121,11 +121,11 @@ namespace Matterway.Customers.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "CustomerArticle",
-                columns: new[] { "Id", "CustomerId", "OrderId", "ArticleId", "ArticleName", "Quantity", "UnitPrice" },
+                columns: new[] { "Id", "ArticleId", "ArticleName", "CustomerId", "OrderId", "Quantity", "UnitPrice" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", 3, 4999m },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", 1, 19999m }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 3, 4999m },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 1, 19999m }
                 });
 
             migrationBuilder.CreateIndex(
