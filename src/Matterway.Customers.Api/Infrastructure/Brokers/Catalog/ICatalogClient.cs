@@ -1,8 +1,11 @@
+using Matterway.Customers.Api.Application.Brokers;
+
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 
 public interface ICatalogClient
 {
-    Task<CatalogClientGetArticleByIdResponse?> GetArticleById(Guid id, CancellationToken cancellationToken);
+    Task<BrokerResponse<CatalogClientGetArticleByIdResponse>> GetArticleById(Guid id,
+        CancellationToken cancellationToken);
 }
 
 public record CatalogClientGetArticleByIdResponse

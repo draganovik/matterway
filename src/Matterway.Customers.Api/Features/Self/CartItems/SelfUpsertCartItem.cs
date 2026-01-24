@@ -6,6 +6,7 @@ using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Matterway.Customers.Api.Features.Self.CartItems;
 
@@ -39,8 +40,18 @@ public class SelfUpsertCartItem : IEndpoint
         if (!RequestIdentity.CanManageOwnedResource(httpContext.User, customerId))
             return TypedResults.Forbid();
 
-        var article = await catalogClient.GetArticleById(articleId, cancellationToken);
-        if (article is null) return TypedResults.NotFound();
+        var articleResponse = await catalogClient.GetArticleById(articleId, cancellationToken);
+        if (!articleResponse.IsSuccess || articleResponse.Data is null)
+            return articleResponse.StatusCode == HttpStatusCode.NotFound
+                ? TypedResults.NotFound()
+                : TypedResults.BadRequest(new ProblemDetails
+                {
+                    Title = "Bad Request",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = articleResponse.ErrorMessage ?? "Unable to retrieve article."
+                });
+
+        var article = articleResponse.Data;
 
         var resolvedPrice = article.Price ?? article.BasePrice;
         if (resolvedPrice is null)

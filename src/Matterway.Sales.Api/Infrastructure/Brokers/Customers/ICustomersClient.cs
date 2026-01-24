@@ -1,17 +1,13 @@
 using System.Net;
+using Matterway.Sales.Api.Application.Brokers;
 
 namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
 public interface ICustomersClient
 {
-    Task<CustomersOrderResult> CreateOrderAsync(Guid customerId, CustomersCreateOrderRequest request,
+    Task<BrokerResponse<CustomersOrderResponse>> CreateOrderAsync(Guid customerId, CustomersCreateOrderRequest request,
         string? authorizationHeader,
         CancellationToken cancellationToken);
-}
-
-public sealed record CustomersOrderResult(HttpStatusCode StatusCode, CustomersOrderResponse? Order)
-{
-    public bool IsSuccess => StatusCode is >= HttpStatusCode.OK and < HttpStatusCode.MultipleChoices;
 }
 
 public sealed record CustomersCreateOrderRequest

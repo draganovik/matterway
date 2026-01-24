@@ -2,7 +2,7 @@
 const formModel = defineModel<{
   firstName: string;
   lastName: string;
-  birthDate: Date;
+  birthDate: string; // yyyy-MM-dd
   email: string;
   password: string;
   confirmPassword: string;
@@ -85,6 +85,20 @@ const handleSubmit = () => {
         v-model="formModel.email"
         class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         placeholder="john.doe@company.com"
+        required
+      />
+    </div>
+    <div class="mb-6">
+      <label
+        for="birthDate"
+        class="mb-2 block text-sm font-medium text-slate-900 dark:text-white"
+        >Datum rođenja</label
+      >
+      <input
+        type="date"
+        id="birthDate"
+        v-model="formModel.birthDate"
+        class="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         required
       />
     </div>

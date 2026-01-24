@@ -3,7 +3,7 @@ import { createUser } from "@composables/createUser";
 type RegisterFormModel = {
   firstName: string;
   lastName: string;
-  birthDate: Date;
+  birthDate: string; // yyyy-MM-dd
   email: string;
   password: string;
   confirmPassword: string;
@@ -15,7 +15,9 @@ const errorMessage = ref<string | null>(null);
 const registerModel = ref<RegisterFormModel>({
   firstName: "",
   lastName: "",
-  birthDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+  birthDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+    .toISOString()
+    .split("T")[0],
   email: "",
   password: "",
   confirmPassword: "",
@@ -32,7 +34,7 @@ const submitFormRegister = async () => {
     const response = await createUser(
       registerModel.value.firstName,
       registerModel.value.lastName,
-      registerModel.value.birthDate,
+      registerModel.value.birthDate, // already yyyy-MM-dd
       registerModel.value.email,
       registerModel.value.password,
     );

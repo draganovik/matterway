@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Asp.Versioning;
 using Matterway.Sales.Api.Application;
+using Matterway.Sales.Api.Application.Brokers;
 using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
@@ -50,7 +51,7 @@ public class SelfCreateOrder : IEndpoint
             authorization,
             cancellationToken);
 
-        if (!customersResult.IsSuccess)
+        if (!customersResult.IsSuccess || customersResult.Data is null)
             return customersResult.StatusCode switch
             {
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
@@ -58,18 +59,12 @@ public class SelfCreateOrder : IEndpoint
                 _ => TypedResults.BadRequest(new ProblemDetails
                 {
                     Title = "Customer order could not be created.",
-                    Status = StatusCodes.Status400BadRequest
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = customersResult.ErrorMessage ?? "Unknown error."
                 })
             };
 
-        if (customersResult.Order is null)
-            return TypedResults.BadRequest(new ProblemDetails
-            {
-                Title = "Customer order could not be created.",
-                Status = StatusCodes.Status400BadRequest
-            });
-
-        if (customersResult.Order.OrderId != orderId)
+        if (customersResult.Data.OrderId != orderId)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Customer order mismatch.",
@@ -77,7 +72,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Customer order id does not match the Sales order id."
             });
 
-        if (customersResult.Order.CustomerId != effectiveCustomerId)
+        if (customersResult.Data.CustomerId != effectiveCustomerId)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Customer order mismatch.",
@@ -85,7 +80,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Customer id does not match the Sales order request."
             });
 
-        if (customersResult.Order.Items.Count == 0)
+        if (customersResult.Data.Items.Count == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
@@ -93,7 +88,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Order items are missing."
             });
 
-        if (customersResult.Order.Items.Any(item => item.UnitPrice is null))
+        if (customersResult.Data.Items.Any(item => item.UnitPrice is null))
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
@@ -101,7 +96,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Order items must include unit prices."
             });
 
-        if (customersResult.Order.Items.Any(item => string.IsNullOrWhiteSpace(item.ArticleName)))
+        if (customersResult.Data.Items.Any(item => string.IsNullOrWhiteSpace(item.ArticleName)))
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
@@ -109,7 +104,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Order items must include article titles."
             });
 
-        var order = MapToEntity(request, customersResult.Order, effectiveCustomerId);
+        var order = MapToEntity(request, customersResult.Data, effectiveCustomerId);
 
         var created = await orderRepository.Create(order, cancellationToken);
         if (created is null)
