@@ -53,7 +53,7 @@ export const useCartStore = defineStore("cart", {
       if (findItem && findItem.quantity > 1) {
         findItem.quantity--;
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${findItem?.articleId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/self/customers/${session.getTokenData?.sub}/cart-items/${findItem?.articleId}`,
           {
             method: "PUT",
             body: JSON.stringify({ quantity: findItem.quantity }),
@@ -64,7 +64,7 @@ export const useCartStore = defineStore("cart", {
           (item) => item.articleId !== article.id,
         );
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${article.id}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/self/customers/${session.getTokenData?.sub}/cart-items/${article.id}`,
           {
             method: "DELETE",
           },
@@ -88,7 +88,7 @@ export const useCartStore = defineStore("cart", {
       );
 
       await request(
-        `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${currentItem?.articleId}`,
+        `${config.public.customersApiBaseUrl}/api/v1.0/self/customers/${session.getTokenData?.sub}/cart-items/${currentItem?.articleId}`,
         {
           method: "PUT",
           body: JSON.stringify({ quantity: currentItem?.quantity }),
@@ -100,7 +100,7 @@ export const useCartStore = defineStore("cart", {
       const session = useSessionStore();
       this.cartItems.forEach(async (item) => {
         await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${session.getTokenData?.sub}/CartItems/${item.articleId}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/self/customers/${session.getTokenData?.sub}/cart-items/${item.articleId}`,
           {
             method: "DELETE",
           },
@@ -113,7 +113,7 @@ export const useCartStore = defineStore("cart", {
       const config = useRuntimeConfig();
       try {
         const response = await request(
-          `${config.public.customersApiBaseUrl}/api/v1.0/Customers/CartItems?page=${page}&pageSize=${pageSize}`,
+          `${config.public.customersApiBaseUrl}/api/v1.0/self/cart/items?page=${page}&pageSize=${pageSize}`,
           {
             method: "GET",
           },

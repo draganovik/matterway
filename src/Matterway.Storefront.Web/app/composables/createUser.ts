@@ -11,7 +11,7 @@ export async function createUser(
   const config = useRuntimeConfig();
 
   const createUser = await fetch(
-    `${config.public.authApiBaseUrl}/api/v1.0/SystemUsers`,
+    `${config.public.authApiBaseUrl}/api/v1.0/public/auth/signup`,
     {
       method: "POST",
       headers: {
@@ -33,7 +33,7 @@ export async function createUser(
     await session.login(loginModel);
 
     const createCustomer = await request(
-      `${config.public.customersApiBaseUrl}/api/v1.0/Customers`,
+      `${config.public.customersApiBaseUrl}/api/v1.0/self/profile`,
       {
         method: "POST",
         body: JSON.stringify({
