@@ -16,7 +16,11 @@ public static class CorsRegistration
             var storefrontOrigin = builder.Configuration.ResolveServiceUri("storefront-web")
                 .GetLeftPart(UriPartial.Authority);
 
+            var dashboardOrigin = builder.Configuration.ResolveServiceUri("dashboard-web")
+                .GetLeftPart(UriPartial.Authority);
+
             var allowedOrigins = configuredOrigins.Append(storefrontOrigin)
+                .Append(dashboardOrigin)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 

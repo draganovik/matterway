@@ -117,6 +117,34 @@ var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.W
         service.Ports = ["3001:3000"];
     });
 
+// Setup Dashboard Web Application
+var dashboard = builder.AddViteApp("dashboard-web", "../Matterway.Dashboard.Web")
+    .WaitFor(identityApi)
+    .WaitFor(catalogApi)
+    .WaitFor(customersApi)
+    .WaitFor(salesApi)
+    .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApi.GetEndpoint("http"))
+    .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
+    .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
+    .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
+    // expose public runtime config values so the client bundle has base URLs
+    .WithEnvironment("IDENTITY_API_BASE_URL", identityApi.GetEndpoint("http"))
+    .WithEnvironment("CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
+    .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
+    .WithEnvironment("SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
+    .WithEndpoint("http", e =>
+    {
+        e.TargetPort = 3000;
+        e.Port = 3002;
+    })
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerFile()
+    .PublishAsDockerComposeService((_, service) =>
+    {
+        service.Restart = "unless-stopped";
+        service.Ports = ["3002:3000"];
+    });
+
 ConfigureApiJwtSettings(catalogApi);
 ConfigureApiJwtSettings(customersApi);
 ConfigureApiJwtSettings(identityApi);
@@ -134,7 +162,9 @@ return;
 
 void ConfigureApiCorsOrigins(IResourceBuilder<ProjectResource> resource)
 {
-    resource.WithEnvironment("Cors__AllowedOrigins__0", storefront.GetEndpoint("http"));
+    resource
+        .WithEnvironment("Cors__AllowedOrigins__0", storefront.GetEndpoint("http"))
+        .WithEnvironment("Cors__AllowedOrigins__1", dashboard.GetEndpoint("http"));
 }
 
 void ConfigureApiJwtSettings(IResourceBuilder<ProjectResource> resource)

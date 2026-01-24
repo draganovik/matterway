@@ -368,3 +368,7 @@ FodyWeavers.xsd
 /docker-compose-artifacts
 src/*/*.sln
 *.DotSettings
+/.codex
+/.claude
+/.agents
+/src/Matterway.Dashboard.Web/.agents
