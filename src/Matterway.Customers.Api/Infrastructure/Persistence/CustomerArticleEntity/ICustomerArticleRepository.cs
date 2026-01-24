@@ -7,8 +7,6 @@ public interface ICustomerArticleRepository
     Task<ICollection<CustomerArticle>> QueryCart(Guid customerId, int pageIndex, int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<ICollection<CustomerArticle>> GetCartItems(Guid customerId, CancellationToken cancellationToken = default);
-
     Task<CustomerArticle?> UpsertCartItem(CustomerArticle requestModel, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteCartItem(Guid customerId, Guid articleId, CancellationToken cancellationToken = default);
@@ -16,6 +14,4 @@ public interface ICustomerArticleRepository
     Task<CustomerArticle?> GetCartItem(Guid customerId, Guid articleId, CancellationToken cancellationToken = default);
 
     Task<int> CountCart(Guid customerId, CancellationToken cancellationToken = default);
-
-    Task<ICollection<CustomerArticle>> QueryByOrderId(Guid orderId, CancellationToken cancellationToken = default);
 }

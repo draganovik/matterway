@@ -16,14 +16,6 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ICollection<CustomerArticle>> GetCartItems(Guid customerId,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.CustomerArticle
-            .Where(article => article.CustomerId == customerId && article.OrderId == null)
-            .ToListAsync(cancellationToken);
-    }
-
     public async Task<CustomerArticle?> UpsertCartItem(CustomerArticle requestModel,
         CancellationToken cancellationToken = default)
     {
@@ -35,9 +27,17 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
                 cancellationToken);
 
         if (existing is not null)
-            context.CustomerArticle.Entry(existing).CurrentValues.SetValues(requestModel);
+        {
+            // Update only mutable fields to avoid touching the primary key.
+            existing.Quantity = requestModel.Quantity;
+            existing.UnitPrice = requestModel.UnitPrice;
+            existing.ArticleName = requestModel.ArticleName;
+            context.CustomerArticle.Update(existing);
+        }
         else
+        {
             context.CustomerArticle.Add(requestModel);
+        }
 
         var affected = await context.SaveChangesAsync(cancellationToken);
         return affected > 0 ? existing ?? requestModel : null;
@@ -69,14 +69,5 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
         return await context.CustomerArticle
             .Where(article => article.CustomerId == customerId && article.OrderId == null)
             .CountAsync(cancellationToken);
-    }
-
-    public async Task<ICollection<CustomerArticle>> QueryByOrderId(Guid orderId,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.CustomerArticle
-            .Where(article => article.OrderId == orderId)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
     }
 }
