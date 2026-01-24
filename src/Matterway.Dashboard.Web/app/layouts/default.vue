@@ -1,81 +1,127 @@
 <script setup lang="ts">
+import type { NavigationMenuItem } from '@nuxt/ui'
+import { adminServices } from '~/data/adminFeatures'
 import { useAuthSession } from '~/composables/useAuthSession'
 
+const route = useRoute()
 const auth = useAuthSession()
-const sidebarOpen = ref(false)
+const { isNotificationsSlideoverOpen } = useDashboard()
 
-const displayRole = computed(() => auth.role.value ?? 'Unknown')
-const displayPerms = computed(() => auth.permissions.value.join(', '))
+const open = ref(false)
 
-async function handleLogout() {
-  await auth.logout()
-  await navigateTo('/login')
+const iconMap: Record<string, string> = {
+  catalog: 'i-lucide-package',
+  customers: 'i-lucide-users',
+  sales: 'i-lucide-shopping-bag',
+  identity: 'i-lucide-shield'
 }
+
+const navItems = computed<NavigationMenuItem[]>(() => {
+  return adminServices
+    .filter(section => auth.hasPermission(section.service, section.minimum))
+    .map(section => ({
+      label: section.label,
+      icon: iconMap[section.key] || 'i-lucide-folder',
+      to: `/${section.key}`,
+      exact: true,
+      type: 'trigger',
+      defaultOpen: true,
+      onSelect: () => {
+        open.value = false
+      },
+      children: section.features
+        .filter(feature => auth.hasPermission(feature.service, feature.minimum))
+        .map(feature => ({
+          label: feature.label,
+          to: feature.route,
+          onSelect: () => {
+            open.value = false
+          }
+        }))
+    }))
+    .filter(section => Array.isArray(section.children) && section.children.length > 0)
+})
+
+const secondaryItems = computed<NavigationMenuItem[]>(() => ([
+  {
+    label: 'Documentation',
+    icon: 'i-lucide-book-open',
+    to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
+    target: '_blank'
+  }
+]))
+
+const searchGroups = computed(() => [{
+  id: 'services',
+  label: 'Navigation',
+  items: navItems.value.flatMap(section =>
+    (section.children || []).map((child: any) => ({
+      id: `${section.label}-${child.label}`,
+      label: child.label,
+      icon: section.icon,
+      to: child.to
+    }))
+  )
+}, {
+  id: 'actions',
+  label: 'Actions',
+  items: [{
+    id: 'open-notifications',
+    label: 'Open notifications',
+    icon: 'i-lucide-bell',
+    onSelect: () => {
+      isNotificationsSlideoverOpen.value = true
+    }
+  }]
+}])
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50">
-    <div class="flex min-h-screen">
-      <aside
-        class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur transition duration-200 lg:static lg:translate-x-0"
-        :class="sidebarOpen ? 'translate-x-0' : ''"
-      >
-        <div class="flex items-center justify-between">
-          <NuxtLink to="/" class="text-lg font-semibold tracking-tight">
-            Matterway Ops
-          </NuxtLink>
-          <UButton
-            icon="i-lucide-x"
-            color="neutral"
-            variant="ghost"
-            class="lg:hidden"
-            @click="sidebarOpen = false"
-          />
-        </div>
-        <div class="mt-10">
-          <SidebarNav />
-        </div>
-      </aside>
+  <UDashboardGroup unit="rem">
+    <UDashboardSidebar
+      id="default"
+      v-model:open="open"
+      collapsible
+      resizable
+      class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }"
+    >
+      <template #header="{ collapsed }">
+        <TeamsMenu :collapsed="collapsed" />
+      </template>
 
-      <div class="flex flex-1 flex-col">
-        <header class="sticky top-0 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur">
-          <div class="flex items-center justify-between px-6 py-4">
-            <div class="flex items-center gap-3">
-              <UButton
-                icon="i-lucide-panel-left"
-                color="neutral"
-                variant="ghost"
-                class="lg:hidden"
-                @click="sidebarOpen = true"
-              />
-              <div>
-                <p class="text-sm text-muted">Matterway Management Plane</p>
-                <p class="text-xl font-semibold text-slate-900">
-                  {{ $route.meta?.title || 'Dashboard' }}
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-4">
-              <div class="hidden text-right text-xs text-muted sm:block">
-                <p>Role: {{ displayRole }}</p>
-                <p class="max-w-[360px] truncate">Perms: {{ displayPerms || 'none' }}</p>
-              </div>
-              <UButton
-                icon="i-lucide-log-out"
-                color="neutral"
-                variant="outline"
-                @click="handleLogout"
-              >
-                Logout
-              </UButton>
-            </div>
-          </div>
-        </header>
+      <template #default="{ collapsed }">
+        <UDashboardSearchButton
+          :collapsed="collapsed"
+          class="bg-transparent ring-default"
+        />
 
-        <main class="flex-1 px-6 py-8">
-          <slot />
-        </main>
-      </div>
-    </div>
-  </div>
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="navItems"
+          orientation="vertical"
+          tooltip
+          popover
+        />
+
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="secondaryItems"
+          orientation="vertical"
+          tooltip
+          class="mt-auto"
+        />
+      </template>
+
+      <template #footer="{ collapsed }">
+        <UserMenu :collapsed="collapsed" />
+      </template>
+    </UDashboardSidebar>
+
+    <UDashboardSearch :groups="searchGroups" />
+
+    <slot />
+
+    <NotificationsSlideover />
+  </UDashboardGroup>
 </template>

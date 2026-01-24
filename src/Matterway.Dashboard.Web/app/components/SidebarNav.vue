@@ -7,14 +7,14 @@ const auth = useAuthSession()
 
 const sections = computed(() =>
   adminServices
-    .filter((section) => auth.hasPermission(section.service, section.minimum))
-    .map((section) => ({
+    .filter(section => auth.hasPermission(section.service, section.minimum))
+    .map(section => ({
       ...section,
-      features: section.features.filter((feature) =>
+      features: section.features.filter(feature =>
         auth.hasPermission(feature.service, feature.minimum)
       )
     }))
-    .filter((section) => section.features.length > 0)
+    .filter(section => section.features.length > 0)
 )
 
 const isActive = (path: string) => route.path === path

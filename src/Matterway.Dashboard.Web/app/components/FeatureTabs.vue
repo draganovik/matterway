@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import type { FeatureAction } from '~/data/adminFeatures'
+import { useFeatureTabs } from '~/composables/useFeatureTabs'
 
-defineProps<{
-  tabs: FeatureAction[]
-  modelValue: string
-}>()
+const { tabs, active, setActive } = useFeatureTabs()
 
-const emit = defineEmits<{
-  (event: 'update:modelValue', value: string): void
-}>()
+const items = computed(() =>
+  tabs.value.map(tab => ({ label: tab.label, value: tab.key }))
+)
 </script>
 
 <template>
   <UTabs
-    :items="tabs.map(tab => ({ label: tab.label, value: tab.key }))"
-    :model-value="modelValue"
-    @update:model-value="(value: string) => emit('update:modelValue', value)"
+    v-if="items.length > 1"
+    :items="items"
+    :model-value="active"
+    @update:model-value="(value: string) => setActive(value)"
   />
 </template>

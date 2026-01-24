@@ -42,6 +42,7 @@ export const adminServices: ServiceSection[] = [
         service: 'catalog',
         minimum: 'operator',
         actions: [
+          { key: 'query', label: 'Query', method: 'GET', path: 'admin/articles', permission: 'observer' },
           { key: 'create', label: 'Create', method: 'POST', path: 'admin/articles', permission: 'operator' },
           { key: 'update', label: 'Update', method: 'PATCH', path: 'admin/articles/{id}', permission: 'operator' },
           { key: 'delete', label: 'Delete', method: 'DELETE', path: 'admin/articles/{id}', permission: 'operator' }
@@ -54,6 +55,13 @@ export const adminServices: ServiceSection[] = [
         service: 'catalog',
         minimum: 'operator',
         actions: [
+          {
+            key: 'query',
+            label: 'Query',
+            method: 'GET',
+            path: 'admin/articles/{articleId}/images',
+            permission: 'observer'
+          },
           {
             key: 'create',
             label: 'Create',
@@ -85,6 +93,13 @@ export const adminServices: ServiceSection[] = [
         minimum: 'operator',
         actions: [
           {
+            key: 'query',
+            label: 'Query',
+            method: 'GET',
+            path: 'admin/articles/{articleId}/details',
+            permission: 'observer'
+          },
+          {
             key: 'create',
             label: 'Create',
             method: 'POST',
@@ -114,6 +129,13 @@ export const adminServices: ServiceSection[] = [
         service: 'catalog',
         minimum: 'operator',
         actions: [
+          {
+            key: 'query',
+            label: 'Query',
+            method: 'GET',
+            path: 'admin/articles/{articleId}/specifications',
+            permission: 'observer'
+          },
           {
             key: 'create',
             label: 'Create',
@@ -145,7 +167,7 @@ export const adminServices: ServiceSection[] = [
         minimum: 'observer',
         actions: [
           { key: 'query', label: 'Query', method: 'GET', path: 'admin/details', permission: 'observer' },
-          { key: 'update', label: 'Upsert', method: 'PUT', path: 'admin/details/{slug}', permission: 'operator' },
+          { key: 'update', label: 'Update', method: 'PUT', path: 'admin/details/{slug}', permission: 'operator' },
           { key: 'delete', label: 'Delete', method: 'DELETE', path: 'admin/details/{slug}', permission: 'operator' }
         ]
       },
@@ -165,7 +187,7 @@ export const adminServices: ServiceSection[] = [
           },
           {
             key: 'update',
-            label: 'Upsert',
+            label: 'Update',
             method: 'PUT',
             path: 'admin/specifications/{slug}',
             permission: 'operator'
@@ -186,6 +208,7 @@ export const adminServices: ServiceSection[] = [
         service: 'catalog',
         minimum: 'operator',
         actions: [
+          { key: 'query', label: 'Query', method: 'GET', path: 'admin/discounts', permission: 'observer' },
           { key: 'create', label: 'Create', method: 'POST', path: 'admin/discounts', permission: 'operator' },
           {
             key: 'update',
@@ -270,7 +293,7 @@ export const adminServices: ServiceSection[] = [
           { key: 'query', label: 'Query', method: 'GET', path: 'admin/orders', permission: 'observer' },
           {
             key: 'create',
-            label: 'Add Status',
+            label: 'Create',
             method: 'POST',
             path: 'admin/orders/{orderId}/statuses',
             permission: 'operator'
@@ -335,7 +358,7 @@ export const adminServices: ServiceSection[] = [
           },
           {
             key: 'create',
-            label: 'Add',
+            label: 'Create',
             method: 'POST',
             path: 'admin/system-users/{id}/perms',
             permission: 'administrator'
@@ -355,7 +378,9 @@ export const adminServices: ServiceSection[] = [
 
 export function getFeatureByRoute(route: string) {
   for (const service of adminServices) {
-    const match = service.features.find((feature) => feature.route === route)
+    const match = service.features.find(feature =>
+      route === feature.route || route.startsWith(`${feature.route}/`)
+    )
     if (match) return match
   }
   return null

@@ -20,7 +20,7 @@ defineProps<{
     <UAlert
       v-if="error"
       icon="i-lucide-alert-triangle"
-      color="red"
+      color="error"
       variant="soft"
     >
       {{ error }}
@@ -28,7 +28,7 @@ defineProps<{
     <UAlert
       v-if="success"
       icon="i-lucide-check-circle"
-      color="green"
+      color="success"
       variant="soft"
     >
       {{ success }}

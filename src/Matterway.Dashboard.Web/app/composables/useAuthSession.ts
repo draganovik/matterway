@@ -63,8 +63,8 @@ export function useAuthSession() {
 
   const role = computed(
     () =>
-      getJwtStringClaim(payload.value, 'role') ||
-      getJwtStringClaim(payload.value, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role')
+      getJwtStringClaim(payload.value, 'role')
+      || getJwtStringClaim(payload.value, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role')
   )
 
   const permissions = computed(() => getJwtArrayClaim(payload.value, 'perm'))
@@ -148,7 +148,7 @@ export function useAuthSession() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        accept: 'application/json'
+        'accept': 'application/json'
       },
       body: JSON.stringify({ email, password })
     })
@@ -193,7 +193,7 @@ export function useAuthSession() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          accept: 'application/json'
+          'accept': 'application/json'
         },
         body: JSON.stringify({ refreshToken })
       })

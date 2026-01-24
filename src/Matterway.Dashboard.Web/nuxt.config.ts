@@ -16,7 +16,6 @@ const alias = {
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  alias,
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui'
@@ -35,6 +34,8 @@ export default defineNuxtConfig({
     }
   },
 
+  css: ['~/assets/css/main.css'],
+
   runtimeConfig: {
     public: {
       identityApiBaseUrl: process.env.IDENTITY_API_BASE_URL,
@@ -43,8 +44,7 @@ export default defineNuxtConfig({
       salesApiBaseUrl: process.env.SALES_API_BASE_URL
     }
   },
-
-  css: ['~/assets/css/main.css'],
+  alias,
 
   compatibilityDate: '2025-01-15',
 
