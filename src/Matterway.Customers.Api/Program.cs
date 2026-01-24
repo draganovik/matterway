@@ -2,6 +2,7 @@
 using Matterway.Customers.Api.Application.Configurations;
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.Customers.Api.Infrastructure.Persistence;
+using Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 using Matterway.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 
@@ -34,6 +35,7 @@ builder
 builder
     .ConfigureAuthentication()
     .ConfigureCatalogIntegration()
+    .ConfigureIdentityIntegration()
     .ConfigurePersistence()
     .ConfigureFeatures();
 

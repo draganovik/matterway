@@ -23,7 +23,7 @@ const loadDefaultAddress = async () => {
 
   try {
     const response = await request(
-      `${config.public.customersApiBaseUrl}/api/v1.0/Customers/${customerId}/Address`,
+      `${config.public.customersApiBaseUrl}/api/v1.0/self/address`,
       { method: "GET" },
     );
     const address = await response.json();
@@ -58,7 +58,7 @@ const pay = async () => {
   isProcessingPayment.value = true;
   try {
     const salesOrderResponse = await request(
-      `${config.public.salesApiBaseUrl}/api/v1/Orders`,
+      `${config.public.salesApiBaseUrl}/api/v1.0/self/orders`,
       {
         method: "POST",
         body: JSON.stringify({

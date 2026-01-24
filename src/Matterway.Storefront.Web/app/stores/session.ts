@@ -89,7 +89,7 @@ export const useSessionStore = defineStore("session", {
   actions: {
     async login(credentials: LoginModel) {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/public/auth`;
       const response = await fetch(`${baseUrl}/login`, {
         method: "POST",
         headers: {
@@ -106,7 +106,7 @@ export const useSessionStore = defineStore("session", {
 
     async logout() {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/public/auth`;
       const response = await request(`${baseUrl}/logout`, {
         method: "POST",
       });
@@ -118,7 +118,7 @@ export const useSessionStore = defineStore("session", {
     },
     async refreshToken() {
       const config = useRuntimeConfig();
-      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/Auth`;
+      const baseUrl = `${config.public.authApiBaseUrl}/api/v1.0/public/auth`;
       const response = await fetch(`${baseUrl}/refresh`, {
         method: "POST",
         headers: {

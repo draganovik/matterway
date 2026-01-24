@@ -90,7 +90,7 @@ const config = useRuntimeConfig();
 const getOrders = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const response = await request(
-    `${config.public.customersApiBaseUrl}/api/v1.0/Customers/Orders?page=1&pageSize=10`,
+    `${config.public.salesApiBaseUrl}/api/v1.0/self/orders?page=1&pageSize=10`,
     {},
   );
   if (response.status === 204) {
@@ -99,11 +99,11 @@ const getOrders = async () => {
   }
   const payload = await response.json();
   orders.value = (payload.data || []).map((order: any) => ({
-    id: order.orderId,
+    id: order.id,
     totalAmount: order.totalAmount,
     items: (order.items || []).map((item: any) => ({
       quantity: item.quantity,
-      articleTitle: item.articleName,
+      articleTitle: item.articleTitle,
     })),
   }));
 };

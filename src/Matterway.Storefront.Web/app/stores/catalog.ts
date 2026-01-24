@@ -43,7 +43,7 @@ export const useCatalogStore = defineStore("catalog", {
     async fetchArticleById(id: string): Promise<ArticleModel | null> {
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/public/articles/${id}`,
         {
           method: "GET",
           headers: {
@@ -82,7 +82,7 @@ export const useCatalogStore = defineStore("catalog", {
 
       const config = useRuntimeConfig();
       const response = await fetch(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles?${params.toString()}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/public/articles?${params.toString()}`,
         {
           method: "GET",
           headers: {
@@ -128,7 +128,7 @@ export const useCatalogStore = defineStore("catalog", {
     async updateArticle(article: ArticleModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${article.id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${article.id}`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -175,7 +175,7 @@ export const useCatalogStore = defineStore("catalog", {
     async deleteArticle(article: ArticleModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${article.id}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${article.id}`,
         {
           method: "DELETE",
         },
@@ -193,7 +193,7 @@ export const useCatalogStore = defineStore("catalog", {
     async createArticle(article: ArticleModel): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -241,7 +241,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Details`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/details`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -257,7 +257,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Details/${encodeURIComponent(detailSlug)}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/details/${encodeURIComponent(detailSlug)}`,
         {
           method: "DELETE",
         },
@@ -270,7 +270,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Details/${encodeURIComponent(detailSlug)}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/details/${encodeURIComponent(detailSlug)}`,
         {
           method: "PATCH",
           body: JSON.stringify({ value }),
@@ -285,7 +285,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Specifications`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -301,7 +301,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Specifications/${encodeURIComponent(specificationSlug)}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications/${encodeURIComponent(specificationSlug)}`,
         {
           method: "DELETE",
         },
@@ -314,7 +314,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Specifications/${encodeURIComponent(specificationSlug)}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications/${encodeURIComponent(specificationSlug)}`,
         {
           method: "PATCH",
           body: JSON.stringify({ value }),
@@ -336,7 +336,7 @@ export const useCatalogStore = defineStore("catalog", {
       }
       const query = params.toString();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Details${
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/details${
           query ? `?${query}` : ""
         }`,
         {
@@ -360,7 +360,7 @@ export const useCatalogStore = defineStore("catalog", {
       }
       const query = params.toString();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Specifications${
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/specifications${
           query ? `?${query}` : ""
         }`,
         { method: "GET" },
@@ -383,7 +383,7 @@ export const useCatalogStore = defineStore("catalog", {
       }
 
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Images`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/images`,
         {
           method: "POST",
           body: formData,
@@ -405,7 +405,7 @@ export const useCatalogStore = defineStore("catalog", {
         body.imageAlt = payload.imageAlt;
       }
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Images/${orderIndex}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/images/${orderIndex}`,
         {
           method: "PATCH",
           body: JSON.stringify(body),
@@ -419,7 +419,7 @@ export const useCatalogStore = defineStore("catalog", {
     ): Promise<Response> {
       const config = useRuntimeConfig();
       const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/Articles/${articleId}/Images/${orderIndex}`,
+        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/images/${orderIndex}`,
         {
           method: "DELETE",
         },

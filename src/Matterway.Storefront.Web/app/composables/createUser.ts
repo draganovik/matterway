@@ -4,27 +4,31 @@ import LoginModel from "#models/LoginModel";
 export async function createUser(
   firstName: string,
   lastName: string,
-  birthDate: Date,
+  birthDate: string, // expected format yyyy-MM-dd
   email: string,
   password: string,
 ): Promise<Response> {
   const config = useRuntimeConfig();
 
-  const createUser = await fetch(
-    `${config.public.authApiBaseUrl}/api/v1.0/SystemUsers`,
+  const registerResponse = await fetch(
+    `${config.public.customersApiBaseUrl}/api/v1.0/public/register`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: email,
-        password: password,
+        email,
+        password,
+        firstName,
+        lastName,
+        birthDate, // DateOnly on API; keep as yyyy-MM-dd
       }),
     },
   );
-  if (createUser.ok) {
-    const user = await createUser.json();
+
+  if (registerResponse.ok) {
+    // auto-login with provided credentials
     const loginModel = new LoginModel();
     loginModel.email = email;
     loginModel.password = password;
@@ -32,20 +36,7 @@ export async function createUser(
     const session = useSessionStore();
     await session.login(loginModel);
 
-    const createCustomer = await request(
-      `${config.public.customersApiBaseUrl}/api/v1.0/Customers`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          systemUserId: user.id,
-          firstName: firstName,
-          lastName: lastName,
-          birthDate: birthDate,
-        }),
-      },
-    );
-
-    return createCustomer;
+    return registerResponse;
   }
-  return createUser;
+  return registerResponse;
 }

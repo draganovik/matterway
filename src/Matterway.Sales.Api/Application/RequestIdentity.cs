@@ -25,12 +25,14 @@ public static class RequestIdentity
 
     public static bool AsObserver(ClaimsPrincipal? principal)
     {
-        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Observer);
+        return principal is not null &&
+               PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Observer);
     }
 
     public static bool AsOperator(ClaimsPrincipal? principal)
     {
-        return PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Operator);
+        return principal is not null &&
+               PermissionClaims.HasPermission(principal, ServiceName, PermissionLevel.Operator);
     }
 
     private static string? GetSubjectValue(ClaimsPrincipal principal)
