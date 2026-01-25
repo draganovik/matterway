@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { useAuthSession } from '~/composables/useAuthSession'
+
 const colorMode = useColorMode()
 const color = computed(() => (colorMode.value === 'dark' ? '#0f172a' : 'white'))
+const auth = useAuthSession()
+const isBooting = useState('app-booting', () => true)
 
 useHead({
   meta: [
@@ -15,12 +19,28 @@ useHead({
     lang: 'en'
   }
 })
+
+onMounted(async () => {
+  if (!import.meta.client) return
+  await auth.initialize()
+  isBooting.value = false
+})
 </script>
 
 <template>
   <UApp>
     <NuxtLoadingIndicator />
-    <NuxtLayout>
+    <div
+      v-if="isBooting"
+      class="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-emerald-950"
+    >
+      <div class="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6">
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        </div>
+      </div>
+    </div>
+    <NuxtLayout v-else>
       <NuxtPage />
     </NuxtLayout>
   </UApp>

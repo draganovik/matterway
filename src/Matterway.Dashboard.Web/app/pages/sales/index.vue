@@ -7,15 +7,6 @@ definePageMeta({
   service: 'sales',
   level: 'observer'
 })
-
-const auth = useAuthSession()
-const section = computed(() => adminServices.find(item => item.key === 'sales'))
-
-const features = computed(() =>
-  section.value?.features.filter(feature =>
-    auth.hasPermission(feature.service, feature.minimum)
-  ) || []
-)
 </script>
 
 <template>

@@ -18,6 +18,11 @@ const alias = {
   "#models": withRoot("models"),
   "#services": withRoot("services"),
 } satisfies Record<string, string>;
+const isDev = process.env.NODE_ENV !== "production";
+const noCacheHeaders = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+};
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   alias,
@@ -54,8 +59,22 @@ export default defineNuxtConfig({
     },
   },
   css: ["@assets/css/main.css"],
+  routeRules: isDev
+    ? {
+        "/**": {
+          headers: noCacheHeaders,
+        },
+      }
+    : undefined,
   vite: {
     plugins: [tailwindcss()],
+    ...(isDev
+      ? {
+          server: {
+            headers: noCacheHeaders,
+          },
+        }
+      : {}),
   },
   modules: ["@pinia/nuxt", "@nuxt/icon"],
 });

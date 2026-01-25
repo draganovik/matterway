@@ -8,47 +8,15 @@ definePageMeta({
   title: 'Sign In'
 })
 
-const auth = useAuthSession()
-const form = reactive({
-  email: '',
-  password: ''
-})
-const error = ref('')
-const loading = ref(false)
-
 onMounted(() => {
   if (auth.isLoggedIn.value) {
     void navigateTo(getFirstRoute())
   }
 })
-
-function getFirstRoute() {
-  for (const service of adminServices) {
-    if (!auth.hasPermission(service.service, service.minimum)) continue
-    const feature = service.features.find(item =>
-      auth.hasPermission(item.service, item.minimum)
-    )
-    if (feature) return feature.route
-  }
-  return '/'
-}
-
-async function submit() {
-  error.value = ''
-  loading.value = true
-  try {
-    await auth.login(form.email, form.password)
-    await navigateTo(getFirstRoute())
-  } catch (err: any) {
-    error.value = err?.message || 'Login failed.'
-  } finally {
-    loading.value = false
-  }
-}
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50">
+  <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-emerald-950">
     <div class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6">
       <div class="grid w-full gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="hidden flex-col justify-center gap-6 lg:flex">

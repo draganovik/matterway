@@ -4,9 +4,7 @@ import { getFeatureByRoute } from '~/data/adminFeatures'
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthSession()
 
-  if (import.meta.client) {
-    await auth.initialize()
-  }
+  await auth.initialize()
 
   const isPublic = Boolean(to.meta.public)
   if (isPublic) return

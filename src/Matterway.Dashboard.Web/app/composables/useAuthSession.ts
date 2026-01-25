@@ -131,6 +131,7 @@ export function useAuthSession() {
   }
 
   function scheduleRefresh() {
+    if (!import.meta.client) return
     clearRefreshTimer()
     const lifetimeMs = getAccessLifetimeMs()
     if (!lifetimeMs) return

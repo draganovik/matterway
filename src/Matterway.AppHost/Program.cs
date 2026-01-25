@@ -104,17 +104,18 @@ var salesApi = builder.AddProject<Matterway_Sales_Api>("sales-api")
 var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.Web")
     .WaitFor(catalogApi)
     .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
+    .WithEnvironment("PORT", "3001")
     .WithEndpoint("http", e =>
     {
-        e.TargetPort = 3000;
         e.Port = 3001;
+        e.IsProxied = false;
     })
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile()
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = ["3001:3000"];
+        service.Ports = ["3001:3001"];
     });
 
 // Setup Dashboard Web Application
@@ -132,17 +133,18 @@ var dashboard = builder.AddViteApp("dashboard-web", "../Matterway.Dashboard.Web"
     .WithEnvironment("CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
     .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
     .WithEnvironment("SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
+    .WithEnvironment("PORT", "3002")
     .WithEndpoint("http", e =>
     {
-        e.TargetPort = 3000;
         e.Port = 3002;
+        e.IsProxied = false;
     })
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile()
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = ["3002:3000"];
+        service.Ports = ["3002:3002"];
     });
 
 ConfigureApiJwtSettings(catalogApi);

@@ -5,21 +5,6 @@ import { useAuthSession } from '~/composables/useAuthSession'
 definePageMeta({
   title: 'Overview'
 })
-
-const auth = useAuthSession()
-const { isNotificationsSlideoverOpen } = useDashboard()
-
-const sections = computed(() =>
-  adminServices
-    .filter(section => auth.hasPermission(section.service, section.minimum))
-    .map(section => ({
-      ...section,
-      features: section.features.filter(feature =>
-        auth.hasPermission(feature.service, feature.minimum)
-      )
-    }))
-    .filter(section => section.features.length > 0)
-)
 </script>
 
 <template>

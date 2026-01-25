@@ -14,6 +14,11 @@ const alias = {
   '@plugins': withRoot('app/plugins')
 } satisfies Record<string, string>
 
+const isDev = process.env.NODE_ENV !== 'production'
+const noCacheHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -45,8 +50,22 @@ export default defineNuxtConfig({
     }
   },
   alias,
+  routeRules: isDev
+    ? {
+        '/**': {
+          headers: noCacheHeaders
+        }
+      }
+    : undefined,
 
   compatibilityDate: '2025-01-15',
+  vite: isDev
+    ? {
+        server: {
+          headers: noCacheHeaders
+        }
+      }
+    : undefined,
 
   eslint: {
     config: {
