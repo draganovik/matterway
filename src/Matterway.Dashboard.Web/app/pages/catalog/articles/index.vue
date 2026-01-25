@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useApiClient } from '~/composables/useApiClient'
 import { formatMoney } from '~/utils/format'
 
 definePageMeta({

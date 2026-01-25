@@ -8,11 +8,43 @@ definePageMeta({
   title: 'Sign In'
 })
 
+const auth = useAuthSession()
+const form = reactive({
+  email: '',
+  password: ''
+})
+const error = ref('')
+const loading = ref(false)
+
 onMounted(() => {
   if (auth.isLoggedIn.value) {
     void navigateTo(getFirstRoute())
   }
 })
+
+function getFirstRoute() {
+  for (const service of adminServices) {
+    if (!auth.hasPermission(service.service, service.minimum)) continue
+    const feature = service.features.find(item =>
+      auth.hasPermission(item.service, item.minimum)
+    )
+    if (feature) return feature.route
+  }
+  return '/'
+}
+
+async function submit() {
+  error.value = ''
+  loading.value = true
+  try {
+    await auth.login(form.email, form.password)
+    await navigateTo(getFirstRoute())
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Login failed.'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>

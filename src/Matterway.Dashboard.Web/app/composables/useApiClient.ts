@@ -26,7 +26,7 @@ function getBaseUrl(service: ApiService) {
   }
 }
 
-function getValidationErrors(payload: any): Record<string, string[]> | undefined {
+function getValidationErrors(payload: unknown): Record<string, string[]> | undefined {
   if (!payload || typeof payload !== 'object') return undefined
   if (!payload.errors || typeof payload.errors !== 'object') return undefined
   return payload.errors as Record<string, string[]>

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { useApiClient } from '~/composables/useApiClient'
-import { formatDateTime, formatMoney } from '~/utils/format'
-
 definePageMeta({
   title: 'Orders',
   service: 'sales',

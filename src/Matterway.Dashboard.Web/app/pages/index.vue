@@ -1,9 +1,25 @@
 <script setup lang="ts">
 import { adminServices } from '~/data/adminFeatures'
 import { useAuthSession } from '~/composables/useAuthSession'
+import { useDashboard } from '~/composables/useDashboard'
 
 definePageMeta({
   title: 'Overview'
+})
+
+const auth = useAuthSession()
+const { isNotificationsSlideoverOpen } = useDashboard()
+
+const sections = computed(() => {
+  return adminServices
+    .filter(section => auth.hasPermission(section.service, section.minimum))
+    .map(section => ({
+      ...section,
+      features: section.features.filter(feature =>
+        auth.hasPermission(feature.service, feature.minimum)
+      )
+    }))
+    .filter(section => section.features.length)
 })
 </script>
 

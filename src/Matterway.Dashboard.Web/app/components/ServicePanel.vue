@@ -7,16 +7,12 @@ const props = defineProps<{
   serviceKey: 'catalog' | 'customers' | 'sales' | 'identity'
   title: string
 }>()
-
 const route = useRoute()
 const auth = useAuthSession()
-
 const actionOrder = ['query', 'create', 'update', 'delete']
-
 const actionItems = computed<NavigationMenuItem[][]>(() => {
   const feature = getFeatureByRoute(route.path)
   if (!feature || feature.service !== props.serviceKey) return []
-
   const items = feature.actions
     .filter(action => auth.hasPermission(feature.service, action.permission))
     .sort((a, b) => actionOrder.indexOf(a.key) - actionOrder.indexOf(b.key))
@@ -25,7 +21,6 @@ const actionItems = computed<NavigationMenuItem[][]>(() => {
       to: action.key === 'query' ? feature.route : `${feature.route}/${action.key}`,
       exact: action.key === 'query'
     }))
-
   return items.length ? [items] : []
 })
 </script>

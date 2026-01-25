@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useApiClient } from '~/composables/useApiClient'
-
 definePageMeta({
   title: 'Specifications',
   service: 'catalog',

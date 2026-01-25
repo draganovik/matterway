@@ -8,9 +8,7 @@ defineProps<{
 
 const auth = useAuthSession()
 const colorMode = useColorMode()
-
 const userLabel = computed(() => auth.role.value ? `Employee (${auth.role.value})` : 'Employee')
-
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
   label: userLabel.value,

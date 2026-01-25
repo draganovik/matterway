@@ -3,10 +3,8 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 import { adminServices } from '~/data/adminFeatures'
 import { useAuthSession } from '~/composables/useAuthSession'
 
-const route = useRoute()
 const auth = useAuthSession()
 const { isNotificationsSlideoverOpen } = useDashboard()
-
 const open = ref(false)
 
 const iconMap: Record<string, string> = {
@@ -55,7 +53,7 @@ const searchGroups = computed(() => [{
   id: 'services',
   label: 'Navigation',
   items: navItems.value.flatMap(section =>
-    (section.children || []).map((child: any) => ({
+    (section.children || []).map((child: NavigationMenuItem) => ({
       id: `${section.label}-${child.label}`,
       label: child.label,
       icon: section.icon,
