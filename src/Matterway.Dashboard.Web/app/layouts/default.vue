@@ -22,7 +22,7 @@ const navItems = computed<NavigationMenuItem[]>(() => {
       icon: iconMap[section.key] || 'i-lucide-folder',
       to: `/${section.key}`,
       exact: true,
-      type: 'trigger',
+      type: 'trigger' as const,
       defaultOpen: true,
       onSelect: () => {
         open.value = false
