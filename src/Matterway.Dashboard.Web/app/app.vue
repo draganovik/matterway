@@ -4,7 +4,8 @@ import { useAuthSession } from '~/composables/useAuthSession'
 const colorMode = useColorMode()
 const color = computed(() => (colorMode.value === 'dark' ? '#0f172a' : 'white'))
 const auth = useAuthSession()
-const isBooting = useState('app-booting', () => true)
+const route = useRoute()
+const isBooting = computed(() => !auth.isInitialized.value && !route.meta?.public)
 
 useHead({
   meta: [
@@ -13,17 +14,16 @@ useHead({
     { key: 'theme-color', name: 'theme-color', content: color }
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' }
+    { rel: 'icon', href: '/favicon.svg' }
   ],
   htmlAttrs: {
     lang: 'en'
   }
 })
 
-onMounted(async () => {
+onMounted(() => {
   if (!import.meta.client) return
-  await auth.initialize()
-  isBooting.value = false
+  void auth.initialize()
 })
 </script>
 

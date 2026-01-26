@@ -1,10 +1,59 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Customers',
   service: 'customers',
   level: 'observer',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const createForm = reactive({
+  systemUserId: '',
+  firstName: '',
+  lastName: '',
+  birthDate: '',
+  defaultAddressId: ''
+})
+const createState = useRequestState()
+
+async function createCustomer() {
+  createState.error = ''
+  createState.success = ''
+  if (!createForm.systemUserId) {
+    createState.error = 'System User Id is required.'
+    return
+  }
+  createState.loading = true
+  try {
+    const result = await api.request(
+      'customers',
+      'admin/customers',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          systemUserId: createForm.systemUserId,
+          firstName: createForm.firstName,
+          lastName: createForm.lastName,
+          birthDate: createForm.birthDate,
+          defaultAddressId: createForm.defaultAddressId || null
+        })
+      }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to create customer.'
+      return
+    }
+    createState.success = 'Customer created.'
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to create customer.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>

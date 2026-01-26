@@ -1,10 +1,46 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Discounts',
   service: 'catalog',
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  code: ''
+})
+const deleteState = useRequestState()
+
+async function deleteDiscount() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.code) {
+    deleteState.error = 'Code is required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/discounts/${deleteForm.code}`,
+      { method: 'DELETE' }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to delete discounts.'
+      return
+    }
+    deleteState.success = 'Discounts deleted.'
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to delete discounts.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

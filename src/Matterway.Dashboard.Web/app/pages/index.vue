@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { adminServices } from '~/data/adminFeatures'
+import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 import { useDashboard } from '~/composables/useDashboard'
 
@@ -11,7 +11,7 @@ const auth = useAuthSession()
 const { isNotificationsSlideoverOpen } = useDashboard()
 
 const sections = computed(() => {
-  return adminServices
+  return serviceSections
     .filter(section => auth.hasPermission(section.service, section.minimum))
     .map(section => ({
       ...section,

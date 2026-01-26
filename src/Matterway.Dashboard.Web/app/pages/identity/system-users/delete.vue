@@ -1,10 +1,46 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'System Users',
   service: 'identity',
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  userId: ''
+})
+const deleteState = useRequestState()
+
+async function deleteUser() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.userId) {
+    deleteState.error = 'User Id is required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'identity',
+      `admin/system-users/${deleteForm.userId}`,
+      { method: 'DELETE' }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to delete user.'
+      return
+    }
+    deleteState.success = 'User deleted.'
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to delete user.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

@@ -1,10 +1,57 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleImages } from '~/composables/useArticleImages'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Images',
   service: 'catalog',
   level: 'operator',
   action: 'update'
 })
+
+const api = useApiClient()
+
+const updateForm = reactive({
+  articleId: '',
+  orderIndex: 0,
+  newOrderIndex: null as number | null,
+  imageAlt: ''
+})
+const updateState = useRequestState()
+
+const { imagePreview, previewState, loadImages } = useArticleImages()
+
+async function updateImage() {
+  updateState.error = ''
+  updateState.success = ''
+  if (!updateForm.articleId) {
+    updateState.error = 'Article Id is required.'
+    return
+  }
+  updateState.loading = true
+  try {
+    const payload: Record<string, unknown> = {}
+    if (updateForm.newOrderIndex !== null) payload.orderIndex = updateForm.newOrderIndex
+    if (updateForm.imageAlt) payload.imageAlt = updateForm.imageAlt
+
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${updateForm.articleId}/images/${updateForm.orderIndex}`,
+      { method: 'PATCH', body: JSON.stringify(payload) }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update image.'
+      return
+    }
+    updateState.success = 'Image updated.'
+    await loadImages(updateForm.articleId)
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update image.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

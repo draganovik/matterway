@@ -1,10 +1,58 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Customers',
   service: 'customers',
   level: 'observer',
   action: 'update'
 })
+
+const api = useApiClient()
+
+const updateForm = reactive({
+  systemUserId: '',
+  firstName: '',
+  lastName: '',
+  birthDate: '',
+  defaultAddressId: ''
+})
+const updateState = useRequestState()
+
+async function updateCustomer() {
+  updateState.error = ''
+  updateState.success = ''
+  if (!updateForm.systemUserId) {
+    updateState.error = 'System User Id is required.'
+    return
+  }
+  updateState.loading = true
+  try {
+    const result = await api.request(
+      'customers',
+      `admin/customers/${updateForm.systemUserId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          firstName: updateForm.firstName,
+          lastName: updateForm.lastName,
+          birthDate: updateForm.birthDate,
+          defaultAddressId: updateForm.defaultAddressId || null
+        })
+      }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update customer.'
+      return
+    }
+    updateState.success = 'Customer updated.'
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update customer.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

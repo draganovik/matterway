@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { adminServices } from '~/data/adminFeatures'
+import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 const route = useRoute()
 const auth = useAuthSession()
 
 const sections = computed(() =>
-  adminServices
+  serviceSections
     .filter(section => auth.hasPermission(section.service, section.minimum))
     .map(section => ({
       ...section,

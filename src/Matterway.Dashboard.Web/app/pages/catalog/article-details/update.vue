@@ -1,10 +1,55 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleDetails } from '~/composables/useArticleDetails'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Details',
   service: 'catalog',
   level: 'operator',
   action: 'update'
 })
+
+const api = useApiClient()
+
+const updateForm = reactive({
+  articleId: '',
+  detailSlug: '',
+  value: ''
+})
+const updateState = useRequestState()
+
+const { articlePreview, previewState, loadArticleDetails } = useArticleDetails()
+
+async function updateDetail() {
+  updateState.error = ''
+  updateState.success = ''
+  if (!updateForm.articleId || !updateForm.detailSlug) {
+    updateState.error = 'Article Id and detail slug are required.'
+    return
+  }
+  updateState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${updateForm.articleId}/details/${updateForm.detailSlug}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ value: updateForm.value })
+      }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update detail.'
+      return
+    }
+    updateState.success = 'Detail updated.'
+    await loadArticleDetails(updateForm.articleId)
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update detail.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

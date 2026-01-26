@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { useArticleDetails } from '~/composables/useArticleDetails'
+
 definePageMeta({
   title: 'Article Details',
   service: 'catalog',
   level: 'operator'
 })
+
+const queryForm = reactive({
+  articleId: ''
+})
+
+const { articlePreview, previewState, loadArticleDetails } = useArticleDetails()
 </script>
 
 <template>

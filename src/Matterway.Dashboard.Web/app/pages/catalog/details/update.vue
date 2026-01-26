@@ -1,10 +1,50 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Details',
   service: 'catalog',
   level: 'observer',
   action: 'update'
 })
+
+const api = useApiClient()
+
+const upsertForm = reactive({
+  slug: '',
+  title: ''
+})
+const upsertState = useRequestState()
+
+async function upsertDetail() {
+  upsertState.error = ''
+  upsertState.success = ''
+  if (!upsertForm.slug || !upsertForm.title) {
+    upsertState.error = 'Slug and title are required.'
+    return
+  }
+  upsertState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/details/${upsertForm.slug}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ title: upsertForm.title })
+      }
+    )
+    if (!result.ok) {
+      upsertState.error = result.error || 'Failed to save detail.'
+      return
+    }
+    upsertState.success = 'Detail saved.'
+  } catch (err) {
+    upsertState.error = err instanceof Error ? err.message : 'Failed to save detail.'
+  } finally {
+    upsertState.loading = false
+  }
+}
 </script>
 
 <template>

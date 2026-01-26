@@ -1,10 +1,51 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleSpecifications } from '~/composables/useArticleSpecifications'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Specifications',
   service: 'catalog',
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  articleId: '',
+  specificationSlug: ''
+})
+const deleteState = useRequestState()
+
+const { articlePreview, previewState, loadArticleSpecs } = useArticleSpecifications()
+
+async function deleteSpec() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.articleId || !deleteForm.specificationSlug) {
+    deleteState.error = 'Article Id and specification are required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${deleteForm.articleId}/specifications/${deleteForm.specificationSlug}`,
+      { method: 'DELETE' }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to remove specification.'
+      return
+    }
+    deleteState.success = 'Specification removed.'
+    await loadArticleSpecs(deleteForm.articleId)
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to remove specification.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

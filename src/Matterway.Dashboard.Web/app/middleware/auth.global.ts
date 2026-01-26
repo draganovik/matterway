@@ -1,22 +1,17 @@
 import { useAuthSession } from '~/composables/useAuthSession'
-import { getFeatureByRoute } from '~/data/adminFeatures'
+import { getFeatureByRoute } from '~/data/serviceRegistry'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthSession()
 
-  await auth.initialize()
-
-  const isPublic = Boolean(to.meta.public)
-  if (isPublic) return
-
-  if (!auth.isLoggedIn.value) {
-    if (to.path !== '/login') {
-      return navigateTo('/login')
-    }
+  if (to.meta.public) {
+    void auth.initialize()
     return
   }
 
-  if (!auth.isEmployee.value) {
+  await auth.initialize()
+
+  if (!auth.isLoggedIn.value || !auth.isEmployee.value) {
     return navigateTo('/login')
   }
 

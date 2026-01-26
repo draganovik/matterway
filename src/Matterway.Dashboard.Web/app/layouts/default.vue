@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { adminServices } from '~/data/adminFeatures'
+import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 const auth = useAuthSession()
@@ -15,7 +15,7 @@ const iconMap: Record<string, string> = {
 }
 
 const navItems = computed<NavigationMenuItem[]>(() => {
-  return adminServices
+  return serviceSections
     .filter(section => auth.hasPermission(section.service, section.minimum))
     .map(section => ({
       label: section.label,
@@ -42,9 +42,9 @@ const navItems = computed<NavigationMenuItem[]>(() => {
 
 const secondaryItems = computed<NavigationMenuItem[]>(() => ([
   {
-    label: 'Documentation',
-    icon: 'i-lucide-book-open',
-    to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
+    label: 'Solution Repository',
+    icon: 'i-lucide-github',
+    to: 'https://github.com/draganovik/aspire-matterway',
     target: '_blank'
   }
 ]))

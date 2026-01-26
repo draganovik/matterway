@@ -1,10 +1,81 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleSpecifications } from '~/composables/useArticleSpecifications'
+import { useRequestState } from '~/composables/useRequestState'
+import { normalizeList } from '~/utils/http'
+
 definePageMeta({
   title: 'Article Specifications',
   service: 'catalog',
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const createForm = reactive({
+  articleId: '',
+  specificationSlug: '',
+  value: 0
+})
+const createState = useRequestState()
+
+const specOptions = ref<Array<{ slug: string, title: string, unit?: string }>>([])
+const specState = useRequestState()
+
+const { articlePreview, previewState, loadArticleSpecs } = useArticleSpecifications()
+
+async function loadSpecs() {
+  specState.error = ''
+  specState.loading = true
+  try {
+    const result = await api.request<unknown>('catalog', 'admin/specifications')
+    if (!result.ok) {
+      specState.error = result.error || 'Failed to load specifications.'
+      specOptions.value = []
+      return
+    }
+    specOptions.value = normalizeList(result.data)
+  } catch (err) {
+    specState.error = err instanceof Error ? err.message : 'Failed to load specifications.'
+    specOptions.value = []
+  } finally {
+    specState.loading = false
+  }
+}
+
+async function createSpec() {
+  createState.error = ''
+  createState.success = ''
+  if (!createForm.articleId || !createForm.specificationSlug) {
+    createState.error = 'Article Id and specification are required.'
+    return
+  }
+  createState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${createForm.articleId}/specifications`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          specificationSlug: createForm.specificationSlug,
+          value: createForm.value
+        })
+      }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to add specification.'
+      return
+    }
+    createState.success = 'Specification added.'
+    await loadArticleSpecs(createForm.articleId)
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to add specification.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>

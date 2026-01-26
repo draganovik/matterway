@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { permissionLevels, permissionServices } from '~/data/permissions'
+import { permissionLevels, permissionServices } from '~/data/serviceRegistry'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
 
 definePageMeta({
   title: 'User Permissions',
@@ -7,6 +9,47 @@ definePageMeta({
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  userId: '',
+  service: '',
+  level: ''
+})
+const deleteState = useRequestState()
+
+async function deletePerm() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.userId || !deleteForm.service || !deleteForm.level) {
+    deleteState.error = 'User, service, and level are required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'identity',
+      `admin/system-users/${deleteForm.userId}/perms`,
+      {
+        method: 'DELETE',
+        body: JSON.stringify({
+          service: deleteForm.service,
+          level: deleteForm.level
+        })
+      }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to remove permission.'
+      return
+    }
+    deleteState.success = 'Permission removed.'
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to remove permission.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

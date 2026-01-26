@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { adminServices } from '~/data/adminFeatures'
+import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 definePageMeta({
@@ -16,14 +16,15 @@ const form = reactive({
 const error = ref('')
 const loading = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
+  await auth.initialize()
   if (auth.isLoggedIn.value) {
-    void navigateTo(getFirstRoute())
+    await navigateTo(getFirstRoute())
   }
 })
 
 function getFirstRoute() {
-  for (const service of adminServices) {
+  for (const service of serviceSections) {
     if (!auth.hasPermission(service.service, service.minimum)) continue
     const feature = service.features.find(item =>
       auth.hasPermission(item.service, item.minimum)
@@ -85,21 +86,25 @@ async function submit() {
             <UFormField
               label="Email"
               required
+              class="w-full"
             >
               <UInput
                 v-model="form.email"
                 type="email"
                 placeholder="name@matterway.local"
+                class="w-full"
               />
             </UFormField>
             <UFormField
               label="Password"
               required
+              class="w-full"
             >
               <UInput
                 v-model="form.password"
                 type="password"
                 placeholder="••••••••"
+                class="w-full"
               />
             </UFormField>
             <UAlert

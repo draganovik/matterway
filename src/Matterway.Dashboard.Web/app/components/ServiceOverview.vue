@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FeatureDefinition } from '~/data/adminFeatures'
+import type { FeatureDefinition } from '~/data/serviceRegistry'
 
 defineProps<{
   title: string

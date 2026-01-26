@@ -1,10 +1,51 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleImages } from '~/composables/useArticleImages'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Images',
   service: 'catalog',
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  articleId: '',
+  orderIndex: 0
+})
+const deleteState = useRequestState()
+
+const { imagePreview, previewState, loadImages } = useArticleImages()
+
+async function deleteImage() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.articleId) {
+    deleteState.error = 'Article Id is required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${deleteForm.articleId}/images/${deleteForm.orderIndex}`,
+      { method: 'DELETE' }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to remove image.'
+      return
+    }
+    deleteState.success = 'Image removed.'
+    await loadImages(deleteForm.articleId)
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to remove image.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

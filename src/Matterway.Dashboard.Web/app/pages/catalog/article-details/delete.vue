@@ -1,10 +1,51 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleDetails } from '~/composables/useArticleDetails'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Details',
   service: 'catalog',
   level: 'operator',
   action: 'delete'
 })
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  articleId: '',
+  detailSlug: ''
+})
+const deleteState = useRequestState()
+
+const { articlePreview, previewState, loadArticleDetails } = useArticleDetails()
+
+async function deleteDetail() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.articleId || !deleteForm.detailSlug) {
+    deleteState.error = 'Article Id and detail slug are required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${deleteForm.articleId}/details/${deleteForm.detailSlug}`,
+      { method: 'DELETE' }
+    )
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to remove detail.'
+      return
+    }
+    deleteState.success = 'Detail removed.'
+    await loadArticleDetails(deleteForm.articleId)
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to remove detail.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

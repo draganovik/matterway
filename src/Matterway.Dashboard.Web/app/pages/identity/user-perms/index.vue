@@ -1,9 +1,43 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { normalizeList } from '~/utils/http'
+
 definePageMeta({
   title: 'User Permissions',
   service: 'identity',
   level: 'operator'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  userId: ''
+})
+const queryState = useRequestState()
+const queryResults = ref<Array<{ service: string, level: string }>>([])
+
+async function loadPerms() {
+  queryState.error = ''
+  queryState.loading = true
+  try {
+    const result = await api.request<unknown>(
+      'identity',
+      `admin/system-users/${queryForm.userId}/perms`
+    )
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load permissions.'
+      queryResults.value = []
+      return
+    }
+    queryResults.value = normalizeList(result.data)
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load permissions.'
+    queryResults.value = []
+  } finally {
+    queryState.loading = false
+  }
+}
 </script>
 
 <template>

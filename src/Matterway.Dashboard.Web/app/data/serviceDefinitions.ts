@@ -28,7 +28,7 @@ export type ServiceSection = {
   features: FeatureDefinition[]
 }
 
-export const adminServices: ServiceSection[] = [
+export const serviceSections: ServiceSection[] = [
   {
     key: 'catalog',
     label: 'Catalog',
@@ -376,12 +376,4 @@ export const adminServices: ServiceSection[] = [
   }
 ]
 
-export function getFeatureByRoute(route: string) {
-  for (const service of adminServices) {
-    const match = service.features.find(feature =>
-      route === feature.route || route.startsWith(`${feature.route}/`)
-    )
-    if (match) return match
-  }
-  return null
-}
+export const allFeatures = serviceSections.flatMap(section => section.features)

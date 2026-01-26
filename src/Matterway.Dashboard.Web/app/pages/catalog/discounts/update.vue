@@ -1,10 +1,70 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { useDiscountSelection } from '~/composables/useDiscountSelection'
+
 definePageMeta({
   title: 'Discounts',
   service: 'catalog',
   level: 'operator',
   action: 'update'
 })
+
+const api = useApiClient()
+const updateState = useRequestState()
+
+const { updateIds, removeArticleId, setArticleIds } = useDiscountSelection()
+
+const updateForm = reactive({
+  code: '',
+  percentage: 0.1,
+  validFrom: '',
+  validTo: '',
+  articleIds: [] as string[]
+})
+
+watch(updateIds, (ids) => {
+  updateForm.articleIds = [...ids]
+}, { immediate: true })
+
+function splitArticleIds(value: string) {
+  const ids = value
+    .split(/[\n,]+/)
+    .map(item => item.trim())
+    .filter(Boolean)
+  setArticleIds('update', ids)
+  return ids
+}
+
+async function updateDiscount() {
+  updateState.error = ''
+  updateState.success = ''
+  updateState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/discounts/${updateForm.code}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({
+          percentage: updateForm.percentage,
+          validFrom: updateForm.validFrom,
+          validTo: updateForm.validTo || null,
+          articleIds: updateForm.articleIds
+        })
+      }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update discounts.'
+      return
+    }
+    updateState.success = 'Discounts updated.'
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update discounts.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

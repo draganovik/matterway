@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { permissionLevels, permissionServices } from '~/data/permissions'
+import { permissionLevels, permissionServices } from '~/data/serviceRegistry'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
 
 definePageMeta({
   title: 'User Permissions',
@@ -7,6 +9,47 @@ definePageMeta({
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const addForm = reactive({
+  userId: '',
+  service: '',
+  level: ''
+})
+const addState = useRequestState()
+
+async function addPerm() {
+  addState.error = ''
+  addState.success = ''
+  if (!addForm.userId || !addForm.service || !addForm.level) {
+    addState.error = 'User, service, and level are required.'
+    return
+  }
+  addState.loading = true
+  try {
+    const result = await api.request(
+      'identity',
+      `admin/system-users/${addForm.userId}/perms`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          service: addForm.service,
+          level: addForm.level
+        })
+      }
+    )
+    if (!result.ok) {
+      addState.error = result.error || 'Failed to add permission.'
+      return
+    }
+    addState.success = 'Permission added.'
+  } catch (err) {
+    addState.error = err instanceof Error ? err.message : 'Failed to add permission.'
+  } finally {
+    addState.loading = false
+  }
+}
 </script>
 
 <template>

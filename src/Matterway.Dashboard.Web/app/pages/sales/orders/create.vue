@@ -1,10 +1,63 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Orders',
   service: 'sales',
   level: 'observer',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const statusOptions = [
+  'Created',
+  'Confirmed',
+  'Paid',
+  'Shipped',
+  'Delivered',
+  'Canceled'
+]
+
+const statusForm = reactive({
+  orderId: '',
+  status: '',
+  note: ''
+})
+const statusState = useRequestState()
+
+async function addStatus() {
+  statusState.error = ''
+  statusState.success = ''
+  if (!statusForm.orderId || !statusForm.status) {
+    statusState.error = 'Order Id and status are required.'
+    return
+  }
+  statusState.loading = true
+  try {
+    const result = await api.request(
+      'sales',
+      `admin/orders/${statusForm.orderId}/statuses`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          status: statusForm.status,
+          note: statusForm.note || null
+        })
+      }
+    )
+    if (!result.ok) {
+      statusState.error = result.error || 'Failed to add status.'
+      return
+    }
+    statusState.success = 'Status added.'
+  } catch (err) {
+    statusState.error = err instanceof Error ? err.message : 'Failed to add status.'
+  } finally {
+    statusState.loading = false
+  }
+}
 </script>
 
 <template>

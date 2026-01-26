@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { useArticleImages } from '~/composables/useArticleImages'
+
 definePageMeta({
   title: 'Article Images',
   service: 'catalog',
   level: 'operator'
 })
+
+const queryForm = reactive({
+  articleId: ''
+})
+
+const { imagePreview, previewState, loadImages } = useArticleImages()
 </script>
 
 <template>

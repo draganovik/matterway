@@ -1,11 +1,60 @@
 <script setup lang="ts">
-import { formatMoney } from '~/utils/format'
+import { formatMoney } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { useDiscountSelection } from '~/composables/useDiscountSelection'
+import { buildQuery, normalizeList } from '~/utils/http'
 
 definePageMeta({
   title: 'Discounts',
   service: 'catalog',
   level: 'operator'
 })
+
+const api = useApiClient()
+
+const searchForm = reactive({
+  filter: '',
+  page: 1,
+  pageSize: 25
+})
+const searchState = useRequestState()
+const searchResults = ref<Array<{
+  id: string
+  title: string
+  price: number
+  isAvailable: boolean
+}>>([])
+
+const { addArticleId } = useDiscountSelection()
+
+async function searchArticles() {
+  searchState.error = ''
+  searchState.empty = ''
+  searchState.loading = true
+  try {
+    const query = buildQuery({
+      filter: searchForm.filter,
+      page: searchForm.page,
+      pageSize: searchForm.pageSize
+    })
+    const result = await api.request<unknown>('catalog', `admin/articles${query}`)
+    if (!result.ok) {
+      searchState.error = result.error || 'Failed to load articles.'
+      searchResults.value = []
+      return
+    }
+    searchResults.value = normalizeList(result.data)
+    if (!searchResults.value.length) {
+      searchState.empty = 'No articles found.'
+    }
+  } catch (err) {
+    searchState.error = err instanceof Error ? err.message : 'Failed to load articles.'
+    searchResults.value = []
+  } finally {
+    searchState.loading = false
+  }
+}
 </script>
 
 <template>

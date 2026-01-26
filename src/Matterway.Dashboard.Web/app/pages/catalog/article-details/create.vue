@@ -1,10 +1,81 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleDetails } from '~/composables/useArticleDetails'
+import { useRequestState } from '~/composables/useRequestState'
+import { normalizeList } from '~/utils/http'
+
 definePageMeta({
   title: 'Article Details',
   service: 'catalog',
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const createForm = reactive({
+  articleId: '',
+  detailSlug: '',
+  value: ''
+})
+const createState = useRequestState()
+
+const detailOptions = ref<Array<{ slug: string, title: string }>>([])
+const detailState = useRequestState()
+
+const { articlePreview, previewState, loadArticleDetails } = useArticleDetails()
+
+async function loadDetails() {
+  detailState.error = ''
+  detailState.loading = true
+  try {
+    const result = await api.request<unknown>('catalog', 'admin/details')
+    if (!result.ok) {
+      detailState.error = result.error || 'Failed to load detail definitions.'
+      detailOptions.value = []
+      return
+    }
+    detailOptions.value = normalizeList(result.data)
+  } catch (err) {
+    detailState.error = err instanceof Error ? err.message : 'Failed to load detail definitions.'
+    detailOptions.value = []
+  } finally {
+    detailState.loading = false
+  }
+}
+
+async function createDetail() {
+  createState.error = ''
+  createState.success = ''
+  if (!createForm.articleId || !createForm.detailSlug) {
+    createState.error = 'Article Id and detail slug are required.'
+    return
+  }
+  createState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${createForm.articleId}/details`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          detailSlug: createForm.detailSlug,
+          value: createForm.value
+        })
+      }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to add detail.'
+      return
+    }
+    createState.success = 'Detail added.'
+    await loadArticleDetails(createForm.articleId)
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to add detail.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>

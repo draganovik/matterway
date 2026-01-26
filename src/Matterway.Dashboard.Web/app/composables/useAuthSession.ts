@@ -1,6 +1,14 @@
 import { decodeJwtPayload, getJwtArrayClaim, getJwtStringClaim, type JwtPayload } from '~/utils/jwt'
 
 const refreshCookieName = 'mw_refresh'
+const permissionLevels = {
+  observer: 0,
+  operator: 1,
+  administrator: 2
+} as const
+
+let refreshPromise: Promise<void> | null = null
+let initPromise: Promise<void> | null = null
 
 type AuthSession = {
   accessToken: string | null
@@ -18,8 +26,6 @@ type LoginResponse = {
   expires: string
   refreshExpires: string
 }
-
-type RefreshResponse = LoginResponse
 
 function useSessionState() {
   return useState<AuthSession>('auth-session', () => ({
@@ -53,7 +59,6 @@ export function useAuthSession() {
     default: () => null
   })
   const refreshTimer = useState<ReturnType<typeof setTimeout> | null>('auth-refresh-timer', () => null)
-  const isRefreshing = useState('auth-is-refreshing', () => false)
   const isInitialized = useState('auth-is-initialized', () => false)
 
   const payload = computed<JwtPayload | null>(() => {
@@ -71,7 +76,7 @@ export function useAuthSession() {
 
   const isEmployee = computed(() => role.value?.toLowerCase() === 'employee')
 
-  const isLoggedIn = computed(() => !!session.value.accessToken && !isAccessExpired())
+  const isLoggedIn = computed(() => Boolean(session.value.accessToken) && !isAccessExpired())
 
   function clearRefreshTimer() {
     if (refreshTimer.value) {
@@ -123,17 +128,13 @@ export function useAuthSession() {
     return `${session.value.tokenType} ${session.value.accessToken}`
   }
 
-  function getAccessLifetimeMs() {
-    const created = parseDate(session.value.created)
-    const expires = parseDate(session.value.expires)
-    if (!created || !expires) return null
-    return Math.max(0, expires.getTime() - created.getTime())
-  }
-
   function scheduleRefresh() {
     if (!import.meta.client) return
     clearRefreshTimer()
-    const lifetimeMs = getAccessLifetimeMs()
+    const created = parseDate(session.value.created)
+    const expires = parseDate(session.value.expires)
+    if (!created || !expires) return
+    const lifetimeMs = Math.max(0, expires.getTime() - created.getTime())
     if (!lifetimeMs) return
     const delay = Math.floor(lifetimeMs * (2 / 3))
     if (delay <= 0) return
@@ -183,53 +184,55 @@ export function useAuthSession() {
   }
 
   async function refreshTokens() {
-    if (isRefreshing.value) return
+    if (refreshPromise) return refreshPromise
     const refreshToken = refreshCookie.value
     if (!refreshToken) return
-    isRefreshing.value = true
+    refreshPromise = (async () => {
+      try {
+        const config = useRuntimeConfig()
+        const baseUrl = `${config.public.identityApiBaseUrl}/api/v1.0/public/auth`
+        const response = await fetch(`${baseUrl}/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json'
+          },
+          body: JSON.stringify({ refreshToken })
+        })
+
+        if (!response.ok) {
+          clearSession()
+          return
+        }
+
+        const data = (await response.json()) as LoginResponse
+        setSession(data)
+        if (!isEmployee.value) {
+          clearSession()
+        }
+      } catch {
+        clearSession()
+      }
+    })()
+
     try {
-      const config = useRuntimeConfig()
-      const baseUrl = `${config.public.identityApiBaseUrl}/api/v1.0/public/auth`
-      const response = await fetch(`${baseUrl}/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': 'application/json'
-        },
-        body: JSON.stringify({ refreshToken })
-      })
-
-      if (!response.ok) {
-        clearSession()
-        return
-      }
-
-      const data = (await response.json()) as RefreshResponse
-      setSession(data)
-      if (!isEmployee.value) {
-        clearSession()
-      }
+      await refreshPromise
     } finally {
-      isRefreshing.value = false
+      refreshPromise = null
     }
   }
 
   function hasPermission(service: string, minimumLevel: 'observer' | 'operator' | 'administrator' = 'observer') {
     if (!isEmployee.value) return false
-    const levels = {
-      observer: 0,
-      operator: 1,
-      administrator: 2
-    }
-    const required = levels[minimumLevel]
+    const required = permissionLevels[minimumLevel]
     const normalizedService = service.toLowerCase()
     return permissions.value.some((perm) => {
       const [permService, permLevel] = perm.split(':', 2)
       if (!permService || !permLevel) return false
       if (permService.toLowerCase() !== normalizedService) return false
-      const normalizedLevel = permLevel.toLowerCase() as keyof typeof levels
-      if (levels[normalizedLevel] === undefined) return false
-      return levels[normalizedLevel] >= required
+      const normalizedLevel = permLevel.toLowerCase() as keyof typeof permissionLevels
+      if (permissionLevels[normalizedLevel] === undefined) return false
+      return permissionLevels[normalizedLevel] >= required
     })
   }
 
@@ -241,18 +244,31 @@ export function useAuthSession() {
 
   async function initialize() {
     if (isInitialized.value) return
-    if (session.value.accessToken) {
-      if (!isAccessExpired()) {
-        scheduleRefresh()
-        isInitialized.value = true
-        return
+    if (initPromise) return initPromise
+    initPromise = (async () => {
+      if (session.value.accessToken) {
+        if (!isAccessExpired()) {
+          scheduleRefresh()
+          isInitialized.value = true
+          return
+        }
+        session.value.accessToken = null
       }
-      session.value.accessToken = null
+      if (refreshCookie.value) {
+        try {
+          await refreshTokens()
+        } catch {
+          clearSession()
+        }
+      }
+      isInitialized.value = true
+    })()
+
+    try {
+      await initPromise
+    } finally {
+      initPromise = null
     }
-    if (refreshCookie.value) {
-      await refreshTokens()
-    }
-    isInitialized.value = true
   }
 
   return {

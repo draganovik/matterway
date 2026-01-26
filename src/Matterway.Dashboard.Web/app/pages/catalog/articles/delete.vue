@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { formatMoney } from '~/utils/format'
+import { formatMoney } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
 
 definePageMeta({
   title: 'Articles',
@@ -7,6 +9,64 @@ definePageMeta({
   level: 'operator',
   action: 'delete'
 })
+
+type ArticlePreview = {
+  id: string
+  code: string
+  title: string
+  price: number
+}
+
+const api = useApiClient()
+
+const deleteForm = reactive({
+  id: ''
+})
+const deleteState = useRequestState()
+const deletePreview = ref<ArticlePreview | null>(null)
+
+async function loadArticle() {
+  if (!deleteForm.id) return
+  deleteState.error = ''
+  deleteState.loading = true
+  try {
+    const result = await api.request<ArticlePreview>('catalog', `admin/articles/${deleteForm.id}`)
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to load article.'
+      deletePreview.value = null
+      return
+    }
+    deletePreview.value = result.data || null
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to load article.'
+    deletePreview.value = null
+  } finally {
+    deleteState.loading = false
+  }
+}
+
+async function deleteArticle() {
+  deleteState.error = ''
+  deleteState.success = ''
+  if (!deleteForm.id) {
+    deleteState.error = 'Article Id is required.'
+    return
+  }
+  deleteState.loading = true
+  try {
+    const result = await api.request('catalog', `admin/articles/${deleteForm.id}`, { method: 'DELETE' })
+    if (!result.ok) {
+      deleteState.error = result.error || 'Failed to delete article.'
+      return
+    }
+    deleteState.success = 'Article deleted.'
+    deletePreview.value = null
+  } catch (err) {
+    deleteState.error = err instanceof Error ? err.message : 'Failed to delete article.'
+  } finally {
+    deleteState.loading = false
+  }
+}
 </script>
 
 <template>

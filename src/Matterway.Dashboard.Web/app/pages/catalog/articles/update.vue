@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { formatMoney } from '~/utils/format'
+import { formatMoney } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
 
 definePageMeta({
   title: 'Articles',
@@ -7,6 +9,90 @@ definePageMeta({
   level: 'operator',
   action: 'update'
 })
+
+type ArticlePreview = {
+  id: string
+  code: string
+  title: string
+  price: number
+  isAvailable: boolean
+  description?: string
+}
+
+const api = useApiClient()
+
+const updateForm = reactive({
+  id: '',
+  articleCode: '',
+  basePrice: null as number | null,
+  title: '',
+  description: '',
+  isAvailable: true
+})
+const updateState = useRequestState()
+const updatePreview = ref<ArticlePreview | null>(null)
+
+async function loadArticle(mode?: 'update') {
+  if (!updateForm.id) return
+  updateState.error = ''
+  updateState.loading = true
+  try {
+    const result = await api.request<ArticlePreview>('catalog', `admin/articles/${updateForm.id}`)
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to load article.'
+      updatePreview.value = null
+      return
+    }
+    updatePreview.value = result.data || null
+    if (mode === 'update' && result.data) {
+      updateForm.articleCode = result.data.code
+      updateForm.basePrice = result.data.price
+      updateForm.title = result.data.title
+      updateForm.description = result.data.description || ''
+      updateForm.isAvailable = Boolean(result.data.isAvailable)
+    }
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to load article.'
+    updatePreview.value = null
+  } finally {
+    updateState.loading = false
+  }
+}
+
+async function updateArticle() {
+  updateState.error = ''
+  updateState.success = ''
+  if (!updateForm.id) {
+    updateState.error = 'Article Id is required.'
+    return
+  }
+  updateState.loading = true
+  try {
+    const payload: Record<string, unknown> = {
+      code: updateForm.articleCode,
+      title: updateForm.title,
+      description: updateForm.description,
+      isAvailable: updateForm.isAvailable
+    }
+    if (updateForm.basePrice !== null) payload.basePrice = updateForm.basePrice
+
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${updateForm.id}`,
+      { method: 'PATCH', body: JSON.stringify(payload) }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update article.'
+      return
+    }
+    updateState.success = 'Article updated.'
+    await loadArticle()
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update article.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

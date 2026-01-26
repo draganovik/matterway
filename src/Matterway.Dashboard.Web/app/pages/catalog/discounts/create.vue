@@ -1,10 +1,71 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { useDiscountSelection } from '~/composables/useDiscountSelection'
+
 definePageMeta({
   title: 'Discounts',
   service: 'catalog',
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+const createState = useRequestState()
+
+const { createIds, removeArticleId, setArticleIds } = useDiscountSelection()
+
+const createForm = reactive({
+  code: '',
+  percentage: 0.1,
+  validFrom: '',
+  validTo: '',
+  articleIds: [] as string[]
+})
+
+watch(createIds, (ids) => {
+  createForm.articleIds = [...ids]
+}, { immediate: true })
+
+function splitArticleIds(value: string) {
+  const ids = value
+    .split(/[\n,]+/)
+    .map(item => item.trim())
+    .filter(Boolean)
+  setArticleIds('create', ids)
+  return ids
+}
+
+async function createDiscount() {
+  createState.error = ''
+  createState.success = ''
+  createState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      'admin/discounts',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          code: createForm.code,
+          percentage: createForm.percentage,
+          validFrom: createForm.validFrom,
+          validTo: createForm.validTo || null,
+          articleIds: createForm.articleIds
+        })
+      }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to create discounts.'
+      return
+    }
+    createState.success = 'Discounts created.'
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to create discounts.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>

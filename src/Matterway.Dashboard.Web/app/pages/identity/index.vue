@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { adminServices } from '~/data/adminFeatures'
+import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 definePageMeta({
@@ -10,7 +10,7 @@ definePageMeta({
 
 const auth = useAuthSession()
 const features = computed(() => {
-  const service = adminServices.find(item => item.key === 'identity')
+  const service = serviceSections.find(item => item.key === 'identity')
   if (!service) return []
   return service.features.filter(feature =>
     auth.hasPermission(feature.service, feature.minimum)

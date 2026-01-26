@@ -1,5 +1,5 @@
-import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 const withRoot = (...segments: string[]) => resolve(projectRoot, ...segments)
@@ -14,17 +14,14 @@ const alias = {
   '@plugins': withRoot('app/plugins')
 } satisfies Record<string, string>
 
-const isDev = process.env.NODE_ENV !== 'production'
-const noCacheHeaders = {
-  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
-}
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui'
   ],
+  ssr: false,
 
   devtools: {
     enabled: true
@@ -34,7 +31,7 @@ export default defineNuxtConfig({
     head: {
       titleTemplate: '%s - Matterway Dashboard',
       link: [
-        { rel: 'icon', href: '/favicon.ico' }
+        { rel: 'icon', href: '/favicon.svg' }
       ]
     }
   },
@@ -50,22 +47,8 @@ export default defineNuxtConfig({
     }
   },
   alias,
-  routeRules: isDev
-    ? {
-        '/**': {
-          headers: noCacheHeaders
-        }
-      }
-    : undefined,
 
   compatibilityDate: '2025-01-15',
-  vite: isDev
-    ? {
-        server: {
-          headers: noCacheHeaders
-        }
-      }
-    : undefined,
 
   eslint: {
     config: {

@@ -48,6 +48,9 @@ export function useApiClient() {
     options: RequestInit = {},
     allowUnauthorized = false
   ): Promise<ApiResult<T>> {
+    if (!auth.isInitialized.value) {
+      await auth.initialize()
+    }
     const baseUrl = getBaseUrl(service)
     const url = `${baseUrl}/api/v1.0/${path}`
     const headers = new Headers(options.headers || {})

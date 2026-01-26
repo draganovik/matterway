@@ -1,11 +1,47 @@
 <script setup lang="ts">
-import { formatMoney } from '~/utils/format'
+import { formatMoney } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
 
 definePageMeta({
   title: 'Cart Items',
   service: 'customers',
   level: 'observer'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  customerId: '',
+  articleId: ''
+})
+const queryState = useRequestState()
+const queryResult = ref<{
+  articleName: string
+  quantity: number
+  unitPrice: number
+} | null>(null)
+
+async function queryCartItem() {
+  queryState.error = ''
+  queryState.loading = true
+  queryResult.value = null
+  try {
+    const result = await api.request(
+      'customers',
+      `admin/customers/${queryForm.customerId}/cart-items/${queryForm.articleId}`
+    )
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load cart item.'
+      return
+    }
+    queryResult.value = result.data as typeof queryResult.value
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load cart item.'
+  } finally {
+    queryState.loading = false
+  }
+}
 </script>
 
 <template>

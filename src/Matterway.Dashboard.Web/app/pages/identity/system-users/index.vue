@@ -1,11 +1,84 @@
 <script setup lang="ts">
-import { formatDateTime } from '~/utils/format'
+import { formatDateTime } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { buildQuery, normalizeList } from '~/utils/http'
 
 definePageMeta({
   title: 'System Users',
   service: 'identity',
   level: 'operator'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  page: 1,
+  pageSize: 25
+})
+const queryState = useRequestState()
+const queryResults = ref<Array<{
+  id: string
+  email: string
+  role: string
+  created: string
+}>>([])
+
+const lookupForm = reactive({
+  userId: ''
+})
+const lookupState = useRequestState()
+const lookupResult = ref<{
+  id: string
+  email: string
+  role: string
+  created: string
+} | null>(null)
+
+async function queryUsers() {
+  queryState.error = ''
+  queryState.empty = ''
+  queryState.loading = true
+  try {
+    const query = buildQuery({
+      page: queryForm.page,
+      pageSize: queryForm.pageSize
+    })
+    const result = await api.request<unknown>('identity', `admin/system-users${query}`)
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load users.'
+      queryResults.value = []
+      return
+    }
+    queryResults.value = normalizeList(result.data)
+    if (!queryResults.value.length) {
+      queryState.empty = 'No users found.'
+    }
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load users.'
+    queryResults.value = []
+  } finally {
+    queryState.loading = false
+  }
+}
+
+async function lookupUser() {
+  lookupState.error = ''
+  lookupState.loading = true
+  lookupResult.value = null
+  try {
+    const result = await api.request('identity', `admin/system-users/${lookupForm.userId}`)
+    if (!result.ok) {
+      lookupState.error = result.error || 'Failed to load user.'
+      return
+    }
+    lookupResult.value = result.data as typeof lookupResult.value
+  } catch (err) {
+    lookupState.error = err instanceof Error ? err.message : 'Failed to load user.'
+  } finally {
+    lookupState.loading = false
+  }
+}
 </script>
 
 <template>

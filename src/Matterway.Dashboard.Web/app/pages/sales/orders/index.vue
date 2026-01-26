@@ -1,11 +1,87 @@
 <script setup lang="ts">
-import { formatDateTime, formatMoney } from '~/utils/format'
+import { formatDateTime, formatMoney } from '~/utils/formatters'
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { buildQuery, normalizeList } from '~/utils/http'
 
 definePageMeta({
   title: 'Orders',
   service: 'sales',
   level: 'observer'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  page: 1,
+  pageSize: 25,
+  customerId: ''
+})
+const queryState = useRequestState()
+const queryResults = ref<Array<{
+  id: string
+  customerId: string
+  type: string
+  totalAmount: number
+  placedAt: string
+}>>([])
+
+const lookupForm = reactive({
+  orderId: ''
+})
+const lookupState = useRequestState()
+const lookupResult = ref<{
+  id: string
+  totalAmount: number
+  placedAt: string
+  statusHistory: Array<{ status: string, changedAt: string, note?: string }>
+} | null>(null)
+
+async function queryOrders() {
+  queryState.error = ''
+  queryState.empty = ''
+  queryState.loading = true
+  try {
+    const query = buildQuery({
+      page: queryForm.page,
+      pageSize: queryForm.pageSize,
+      customerId: queryForm.customerId
+    })
+    const result = await api.request<unknown>('sales', `admin/orders${query}`)
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load orders.'
+      queryResults.value = []
+      return
+    }
+    queryResults.value = normalizeList(result.data)
+    if (!queryResults.value.length) {
+      queryState.empty = 'No orders found.'
+    }
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load orders.'
+    queryResults.value = []
+  } finally {
+    queryState.loading = false
+  }
+}
+
+async function lookupOrder() {
+  lookupState.error = ''
+  lookupState.loading = true
+  lookupResult.value = null
+  try {
+    const result = await api.request('sales', `admin/orders/${lookupForm.orderId}`)
+    if (!result.ok) {
+      lookupState.error = result.error || 'Failed to load order.'
+      return
+    }
+    lookupResult.value = result.data as typeof lookupResult.value
+  } catch (err) {
+    lookupState.error = err instanceof Error ? err.message : 'Failed to load order.'
+  } finally {
+    lookupState.loading = false
+  }
+}
 </script>
 
 <template>

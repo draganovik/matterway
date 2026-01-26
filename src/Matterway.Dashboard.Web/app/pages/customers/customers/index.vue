@@ -1,9 +1,86 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { buildQuery, normalizeList } from '~/utils/http'
+
 definePageMeta({
   title: 'Customers',
   service: 'customers',
   level: 'observer'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  page: 1,
+  pageSize: 25
+})
+const queryState = useRequestState()
+const queryResults = ref<Array<{
+  systemUserId: string
+  firstName: string
+  lastName: string
+  birthDate: string
+}>>([])
+
+const lookupForm = reactive({
+  customerId: ''
+})
+const lookupState = useRequestState()
+const lookupResult = ref<{
+  systemUserId: string
+  firstName: string
+  lastName: string
+  birthDate: string
+} | null>(null)
+
+async function queryCustomers() {
+  queryState.error = ''
+  queryState.empty = ''
+  queryState.loading = true
+  try {
+    const query = buildQuery({
+      page: queryForm.page,
+      pageSize: queryForm.pageSize
+    })
+    const result = await api.request<unknown>('customers', `admin/customers${query}`)
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load customers.'
+      queryResults.value = []
+      return
+    }
+    queryResults.value = normalizeList(result.data)
+    if (!queryResults.value.length) {
+      queryState.empty = 'No customers found.'
+    }
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load customers.'
+    queryResults.value = []
+  } finally {
+    queryState.loading = false
+  }
+}
+
+async function lookupCustomer() {
+  lookupState.error = ''
+  lookupState.loading = true
+  lookupResult.value = null
+  try {
+    const result = await api.request(
+      'customers',
+      `admin/customers/${lookupForm.customerId}`
+    )
+    if (!result.ok) {
+      lookupState.error = result.error || 'Failed to load customer.'
+      return
+    }
+    lookupResult.value = result.data as typeof lookupResult.value
+  } catch (err) {
+    lookupState.error = err instanceof Error ? err.message : 'Failed to load customer.'
+  } finally {
+    lookupState.loading = false
+  }
+}
 </script>
 
 <template>

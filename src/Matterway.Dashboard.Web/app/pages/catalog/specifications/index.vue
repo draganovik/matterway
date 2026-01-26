@@ -1,9 +1,49 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+import { buildQuery, normalizeList } from '~/utils/http'
+
 definePageMeta({
   title: 'Specifications',
   service: 'catalog',
   level: 'observer'
 })
+
+const api = useApiClient()
+
+const queryForm = reactive({
+  titleLike: '',
+  limit: 25
+})
+const queryState = useRequestState()
+const queryResults = ref<Array<{ slug: string, title: string, unit?: string }>>([])
+
+async function querySpecs() {
+  queryState.error = ''
+  queryState.empty = ''
+  queryState.loading = true
+  try {
+    const query = buildQuery({
+      titleLike: queryForm.titleLike,
+      limit: queryForm.limit
+    })
+    const result = await api.request<unknown>('catalog', `admin/specifications${query}`)
+    if (!result.ok) {
+      queryState.error = result.error || 'Failed to load specifications.'
+      queryResults.value = []
+      return
+    }
+    queryResults.value = normalizeList(result.data)
+    if (!queryResults.value.length) {
+      queryState.empty = 'No specifications found.'
+    }
+  } catch (err) {
+    queryState.error = err instanceof Error ? err.message : 'Failed to load specifications.'
+    queryResults.value = []
+  } finally {
+    queryState.loading = false
+  }
+}
 </script>
 
 <template>

@@ -1,10 +1,55 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Articles',
   service: 'catalog',
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const createForm = reactive({
+  articleCode: '',
+  basePrice: 0,
+  title: '',
+  description: '',
+  isAvailable: true
+})
+const createState = useRequestState()
+
+async function createArticle() {
+  createState.error = ''
+  createState.success = ''
+  createState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      'admin/articles',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          code: createForm.articleCode,
+          basePrice: createForm.basePrice,
+          title: createForm.title,
+          description: createForm.description,
+          isAvailable: createForm.isAvailable
+        })
+      }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to create article.'
+      return
+    }
+    createState.success = 'Article created.'
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to create article.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>

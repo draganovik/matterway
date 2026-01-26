@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { getFeatureByRoute } from '~/data/adminFeatures'
+import { getFeatureByRoute } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 const props = defineProps<{
@@ -48,7 +48,7 @@ const actionItems = computed<NavigationMenuItem[][]>(() => {
 
     <template #body>
       <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-5xl mx-auto">
-        <NuxtPage />
+        <NuxtPage :key="route.fullPath" />
       </div>
     </template>
   </UDashboardPanel>

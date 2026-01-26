@@ -1,10 +1,55 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleSpecifications } from '~/composables/useArticleSpecifications'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Specifications',
   service: 'catalog',
   level: 'operator',
   action: 'update'
 })
+
+const api = useApiClient()
+
+const updateForm = reactive({
+  articleId: '',
+  specificationSlug: '',
+  value: 0
+})
+const updateState = useRequestState()
+
+const { articlePreview, previewState, loadArticleSpecs } = useArticleSpecifications()
+
+async function updateSpec() {
+  updateState.error = ''
+  updateState.success = ''
+  if (!updateForm.articleId || !updateForm.specificationSlug) {
+    updateState.error = 'Article Id and specification are required.'
+    return
+  }
+  updateState.loading = true
+  try {
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${updateForm.articleId}/specifications/${updateForm.specificationSlug}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ value: updateForm.value })
+      }
+    )
+    if (!result.ok) {
+      updateState.error = result.error || 'Failed to update specification.'
+      return
+    }
+    updateState.success = 'Specification updated.'
+    await loadArticleSpecs(updateForm.articleId)
+  } catch (err) {
+    updateState.error = err instanceof Error ? err.message : 'Failed to update specification.'
+  } finally {
+    updateState.loading = false
+  }
+}
 </script>
 
 <template>

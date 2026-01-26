@@ -1,10 +1,58 @@
 <script setup lang="ts">
+import { useApiClient } from '~/composables/useApiClient'
+import { useArticleImages } from '~/composables/useArticleImages'
+import { useRequestState } from '~/composables/useRequestState'
+
 definePageMeta({
   title: 'Article Images',
   service: 'catalog',
   level: 'operator',
   action: 'create'
 })
+
+const api = useApiClient()
+
+const createForm = reactive({
+  articleId: '',
+  orderIndex: 0,
+  file: null as File | null,
+  imageAlt: ''
+})
+const createState = useRequestState()
+
+const { imagePreview, previewState, loadImages } = useArticleImages()
+
+async function createImage() {
+  createState.error = ''
+  createState.success = ''
+  if (!createForm.articleId || !createForm.file) {
+    createState.error = 'Article Id and image file are required.'
+    return
+  }
+  createState.loading = true
+  try {
+    const body = new FormData()
+    body.append('file', createForm.file)
+    body.append('orderIndex', String(createForm.orderIndex))
+    if (createForm.imageAlt) body.append('imageAlt', createForm.imageAlt)
+
+    const result = await api.request(
+      'catalog',
+      `admin/articles/${createForm.articleId}/images`,
+      { method: 'POST', body }
+    )
+    if (!result.ok) {
+      createState.error = result.error || 'Failed to add image.'
+      return
+    }
+    createState.success = 'Image added.'
+    await loadImages(createForm.articleId)
+  } catch (err) {
+    createState.error = err instanceof Error ? err.message : 'Failed to add image.'
+  } finally {
+    createState.loading = false
+  }
+}
 </script>
 
 <template>
