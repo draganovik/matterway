@@ -2,7 +2,7 @@
 import { useAuthSession } from '~/composables/useAuthSession'
 
 const colorMode = useColorMode()
-const color = computed(() => (colorMode.value === 'dark' ? '#0f172a' : 'white'))
+const color = computed(() => (colorMode.value === 'dark' ? '#0c0a09' : '#fff7ed'))
 const auth = useAuthSession()
 const route = useRoute()
 const isBooting = computed(() => !auth.isInitialized.value && !route.meta?.public)
@@ -32,11 +32,11 @@ onMounted(() => {
     <NuxtLoadingIndicator />
     <div
       v-if="isBooting"
-      class="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-emerald-950"
+      class="min-h-screen bg-linear-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950"
     >
       <div class="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6">
         <div class="flex flex-col items-center gap-4 text-center">
-          <div class="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <div class="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
         </div>
       </div>
     </div>

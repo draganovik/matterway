@@ -4,7 +4,6 @@ import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
 
 const auth = useAuthSession()
-const { isNotificationsSlideoverOpen } = useDashboard()
 const open = ref(false)
 
 const iconMap: Record<string, string> = {
@@ -61,17 +60,6 @@ const searchGroups = computed(() => [{
       to: child.to
     }))
   )
-}, {
-  id: 'actions',
-  label: 'Actions',
-  items: [{
-    id: 'open-notifications',
-    label: 'Open notifications',
-    icon: 'i-lucide-bell',
-    onSelect: () => {
-      isNotificationsSlideoverOpen.value = true
-    }
-  }]
 }])
 </script>
 
@@ -121,6 +109,5 @@ const searchGroups = computed(() => [{
 
     <slot />
 
-    <NotificationsSlideover />
   </UDashboardGroup>
 </template>

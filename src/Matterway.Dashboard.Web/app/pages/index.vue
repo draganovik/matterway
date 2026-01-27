@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { serviceSections } from '~/data/serviceRegistry'
 import { useAuthSession } from '~/composables/useAuthSession'
-import { useDashboard } from '~/composables/useDashboard'
 
 definePageMeta({
   title: 'Overview'
 })
 
 const auth = useAuthSession()
-const { isNotificationsSlideoverOpen } = useDashboard()
-
 const sections = computed(() => {
   return serviceSections
     .filter(section => auth.hasPermission(section.service, section.minimum))
@@ -34,26 +31,7 @@ const sections = computed(() => {
           <UDashboardSidebarCollapse />
         </template>
 
-        <template #right>
-          <UTooltip text="Notifications">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              square
-              @click="isNotificationsSlideoverOpen = true"
-            >
-              <UChip
-                color="error"
-                inset
-              >
-                <UIcon
-                  name="i-lucide-bell"
-                  class="size-5 shrink-0"
-                />
-              </UChip>
-            </UButton>
-          </UTooltip>
-        </template>
+        <template #right />
       </UDashboardNavbar>
     </template>
 
@@ -116,7 +94,7 @@ const sections = computed(() => {
                 v-for="feature in section.features"
                 :key="feature.key"
                 :to="feature.route"
-                class="flex items-center justify-between rounded-lg border border-default px-4 py-3 text-sm transition hover:border-emerald-200 hover:bg-emerald-50"
+              class="flex items-center justify-between rounded-lg border border-default px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary/10"
               >
                 <span>{{ feature.label }}</span>
                 <span class="text-xs text-muted">Open</span>
