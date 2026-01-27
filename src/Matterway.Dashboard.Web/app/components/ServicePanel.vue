@@ -23,6 +23,11 @@ const actionItems = computed<NavigationMenuItem[][]>(() => {
     }))
   return items.length ? [items] : []
 })
+
+const pageTabs = computed<NavigationMenuItem[]>(() => {
+  const tabs = route.meta?.tabs
+  return Array.isArray(tabs) ? (tabs as NavigationMenuItem[]) : []
+})
 </script>
 
 <template>
@@ -37,6 +42,14 @@ const actionItems = computed<NavigationMenuItem[][]>(() => {
         </template>
       </UDashboardNavbar>
 
+      <UDashboardToolbar v-if="pageTabs.length">
+        <UNavigationMenu
+          :items="pageTabs"
+          highlight
+          class="-mx-1 flex-1"
+        />
+      </UDashboardToolbar>
+
       <UDashboardToolbar v-if="actionItems.length">
         <UNavigationMenu
           :items="actionItems"
@@ -47,7 +60,7 @@ const actionItems = computed<NavigationMenuItem[][]>(() => {
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-5xl mx-auto">
+      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full">
         <NuxtPage :key="route.fullPath" />
       </div>
     </template>

@@ -52,7 +52,15 @@ export function useApiClient() {
       await auth.initialize()
     }
     const baseUrl = getBaseUrl(service)
-    const url = `${baseUrl}/api/v1.0/${path}`
+    if (!baseUrl) {
+      return {
+        ok: false,
+        status: 0,
+        error: `Missing API base URL for ${service}. Check runtimeConfig.public.${service}ApiBaseUrl.`
+      }
+    }
+    const apiVersion = service === 'catalog' ? 'v1' : 'v1.0'
+    const url = `${baseUrl}/api/${apiVersion}/${path}`
     const headers = new Headers(options.headers || {})
     if (!headers.has('Accept')) headers.set('Accept', 'application/json')
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {

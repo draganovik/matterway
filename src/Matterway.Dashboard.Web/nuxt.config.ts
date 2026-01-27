@@ -3,6 +3,9 @@ import { resolve } from 'node:path'
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 const withRoot = (...segments: string[]) => resolve(projectRoot, ...segments)
+const env = process.env
+
+const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
 
 const alias = {
   '@assets': withRoot('app/assets'),
@@ -22,6 +25,12 @@ export default defineNuxtConfig({
     '@nuxt/ui'
   ],
   ssr: false,
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false
+    }
+  ],
 
   devtools: {
     enabled: true
@@ -40,10 +49,10 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      identityApiBaseUrl: process.env.IDENTITY_API_BASE_URL,
-      catalogApiBaseUrl: process.env.CATALOG_API_BASE_URL,
-      customersApiBaseUrl: process.env.CUSTOMERS_API_BASE_URL,
-      salesApiBaseUrl: process.env.SALES_API_BASE_URL
+      identityApiBaseUrl: publicEnv('IDENTITY_API_BASE_URL'),
+      catalogApiBaseUrl: publicEnv('CATALOG_API_BASE_URL'),
+      customersApiBaseUrl: publicEnv('CUSTOMERS_API_BASE_URL'),
+      salesApiBaseUrl: publicEnv('SALES_API_BASE_URL')
     }
   },
   alias,

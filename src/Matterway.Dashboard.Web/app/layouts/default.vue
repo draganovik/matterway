@@ -32,6 +32,7 @@ const navItems = computed<NavigationMenuItem[]>(() => {
         .map(feature => ({
           label: feature.label,
           to: feature.route,
+          exact: false,
           onSelect: () => {
             open.value = false
           }
