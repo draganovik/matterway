@@ -9,10 +9,28 @@ definePageMeta({
 })
 
 const auth = useAuthSession()
-const form = reactive({
-  email: '',
-  password: ''
-})
+const fields = [
+  {
+    name: 'email',
+    label: 'Email',
+    type: 'email',
+    placeholder: 'name@matterway.local',
+    required: true,
+    autocomplete: 'email'
+  },
+  {
+    name: 'password',
+    label: 'Password',
+    type: 'password',
+    placeholder: '••••••••',
+    required: true,
+    autocomplete: 'current-password'
+  }
+]
+const submitConfig = {
+  label: 'Sign in',
+  color: 'primary'
+}
 const error = ref('')
 const loading = ref(false)
 
@@ -34,11 +52,11 @@ function getFirstRoute() {
   return '/'
 }
 
-async function submit() {
+async function handleSubmit(event: { data: Record<string, string> }) {
   error.value = ''
   loading.value = true
   try {
-    await auth.login(form.email, form.password)
+    await auth.login(event.data.email, event.data.password)
     await navigateTo(getFirstRoute())
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Login failed.'
@@ -49,11 +67,11 @@ async function submit() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-emerald-950">
+  <div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950">
     <div class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6">
       <div class="grid w-full gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="hidden flex-col justify-center gap-6 lg:flex">
-          <p class="text-sm uppercase tracking-[0.4em] text-emerald-600">
+          <p class="text-sm uppercase tracking-[0.4em] text-orange-600">
             Matterway
           </p>
           <h1 class="text-4xl font-semibold text-foreground">
@@ -65,65 +83,38 @@ async function submit() {
           </p>
         </div>
         <UCard class="border border-default shadow-xl">
-          <template #header>
-            <div class="space-y-1">
-              <p class="text-sm uppercase tracking-[0.3em] text-emerald-600">
-                Operator Access
-              </p>
-              <h2 class="text-2xl font-semibold text-foreground">
-                Sign in
-              </h2>
-              <p class="text-sm text-muted">
-                Use your employee credentials.
-              </p>
-            </div>
-          </template>
-
-          <UForm
-            class="space-y-4"
-            @submit="submit"
+          <UAuthForm
+            title="Sign in"
+            description="Use your employee credentials."
+            :fields="fields"
+            :submit="submitConfig"
+            :loading="loading"
+            @submit="handleSubmit"
           >
-            <UFormField
-              label="Email"
-              required
-              class="w-full"
-            >
-              <UInput
-                v-model="form.email"
-                type="email"
-                placeholder="name@matterway.local"
-                class="w-full"
-              />
-            </UFormField>
-            <UFormField
-              label="Password"
-              required
-              class="w-full"
-            >
-              <UInput
-                v-model="form.password"
-                type="password"
-                placeholder="••••••••"
-                class="w-full"
-              />
-            </UFormField>
-            <UAlert
-              v-if="error"
-              color="error"
-              variant="soft"
-              icon="i-lucide-alert-triangle"
-            >
-              {{ error }}
-            </UAlert>
-            <UButton
-              type="submit"
-              color="primary"
-              :loading="loading"
-              class="w-full"
-            >
-              Sign in
-            </UButton>
-          </UForm>
+            <template #header>
+              <div class="space-y-1">
+                <p class="text-sm uppercase tracking-[0.3em] text-orange-600">
+                  Operator Access
+                </p>
+                <h2 class="text-2xl font-semibold text-foreground">
+                  Sign in
+                </h2>
+                <p class="text-sm text-muted">
+                  Use your employee credentials.
+                </p>
+              </div>
+            </template>
+            <template #validation>
+              <UAlert
+                v-if="error"
+                color="error"
+                variant="soft"
+                icon="i-lucide-alert-triangle"
+              >
+                {{ error }}
+              </UAlert>
+            </template>
+          </UAuthForm>
         </UCard>
       </div>
     </div>

@@ -108,6 +108,5 @@ const searchGroups = computed(() => [{
     <UDashboardSearch :groups="searchGroups" />
 
     <slot />
-
   </UDashboardGroup>
 </template>

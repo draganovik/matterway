@@ -37,10 +37,10 @@ const sections = computed(() => {
 
     <template #body>
       <div class="space-y-8">
-        <UCard class="border border-default">
+        <UCard class="border border-default bg-elevated/20">
           <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p class="text-xs uppercase tracking-[0.3em] text-emerald-600">
+              <p class="text-xs uppercase tracking-[0.3em] text-orange-600 dark:text-orange-400">
                 Dashboard
               </p>
               <h1 class="text-3xl font-semibold text-foreground">
@@ -77,11 +77,11 @@ const sections = computed(() => {
           <UCard
             v-for="section in sections"
             :key="section.key"
-            class="border border-default"
+            class="border border-default bg-elevated/10"
           >
             <template #header>
               <div>
-                <p class="text-xs uppercase tracking-[0.3em] text-emerald-600">
+                <p class="text-xs uppercase tracking-[0.3em] text-orange-600 dark:text-orange-400">
                   {{ section.label }}
                 </p>
                 <h2 class="text-xl font-semibold text-foreground">
@@ -94,7 +94,7 @@ const sections = computed(() => {
                 v-for="feature in section.features"
                 :key="feature.key"
                 :to="feature.route"
-              class="flex items-center justify-between rounded-lg border border-default px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary/10"
+                class="flex items-center justify-between rounded-lg border border-default px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary/10"
               >
                 <span>{{ feature.label }}</span>
                 <span class="text-xs text-muted">Open</span>
