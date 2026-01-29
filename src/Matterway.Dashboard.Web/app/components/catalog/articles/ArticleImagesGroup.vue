@@ -150,50 +150,14 @@ async function removeImage(image: ArticleImageProperty) {
   updateImages(images.value.filter(item => item.id !== image.id))
   removeState.success = 'Image removed.'
 }
-
-async function replaceImage(image: ArticleImageProperty, file: File) {
-  replaceState.error = ''
-  replaceState.success = ''
-  if (!props.articleId) return
-  replaceState.loading = true
-  const removeResult = await api.removeArticleImage(props.articleId, image.orderIndex)
-  if (!removeResult.ok) {
-    replaceState.loading = false
-    replaceState.error = removeResult.error || 'Unable to replace image.'
-    return
-  }
-  const key = String(image.id || image.orderIndex)
-  const edit = editMap[key]
-  const addResult = await api.addArticleImage(props.articleId, {
-    orderIndex: image.orderIndex,
-    file,
-    imageAlt: edit?.imageAlt || image.imageAlt || ''
-  })
-  replaceState.loading = false
-  if (!addResult.ok) {
-    replaceState.error = addResult.error || 'Unable to replace image.'
-    return
-  }
-  const without = images.value.filter(item => item.id !== image.id)
-  if (addResult.data && typeof addResult.data === 'object') {
-    without.push(addResult.data as ArticleImageProperty)
-  }
-  updateImages(without.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
-  replaceState.success = 'Image replaced.'
-}
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-base font-semibold text-foreground">
-          Images
-        </h3>
-        <p class="text-sm text-muted">
-          Manage article visuals without leaving the editor.
-        </p>
-      </div>
+      <h3 class="text-base font-semibold text-foreground">
+        Images
+      </h3>
     </div>
 
     <div
@@ -205,142 +169,123 @@ async function replaceImage(image: ArticleImageProperty, file: File) {
 
     <div
       v-else
-      class="grid gap-4"
+      class="grid gap-4 @container"
     >
-      <div class="rounded-lg border border-default bg-background p-4">
-        <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
-          <UFormField
-            label="Order Index"
-            required
-          >
-            <UInput
-              v-model="addForm.orderIndex"
-              type="number"
-              min="0"
-              size="md"
-              :disabled="!canEdit"
-            />
-          </UFormField>
-          <UFormField label="Image Alt">
-            <UInput
-              v-model="addForm.imageAlt"
-              size="md"
-              :disabled="!canEdit"
-            />
-          </UFormField>
-          <UFormField
-            label="File"
-            required
-          >
-            <UFileUpload
-              v-model="addForm.file"
-              accept="image/*"
-              variant="button"
-              size="md"
-              label="Choose image"
-              :preview="false"
-              :reset="true"
-              class="w-full"
-              :disabled="!canEdit"
-            />
-          </UFormField>
-        </div>
-        <div class="mt-4 flex flex-wrap items-center gap-3">
+      <div class="grid grid-cols-4 gap-3">
+        <UFormField
+          label="File"
+          required
+        >
+          <UFileUpload
+            v-model="addForm.file"
+            accept="image/*"
+            variant="button"
+            label="Choose image"
+            :preview="false"
+            :reset="true"
+            class="px-auto px-2"
+            :disabled="!canEdit"
+          />
+        </UFormField>
+        <UFormField
+          label="Order Index"
+          required
+        >
+          <UInput
+            v-model="addForm.orderIndex"
+            type="number"
+            min="0"
+            :disabled="!canEdit"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField label="Image Alt">
+          <UInput
+            v-model="addForm.imageAlt"
+            :disabled="!canEdit"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField>
+          <br class="mt-1">
           <UButton
             color="primary"
             :loading="addState.loading"
             :disabled="!canEdit"
             @click="addImage"
           >
-            Add Image
+            Upload
           </UButton>
-          <FormStatus
-            :error="addState.error"
-            :success="addState.success"
-          />
-        </div>
+        </UFormField>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <FormStatus
+          :error="addState.error"
+          :success="addState.success"
+        />
       </div>
 
-      <div class="grid gap-3">
+      <div class="rounded-md border grid @sm:grid-cols-2 @md:grid-cols-3 @lg:grid-cols-4 border-default/40">
         <div
           v-for="image in images"
           :key="image.id"
-          class="rounded-lg border border-default bg-background p-4"
+          class="border-t border-default/40 px-3 py-3 first:border-t-0"
         >
-          <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex min-w-50 flex-1 gap-4">
-              <div class="h-20 w-20 overflow-hidden rounded-md bg-muted/60">
-                <img
-                  v-if="image.imageUrl"
-                  :src="image.imageUrl"
-                  :alt="image.imageAlt || ''"
-                  class="h-full w-full object-cover"
-                >
-                <div
-                  v-else
-                  class="flex h-full w-full items-center justify-center text-xs text-muted"
-                >
-                  No image
-                </div>
-              </div>
-              <div class="min-w-0">
-                <p class="text-sm font-medium text-foreground">
-                  Order {{ image.orderIndex }}
-                </p>
-                <p class="text-sm text-muted">
-                  {{ image.imageAlt || 'No alt text' }}
-                </p>
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <UFileUpload
-                :model-value="null"
-                accept="image/*"
-                variant="button"
-                size="sm"
-                label="Replace"
-                :preview="false"
-                :reset="true"
-                class="min-w-[7.5rem]"
-                :disabled="!canEdit || replaceState.loading"
-                @update:model-value="(file) => file && replaceImage(image, file)"
-              />
-              <UButton
-                color="error"
-                variant="ghost"
-                :disabled="!canEdit"
-                @click="removeImage(image)"
+          <div class="grid gap-3">
+            <div class="aspect-4/3 overflow-hidden rounded-md bg-muted/60">
+              <img
+                v-if="image.imageUrl"
+                :src="image.imageUrl"
+                :alt="image.imageAlt || ''"
+                class="w-full h-full object-cover"
               >
-                Remove
-              </UButton>
+              <div
+                v-else
+                class="flex w-full h-full items-center justify-center text-xs text-muted"
+              >
+                No image
+              </div>
             </div>
-          </div>
-
-          <div class="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-            <UFormField label="Order Index">
-              <UInput
-                v-model="editMap[String(image.id || image.orderIndex)]!.orderIndex"
-                type="number"
-                min="0"
-                size="md"
-                :disabled="!canEdit"
-              />
-            </UFormField>
-            <UFormField label="Image Alt">
-              <UInput
-                v-model="editMap[String(image.id || image.orderIndex)]!.imageAlt"
-                size="md"
-                :disabled="!canEdit"
-              />
-            </UFormField>
-            <div class="flex items-end">
+            <div class="grid gap-3">
+              <UFormField
+                label="Order Index"
+                class="col-span-2"
+              >
+                <UInput
+                  v-model="editMap[String(image.id || image.orderIndex)]!.orderIndex"
+                  type="number"
+                  min="0"
+                  :disabled="!canEdit"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField
+                label="Image Alt"
+                class="col-span-2"
+              >
+                <UInput
+                  v-model="editMap[String(image.id || image.orderIndex)]!.imageAlt"
+                  :disabled="!canEdit"
+                  class="w-full"
+                />
+              </UFormField>
               <UButton
                 variant="outline"
                 :loading="updateState.loading"
                 :disabled="!canEdit"
+                class="justify-center"
                 @click="updateImage(image)"
               >
                 Update
+              </UButton>
+              <UButton
+                color="error"
+                variant="ghost"
+                :disabled="!canEdit"
+                class="justify-center"
+                @click="removeImage(image)"
+              >
+                Remove
               </UButton>
             </div>
           </div>

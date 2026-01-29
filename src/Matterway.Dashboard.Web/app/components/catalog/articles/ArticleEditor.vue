@@ -106,7 +106,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-5">
     <div
       v-if="error"
       class="rounded-lg border border-red-200/60 bg-red-50/60 px-4 py-3 text-sm text-red-600"
@@ -130,9 +130,9 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
     <div
       v-else
-      class="flex flex-col gap-6"
+      class="grid gap-5"
     >
-      <div class="rounded-lg border border-default bg-background p-5">
+      <section>
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 class="text-base font-semibold text-foreground">
@@ -156,10 +156,11 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <UButton
-            size="md"
+            size="lg"
             color="primary"
             :loading="updateState.loading"
             :disabled="!canEdit"
+            class="ml-auto"
             @click="saveArticle"
           >
             Update Article
@@ -169,18 +170,18 @@ function updateImages(images: GetArticleByIdResponse['images']) {
             :success="updateState.success"
           />
         </div>
-      </div>
+      </section>
 
-      <div class="rounded-lg border border-default bg-background p-5">
+      <section class="space-y-3">
         <ArticleImagesGroup
           :article-id="article.id"
           :model-value="article.images || []"
           :can-edit="canEdit"
           @update:model-value="updateImages"
         />
-      </div>
+      </section>
 
-      <div class="rounded-lg border border-default bg-background p-5">
+      <section class="space-y-3">
         <ArticleDetailsSpecsGroup
           :article-id="article.id"
           :details="article.details || []"
@@ -189,7 +190,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
           @update:details="updateDetails"
           @update:specifications="updateSpecifications"
         />
-      </div>
+      </section>
     </div>
   </div>
 </template>

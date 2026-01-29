@@ -50,65 +50,69 @@ watch(
 
 <template>
   <div class="grid gap-4">
-    <div class="grid gap-4 md:grid-cols-2">
-      <UFormField
-        label="Article Code"
-        required
-        help="5-10 uppercase letters or numbers"
-      >
-        <UInput
-          v-model="form.articleCode"
-          placeholder="ABCDE"
-          size="md"
-          :disabled="disabled"
-        />
-      </UFormField>
-      <UFormField
-        label="Base Price"
-        required
-      >
-        <UInput
-          v-model="form.basePrice"
-          type="number"
-          min="0.01"
-          step="0.01"
-          placeholder="0.00"
-          size="md"
-          :disabled="disabled"
-        />
-      </UFormField>
-    </div>
-
     <UFormField
       label="Title"
       required
+      class="md:col-span-3"
     >
       <UInput
         v-model="form.title"
         placeholder="Article title"
-        size="md"
         :disabled="disabled"
+        size="xl"
+        class="w-full"
       />
     </UFormField>
 
     <UFormField
-      label="Description"
+      label="Article Code"
+      required
+      help="5-10 uppercase letters or numbers"
+    >
+      <UInput
+        v-model="form.articleCode"
+        placeholder="ABCDE"
+        :disabled="disabled"
+        class="w-full"
+      />
+    </UFormField>
+
+    <UFormField
+      label="Base Price"
       required
     >
-      <UTextarea
-        v-model="form.description"
-        :rows="5"
-        placeholder="Describe the article"
-        size="md"
+      <UInput
+        v-model="form.basePrice"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="0.00"
         :disabled="disabled"
+        class="w-full"
       />
     </UFormField>
 
     <UFormField label="Available">
       <USwitch
         v-model="form.isAvailable"
-        size="md"
         :disabled="disabled"
+        size="xl"
+        class="pt-0.5"
+      />
+    </UFormField>
+
+    <UFormField
+      label="Description"
+      required
+      class="md:col-span-3"
+    >
+      <UTextarea
+        v-model="form.description"
+        :rows="5"
+        placeholder="Describe the article"
+        size="xl"
+        :disabled="disabled"
+        class="w-full"
       />
     </UFormField>
   </div>

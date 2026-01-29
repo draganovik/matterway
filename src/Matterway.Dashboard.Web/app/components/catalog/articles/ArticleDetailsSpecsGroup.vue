@@ -275,14 +275,11 @@ function editSpecification(spec: ArticleSpecificationProperty) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <div>
+  <div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between">
       <h3 class="text-base font-semibold text-foreground">
         Details & Specifications
       </h3>
-      <p class="text-sm text-muted">
-        Link rich attributes to the article using a single adaptive workflow.
-      </p>
     </div>
 
     <div
@@ -294,10 +291,10 @@ function editSpecification(spec: ArticleSpecificationProperty) {
 
     <div
       v-else
-      class="grid gap-4"
+      class="grid gap-4 lg:grid-cols-2"
     >
-      <div class="rounded-lg border border-default bg-background p-4">
-        <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+      <div class="grid gap-3">
+        <div class="grid gap-3 md:grid-cols-2">
           <UFormField
             label="Detail or Specification"
             required
@@ -326,7 +323,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
           </div>
         </div>
 
-        <div class="mt-3 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div class="grid gap-3 md:grid-cols-2">
           <UFormField
             :label="selectedOption?._mwType === 'spec' ? 'Numeric Value' : 'Value'"
             required
@@ -350,39 +347,37 @@ function editSpecification(spec: ArticleSpecificationProperty) {
           </div>
         </div>
 
-        <div class="mt-3">
-          <FormStatus :error="definitionState.error || mutateState.error" />
-          <FormStatus :success="definitionState.success || mutateState.success" />
-        </div>
+        <FormStatus :error="definitionState.error || mutateState.error" />
+        <FormStatus :success="definitionState.success || mutateState.success" />
       </div>
 
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="rounded-lg border border-default bg-background p-4">
-          <h4 class="text-sm font-semibold text-muted">
+      <div class="grid gap-4">
+        <section class="space-y-2">
+          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
             Details
           </h4>
           <div
             v-if="!detailList.length"
-            class="mt-2 text-sm text-muted"
+            class="text-sm text-muted"
           >
             No details attached.
           </div>
           <div
             v-else
-            class="mt-3 grid gap-3"
+            class="rounded-md border border-default/40"
           >
             <div
               v-for="detail in detailList"
               :key="detail.detailSlug ?? detail.title ?? 'detail-unknown'"
-              class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-default px-3 py-3"
+              class="flex flex-wrap items-center justify-between gap-2 border-t border-default/40 px-3 py-2 first:border-t-0"
             >
-              <div>
-                <p class="text-sm font-medium text-foreground">
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-foreground">
                   {{ detail.title || detail.detailSlug }}
-                </p>
-                <p class="text-sm text-muted">
+                </div>
+                <div class="text-xs text-muted">
                   {{ detail.value || 'No value' }}
-                </p>
+                </div>
               </div>
               <div class="flex items-center gap-2">
                 <UButton
@@ -403,34 +398,34 @@ function editSpecification(spec: ArticleSpecificationProperty) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="rounded-lg border border-default bg-background p-4">
-          <h4 class="text-sm font-semibold text-muted">
+        <section class="space-y-2">
+          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
             Specifications
           </h4>
           <div
             v-if="!specList.length"
-            class="mt-2 text-sm text-muted"
+            class="text-sm text-muted"
           >
             No specifications attached.
           </div>
           <div
             v-else
-            class="mt-3 grid gap-3"
+            class="rounded-md border border-default/40"
           >
             <div
               v-for="spec in specList"
               :key="spec.specificationSlug ?? spec.title ?? 'spec-unknown'"
-              class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-default px-3 py-3"
+              class="flex flex-wrap items-center justify-between gap-2 border-t border-default/40 px-3 py-2 first:border-t-0"
             >
-              <div>
-                <p class="text-sm font-medium text-foreground">
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-foreground">
                   {{ spec.title || spec.specificationSlug }}
-                </p>
-                <p class="text-sm text-muted">
+                </div>
+                <div class="text-xs text-muted">
                   {{ spec.value ?? 'No value' }} {{ spec.unit || '' }}
-                </p>
+                </div>
               </div>
               <div class="flex items-center gap-2">
                 <UButton
@@ -451,13 +446,13 @@ function editSpecification(spec: ArticleSpecificationProperty) {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <FormStatus
-        :error="removeState.error"
-        :success="removeState.success"
-      />
+        <FormStatus
+          :error="removeState.error"
+          :success="removeState.success"
+        />
+      </div>
     </div>
   </div>
 </template>
