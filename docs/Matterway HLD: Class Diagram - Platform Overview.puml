@@ -89,7 +89,7 @@ package "Catalog" {
     +slug: String
   }
 
-  note top of AttributeSlug
+  note left of AttributeSlug
   Shared, unique slug namespace
   for Detail & Specification
   (lowercase normalized)
@@ -171,10 +171,10 @@ package "Customers" {
     +placedAt: DateTime
   }
 
-  CustomerOrder "0..*" -up- "1" Customer : customerId
+  CustomerOrder "0..*" -- "1" Customer : customerId
   Customer "1" -- "0..1" Address : customerId
   CustomerArticle "0..*" -- "1" Customer : customerId
-  CustomerArticle "0..*" -right- "0..1" CustomerOrder : orderId
+  CustomerArticle "0..*" -- "0..1" CustomerOrder : orderId
 }
 
 package "Sales" {
@@ -211,7 +211,7 @@ package "Sales" {
     +quantity: Integer
   }
 
-  note left of Order
+  note right of Order
     Flow (happy path)
     Customer -> Sales: Place order
     Sales -> Inventory: Request stock reservation
@@ -270,115 +270,14 @@ package "Sales" {
   Payment "0..*" -- "1" Order : orderId
 }
 
-package "Inventory" {
-
-  enum ReservationStatus {
-    Pending
-    Ready
-    Fulfilled
-    Expired
-  }
-
-  enum AllocationStatus {
-    Pending
-    Allocated
-    Processed
-    Cancelled
-  }
-
-  class Warehouse {
-    +warehouseId: UUID
-    +warehouseCode: String <<unique>>
-    --
-    +title: String
-    +country: String
-    +city: String
-    +zip: String
-    +street: String
-    +note: String?
-  }
-
-  ' Summary per (warehouseId, articleId).
-  ' available = onHandQty - allocatedQty
-  class StockUnit {
-    +warehouseId: UUID
-    +articleId: UUID
-    --
-    +availableQty: Integer
-    +allocatedQty: Integer
-  }
-
-  note left of StockUnit
-    Summary/read model:
-    available = onHandQty - allocatedQty
-
-    Keep onHandQty in sync with StockUnitBatch.initial/remaining
-    Keep allocatedQty in sync with active Reservations
-    Use optimistic concurrency via version.
-  end note
-
-  ' What warehouse workers add when receiving goods
-  class StockUnitBatch {
-    +stockUnitBatchId: UUID
-    --
-    +warehouseId: UUID
-    +articleId: UUID
-    ..
-    +supplierRef: String?
-    +receivedAt: DateTime
-    +initialQty: Integer
-    +remainingQty: Integer
-    +expiryDate: DateOnly?
-    +note: String?
-  }
-
-  note left of StockUnitBatch
-    remainingQty decreases on picking/dispatch.
-    If you later need audit/history,
-    reintroduce StockMovement.
-  end note
-
-  ' Business promise: reserve quantity for an order line
-  class Reservation {
-    +orderId: String
-    --
-    +status: ReservationStatus
-    +reservedAt: DateTime
-    +note: String?
-  }
-
-  ' Physical planning: which batches satisfy the reservation (FIFO/FEFO)
-  class ReservationAllocation {
-    +orderId: String
-    +stockUnitBatchId: UUID
-    --
-    +quantity: Integer
-    +status: AllocationStatus
-  }
-
-  ' Relationships
-  Warehouse "1" -- "0..*" StockUnit : holds
-
-  ' Conceptual link: batches + reservations roll up into StockUnit
-  StockUnit "1" -- "0..*" StockUnitBatch : (warehouseId, articleId)
-
-  Reservation "1" -- "0..*" ReservationAllocation : allocates
-  StockUnitBatch "1" -- "0..*" ReservationAllocation : takenFrom
-}
-
 ' =======================
 ' RELATIONSHIPS
 ' =======================
 
 ' Identity
-SystemUser "1" .. "0..1" Customer
+SystemUser "1" .up. "0..1" Customer
 
 ' Customers
 CustomerArticle "0..*" .. "1" Article
 CustomerOrder "0..1" .. "1" Order
-
-' Inventory
-StockUnit "0..1" .. "1" Article
-Reservation "1" .. "1" Order
-ReservationAllocation "1..*" .. "1" OrderItem
 @enduml
