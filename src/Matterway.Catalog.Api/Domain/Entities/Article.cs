@@ -11,8 +11,8 @@ public class Article
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public List<ArticleDetail> ArticleDetails { get; } = [];
-    public List<ArticleSpecification> ArticleSpecifications { get; } = [];
+    public List<ArticleDetailText> ArticleDetailTexts { get; } = [];
+    public List<ArticleDetailNumeric> ArticleDetailNumerics { get; } = [];
     public List<ArticleImage> ArticleImages { get; } = [];
     public List<Discount> Discounts { get; } = [];
 

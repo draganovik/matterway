@@ -36,7 +36,7 @@ package "Identity" {
   }
 
   class IdentityUserClaim {
-    +id: Integer
+    +id: Numeric
     --
     +userId: UUID
     ..
@@ -55,7 +55,7 @@ package "Catalog" {
     --
     +articleId: UUID
     ..
-    +percentage: Decimal
+    +percentage: Numeric
     +validFrom: DateTime
     +validTo: DateTime?
   }
@@ -72,37 +72,21 @@ package "Catalog" {
     +updatedAt: DateTime
   }
 
-  class ArticleDetail {
+  class ArticleDetailText {
     +articleId: UUID
     +detailSlug: String
     --
     +value: String
   }
 
-  class Detail {
-    +slug: String
-    --
-    +title: String
-  }
-
-  class AttributeSlug {
-    +slug: String
-  }
-
-  note left of AttributeSlug
-  Shared, unique slug namespace
-  for Detail & Specification
-  (lowercase normalized)
-  end note
-
-  class ArticleSpecification {
+  class ArticleDetailNumeric {
     +articleId: UUID
-    +specificationSlug: String
+    +detailSlug: String
     --
-    +value: Decimal
+    +value: Numeric
   }
 
-  class Specification {
+  class Detail {
     +slug: String
     --
     +title: String
@@ -114,19 +98,17 @@ package "Catalog" {
     --
     +articleId: UUID
     ..
-    +orderIndex: Integer
+    +orderIndex: Numeric
     +imageUrl: String
     +imageAlt: String?
   }
 
   Discount "0..*" -- "1" Article : articleId
-  ArticleDetail "0..*" -- "1" Article : articleId
-  ArticleDetail "0..*" -- "1" Detail : detailSlug
-  ArticleSpecification "0..*" -- "1" Article : articleId
-  ArticleSpecification "0..*" -- "1" Specification : specificationSlug
+  ArticleDetailText "0..*" -- "1" Article : articleId
+  ArticleDetailText "0..*" -- "1" Detail : detailSlug
+  ArticleDetailNumeric "0..*" -- "1" Article : articleId
+  ArticleDetailNumeric "0..*" -- "1" Detail : detailSlug
   ArticleImage "0..*" -- "1" Article : articleId
-  Detail -- AttributeSlug : slug (PK/FK)
-  Specification -- AttributeSlug : slug (PK/FK)
 }
 
 package "Customers" {
@@ -160,7 +142,7 @@ package "Customers" {
     +orderId: UUID?
     +articleName: String?
     +unitPrice: Money?
-    +quantity: Integer
+    +quantity: Numeric
   }
 
   class CustomerOrder {
@@ -208,7 +190,7 @@ package "Sales" {
     +articleId: UUID
     +articleTitle: String
     +unitPrice: Money
-    +quantity: Integer
+    +quantity: Numeric
   }
 
   note right of Order
@@ -236,7 +218,7 @@ package "Sales" {
   }
 
   class OrderStatus {
-    +id: Integer
+    +id: Numeric
     --
     +orderId: UUID
     ..

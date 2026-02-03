@@ -44,7 +44,8 @@ public class AdminPutDetail : IEndpoint
         var entity = new Detail
         {
             Slug = normalizedSlug,
-            Title = request.Title.Trim()
+            Title = request.Title.Trim(),
+            Unit = string.IsNullOrWhiteSpace(request.Unit) ? null : request.Unit.Trim()
         };
 
         var saved = await repository.Upsert(entity, cancellationToken);
@@ -52,7 +53,7 @@ public class AdminPutDetail : IEndpoint
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot create or save detail",
-                Detail = "Slug is already used by a specification or update failed.",
+                Detail = "Detail update failed or unit conflicts with existing article details.",
                 Status = StatusCodes.Status400BadRequest
             });
 
@@ -71,12 +72,16 @@ public class AdminPutDetail : IEndpoint
         [Required]
         [StringLength(120, MinimumLength = 1)]
         public required string Title { get; init; }
+
+        [StringLength(40)]
+        public string? Unit { get; init; }
     }
 
     public record PutDetailResponse
     {
         public string? Slug { get; init; }
         public string? Title { get; init; }
+        public string? Unit { get; init; }
     }
 
     public static PutDetailResponse MapToResponse(Detail entity)
@@ -84,7 +89,8 @@ public class AdminPutDetail : IEndpoint
         return new PutDetailResponse
         {
             Slug = entity.Slug,
-            Title = entity.Title
+            Title = entity.Title,
+            Unit = entity.Unit
         };
     }
 }

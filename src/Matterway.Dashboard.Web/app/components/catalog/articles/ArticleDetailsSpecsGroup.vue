@@ -2,33 +2,27 @@
 import {
   useCatalogApi,
   type ArticleDetailProperty,
-  type ArticleSpecificationProperty,
-  type QueryDetailResponse,
-  type QuerySpecificationResponse
+  type QueryDetailResponse
 } from '~/composables/useCatalogApi'
 import { useRequestState } from '~/composables/useRequestState'
 
 const props = withDefaults(defineProps<{
   articleId?: string | null
   details?: ArticleDetailProperty[]
-  specifications?: ArticleSpecificationProperty[]
   canEdit?: boolean
 }>(), {
   articleId: null,
   details: () => [],
-  specifications: () => [],
   canEdit: false
 })
 
 const emit = defineEmits<{
   (event: 'update:details', value: ArticleDetailProperty[]): void
-  (event: 'update:specifications', value: ArticleSpecificationProperty[]): void
 }>()
 
 const api = useCatalogApi()
 
 const detailList = ref<ArticleDetailProperty[]>([])
-const specList = ref<ArticleSpecificationProperty[]>([])
 
 const definitionState = useRequestState()
 const mutateState = useRequestState()
@@ -36,7 +30,6 @@ const removeState = useRequestState()
 
 const searchTerm = ref('')
 const detailOptions = ref<QueryDetailResponse[]>([])
-const specOptions = ref<QuerySpecificationResponse[]>([])
 const selectedKey = ref<string>('')
 const valueInput = ref<string>('')
 
@@ -44,38 +37,20 @@ const combinedOptions = computed(() => {
   const detailItems = detailOptions.value
     .filter(option => option.slug)
     .map(option => ({
-      id: `detail:${option.slug}`,
-      slug: option.slug as string,
-      label: (option.title ?? option.slug ?? '').toString(),
-      type: 'item' as const, // must be "item" for SelectMenuItem
-      _mwType: 'detail' as const // custom property to distinguish type
-    }))
-  const specItems = specOptions.value
-    .filter(option => option.slug)
-    .map(option => ({
-      id: `spec:${option.slug}`,
+      id: option.slug as string,
       slug: option.slug as string,
       label: (option.title ?? option.slug ?? '').toString(),
       unit: option.unit || '',
-      type: 'item' as const, // must be "item" for SelectMenuItem
-      _mwType: 'spec' as const // custom property to distinguish type
+      type: 'item' as const
     }))
-  return [...detailItems, ...specItems]
+  return [...detailItems]
 })
 
 const selectedOption = computed(() => {
   const match = combinedOptions.value.find(option => option.id === selectedKey.value)
   if (match) return match
   if (!selectedKey.value) return null
-  const [mwType, slug] = selectedKey.value.split(':', 2)
-  if (!slug) return null
-  if (mwType === 'detail') {
-    return { id: selectedKey.value, slug, label: slug, type: 'item' as const, _mwType: 'detail' as const }
-  }
-  if (mwType === 'spec') {
-    return { id: selectedKey.value, slug, label: slug, unit: '', type: 'item' as const, _mwType: 'spec' as const }
-  }
-  return null
+  return { id: selectedKey.value, slug: selectedKey.value, label: selectedKey.value, unit: '', type: 'item' as const }
 })
 
 watch(
@@ -86,26 +61,16 @@ watch(
   { immediate: true }
 )
 
-watch(
-  () => props.specifications,
-  (value) => {
-    specList.value = Array.isArray(value) ? [...value] : []
-  },
-  { immediate: true }
-)
-
 watch(selectedOption, (option) => {
   if (!option) {
     valueInput.value = ''
     return
   }
-  if (option._mwType === 'detail') {
-    const existing = detailList.value.find(item => item.detailSlug === option.slug)
-    valueInput.value = existing?.value || ''
-  } else if (option._mwType === 'spec') {
-    const existing = specList.value.find(item => item.specificationSlug === option.slug)
-    valueInput.value = existing?.value?.toString() || ''
-  }
+  const existing = detailList.value.find(item => item.detailSlug === option.slug)
+  valueInput.value =
+    existing?.textValue ??
+    existing?.numericValue?.toString() ??
+    ''
 })
 
 watch(
@@ -124,27 +89,18 @@ function updateDetails(next: ArticleDetailProperty[]) {
   emit('update:details', detailList.value)
 }
 
-function updateSpecifications(next: ArticleSpecificationProperty[]) {
-  specList.value = [...next]
-  emit('update:specifications', specList.value)
-}
-
 async function loadDefinitions() {
   definitionState.error = ''
   definitionState.success = ''
   definitionState.loading = true
   const titleLike = searchTerm.value.trim() || undefined
-  const [detailsResult, specsResult] = await Promise.all([
-    api.queryDetails({ limit: 25, titleLike }),
-    api.querySpecifications({ limit: 25, titleLike })
-  ])
+  const detailsResult = await api.queryDetails({ limit: 25, titleLike })
   definitionState.loading = false
-  if (!detailsResult.ok || !specsResult.ok) {
-    definitionState.error = detailsResult.error || specsResult.error || 'Unable to load definitions.'
+  if (!detailsResult.ok) {
+    definitionState.error = detailsResult.error || 'Unable to load definitions.'
     return
   }
   detailOptions.value = detailsResult.data || []
-  specOptions.value = specsResult.data || []
   definitionState.success = 'Definitions loaded.'
 }
 
@@ -153,37 +109,44 @@ async function applyAssociation() {
   mutateState.success = ''
   const option = selectedOption.value
   if (!props.articleId) {
-    mutateState.error = 'Create the article before adding details or specifications.'
+    mutateState.error = 'Create the article before adding details.'
     return
   }
   if (!option) {
-    mutateState.error = 'Select a detail or specification.'
+    mutateState.error = 'Select a detail.'
     return
   }
   const rawValue = valueInput.value.trim()
+  const isNumeric = Boolean(option.unit)
   if (!rawValue) {
     mutateState.error = 'Provide a value.'
     return
   }
   mutateState.loading = true
-  if (option._mwType === 'detail') {
-    const existing = detailList.value.find(item => item.detailSlug === option.slug)
+  const existing = detailList.value.find(item => item.detailSlug === option.slug)
+  if (isNumeric) {
+    const numericValue = Number(rawValue)
+    if (!Number.isFinite(numericValue)) {
+      mutateState.loading = false
+      mutateState.error = 'Numeric value is invalid.'
+      return
+    }
     if (existing) {
-      const result = await api.updateArticleDetail(props.articleId, option.slug, { value: rawValue })
+      const result = await api.updateArticleDetail(props.articleId, option.slug, { numericValue })
       mutateState.loading = false
       if (!result.ok) {
         mutateState.error = result.error || 'Unable to update detail.'
         return
       }
       updateDetails(detailList.value.map(item =>
-        item.detailSlug === option.slug ? { ...item, value: rawValue } : item
+        item.detailSlug === option.slug ? { ...item, numericValue, textValue: null } : item
       ))
       mutateState.success = 'Detail updated.'
       return
     }
     const addResult = await api.addArticleDetail(props.articleId, {
       detailSlug: option.slug,
-      value: rawValue
+      numericValue
     })
     mutateState.loading = false
     if (!addResult.ok) {
@@ -192,43 +155,39 @@ async function applyAssociation() {
     }
     updateDetails([
       ...detailList.value,
-      { detailSlug: option.slug, title: option.label, value: rawValue }
+      { detailSlug: option.slug, title: option.label, unit: option.unit, numericValue, textValue: null }
     ])
     mutateState.success = 'Detail added.'
     return
   }
 
-  if (option._mwType === 'spec') {
-    const existing = specList.value.find(item => item.specificationSlug === option.slug)
-    const numericValue = Number.isNaN(Number(rawValue)) ? rawValue : Number(rawValue)
-    if (existing) {
-      const result = await api.updateArticleSpecification(props.articleId, option.slug, { value: numericValue })
-      mutateState.loading = false
-      if (!result.ok) {
-        mutateState.error = result.error || 'Unable to update specification.'
-        return
-      }
-      updateSpecifications(specList.value.map(item =>
-        item.specificationSlug === option.slug ? { ...item, value: numericValue } : item
-      ))
-      mutateState.success = 'Specification updated.'
-      return
-    }
-    const addResult = await api.addArticleSpecification(props.articleId, {
-      specificationSlug: option.slug,
-      value: numericValue
-    })
+  if (existing) {
+    const result = await api.updateArticleDetail(props.articleId, option.slug, { textValue: rawValue })
     mutateState.loading = false
-    if (!addResult.ok) {
-      mutateState.error = addResult.error || 'Unable to add specification.'
+    if (!result.ok) {
+      mutateState.error = result.error || 'Unable to update detail.'
       return
     }
-    updateSpecifications([
-      ...specList.value,
-      { specificationSlug: option.slug, title: option.label, unit: option.unit, value: numericValue }
-    ])
-    mutateState.success = 'Specification added.'
+    updateDetails(detailList.value.map(item =>
+      item.detailSlug === option.slug ? { ...item, textValue: rawValue, numericValue: null } : item
+    ))
+    mutateState.success = 'Detail updated.'
+    return
   }
+  const addResult = await api.addArticleDetail(props.articleId, {
+    detailSlug: option.slug,
+    textValue: rawValue
+  })
+  mutateState.loading = false
+  if (!addResult.ok) {
+    mutateState.error = addResult.error || 'Unable to add detail.'
+    return
+  }
+  updateDetails([
+    ...detailList.value,
+    { detailSlug: option.slug, title: option.label, textValue: rawValue, numericValue: null }
+  ])
+  mutateState.success = 'Detail added.'
 }
 
 async function removeDetail(detail: ArticleDetailProperty) {
@@ -246,31 +205,10 @@ async function removeDetail(detail: ArticleDetailProperty) {
   removeState.success = 'Detail removed.'
 }
 
-async function removeSpecification(spec: ArticleSpecificationProperty) {
-  removeState.error = ''
-  removeState.success = ''
-  if (!props.articleId || !spec.specificationSlug) return
-  removeState.loading = true
-  const result = await api.removeArticleSpecification(props.articleId, spec.specificationSlug)
-  removeState.loading = false
-  if (!result.ok) {
-    removeState.error = result.error || 'Unable to remove specification.'
-    return
-  }
-  updateSpecifications(specList.value.filter(item => item.specificationSlug !== spec.specificationSlug))
-  removeState.success = 'Specification removed.'
-}
-
 function editDetail(detail: ArticleDetailProperty) {
   if (!detail.detailSlug) return
-  selectedKey.value = `detail:${detail.detailSlug}`
-  valueInput.value = detail.value || ''
-}
-
-function editSpecification(spec: ArticleSpecificationProperty) {
-  if (!spec.specificationSlug) return
-  selectedKey.value = `spec:${spec.specificationSlug}`
-  valueInput.value = spec.value?.toString() || ''
+  selectedKey.value = detail.detailSlug
+  valueInput.value = detail.textValue ?? detail.numericValue?.toString() ?? ''
 }
 </script>
 
@@ -278,7 +216,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
       <h3 class="text-base font-semibold text-foreground">
-        Details & Specifications
+        Details
       </h3>
     </div>
 
@@ -286,7 +224,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
       v-if="!articleId"
       class="rounded-lg border border-default bg-background px-4 py-4 text-sm text-muted"
     >
-      Create the article first to attach details or specifications.
+      Create the article first to attach details.
     </div>
 
     <div
@@ -296,7 +234,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
       <div class="grid gap-3">
         <div class="grid gap-3 md:grid-cols-2">
           <UFormField
-            label="Detail or Specification"
+            label="Detail"
             required
           >
             <USelectMenu
@@ -308,7 +246,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
               :search-input="true"
               :disabled="!canEdit"
               size="md"
-              placeholder="Select detail or specification"
+              placeholder="Select detail"
             />
           </UFormField>
           <div class="flex items-end">
@@ -325,12 +263,12 @@ function editSpecification(spec: ArticleSpecificationProperty) {
 
         <div class="grid gap-3 md:grid-cols-2">
           <UFormField
-            :label="selectedOption?._mwType === 'spec' ? 'Numeric Value' : 'Value'"
+            :label="selectedOption?.unit ? 'Numeric Value' : 'Value'"
             required
           >
             <UInput
               v-model="valueInput"
-              :type="selectedOption?._mwType === 'spec' ? 'number' : 'text'"
+              :type="selectedOption?.unit ? 'number' : 'text'"
               :disabled="!canEdit"
               size="md"
             />
@@ -353,9 +291,6 @@ function editSpecification(spec: ArticleSpecificationProperty) {
 
       <div class="grid gap-4">
         <section class="space-y-2">
-          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            Details
-          </h4>
           <div
             v-if="!detailList.length"
             class="text-sm text-muted"
@@ -376,7 +311,7 @@ function editSpecification(spec: ArticleSpecificationProperty) {
                   {{ detail.title || detail.detailSlug }}
                 </div>
                 <div class="text-xs text-muted">
-                  {{ detail.value || 'No value' }}
+                  {{ detail.textValue ?? detail.numericValue ?? 'No value' }} {{ detail.unit || '' }}
                 </div>
               </div>
               <div class="flex items-center gap-2">
@@ -392,54 +327,6 @@ function editSpecification(spec: ArticleSpecificationProperty) {
                   variant="ghost"
                   :disabled="!canEdit"
                   @click="removeDetail(detail)"
-                >
-                  Remove
-                </UButton>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="space-y-2">
-          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            Specifications
-          </h4>
-          <div
-            v-if="!specList.length"
-            class="text-sm text-muted"
-          >
-            No specifications attached.
-          </div>
-          <div
-            v-else
-            class="rounded-md border border-default/40"
-          >
-            <div
-              v-for="spec in specList"
-              :key="spec.specificationSlug ?? spec.title ?? 'spec-unknown'"
-              class="flex flex-wrap items-center justify-between gap-2 border-t border-default/40 px-3 py-2 first:border-t-0"
-            >
-              <div class="min-w-0">
-                <div class="text-sm font-medium text-foreground">
-                  {{ spec.title || spec.specificationSlug }}
-                </div>
-                <div class="text-xs text-muted">
-                  {{ spec.value ?? 'No value' }} {{ spec.unit || '' }}
-                </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <UButton
-                  variant="outline"
-                  :disabled="!canEdit"
-                  @click="editSpecification(spec)"
-                >
-                  Edit
-                </UButton>
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  :disabled="!canEdit"
-                  @click="removeSpecification(spec)"
                 >
                   Remove
                 </UButton>

@@ -1,17 +1,17 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
 
-public sealed class EfPgArticleDetailRepository(CatalogDbComposer context) : IArticleDetailRepository
+public sealed class EfPgArticleDetailTextRepository(CatalogDbComposer context) : IArticleDetailTextRepository
 {
-    public async Task<ArticleDetail?> Create(ArticleDetail requestModel,
+    public async Task<ArticleDetailText?> Create(ArticleDetailText requestModel,
         CancellationToken cancellationToken = default)
     {
-        context.ArticleDetail.Add(requestModel);
+        context.ArticleDetailText.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1)
-            return await context.ArticleDetail.Include(x => x.Article).Include(x => x.Detail)
+        if (affected > 0)
+            return await context.ArticleDetailText.Include(x => x.Article).Include(x => x.Detail)
                 .FirstOrDefaultAsync(
                     x => x.ArticleId == requestModel.ArticleId && x.DetailSlug == requestModel.DetailSlug,
                     cancellationToken);
@@ -21,38 +21,27 @@ public sealed class EfPgArticleDetailRepository(CatalogDbComposer context) : IAr
 
     public async Task<bool> Delete(Guid articleId, string detailSlug, CancellationToken cancellationToken = default)
     {
-        var affected = await context.ArticleDetail
+        var affected = await context.ArticleDetailText
             .Where(model => model.ArticleId == articleId && model.DetailSlug == detailSlug)
             .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<ArticleDetail?> GetBy(Guid articleId, string detailSlug,
+    public async Task<ArticleDetailText?> GetBy(Guid articleId, string detailSlug,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleDetail
-            .Include(pd => pd.Article)
+        return await context.ArticleDetailText
             .Include(pd => pd.Detail)
             .FirstOrDefaultAsync(pd => pd.ArticleId == articleId && pd.DetailSlug == detailSlug, cancellationToken);
     }
 
-    public async Task<ICollection<ArticleDetail>> Query(int pageIndex, int pageSize,
+    public async Task<ArticleDetailText?> Update(Guid articleId, string detailSlug, ArticleDetailText request,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleDetail.Include(pd => pd.Article).Include(pd => pd.Detail).AsNoTracking()
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<ArticleDetail?> Update(Guid articleId, string detailSlug, ArticleDetail request,
-        CancellationToken cancellationToken = default)
-    {
-        context.ArticleDetail.Update(request);
+        context.ArticleDetailText.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1)
-            return await context.ArticleDetail
-                .Include(x => x.Article)
+        if (affected > 0)
+            return await context.ArticleDetailText
                 .Include(x => x.Detail)
                 .FirstOrDefaultAsync(x => x.ArticleId == articleId && x.DetailSlug == detailSlug, cancellationToken);
 

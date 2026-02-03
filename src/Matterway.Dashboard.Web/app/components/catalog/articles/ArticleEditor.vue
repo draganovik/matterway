@@ -96,10 +96,6 @@ function updateDetails(details: GetArticleByIdResponse['details']) {
   updateArticleData({ details })
 }
 
-function updateSpecifications(specifications: GetArticleByIdResponse['specifications']) {
-  updateArticleData({ specifications })
-}
-
 function updateImages(images: GetArticleByIdResponse['images']) {
   updateArticleData({ images })
 }
@@ -185,10 +181,8 @@ function updateImages(images: GetArticleByIdResponse['images']) {
         <ArticleDetailsSpecsGroup
           :article-id="article.id"
           :details="article.details || []"
-          :specifications="article.specifications || []"
           :can-edit="canEdit"
           @update:details="updateDetails"
-          @update:specifications="updateSpecifications"
         />
       </section>
     </div>

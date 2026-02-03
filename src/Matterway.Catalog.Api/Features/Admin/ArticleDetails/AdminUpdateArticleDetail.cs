@@ -3,7 +3,9 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +17,7 @@ public class AdminUpdateArticleDetail : IEndpoint
     {
         app.MapPatch("admin/articles/{articleId:guid}/details/{detailSlug}", Handle)
             .WithName("AdminUpdateArticleDetail").WithSummary("Update an ArticleDetail (admin).")
-            .WithTags(nameof(ArticleDetail))
+            .WithTags("ArticleDetail")
             .Produces<UpdateArticleDetailResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -29,46 +31,115 @@ public class AdminUpdateArticleDetail : IEndpoint
             Guid articleId,
             string detailSlug,
             UpdateArticleDetailRequest request,
-            IArticleDetailRepository articleDetailRepository,
+            IDetailRepository detailRepository,
+            IArticleDetailTextRepository detailTextRepository,
+            IArticleDetailNumericRepository detailNumericRepository,
             CancellationToken cancellationToken)
     {
-        var entity = await articleDetailRepository.GetBy(articleId, detailSlug, cancellationToken);
-        if (entity is null) return TypedResults.NotFound();
+        var normalizedSlug = detailSlug.Trim().ToLower();
+        var validation = ValidateRequest(request);
+        if (validation is not null) return validation;
 
-        MapUpdates(entity, request);
+        var detail = await detailRepository.GetBy(normalizedSlug, cancellationToken);
+        if (detail is null)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Detail definition not found."
+            });
 
-        var updated = await articleDetailRepository.Update(articleId, detailSlug, entity, cancellationToken);
+        var isNumeric = !string.IsNullOrWhiteSpace(detail.Unit);
+        if (isNumeric && request.NumericValue is null)
+            return TypedResults.BadRequest(BuildValueMismatchProblem(detail, "numeric"));
+        if (!isNumeric && string.IsNullOrWhiteSpace(request.TextValue))
+            return TypedResults.BadRequest(BuildValueMismatchProblem(detail, "text"));
 
-        if (updated is null) return TypedResults.NotFound();
+        if (isNumeric)
+        {
+            var entity = await detailNumericRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+            if (entity is null) return TypedResults.NotFound();
+            entity.Value = request.NumericValue!.Value;
+            var updated = await detailNumericRepository.Update(articleId, normalizedSlug, entity, cancellationToken);
+            if (updated is null) return TypedResults.NotFound();
+            return TypedResults.Ok(MapToResponse(updated));
+        }
 
-        return TypedResults.Ok(MapToResponse(updated));
+        var textEntity = await detailTextRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        if (textEntity is null) return TypedResults.NotFound();
+        textEntity.Value = request.TextValue!.Trim();
+        var savedText = await detailTextRepository.Update(articleId, normalizedSlug, textEntity, cancellationToken);
+        if (savedText is null) return TypedResults.NotFound();
+        return TypedResults.Ok(MapToResponse(savedText));
     }
 
     public record UpdateArticleDetailRequest
     {
-        [Required]
-        public required string Value { get; init; }
+        public string? TextValue { get; init; }
+        public decimal? NumericValue { get; init; }
     }
 
     public record UpdateArticleDetailResponse
     {
+        public Guid ArticleId { get; init; }
         public string? ArticleTitle { get; init; }
-        public string? Detail { get; init; }
-        public string? Value { get; init; }
+        public string? DetailSlug { get; init; }
+        public string? Title { get; init; }
+        public string? Unit { get; init; }
+        public string? TextValue { get; init; }
+        public decimal? NumericValue { get; init; }
     }
 
-    public static void MapUpdates(ArticleDetail entity, UpdateArticleDetailRequest request)
+    private static BadRequest<ProblemDetails>? ValidateRequest(UpdateArticleDetailRequest request)
     {
-        entity.Value = request.Value;
+        var hasText = !string.IsNullOrWhiteSpace(request.TextValue);
+        var hasNumeric = request.NumericValue is not null;
+        if (hasText == hasNumeric)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Provide exactly one of textValue or numericValue."
+            });
+
+        return null;
     }
 
-    public static UpdateArticleDetailResponse MapToResponse(ArticleDetail entity)
+    private static ProblemDetails BuildValueMismatchProblem(Detail detail, string expectedType)
+    {
+        return new ProblemDetails
+        {
+            Title = "Bad Request",
+            Status = StatusCodes.Status400BadRequest,
+            Detail = $"Detail '{detail.Slug}' requires a {expectedType} value."
+        };
+    }
+
+    public static UpdateArticleDetailResponse MapToResponse(ArticleDetailText entity)
     {
         return new UpdateArticleDetailResponse
         {
+            ArticleId = entity.ArticleId,
             ArticleTitle = entity.Article?.Title,
-            Detail = entity.Detail?.Title,
-            Value = entity.Value
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit,
+            TextValue = entity.Value,
+            NumericValue = null
+        };
+    }
+
+    public static UpdateArticleDetailResponse MapToResponse(ArticleDetailNumeric entity)
+    {
+        return new UpdateArticleDetailResponse
+        {
+            ArticleId = entity.ArticleId,
+            ArticleTitle = entity.Article?.Title,
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit,
+            TextValue = null,
+            NumericValue = entity.Value
         };
     }
 }

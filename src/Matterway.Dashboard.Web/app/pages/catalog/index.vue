@@ -21,7 +21,7 @@ const features = computed(() => {
 <template>
   <ServiceOverview
     title="Catalog"
-    description="Articles define the canonical Catalog pattern. Details, Specifications, and Discounts will follow the same structure."
+    description="Articles define the canonical Catalog pattern. Details and Discounts will follow the same structure."
     :features="features"
   />
 </template>

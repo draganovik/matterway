@@ -14,10 +14,10 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         if (affected > 0)
             return await context.Article
                 .Include(x => x.Discounts)
-                .Include(x => x.ArticleDetails!)
+                .Include(x => x.ArticleDetailTexts!)
                 .ThenInclude(pd => pd!.Detail)
-                .Include(x => x.ArticleSpecifications!)
-                .ThenInclude(ps => ps!.Specification)
+                .Include(x => x.ArticleDetailNumerics!)
+                .ThenInclude(pd => pd!.Detail)
                 .Include(x => x.ArticleImages)
                 .FirstOrDefaultAsync(x => x.Id == requestModel.Id, cancellationToken);
 
@@ -44,11 +44,11 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
                     .Where(model => model.ArticleId == id)
                     .ExecuteDeleteAsync(cancellationToken);
 
-                await context.ArticleDetail
+                await context.ArticleDetailText
                     .Where(model => model.ArticleId == id)
                     .ExecuteDeleteAsync(cancellationToken);
 
-                await context.ArticleSpecification
+                await context.ArticleDetailNumeric
                     .Where(model => model.ArticleId == id)
                     .ExecuteDeleteAsync(cancellationToken);
 
@@ -82,10 +82,10 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         var now = DateTime.UtcNow;
         return await context.Article
             .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
-            .Include(x => x.ArticleDetails!)
+            .Include(x => x.ArticleDetailTexts!)
             .ThenInclude(pd => pd!.Detail)
-            .Include(x => x.ArticleSpecifications!)
-            .ThenInclude(ps => ps!.Specification)
+            .Include(x => x.ArticleDetailNumerics!)
+            .ThenInclude(pd => pd!.Detail)
             .Include(x => x.ArticleImages)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
@@ -121,10 +121,10 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         if (affected > 0)
             return await context.Article
                 .Include(x => x.Discounts)
-                .Include(x => x.ArticleDetails!)
+                .Include(x => x.ArticleDetailTexts!)
                 .ThenInclude(pd => pd.Detail)
-                .Include(x => x.ArticleSpecifications)
-                .ThenInclude(ps => ps.Specification)
+                .Include(x => x.ArticleDetailNumerics)
+                .ThenInclude(pd => pd.Detail)
                 .Include(x => x.ArticleImages)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 

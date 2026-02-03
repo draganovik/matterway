@@ -40,13 +40,13 @@ internal sealed class ArticleEntityTypeConfiguration : IEntityTypeConfiguration<
         builder.Property(p => p.IsAvailable)
             .IsRequired();
 
-        builder.HasMany(p => p.ArticleDetails)
+        builder.HasMany(p => p.ArticleDetailTexts)
             .WithOne(pd => pd.Article)
             .HasForeignKey(pd => pd.ArticleId);
 
-        builder.HasMany(p => p.ArticleSpecifications)
-            .WithOne(ps => ps.Article)
-            .HasForeignKey(ps => ps.ArticleId);
+        builder.HasMany(p => p.ArticleDetailNumerics)
+            .WithOne(pd => pd.Article)
+            .HasForeignKey(pd => pd.ArticleId);
 
         builder.HasMany(p => p.ArticleImages)
             .WithOne(pi => pi.Article)

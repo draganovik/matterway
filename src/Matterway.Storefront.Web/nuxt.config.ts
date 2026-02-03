@@ -20,7 +20,8 @@ const alias = {
 } satisfies Record<string, string>;
 const isDev = process.env.NODE_ENV !== "production";
 const noCacheHeaders = {
-  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  "Cache-Control":
+    "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
 };
 
 // https://nuxt.com/docs/api/configuration/nuxt-config

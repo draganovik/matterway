@@ -52,14 +52,6 @@ export const serviceSections: ServiceSection[] = [
         actions: []
       },
       {
-        key: 'specifications',
-        label: 'Specifications',
-        route: '/catalog/specifications',
-        service: 'catalog',
-        minimum: 'observer',
-        actions: []
-      },
-      {
         key: 'discounts',
         label: 'Discounts',
         route: '/catalog/discounts',

@@ -1,6 +1,6 @@
-﻿namespace Matterway.Catalog.Api.Domain.Entities;
+namespace Matterway.Catalog.Api.Domain.Entities;
 
-public class ArticleDetail
+public class ArticleDetailText
 {
     public required string Value { get; set; }
 

@@ -312,38 +312,12 @@ onMounted(async () => {
             {{ detail.title ?? `Tip #${detail.detailSlug}` }}
           </dt>
           <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
-            {{ detail.value }}
-          </dd>
-        </div>
-      </div>
-      <div
-        v-if="
-          article.articleSpecifications && article.articleSpecifications.length
-        "
-        class="grid gap-4 mb-8 md:grid-cols-2"
-      >
-        <h2
-          class="col-span-2 text-lg font-semibold text-slate-900 dark:text-slate-100"
-        >
-          Specifikacije
-        </h2>
-        <div
-          v-for="spec in article.articleSpecifications"
-          :key="spec.specificationSlug ?? spec.title"
-          class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
-        >
-          <dt
-            class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
-          >
-            {{ spec.title ?? `Tip #${spec.specificationSlug}` }}
-          </dt>
-          <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
-            {{ spec.value }}
+            {{ detail.textValue ?? detail.numericValue }}
             <span
-              v-if="spec.unit"
+              v-if="detail.unit"
               class="text-sm text-slate-500 dark:text-slate-400"
             >
-              {{ spec.unit }}
+              {{ detail.unit }}
             </span>
           </dd>
         </div>

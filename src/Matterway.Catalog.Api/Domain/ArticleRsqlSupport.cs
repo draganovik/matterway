@@ -12,8 +12,8 @@ namespace Matterway.Catalog.Api.Domain;
 /// </summary>
 /// <remarks>
 /// This extension translates a filter string into LINQ expressions EF can execute server-side.
-/// Base article fields live in <see cref="ArticleFieldRules"/>, detail slugs in
-/// <see cref="ArticleDetailRules"/>, and specification slugs in <see cref="ArticleSpecificationRules"/>;
+/// Base article fields live in <see cref="ArticleFieldRules"/>, text detail slugs in
+/// <see cref="ArticleDetailRules"/>, and numeric detail slugs in <see cref="ArticleNumericDetailRules"/>;
 /// add entries there to expose new filters without touching callers.
 /// Examples:
 /// <list type="bullet">
@@ -30,15 +30,15 @@ public static class ArticleRsqlSupport
     private static readonly MethodInfo ToLowerMethod =
         typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes) ?? throw new InvalidOperationException();
 
-    private static readonly MethodInfo AnyDetailMethod = typeof(Enumerable)
+    private static readonly MethodInfo AnyDetailTextMethod = typeof(Enumerable)
         .GetMethods()
         .Single(m => m.Name == nameof(Enumerable.Any) && m.GetParameters().Length == 2)
-        .MakeGenericMethod(typeof(ArticleDetail));
+        .MakeGenericMethod(typeof(ArticleDetailText));
 
-    private static readonly MethodInfo AnySpecificationMethod = typeof(Enumerable)
+    private static readonly MethodInfo AnyDetailNumericMethod = typeof(Enumerable)
         .GetMethods()
         .Single(m => m.Name == nameof(Enumerable.Any) && m.GetParameters().Length == 2)
-        .MakeGenericMethod(typeof(ArticleSpecification));
+        .MakeGenericMethod(typeof(ArticleDetailNumeric));
 
     /// <summary>
     /// Token map for parsing operator fragments inside the filter string.
@@ -107,11 +107,11 @@ public static class ArticleRsqlSupport
                 RsqlOperator.NotIn)
         };
 
-    // Article specification slugs that can be filtered via RSQL (numeric comparisons).
-    private static readonly IReadOnlyDictionary<string, ArticleSpecificationRule> ArticleSpecificationRules =
-        new Dictionary<string, ArticleSpecificationRule>(StringComparer.OrdinalIgnoreCase)
+    // Article numeric detail slugs that can be filtered via RSQL (numeric comparisons).
+    private static readonly IReadOnlyDictionary<string, ArticleDetailNumericRule> ArticleNumericDetailRules =
+        new Dictionary<string, ArticleDetailNumericRule>(StringComparer.OrdinalIgnoreCase)
         {
-            ["battery-size"] = ArticleSpecificationRule.Number(
+            ["battery-size"] = ArticleDetailNumericRule.Number(
                 "battery-size",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -119,7 +119,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["depth"] = ArticleSpecificationRule.Number(
+            ["depth"] = ArticleDetailNumericRule.Number(
                 "depth",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -127,7 +127,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["height"] = ArticleSpecificationRule.Number(
+            ["height"] = ArticleDetailNumericRule.Number(
                 "height",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -135,7 +135,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["power"] = ArticleSpecificationRule.Number(
+            ["power"] = ArticleDetailNumericRule.Number(
                 "power",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -143,7 +143,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["ram-size"] = ArticleSpecificationRule.Number(
+            ["ram-size"] = ArticleDetailNumericRule.Number(
                 "ram-size",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -151,7 +151,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["refresh-rate"] = ArticleSpecificationRule.Number(
+            ["refresh-rate"] = ArticleDetailNumericRule.Number(
                 "refresh-rate",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -159,7 +159,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["screen-size"] = ArticleSpecificationRule.Number(
+            ["screen-size"] = ArticleDetailNumericRule.Number(
                 "screen-size",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -167,7 +167,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["storage"] = ArticleSpecificationRule.Number(
+            ["storage"] = ArticleDetailNumericRule.Number(
                 "storage",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -175,7 +175,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["weight"] = ArticleSpecificationRule.Number(
+            ["weight"] = ArticleDetailNumericRule.Number(
                 "weight",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -183,7 +183,7 @@ public static class ArticleRsqlSupport
                 RsqlOperator.LessThanOrEqual,
                 RsqlOperator.In,
                 RsqlOperator.NotIn),
-            ["width"] = ArticleSpecificationRule.Number(
+            ["width"] = ArticleDetailNumericRule.Number(
                 "width",
                 RsqlOperator.Equal,
                 RsqlOperator.NotEqual,
@@ -321,8 +321,8 @@ public static class ArticleRsqlSupport
         if (ArticleDetailRules.TryGetValue(token.Field, out var detailRule))
             return BuildDetailExpression(parameter, token, detailRule);
 
-        if (ArticleSpecificationRules.TryGetValue(token.Field, out var specificationRule))
-            return BuildSpecificationExpression(parameter, token, specificationRule);
+        if (ArticleNumericDetailRules.TryGetValue(token.Field, out var numericRule))
+            return BuildNumericDetailExpression(parameter, token, numericRule);
 
         throw BadFilter($"Unknown filter field or slug '{token.Field}'.");
     }
@@ -345,50 +345,50 @@ public static class ArticleRsqlSupport
         ArticleDetailRule rule)
     {
         var valuePredicate = BuildStringPredicate(
-            NormalizeString(Expression.Property(DetailParameter, nameof(ArticleDetail.Value))),
+            NormalizeString(Expression.Property(TextDetailParameter, nameof(ArticleDetailText.Value))),
             token);
 
         var slugPredicate = Expression.Equal(
-            Expression.Property(DetailParameter, nameof(ArticleDetail.DetailSlug)),
+            Expression.Property(TextDetailParameter, nameof(ArticleDetailText.DetailSlug)),
             Expression.Constant(rule.Slug));
 
         var detailMatchBody = Expression.AndAlso(slugPredicate, valuePredicate);
-        var detailLambda = Expression.Lambda<Func<ArticleDetail, bool>>(detailMatchBody, DetailParameter);
+        var detailLambda = Expression.Lambda<Func<ArticleDetailText, bool>>(detailMatchBody, TextDetailParameter);
 
         return BuildAnyCall(
             articleParam,
-            nameof(Article.ArticleDetails),
+            nameof(Article.ArticleDetailTexts),
             detailLambda,
-            AnyDetailMethod);
+            AnyDetailTextMethod);
     }
 
-    private static Expression BuildSpecificationExpression(
+    private static Expression BuildNumericDetailExpression(
         ParameterExpression articleParam,
         FilterToken token,
-        ArticleSpecificationRule rule)
+        ArticleDetailNumericRule rule)
     {
         if (!rule.SupportedOperators.Contains(token.Operator))
             throw BadFilter(
-                $"Operator '{token.Operator}' is not supported for specification '{rule.Slug}'. Use one of: {string.Join(", ", rule.SupportedOperators)}.");
+                $"Operator '{token.Operator}' is not supported for numeric detail '{rule.Slug}'. Use one of: {string.Join(", ", rule.SupportedOperators)}.");
 
         var numbers = ParseNumericValues(token.Values);
 
-        var parsedValue = Expression.Property(SpecificationParameter, nameof(ArticleSpecification.Value));
+        var parsedValue = Expression.Property(NumericDetailParameter, nameof(ArticleDetailNumeric.Value));
 
         var comparison = BuildNumericComparison(parsedValue, token.Operator, numbers);
         var slugPredicate = Expression.Equal(
-            Expression.Property(SpecificationParameter, nameof(ArticleSpecification.SpecificationSlug)),
+            Expression.Property(NumericDetailParameter, nameof(ArticleDetailNumeric.DetailSlug)),
             Expression.Constant(rule.Slug));
 
-        var specificationMatchBody = Expression.AndAlso(slugPredicate, comparison);
-        var specificationLambda =
-            Expression.Lambda<Func<ArticleSpecification, bool>>(specificationMatchBody, SpecificationParameter);
+        var numericMatchBody = Expression.AndAlso(slugPredicate, comparison);
+        var numericLambda =
+            Expression.Lambda<Func<ArticleDetailNumeric, bool>>(numericMatchBody, NumericDetailParameter);
 
         return BuildAnyCall(
             articleParam,
-            nameof(Article.ArticleSpecifications),
-            specificationLambda,
-            AnySpecificationMethod);
+            nameof(Article.ArticleDetailNumerics),
+            numericLambda,
+            AnyDetailNumericMethod);
     }
 
     private static Expression BuildAnyCall(
@@ -532,11 +532,11 @@ public static class ArticleRsqlSupport
         return new BadHttpRequestException(detail, StatusCodes.Status400BadRequest);
     }
 
-    private static readonly ParameterExpression DetailParameter =
-        Expression.Parameter(typeof(ArticleDetail), "detail");
+    private static readonly ParameterExpression TextDetailParameter =
+        Expression.Parameter(typeof(ArticleDetailText), "detail");
 
-    private static readonly ParameterExpression SpecificationParameter =
-        Expression.Parameter(typeof(ArticleSpecification), "specification");
+    private static readonly ParameterExpression NumericDetailParameter =
+        Expression.Parameter(typeof(ArticleDetailNumeric), "detailNumeric");
 
     /// <summary>
     /// Parsed token representing a single <c>field op value</c> fragment in the filter string.
@@ -557,15 +557,15 @@ public static class ArticleRsqlSupport
     }
 
     /// <summary>
-    /// Describes how an article specification slug should be interpreted (numeric operators).
+    /// Describes how a numeric detail slug should be interpreted (numeric operators).
     /// </summary>
-    private sealed record ArticleSpecificationRule(
+    private sealed record ArticleDetailNumericRule(
         string Slug,
         ISet<RsqlOperator> SupportedOperators)
     {
-        public static ArticleSpecificationRule Number(string slug, params RsqlOperator[] operators)
+        public static ArticleDetailNumericRule Number(string slug, params RsqlOperator[] operators)
         {
-            return new ArticleSpecificationRule(slug, operators.ToHashSet());
+            return new ArticleDetailNumericRule(slug, operators.ToHashSet());
         }
     }
 

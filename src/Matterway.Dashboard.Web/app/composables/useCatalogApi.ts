@@ -25,14 +25,9 @@ export type ArticleImageProperty = {
 export type ArticleDetailProperty = {
   detailSlug?: string | null
   title?: string | null
-  value?: string | null
-}
-
-export type ArticleSpecificationProperty = {
-  specificationSlug?: string | null
-  title?: string | null
-  value?: number | string | null
   unit?: string | null
+  textValue?: string | null
+  numericValue?: number | string | null
 }
 
 export type QueryArticleResponse = {
@@ -57,7 +52,6 @@ export type GetArticleByIdResponse = {
   discount?: ArticleDiscountProperty | null
   description?: string | null
   details?: ArticleDetailProperty[] | null
-  specifications?: ArticleSpecificationProperty[] | null
   images?: ArticleImageProperty[] | null
   createdAt?: string | null
   updatedAt?: string | null
@@ -119,28 +113,16 @@ export type UpdateArticleResponse = {
 
 export type AddArticleDetailRequest = {
   detailSlug: string
-  value: string
+  textValue?: string | null
+  numericValue?: number | string | null
 }
 
 export type UpdateArticleDetailRequest = {
-  value: string
-}
-
-export type AddArticleSpecificationRequest = {
-  specificationSlug: string
-  value: number | string
-}
-
-export type UpdateArticleSpecificationRequest = {
-  value: number | string
+  textValue?: string | null
+  numericValue?: number | string | null
 }
 
 export type QueryDetailResponse = {
-  slug?: string | null
-  title?: string | null
-}
-
-export type QuerySpecificationResponse = {
   slug?: string | null
   title?: string | null
   unit?: string | null
@@ -238,44 +220,12 @@ export function useCatalogApi() {
     )
   }
 
-  async function addArticleSpecification(articleId: string, payload: AddArticleSpecificationRequest) {
-    return api.request('catalog', `admin/articles/${articleId}/specifications`, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    })
-  }
-
-  async function updateArticleSpecification(articleId: string, specificationSlug: string, payload: UpdateArticleSpecificationRequest) {
-    return api.request('catalog', `admin/articles/${articleId}/specifications/${specificationSlug}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify(payload)
-      }
-    )
-  }
-
-  async function removeArticleSpecification(articleId: string, specificationSlug: string) {
-    return api.request('catalog', `admin/articles/${articleId}/specifications/${specificationSlug}`,
-      {
-        method: 'DELETE'
-      }
-    )
-  }
-
   async function queryDetails(params: { limit: number, titleLike?: string }) {
     const query = buildQuery({
       Limit: params.limit,
       TitleLike: params.titleLike || undefined
     })
     return api.request<QueryDetailResponse[]>('catalog', `admin/details${query}`)
-  }
-
-  async function querySpecifications(params: { limit: number, titleLike?: string }) {
-    const query = buildQuery({
-      Limit: params.limit,
-      TitleLike: params.titleLike || undefined
-    })
-    return api.request<QuerySpecificationResponse[]>('catalog', `admin/specifications${query}`)
   }
 
   return {
@@ -290,10 +240,6 @@ export function useCatalogApi() {
     addArticleDetail,
     updateArticleDetail,
     removeArticleDetail,
-    addArticleSpecification,
-    updateArticleSpecification,
-    removeArticleSpecification,
-    queryDetails,
-    querySpecifications
+    queryDetails
   }
 }

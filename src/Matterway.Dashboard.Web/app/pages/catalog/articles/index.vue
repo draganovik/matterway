@@ -283,7 +283,7 @@ onMounted(() => {
               Create Article (Step {{ createStep }} of 2)
             </h2>
             <p class="text-sm text-muted">
-              Start with the core article, then attach images, details, and specifications.
+              Start with the core article, then attach images and details.
             </p>
           </div>
           <UButton
@@ -332,10 +332,8 @@ onMounted(() => {
         <ArticleDetailsSpecsGroup
           :article-id="createdArticle?.id || null"
           :details="createdArticle?.details || []"
-          :specifications="createdArticle?.specifications || []"
           :can-edit="canEdit"
           @update:details="(details) => updateCreatedArticle({ details })"
-          @update:specifications="(specifications) => updateCreatedArticle({ specifications })"
         />
       </div>
     </div>

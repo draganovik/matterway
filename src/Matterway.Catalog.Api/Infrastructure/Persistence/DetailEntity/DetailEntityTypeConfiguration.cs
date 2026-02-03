@@ -19,10 +19,7 @@ internal sealed class DetailEntityTypeConfiguration : IEntityTypeConfiguration<D
             .HasMaxLength(120)
             .IsRequired();
 
-        builder.HasOne<AttributeSlug>()
-            .WithMany()
-            .HasPrincipalKey(a => a.Slug)
-            .HasForeignKey(d => d.Slug)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(d => d.Unit)
+            .HasMaxLength(40);
     }
 }

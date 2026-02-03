@@ -3,7 +3,9 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +17,7 @@ public class AdminAddArticleDetail : IEndpoint
     {
         app.MapPost("admin/articles/{articleId:Guid}/details", Handle)
             .WithName("AdminAddArticleDetail").WithSummary("Add a new ArticleDetail (admin).")
-            .WithTags(nameof(ArticleDetail))
+            .WithTags("ArticleDetail")
             .Produces<AddArticleDetailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
@@ -29,20 +31,66 @@ public class AdminAddArticleDetail : IEndpoint
         AddArticleDetailRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,
-        IArticleDetailRepository articleDetailRepository,
+        IDetailRepository detailRepository,
+        IArticleDetailTextRepository detailTextRepository,
+        IArticleDetailNumericRepository detailNumericRepository,
         CancellationToken cancellationToken)
     {
-        var articleDetailModel = MapToEntity(articleId, request);
-        var created = await articleDetailRepository.Create(articleDetailModel, cancellationToken);
-        if (created is null)
-        {
-            var problemDetails = new ProblemDetails
+        var normalizedSlug = request.DetailSlug.Trim().ToLower();
+        var validation = ValidateRequest(request);
+        if (validation is not null) return validation;
+
+        var detail = await detailRepository.GetBy(normalizedSlug, cancellationToken);
+        if (detail is null)
+            return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "Cannot create entity"
+                Detail = "Detail definition not found."
+            });
+
+        var isNumeric = !string.IsNullOrWhiteSpace(detail.Unit);
+        if (isNumeric && request.NumericValue is null)
+            return TypedResults.BadRequest(BuildValueMismatchProblem(detail, "numeric"));
+        if (!isNumeric && string.IsNullOrWhiteSpace(request.TextValue))
+            return TypedResults.BadRequest(BuildValueMismatchProblem(detail, "text"));
+
+        var existingText = await detailTextRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        var existingNumeric = await detailNumericRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        if (existingText is not null || existingNumeric is not null)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Article detail already exists."
+            });
+
+        AddArticleDetailResponse created;
+        if (isNumeric)
+        {
+            var entity = new ArticleDetailNumeric
+            {
+                ArticleId = articleId,
+                DetailSlug = normalizedSlug,
+                Value = request.NumericValue!.Value
             };
-            return TypedResults.BadRequest(problemDetails);
+
+            var saved = await detailNumericRepository.Create(entity, cancellationToken);
+            if (saved is null) return TypedResults.BadRequest(BuildCreateProblem());
+            created = MapToResponse(saved);
+        }
+        else
+        {
+            var entity = new ArticleDetailText
+            {
+                ArticleId = articleId,
+                DetailSlug = normalizedSlug,
+                Value = request.TextValue!.Trim()
+            };
+
+            var saved = await detailTextRepository.Create(entity, cancellationToken);
+            if (saved is null) return TypedResults.BadRequest(BuildCreateProblem());
+            created = MapToResponse(saved);
         }
 
         var location = linkGenerator.GetUriByName(
@@ -53,8 +101,7 @@ public class AdminAddArticleDetail : IEndpoint
                 id = created.ArticleId
             });
 
-        return TypedResults.Created(location,
-            MapToResponse(created));
+        return TypedResults.Created(location, created);
     }
 
     public record AddArticleDetailRequest
@@ -62,8 +109,8 @@ public class AdminAddArticleDetail : IEndpoint
         [Required]
         public required string DetailSlug { get; init; }
 
-        [Required]
-        public required string Value { get; init; }
+        public string? TextValue { get; init; }
+        public decimal? NumericValue { get; init; }
     }
 
     public record AddArticleDetailResponse
@@ -72,20 +119,47 @@ public class AdminAddArticleDetail : IEndpoint
         public string? ArticleTitle { get; init; }
         public string? DetailSlug { get; init; }
         public string? Title { get; init; }
-        public string? Value { get; init; }
+        public string? Unit { get; init; }
+        public string? TextValue { get; init; }
+        public decimal? NumericValue { get; init; }
     }
 
-    public static ArticleDetail MapToEntity(Guid articleId, AddArticleDetailRequest request)
+    private static BadRequest<ProblemDetails>? ValidateRequest(AddArticleDetailRequest request)
     {
-        return new ArticleDetail
+        var hasText = !string.IsNullOrWhiteSpace(request.TextValue);
+        var hasNumeric = request.NumericValue is not null;
+        if (hasText == hasNumeric)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Provide exactly one of textValue or numericValue."
+            });
+
+        return null;
+    }
+
+    private static ProblemDetails BuildCreateProblem()
+    {
+        return new ProblemDetails
         {
-            ArticleId = articleId,
-            DetailSlug = request.DetailSlug,
-            Value = request.Value
+            Title = "Bad Request",
+            Status = StatusCodes.Status400BadRequest,
+            Detail = "Cannot create entity"
         };
     }
 
-    public static AddArticleDetailResponse MapToResponse(ArticleDetail entity)
+    private static ProblemDetails BuildValueMismatchProblem(Detail detail, string expectedType)
+    {
+        return new ProblemDetails
+        {
+            Title = "Bad Request",
+            Status = StatusCodes.Status400BadRequest,
+            Detail = $"Detail '{detail.Slug}' requires a {expectedType} value."
+        };
+    }
+
+    public static AddArticleDetailResponse MapToResponse(ArticleDetailText entity)
     {
         return new AddArticleDetailResponse
         {
@@ -93,7 +167,23 @@ public class AdminAddArticleDetail : IEndpoint
             ArticleTitle = entity.Article?.Title,
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
-            Value = entity.Value
+            Unit = entity.Detail?.Unit,
+            TextValue = entity.Value,
+            NumericValue = null
+        };
+    }
+
+    public static AddArticleDetailResponse MapToResponse(ArticleDetailNumeric entity)
+    {
+        return new AddArticleDetailResponse
+        {
+            ArticleId = entity.ArticleId,
+            ArticleTitle = entity.Article?.Title,
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit,
+            TextValue = null,
+            NumericValue = entity.Value
         };
     }
 }

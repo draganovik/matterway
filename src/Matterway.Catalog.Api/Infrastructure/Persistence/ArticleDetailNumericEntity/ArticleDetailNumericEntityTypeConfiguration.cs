@@ -2,13 +2,13 @@ using Matterway.Catalog.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
 
-internal sealed class ArticleDetailEntityTypeConfiguration : IEntityTypeConfiguration<ArticleDetail>
+internal sealed class ArticleDetailNumericEntityTypeConfiguration : IEntityTypeConfiguration<ArticleDetailNumeric>
 {
-    public void Configure(EntityTypeBuilder<ArticleDetail> builder)
+    public void Configure(EntityTypeBuilder<ArticleDetailNumeric> builder)
     {
-        builder.ToTable(nameof(ArticleDetail));
+        builder.ToTable(nameof(ArticleDetailNumeric));
 
         builder.HasKey(pd => new { pd.ArticleId, pd.DetailSlug });
 
@@ -17,7 +17,7 @@ internal sealed class ArticleDetailEntityTypeConfiguration : IEntityTypeConfigur
             .IsRequired();
 
         builder.Property(pd => pd.Value)
-            .HasMaxLength(200)
+            .HasPrecision(18, 2)
             .IsRequired();
 
         builder.HasOne(pd => pd.Detail)
@@ -26,7 +26,7 @@ internal sealed class ArticleDetailEntityTypeConfiguration : IEntityTypeConfigur
             .HasForeignKey(pd => pd.DetailSlug);
 
         builder.HasOne(pd => pd.Article)
-            .WithMany(p => p.ArticleDetails)
+            .WithMany(p => p.ArticleDetailNumerics)
             .HasForeignKey(pd => pd.ArticleId);
     }
 }

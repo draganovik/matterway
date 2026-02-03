@@ -1,14 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
-import {
-  useCatalogStore,
-  type DetailOption,
-  type SpecificationOption,
-} from "@stores/catalog";
+import { useCatalogStore, type DetailOption } from "@stores/catalog";
 import ArticleModel, {
   type ArticleDetail,
   type ArticleImages,
-  type ArticleSpecification,
 } from "#models/ArticleModel";
 
 const catalogStore = useCatalogStore();
@@ -74,12 +69,8 @@ const galleryImages = computed(() => {
 
 const detailForm = ref({
   typeSearch: "",
-  value: "",
-});
-
-const specificationForm = ref({
-  typeSearch: "",
-  value: null as number | null,
+  textValue: "",
+  numericValue: null as number | null,
 });
 
 const selectedDetailType = ref<DetailOption | null>(null);
@@ -89,66 +80,45 @@ const isSearchingDetailTypes = ref(false);
 
 let detailTypeSearchHandle: ReturnType<typeof setTimeout> | null = null;
 
-const selectedSpecificationType = ref<SpecificationOption | null>(null);
-const specificationTypeOptions = ref<SpecificationOption[]>([]);
-const isSpecificationDropdownOpen = ref(false);
-const isSearchingSpecificationTypes = ref(false);
+const isDetailNumeric = computed(() => Boolean(selectedDetailType.value?.unit));
 
-let specificationTypeSearchHandle: ReturnType<typeof setTimeout> | null = null;
+const canSubmitDetail = computed(() => {
+  if (!selectedDetailType.value?.slug) {
+    return false;
+  }
+  if (isDetailNumeric.value) {
+    const rawValue = detailForm.value.numericValue;
+    const value =
+      typeof rawValue === "number" ? rawValue : Number(rawValue ?? undefined);
+    return (
+      rawValue !== null && rawValue !== undefined && Number.isFinite(value)
+    );
+  }
 
-const canSubmitDetail = computed(
-  () =>
-    Boolean(selectedDetailType.value?.slug) &&
-    detailForm.value.value.trim().length > 0,
-);
-
-const canSubmitSpecification = computed(() => {
-  const rawValue = specificationForm.value.value;
-  const value =
-    typeof rawValue === "number" ? rawValue : Number(rawValue ?? undefined);
-  return (
-    Boolean(selectedSpecificationType.value?.slug) &&
-    rawValue !== null &&
-    rawValue !== undefined &&
-    rawValue !== "" &&
-    Number.isFinite(value)
-  );
+  return detailForm.value.textValue.trim().length > 0;
 });
 
 const clearDetailTypeSelection = () => {
   selectedDetailType.value = null;
   detailTypeOptions.value = [];
   detailForm.value.typeSearch = "";
+  detailForm.value.textValue = "";
+  detailForm.value.numericValue = null;
   isDetailTypeDropdownOpen.value = false;
 };
 
-const clearSpecificationTypeSelection = () => {
-  selectedSpecificationType.value = null;
-  specificationTypeOptions.value = [];
-  specificationForm.value.typeSearch = "";
-  isSpecificationDropdownOpen.value = false;
-};
-
 const resetDetailForm = () => {
-  detailForm.value.value = "";
+  detailForm.value.textValue = "";
+  detailForm.value.numericValue = null;
   clearDetailTypeSelection();
-};
-
-const resetSpecificationForm = () => {
-  specificationForm.value.value = null;
-  clearSpecificationTypeSelection();
 };
 
 const handleDetailTypeSelect = (option: DetailOption) => {
   selectedDetailType.value = option;
   detailForm.value.typeSearch = option.title ?? "";
+  detailForm.value.textValue = "";
+  detailForm.value.numericValue = null;
   isDetailTypeDropdownOpen.value = false;
-};
-
-const handleSpecificationTypeSelect = (option: SpecificationOption) => {
-  selectedSpecificationType.value = option;
-  specificationForm.value.typeSearch = option.title ?? "";
-  isSpecificationDropdownOpen.value = false;
 };
 
 const handleDetailTypeFocus = () => {
@@ -160,18 +130,6 @@ const handleDetailTypeFocus = () => {
 const handleDetailTypeBlur = () => {
   setTimeout(() => {
     isDetailTypeDropdownOpen.value = false;
-  }, 120);
-};
-
-const handleSpecificationTypeFocus = () => {
-  if (specificationTypeOptions.value.length > 0) {
-    isSpecificationDropdownOpen.value = true;
-  }
-};
-
-const handleSpecificationTypeBlur = () => {
-  setTimeout(() => {
-    isSpecificationDropdownOpen.value = false;
   }, 120);
 };
 
@@ -206,37 +164,6 @@ const fetchDetailTypeOptions = (search: string) => {
   }, 250);
 };
 
-const fetchSpecificationTypeOptions = (search: string) => {
-  if (specificationTypeSearchHandle) {
-    clearTimeout(specificationTypeSearchHandle);
-  }
-
-  if (!search || search.trim().length < 2) {
-    specificationTypeOptions.value = [];
-    isSpecificationDropdownOpen.value = false;
-    return;
-  }
-
-  isSpecificationDropdownOpen.value = true;
-
-  specificationTypeSearchHandle = setTimeout(async () => {
-    isSearchingSpecificationTypes.value = true;
-    try {
-      specificationTypeOptions.value = await catalogStore.querySpecifications(
-        search.trim(),
-        8,
-      );
-      isSpecificationDropdownOpen.value = true;
-    } catch (error) {
-      console.error("Failed to fetch specification types", error);
-      specificationTypeOptions.value = [];
-      isSpecificationDropdownOpen.value = false;
-    } finally {
-      isSearchingSpecificationTypes.value = false;
-    }
-  }, 250);
-};
-
 watch(
   () => detailForm.value.typeSearch,
   (newValue) => {
@@ -245,17 +172,6 @@ watch(
     }
     selectedDetailType.value = null;
     fetchDetailTypeOptions(newValue);
-  },
-);
-
-watch(
-  () => specificationForm.value.typeSearch,
-  (newValue) => {
-    if (selectedSpecificationType.value?.title === newValue) {
-      return;
-    }
-    selectedSpecificationType.value = null;
-    fetchSpecificationTypeOptions(newValue);
   },
 );
 
@@ -297,15 +213,40 @@ const handleImageFileChange = (event: Event) => {
 };
 
 const addDetail = async () => {
-  const detailValue = detailForm.value.value.trim();
-  if (!article.value || !selectedDetailType.value?.slug || !detailValue) {
+  if (!article.value || !selectedDetailType.value?.slug) {
     return;
   }
-  const response = await catalogStore.createArticleDetail(
-    article.value.id,
-    selectedDetailType.value.slug,
-    detailValue,
-  );
+
+  if (isDetailNumeric.value) {
+    const rawValue = detailForm.value.numericValue;
+    const value =
+      typeof rawValue === "number" ? rawValue : Number(rawValue ?? undefined);
+    if (
+      rawValue === null ||
+      rawValue === undefined ||
+      !Number.isFinite(value)
+    ) {
+      return;
+    }
+    const response = await catalogStore.createArticleDetail(article.value.id, {
+      detailSlug: selectedDetailType.value.slug,
+      numericValue: value,
+    });
+    if (response.ok) {
+      resetDetailForm();
+      await loadArticle();
+    }
+    return;
+  }
+
+  const textValue = detailForm.value.textValue.trim();
+  if (!textValue) {
+    return;
+  }
+  const response = await catalogStore.createArticleDetail(article.value.id, {
+    detailSlug: selectedDetailType.value.slug,
+    textValue,
+  });
   if (response.ok) {
     resetDetailForm();
     await loadArticle();
@@ -326,76 +267,40 @@ const removeDetail = async (detailSlug?: string) => {
 };
 
 const updateDetail = async (detail: ArticleDetail) => {
-  const detailValue = detail.value?.trim();
-  if (!article.value || !detail.detailSlug || !detailValue) {
+  if (!article.value || !detail.detailSlug) {
+    return;
+  }
+
+  if (detail.unit) {
+    const rawValue = detail.numericValue;
+    const value =
+      typeof rawValue === "number" ? rawValue : Number(rawValue ?? undefined);
+    if (
+      rawValue === null ||
+      rawValue === undefined ||
+      !Number.isFinite(value)
+    ) {
+      return;
+    }
+    const response = await catalogStore.updateArticleDetail(
+      article.value.id,
+      detail.detailSlug,
+      { numericValue: value },
+    );
+    if (response.ok) {
+      await loadArticle();
+    }
+    return;
+  }
+
+  const textValue = detail.textValue?.trim();
+  if (!textValue) {
     return;
   }
   const response = await catalogStore.updateArticleDetail(
     article.value.id,
     detail.detailSlug,
-    detailValue,
-  );
-  if (response.ok) {
-    await loadArticle();
-  }
-};
-
-const addSpecification = async () => {
-  const rawValue = specificationForm.value.value;
-  const value =
-    typeof rawValue === "number" ? rawValue : Number(rawValue ?? undefined);
-
-  if (
-    !article.value ||
-    !selectedSpecificationType.value?.slug ||
-    rawValue === null ||
-    rawValue === undefined ||
-    rawValue === "" ||
-    !Number.isFinite(value)
-  ) {
-    return;
-  }
-
-  const response = await catalogStore.createArticleSpecification(
-    article.value.id,
-    selectedSpecificationType.value.slug,
-    value,
-  );
-  if (response.ok) {
-    resetSpecificationForm();
-    await loadArticle();
-  }
-};
-
-const removeSpecification = async (specificationSlug?: string) => {
-  if (!article.value || !specificationSlug) {
-    return;
-  }
-  const response = await catalogStore.deleteArticleSpecification(
-    article.value.id,
-    specificationSlug,
-  );
-  if (response.ok) {
-    await loadArticle();
-  }
-};
-
-const updateSpecification = async (specification: ArticleSpecification) => {
-  const nextValue =
-    typeof specification.value === "number"
-      ? specification.value
-      : Number(specification.value);
-  if (
-    !article.value ||
-    !specification.specificationSlug ||
-    !Number.isFinite(nextValue)
-  ) {
-    return;
-  }
-  const response = await catalogStore.updateArticleSpecification(
-    article.value.id,
-    specification.specificationSlug,
-    nextValue,
+    { textValue },
   );
   if (response.ok) {
     await loadArticle();
@@ -479,7 +384,6 @@ const loadArticle = async () => {
     article.value = null;
     imageOrderInputs.value = {};
     resetDetailForm();
-    resetSpecificationForm();
     return;
   }
 
@@ -491,7 +395,6 @@ const loadArticle = async () => {
     imageOrderInputs.value = {};
   }
   resetDetailForm();
-  resetSpecificationForm();
 };
 
 useHead({
@@ -769,13 +672,29 @@ onMounted(async () => {
                   class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
                 >
                   {{ detail.title ?? `Tip #${detail.detailSlug}` }}
+                  <span
+                    v-if="detail.unit"
+                    class="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500"
+                  >
+                    ({{ detail.unit }})
+                  </span>
                 </p>
                 <textarea
-                  v-model="detail.value"
+                  v-if="!detail.unit"
+                  v-model="detail.textValue"
                   rows="2"
                   placeholder="Vrednost"
                   class="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 ></textarea>
+                <input
+                  v-else
+                  v-model.number="detail.numericValue"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Vrednost"
+                  class="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                />
               </div>
               <div class="flex flex-col gap-2 md:items-end">
                 <button
@@ -860,6 +779,12 @@ onMounted(async () => {
                         >
                           {{ option.title }}
                         </p>
+                        <p
+                          v-if="option.unit"
+                          class="text-xs text-slate-500 dark:text-slate-400"
+                        >
+                          {{ option.unit }}
+                        </p>
                       </li>
                     </ul>
                     <p
@@ -882,12 +807,28 @@ onMounted(async () => {
               >
                 Vrednost
               </label>
+              <textarea
+                v-if="!isDetailNumeric"
+                v-model="detailForm.textValue"
+                rows="2"
+                placeholder="npr. Bela boja"
+                class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              ></textarea>
               <input
-                v-model="detailForm.value"
-                type="text"
+                v-else
+                v-model.number="detailForm.numericValue"
+                type="number"
+                min="0"
+                step="0.01"
                 placeholder="npr. 120"
                 class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
               />
+              <p
+                v-if="selectedDetailType?.unit"
+                class="text-xs text-slate-500 dark:text-slate-400"
+              >
+                Merna jedinica: {{ selectedDetailType.unit }}
+              </p>
             </div>
           </div>
           <button
@@ -897,188 +838,6 @@ onMounted(async () => {
             @click="addDetail()"
           >
             Dodaj detalj
-          </button>
-        </div>
-      </div>
-
-      <div
-        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-700 dark:bg-slate-800"
-      >
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Specifikacije
-          </h2>
-          <span class="text-xs uppercase text-slate-400">
-            {{ article.articleSpecifications?.length || 0 }} unosa
-          </span>
-        </div>
-
-        <div v-if="article.articleSpecifications?.length" class="space-y-4">
-          <div
-            v-for="spec in article.articleSpecifications"
-            :key="spec.specificationSlug ?? spec.title"
-            class="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
-          >
-            <div class="grid gap-3 md:grid-cols-[1fr_auto]">
-              <div class="space-y-2">
-                <p
-                  class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
-                >
-                  {{ spec.title ?? `Tip #${spec.specificationSlug}` }}
-                  <span
-                    v-if="spec.unit"
-                    class="ml-1 text-xs font-normal text-slate-400 dark:text-slate-500"
-                  >
-                    ({{ spec.unit }})
-                  </span>
-                </p>
-                <input
-                  v-model.number="spec.value"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Vrednost"
-                  class="w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                />
-              </div>
-              <div class="flex flex-col gap-2 md:items-end">
-                <button
-                  type="button"
-                  class="rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-blue-800 focus:outline-hidden focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  @click="updateSpecification(spec)"
-                >
-                  Sačuvaj
-                </button>
-                <button
-                  type="button"
-                  class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-red-700 focus:outline-hidden focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
-                  @click="
-                    removeSpecification(spec.specificationSlug ?? undefined)
-                  "
-                >
-                  Ukloni
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else
-          class="rounded-xl border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400"
-        >
-          Još uvek nema numeričkih specifikacija. Dodajte ih ispod.
-        </div>
-
-        <div
-          class="space-y-3 rounded-xl border border-dashed border-slate-300 p-4 dark:border-slate-600"
-        >
-          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
-            Dodaj novu specifikaciju
-          </h3>
-          <div class="grid gap-3 md:grid-cols-2">
-            <div class="space-y-2 flex flex-col">
-              <label
-                class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
-              >
-                Tip specifikacije
-              </label>
-              <div class="relative">
-                <input
-                  v-model="specificationForm.typeSearch"
-                  type="text"
-                  placeholder="Počnite da kucate naziv..."
-                  class="w-full rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                  @focus="handleSpecificationTypeFocus"
-                  @blur="handleSpecificationTypeBlur"
-                />
-                <button
-                  v-if="selectedSpecificationType"
-                  type="button"
-                  class="absolute inset-y-0 right-2 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
-                  @mousedown.prevent
-                  @click="clearSpecificationTypeSelection"
-                >
-                  &times;
-                </button>
-                <div
-                  v-if="isSpecificationDropdownOpen"
-                  class="absolute z-20 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900"
-                >
-                  <p
-                    v-if="isSearchingSpecificationTypes"
-                    class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400"
-                  >
-                    Pretraga u toku...
-                  </p>
-                  <template v-else>
-                    <ul
-                      v-if="specificationTypeOptions.length > 0"
-                      class="max-h-56 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-700"
-                    >
-                      <li
-                        v-for="option in specificationTypeOptions"
-                        :key="option.slug"
-                        class="cursor-pointer px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                        @mousedown.prevent="
-                          handleSpecificationTypeSelect(option)
-                        "
-                      >
-                        <p
-                          class="text-sm font-medium text-slate-900 dark:text-slate-100"
-                        >
-                          {{ option.title }}
-                        </p>
-                        <p
-                          v-if="option.unit"
-                          class="text-xs text-slate-500 dark:text-slate-400"
-                        >
-                          {{ option.unit }}
-                        </p>
-                      </li>
-                    </ul>
-                    <p
-                      v-else
-                      class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400"
-                    >
-                      {{
-                        specificationForm.typeSearch.trim().length < 2
-                          ? "Unesite najmanje 2 karaktera"
-                          : "Nismo pronašli rezultate"
-                      }}
-                    </p>
-                  </template>
-                </div>
-              </div>
-              <p
-                v-if="selectedSpecificationType?.unit"
-                class="text-xs text-slate-500 dark:text-slate-400"
-              >
-                Merna jedinica: {{ selectedSpecificationType.unit }}
-              </p>
-            </div>
-            <div class="space-y-2 flex flex-col">
-              <label
-                class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400"
-              >
-                Vrednost
-              </label>
-              <input
-                v-model.number="specificationForm.value"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="npr. 120"
-                class="rounded-lg border border-slate-300 bg-slate-50 p-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-              />
-            </div>
-          </div>
-          <button
-            type="button"
-            class="w-full rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-hidden focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-700"
-            :disabled="!canSubmitSpecification"
-            @click="addSpecification()"
-          >
-            Dodaj specifikaciju
           </button>
         </div>
       </div>

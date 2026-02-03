@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Matterway.Catalog.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,14 +32,16 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttributeSlug",
+                name: "Detail",
                 columns: table => new
                 {
-                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false)
+                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    Unit = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttributeSlug", x => x.Slug);
+                    table.PrimaryKey("PK_Detail", x => x.Slug);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,44 +87,32 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Detail",
+                name: "ArticleDetailNumeric",
                 columns: table => new
                 {
-                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false)
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DetailSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Detail", x => x.Slug);
+                    table.PrimaryKey("PK_ArticleDetailNumeric", x => new { x.ArticleId, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_Detail_AttributeSlug_Slug",
-                        column: x => x.Slug,
-                        principalTable: "AttributeSlug",
+                        name: "FK_ArticleDetailNumeric_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArticleDetailNumeric_Detail_DetailSlug",
+                        column: x => x.DetailSlug,
+                        principalTable: "Detail",
                         principalColumn: "Slug",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Specification",
-                columns: table => new
-                {
-                    Slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Title = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    Unit = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Specification", x => x.Slug);
-                    table.ForeignKey(
-                        name: "FK_Specification_AttributeSlug_Slug",
-                        column: x => x.Slug,
-                        principalTable: "AttributeSlug",
-                        principalColumn: "Slug",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ArticleDetail",
+                name: "ArticleDetailText",
                 columns: table => new
                 {
                     ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -131,42 +121,17 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleDetail", x => new { x.ArticleId, x.DetailSlug });
+                    table.PrimaryKey("PK_ArticleDetailText", x => new { x.ArticleId, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_ArticleDetail_Article_ArticleId",
+                        name: "FK_ArticleDetailText_Article_ArticleId",
                         column: x => x.ArticleId,
                         principalTable: "Article",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ArticleDetail_Detail_DetailSlug",
+                        name: "FK_ArticleDetailText_Detail_DetailSlug",
                         column: x => x.DetailSlug,
                         principalTable: "Detail",
-                        principalColumn: "Slug",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ArticleSpecification",
-                columns: table => new
-                {
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SpecificationSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArticleSpecification", x => new { x.ArticleId, x.SpecificationSlug });
-                    table.ForeignKey(
-                        name: "FK_ArticleSpecification_Article_ArticleId",
-                        column: x => x.ArticleId,
-                        principalTable: "Article",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ArticleSpecification_Specification_SpecificationSlug",
-                        column: x => x.SpecificationSlug,
-                        principalTable: "Specification",
                         principalColumn: "Slug",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -184,120 +149,43 @@ namespace Matterway.Catalog.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "AttributeSlug",
-                column: "Slug",
-                values: new object[]
-                {
-                    "audio",
-                    "audio-quality",
-                    "battery",
-                    "battery-size",
-                    "brand",
-                    "camera",
-                    "color",
-                    "color-temperature",
-                    "compatibility",
-                    "connectivity",
-                    "depth",
-                    "display",
-                    "features",
-                    "height",
-                    "material",
-                    "model",
-                    "operating-system",
-                    "ports",
-                    "power",
-                    "processor",
-                    "ram-size",
-                    "refresh-rate",
-                    "resolution",
-                    "screen-size",
-                    "storage",
-                    "video-quality",
-                    "weight",
-                    "width"
-                });
-
-            migrationBuilder.InsertData(
-                table: "ArticleImage",
-                columns: new[] { "ArticleId", "Id", "ImageAlt", "ImageUrl", "OrderIndex" },
-                values: new object[,]
-                {
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/article-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/article-24529407541337-media.jpg", 0 },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/articleImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/articleImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Detail",
-                columns: new[] { "Slug", "Title" },
-                values: new object[,]
-                {
-                    { "audio", "Audio" },
-                    { "audio-quality", "Audio Quality" },
-                    { "battery", "Battery" },
-                    { "brand", "Brand" },
-                    { "camera", "Camera" },
-                    { "color", "Color" },
-                    { "color-temperature", "Color Temperature" },
-                    { "compatibility", "Compatibility" },
-                    { "connectivity", "Connectivity" },
-                    { "display", "Display" },
-                    { "features", "Features" },
-                    { "material", "Material" },
-                    { "model", "Model" },
-                    { "operating-system", "Operating System" },
-                    { "ports", "Ports" },
-                    { "processor", "Processor" },
-                    { "resolution", "Resolution" },
-                    { "video-quality", "Video Quality" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Discount",
-                columns: new[] { "ArticleId", "Code", "Percentage", "ValidFrom", "ValidTo" },
-                values: new object[] { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "WINTER25", 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
-
-            migrationBuilder.InsertData(
-                table: "Specification",
                 columns: new[] { "Slug", "Title", "Unit" },
                 values: new object[,]
                 {
+                    { "audio", "Audio", null },
+                    { "audio-quality", "Audio Quality", null },
+                    { "battery", "Battery", null },
                     { "battery-size", "Battery Size", "mAh" },
+                    { "brand", "Brand", null },
+                    { "camera", "Camera", null },
+                    { "color", "Color", null },
+                    { "color-temperature", "Color Temperature", null },
+                    { "compatibility", "Compatibility", null },
+                    { "connectivity", "Connectivity", null },
                     { "depth", "Depth", "millimeters" },
+                    { "display", "Display", null },
+                    { "features", "Features", null },
                     { "height", "Height", "millimeters" },
+                    { "material", "Material", null },
+                    { "model", "Model", null },
+                    { "operating-system", "Operating System", null },
+                    { "ports", "Ports", null },
                     { "power", "Power", "watts" },
+                    { "processor", "Processor", null },
                     { "ram-size", "RAM Size", "GB" },
                     { "refresh-rate", "Refresh Rate", "Hz" },
+                    { "resolution", "Resolution", null },
                     { "screen-size", "Screen Size", "inches" },
                     { "storage", "Storage", "GB" },
+                    { "video-quality", "Video Quality", null },
                     { "weight", "Weight", "grams" },
                     { "width", "Width", "millimeters" }
                 });
 
             migrationBuilder.InsertData(
-                table: "ArticleDetail",
+                table: "ArticleDetailNumeric",
                 columns: new[] { "ArticleId", "DetailSlug", "Value" },
-                values: new object[,]
-                {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "compatibility", "Works with Alexa, Google Assistant, and Siri" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "audio-quality", "Two-way audio with noise cancellation" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "connectivity", "Wi-Fi and Ethernet" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "video-quality", "1080p HD" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "ArticleSpecification",
-                columns: new[] { "ArticleId", "SpecificationSlug", "Value" },
                 values: new object[,]
                 {
                     { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery-size", 3000m },
@@ -315,6 +203,41 @@ namespace Matterway.Catalog.Api.Migrations
                     { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "weight", 72m }
                 });
 
+            migrationBuilder.InsertData(
+                table: "ArticleDetailText",
+                columns: new[] { "ArticleId", "DetailSlug", "Value" },
+                values: new object[,]
+                {
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "compatibility", "Works with Alexa, Google Assistant, and Siri" },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "connectivity", "Wi-Fi and Bluetooth" },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "connectivity", "Wi-Fi and Bluetooth" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "audio-quality", "Two-way audio with noise cancellation" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "connectivity", "Wi-Fi and Ethernet" },
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "video-quality", "1080p HD" },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ArticleImage",
+                columns: new[] { "ArticleId", "Id", "ImageAlt", "ImageUrl", "OrderIndex" },
+                values: new object[,]
+                {
+                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/article-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/article-24529407541337-media.jpg", 0 },
+                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
+                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/articleImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
+                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/articleImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
+                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Discount",
+                columns: new[] { "ArticleId", "Code", "Percentage", "ValidFrom", "ValidTo" },
+                values: new object[] { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "WINTER25", 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Article_ArticleCode",
                 table: "Article",
@@ -322,25 +245,19 @@ namespace Matterway.Catalog.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArticleDetail_DetailSlug",
-                table: "ArticleDetail",
+                name: "IX_ArticleDetailNumeric_DetailSlug",
+                table: "ArticleDetailNumeric",
+                column: "DetailSlug");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleDetailText_DetailSlug",
+                table: "ArticleDetailText",
                 column: "DetailSlug");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArticleImage_ArticleId_OrderIndex",
                 table: "ArticleImage",
                 columns: new[] { "ArticleId", "OrderIndex" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArticleSpecification_SpecificationSlug",
-                table: "ArticleSpecification",
-                column: "SpecificationSlug");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AttributeSlug_Slug",
-                table: "AttributeSlug",
-                column: "Slug",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -353,13 +270,13 @@ namespace Matterway.Catalog.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArticleDetail");
+                name: "ArticleDetailNumeric");
+
+            migrationBuilder.DropTable(
+                name: "ArticleDetailText");
 
             migrationBuilder.DropTable(
                 name: "ArticleImage");
-
-            migrationBuilder.DropTable(
-                name: "ArticleSpecification");
 
             migrationBuilder.DropTable(
                 name: "Discount");
@@ -368,13 +285,7 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "Detail");
 
             migrationBuilder.DropTable(
-                name: "Specification");
-
-            migrationBuilder.DropTable(
                 name: "Article");
-
-            migrationBuilder.DropTable(
-                name: "AttributeSlug");
         }
     }
 }

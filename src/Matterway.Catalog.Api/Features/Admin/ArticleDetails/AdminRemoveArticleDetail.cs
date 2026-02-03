@@ -2,7 +2,8 @@ using Asp.Versioning;
 using Matterway.Catalog.Api.Application;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Admin.ArticleDetails;
@@ -13,7 +14,7 @@ public class AdminRemoveArticleDetail : IEndpoint
     {
         app.MapDelete("admin/articles/{articleId:guid}/details/{detailSlug}", Handle)
             .WithName("AdminDeleteArticleDetail").WithSummary("Delete an ArticleDetail (admin).")
-            .WithTags(nameof(ArticleDetail))
+            .WithTags("ArticleDetail")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
@@ -24,31 +25,52 @@ public class AdminRemoveArticleDetail : IEndpoint
     private static async Task<Results<Ok<RemoveArticleDetailResponse>, NotFound>> Handle(
         Guid articleId,
         string detailSlug,
-        IArticleDetailRepository articleDetailRepository,
+        IArticleDetailTextRepository detailTextRepository,
+        IArticleDetailNumericRepository detailNumericRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await articleDetailRepository.GetBy(articleId, detailSlug, cancellationToken);
+        var normalizedSlug = detailSlug.Trim().ToLower();
+        var textEntity = await detailTextRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        if (textEntity is not null)
+        {
+            var isDeleted = await detailTextRepository.Delete(articleId, normalizedSlug, cancellationToken);
+            return isDeleted ? TypedResults.Ok(MapToResponse(textEntity)) : TypedResults.NotFound();
+        }
 
-        if (entity is null) return TypedResults.NotFound();
-
-        var isDeleted = await articleDetailRepository.Delete(articleId, detailSlug, cancellationToken);
-
-        return isDeleted ? TypedResults.Ok(MapToResponse(entity)) : TypedResults.NotFound();
+        var numericEntity = await detailNumericRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        if (numericEntity is null) return TypedResults.NotFound();
+        var numericDeleted = await detailNumericRepository.Delete(articleId, normalizedSlug, cancellationToken);
+        return numericDeleted ? TypedResults.Ok(MapToResponse(numericEntity)) : TypedResults.NotFound();
     }
 
     public record RemoveArticleDetailResponse
     {
         public required Guid ArticleId { get; init; }
-        public required string DetailType { get; init; }
+        public required string DetailSlug { get; init; }
+        public string? Title { get; init; }
+        public string? Unit { get; init; }
         public string Message { get; init; } = "Article detail removed successfully.";
     }
 
-    public static RemoveArticleDetailResponse MapToResponse(ArticleDetail entity)
+    public static RemoveArticleDetailResponse MapToResponse(ArticleDetailText entity)
     {
         return new RemoveArticleDetailResponse
         {
             ArticleId = entity.ArticleId,
-            DetailType = entity.Detail?.Title ?? "Detail key: " + entity.DetailSlug
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit
+        };
+    }
+
+    public static RemoveArticleDetailResponse MapToResponse(ArticleDetailNumeric entity)
+    {
+        return new RemoveArticleDetailResponse
+        {
+            ArticleId = entity.ArticleId,
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit
         };
     }
 }
