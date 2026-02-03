@@ -156,7 +156,6 @@ function updateImages(images: GetArticleByIdResponse['images']) {
             color="primary"
             :loading="updateState.loading"
             :disabled="!canEdit"
-            class="ml-auto"
             @click="saveArticle"
           >
             Update Article

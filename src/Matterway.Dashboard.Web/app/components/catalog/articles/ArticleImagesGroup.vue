@@ -18,23 +18,17 @@ const emit = defineEmits<{
 
 const api = useCatalogApi()
 const images = ref<ArticleImageProperty[]>([])
-const addForm = reactive({
-  orderIndex: 0,
-  imageAlt: '',
-  file: null as File | null
-})
 const addState = useRequestState()
 const updateState = useRequestState()
 const removeState = useRequestState()
-const replaceState = useRequestState()
-
-const editMap = reactive<Record<string, { orderIndex: number | string, imageAlt: string }>>({})
+const imageModalOpen = ref(false)
+const imageModalMode = ref<'add' | 'edit'>('add')
+const activeImage = ref<ArticleImageProperty | null>(null)
 
 watch(
   () => props.modelValue,
   (value) => {
     images.value = Array.isArray(value) ? [...value] : []
-    syncEdits()
   },
   { immediate: true }
 )
@@ -42,51 +36,52 @@ watch(
 watch(
   () => props.articleId,
   () => {
-    addForm.orderIndex = 0
-    addForm.imageAlt = ''
-    addForm.file = null
     addState.error = ''
     addState.success = ''
   }
 )
 
-function syncEdits() {
-  for (const image of images.value) {
-    const key = String(image.id || image.orderIndex)
-    if (!editMap[key]) {
-      editMap[key] = {
-        orderIndex: image.orderIndex ?? 0,
-        imageAlt: image.imageAlt || ''
-      }
-    } else {
-      editMap[key].orderIndex = image.orderIndex ?? 0
-      editMap[key].imageAlt = image.imageAlt || ''
-    }
-  }
-}
-
 function updateImages(next: ArticleImageProperty[]) {
   images.value = [...next]
   emit('update:modelValue', images.value)
-  syncEdits()
 }
 
-async function addImage() {
+function openAddImageModal() {
   addState.error = ''
   addState.success = ''
   if (!props.articleId) {
     addState.error = 'Create the article before adding images.'
     return
   }
-  if (!addForm.file) {
+  imageModalMode.value = 'add'
+  activeImage.value = null
+  imageModalOpen.value = true
+}
+
+function openEditImageModal(image: ArticleImageProperty) {
+  updateState.error = ''
+  updateState.success = ''
+  imageModalMode.value = 'edit'
+  activeImage.value = image
+  imageModalOpen.value = true
+}
+
+async function addImage(payload: { orderIndex: number, imageAlt: string, file?: File | null }) {
+  addState.error = ''
+  addState.success = ''
+  if (!props.articleId) {
+    addState.error = 'Create the article before adding images.'
+    return
+  }
+  if (!payload.file) {
     addState.error = 'Select an image file to upload.'
     return
   }
   addState.loading = true
   const result = await api.addArticleImage(props.articleId, {
-    orderIndex: addForm.orderIndex,
-    file: addForm.file,
-    imageAlt: addForm.imageAlt
+    orderIndex: payload.orderIndex,
+    file: payload.file,
+    imageAlt: payload.imageAlt
   })
   addState.loading = false
   if (!result.ok) {
@@ -98,24 +93,27 @@ async function addImage() {
     next.push(result.data as ArticleImageProperty)
   }
   updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
-  addForm.file = null
-  addForm.imageAlt = ''
   addState.success = 'Image added.'
+  imageModalOpen.value = false
 }
 
-async function updateImage(image: ArticleImageProperty) {
+async function updateImage(payload: { orderIndex: number, imageAlt: string }) {
   updateState.error = ''
   updateState.success = ''
   if (!props.articleId) return
-  const key = String(image.id || image.orderIndex)
-  const edit = editMap[key] || {
-    orderIndex: image.orderIndex ?? 0,
-    imageAlt: image.imageAlt || ''
+  if (!activeImage.value) {
+    updateState.error = 'Select an image to edit.'
+    return
+  }
+  const targetOrderIndex = activeImage.value.orderIndex
+  if (targetOrderIndex === undefined || targetOrderIndex === null) {
+    updateState.error = 'Selected image is missing an order index.'
+    return
   }
   updateState.loading = true
-  const result = await api.updateArticleImage(props.articleId, image.orderIndex, {
-    imageAlt: edit.imageAlt,
-    orderIndex: edit.orderIndex
+  const result = await api.updateArticleImage(props.articleId, targetOrderIndex, {
+    imageAlt: payload.imageAlt,
+    orderIndex: payload.orderIndex
   })
   updateState.loading = false
   if (!result.ok) {
@@ -123,17 +121,18 @@ async function updateImage(image: ArticleImageProperty) {
     return
   }
   const next = images.value.map((item) => {
-    if (item.id === image.id) {
+    if (item.id === activeImage.value?.id) {
       return {
         ...item,
-        orderIndex: edit.orderIndex,
-        imageAlt: edit.imageAlt
+        orderIndex: payload.orderIndex,
+        imageAlt: payload.imageAlt
       }
     }
     return item
   })
   updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
   updateState.success = 'Image updated.'
+  imageModalOpen.value = false
 }
 
 async function removeImage(image: ArticleImageProperty) {
@@ -150,6 +149,14 @@ async function removeImage(image: ArticleImageProperty) {
   updateImages(images.value.filter(item => item.id !== image.id))
   removeState.success = 'Image removed.'
 }
+
+async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string, file?: File | null }) {
+  if (imageModalMode.value === 'add') {
+    await addImage(payload)
+    return
+  }
+  await updateImage(payload)
+}
 </script>
 
 <template>
@@ -158,6 +165,14 @@ async function removeImage(image: ArticleImageProperty) {
       <h3 class="text-base font-semibold text-foreground">
         Images
       </h3>
+      <UButton
+        color="primary"
+        variant="outline"
+        :disabled="!canEdit || !articleId"
+        @click="openAddImageModal"
+      >
+        Add Image
+      </UButton>
     </div>
 
     <div
@@ -171,60 +186,6 @@ async function removeImage(image: ArticleImageProperty) {
       v-else
       class="grid gap-4 @container"
     >
-      <div class="grid grid-cols-4 gap-3">
-        <UFormField
-          label="File"
-          required
-        >
-          <UFileUpload
-            v-model="addForm.file"
-            accept="image/*"
-            variant="button"
-            label="Choose image"
-            :preview="false"
-            :reset="true"
-            class="px-auto px-2"
-            :disabled="!canEdit"
-          />
-        </UFormField>
-        <UFormField
-          label="Order Index"
-          required
-        >
-          <UInput
-            v-model="addForm.orderIndex"
-            type="number"
-            min="0"
-            :disabled="!canEdit"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Image Alt">
-          <UInput
-            v-model="addForm.imageAlt"
-            :disabled="!canEdit"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField>
-          <br class="mt-1">
-          <UButton
-            color="primary"
-            :loading="addState.loading"
-            :disabled="!canEdit"
-            @click="addImage"
-          >
-            Upload
-          </UButton>
-        </UFormField>
-      </div>
-      <div class="flex flex-wrap items-center gap-3">
-        <FormStatus
-          :error="addState.error"
-          :success="addState.success"
-        />
-      </div>
-
       <div class="rounded-md border grid @sm:grid-cols-2 @md:grid-cols-3 @lg:grid-cols-4 border-default/40">
         <div
           v-for="image in images"
@@ -247,36 +208,13 @@ async function removeImage(image: ArticleImageProperty) {
               </div>
             </div>
             <div class="grid gap-3">
-              <UFormField
-                label="Order Index"
-                class="col-span-2"
-              >
-                <UInput
-                  v-model="editMap[String(image.id || image.orderIndex)]!.orderIndex"
-                  type="number"
-                  min="0"
-                  :disabled="!canEdit"
-                  class="w-full"
-                />
-              </UFormField>
-              <UFormField
-                label="Image Alt"
-                class="col-span-2"
-              >
-                <UInput
-                  v-model="editMap[String(image.id || image.orderIndex)]!.imageAlt"
-                  :disabled="!canEdit"
-                  class="w-full"
-                />
-              </UFormField>
               <UButton
                 variant="outline"
-                :loading="updateState.loading"
                 :disabled="!canEdit"
                 class="justify-center"
-                @click="updateImage(image)"
+                @click="openEditImageModal(image)"
               >
-                Update
+                Edit
               </UButton>
               <UButton
                 color="error"
@@ -293,9 +231,19 @@ async function removeImage(image: ArticleImageProperty) {
       </div>
 
       <div class="flex flex-wrap gap-4">
-        <FormStatus :error="updateState.error || replaceState.error || removeState.error" />
-        <FormStatus :success="updateState.success || replaceState.success || removeState.success" />
+        <FormStatus :error="addState.error || updateState.error || removeState.error" />
+        <FormStatus :success="addState.success || updateState.success || removeState.success" />
       </div>
     </div>
   </div>
+
+  <ArticleImageModal
+    v-model:open="imageModalOpen"
+    :mode="imageModalMode"
+    :image="activeImage"
+    :can-edit="canEdit"
+    :loading="imageModalMode === 'add' ? addState.loading : updateState.loading"
+    :error="imageModalMode === 'add' ? addState.error : updateState.error"
+    @submit="handleImageSubmit"
+  />
 </template>
