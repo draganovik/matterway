@@ -2,6 +2,7 @@
 import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { QueryDetailResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
+import { normalizeSlug } from '~/utils/normalization'
 
 type DetailCreateForm = {
   slug: string
@@ -27,13 +28,6 @@ const form = ref<DetailCreateForm>({
   title: '',
   unit: ''
 })
-
-function normalizeSlug(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-}
 
 function resetForm() {
   form.value = {
@@ -135,7 +129,7 @@ async function createDetail() {
           />
         </UFormField>
 
-        <FormStatus :error="createState.error" />
+        <StatusMessages :error="createState.error" />
       </div>
     </template>
 

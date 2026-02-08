@@ -104,19 +104,15 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
 <template>
   <div class="flex flex-col gap-5">
-    <div
+    <StatusMessages
       v-if="error"
-      class="rounded-lg border border-red-200/60 bg-red-50/60 px-4 py-3 text-sm text-red-600"
-    >
-      {{ error }}
-    </div>
+      :error="error"
+    />
 
-    <div
+    <StatusMessages
       v-else-if="loading"
-      class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-    >
-      Loading article.
-    </div>
+      loading="Loading article."
+    />
 
     <div
       v-else-if="!article"
@@ -175,7 +171,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
           >
             Save Changes
           </UButton>
-          <FormStatus
+          <StatusMessages
             :error="updateState.error"
             :success="updateState.success"
           />

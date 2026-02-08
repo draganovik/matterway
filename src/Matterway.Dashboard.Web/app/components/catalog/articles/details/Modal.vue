@@ -215,7 +215,7 @@ function submit() {
           />
         </UFormField>
 
-        <FormStatus :error="validationError || definitionState.error || error" />
+        <StatusMessages :error="validationError || definitionState.error || error" />
       </div>
     </template>
 

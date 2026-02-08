@@ -105,12 +105,9 @@ async function handleSubmit(event: { data: Record<'email' | 'password', string> 
               </div>
             </template>
             <template #validation>
-              <UAlert
+              <StatusMessages
                 v-if="error"
-                color="error"
-                variant="soft"
-                icon="i-lucide-alert-triangle"
-                :title="error"
+                :error="error"
               />
             </template>
           </UAuthForm>

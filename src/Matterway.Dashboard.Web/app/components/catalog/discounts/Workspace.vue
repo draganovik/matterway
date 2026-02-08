@@ -3,6 +3,8 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { QueryArticleResponse, QueryDiscountResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
+import { normalizeCode } from '~/utils/normalization'
+import { parseNumberOr } from '~/utils/numbers'
 
 type DiscountListItem = {
   key: string
@@ -44,16 +46,6 @@ const form = ref<DiscountForm>({
   validTo: ''
 })
 const selectedArticleIds = ref<string[]>([])
-
-function normalizeCode(value: string) {
-  return value.trim().toUpperCase()
-}
-
-function parseNumber(value: number | string | undefined, fallback: number) {
-  if (value === undefined || value === null || value === '') return fallback
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
-}
 
 function getDefaultDateTimeLocal() {
   const now = new Date()
@@ -161,7 +153,7 @@ async function loadDiscountsFromArticlesFallback() {
     if (result.status === 204 || !result.data) break
 
     articleRows.push(...(result.data.data || []))
-    const totalPages = Math.max(1, parseNumber(result.data.meta?.totalPages, 1))
+    const totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
     if (page >= totalPages) break
     page += 1
   }
@@ -411,24 +403,12 @@ onMounted(() => {
         </div>
 
         <div class="mt-3 grid gap-2">
-          <div
-            v-if="listState.error"
-            class="rounded-lg border border-red-200/60 bg-red-50/60 px-4 py-3 text-sm text-red-600"
-          >
-            {{ listState.error }}
-          </div>
-          <div
-            v-else-if="listState.loading"
-            class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-          >
-            Loading discounts.
-          </div>
-          <div
-            v-else-if="!filteredDiscounts.length"
-            class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-          >
-            {{ listState.empty }}
-          </div>
+          <StatusMessages
+            v-if="listState.error || listState.loading || !filteredDiscounts.length"
+            :error="listState.error"
+            :loading="listState.loading ? 'Loading discounts.' : false"
+            :empty="!listState.loading && !listState.error && !filteredDiscounts.length ? listState.empty : false"
+          />
           <div
             v-else
             class="grid gap-2"
@@ -534,11 +514,11 @@ onMounted(() => {
               :disabled="!canEdit"
               @click="removeDiscount"
             >
-              Delete By Code
+              Delete Discount
             </UButton>
           </div>
 
-          <FormStatus
+          <StatusMessages
             :error="submitState.error || deleteState.error"
             :success="submitState.success || deleteState.success"
           />

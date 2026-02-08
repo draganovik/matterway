@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { serviceSections } from '~/data/serviceRegistry'
-import { useAuthSession } from '~/composables/useAuthSession'
+import { useAuthorizedSections } from '~/composables/useAuthorizedSections'
 
-const auth = useAuthSession()
 const open = ref(false)
+const authorizedSections = useAuthorizedSections()
 
 const iconMap: Record<string, string> = {
   catalog: 'i-lucide-package'
 }
 
 const navItems = computed<NavigationMenuItem[]>(() => {
-  return serviceSections
-    .filter(section => auth.hasPermission(section.service, section.minimum))
+  return authorizedSections.value
     .map(section => ({
       label: section.label,
       icon: iconMap[section.key] || 'i-lucide-folder',
@@ -23,16 +21,14 @@ const navItems = computed<NavigationMenuItem[]>(() => {
       onSelect: () => {
         open.value = false
       },
-      children: section.features
-        .filter(feature => auth.hasPermission(feature.service, feature.minimum))
-        .map(feature => ({
-          label: feature.label,
-          to: feature.route,
-          exact: false,
-          onSelect: () => {
-            open.value = false
-          }
-        }))
+      children: section.features.map(feature => ({
+        label: feature.label,
+        to: feature.route,
+        exact: false,
+        onSelect: () => {
+          open.value = false
+        }
+      }))
     }))
     .filter(section => Array.isArray(section.children) && section.children.length > 0)
 })

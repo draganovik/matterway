@@ -100,7 +100,7 @@ async function createArticle() {
           v-model="form"
           :disabled="!canEdit || createState.loading"
         />
-        <FormStatus :error="createState.error" />
+        <StatusMessages :error="createState.error" />
       </div>
     </template>
 

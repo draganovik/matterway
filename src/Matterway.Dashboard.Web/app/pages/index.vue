@@ -1,23 +1,11 @@
 <script setup lang="ts">
-import { serviceSections } from '~/data/serviceRegistry'
-import { useAuthSession } from '~/composables/useAuthSession'
+import { useAuthorizedSections } from '~/composables/useAuthorizedSections'
 
 definePageMeta({
   title: 'Overview'
 })
 
-const auth = useAuthSession()
-const sections = computed(() => {
-  return serviceSections
-    .filter(section => auth.hasPermission(section.service, section.minimum))
-    .map(section => ({
-      ...section,
-      features: section.features.filter(feature =>
-        auth.hasPermission(feature.service, feature.minimum)
-      )
-    }))
-    .filter(section => section.features.length)
-})
+const sections = useAuthorizedSections()
 </script>
 
 <template>

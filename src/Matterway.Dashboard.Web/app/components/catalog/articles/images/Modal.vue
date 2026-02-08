@@ -129,7 +129,7 @@ function submit() {
           />
         </UFormField>
 
-        <FormStatus :error="validationError || error" />
+        <StatusMessages :error="validationError || error" />
       </div>
     </template>
 

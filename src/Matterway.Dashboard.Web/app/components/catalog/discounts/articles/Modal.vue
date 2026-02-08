@@ -2,6 +2,7 @@
 import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { QueryArticleResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
+import { parseNumberOr } from '~/utils/numbers'
 
 const props = withDefaults(defineProps<{
   open?: boolean
@@ -35,12 +36,6 @@ const pagination = reactive({
   totalCount: 0,
   totalPages: 1
 })
-
-function parseNumber(value: number | string | undefined, fallback: number) {
-  if (value === undefined || value === null || value === '') return fallback
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
-}
 
 const pageSizes = [10, 20, 50, 100].map(value => ({ label: `${value} / page`, value }))
 
@@ -94,10 +89,10 @@ async function loadArticles() {
   }
 
   articles.value = result.data.data || []
-  pagination.totalCount = parseNumber(result.data.meta?.totalCount, articles.value.length)
-  pagination.totalPages = Math.max(1, parseNumber(result.data.meta?.totalPages, 1))
-  pagination.page = Math.max(1, parseNumber(result.data.meta?.currentPage, pagination.page))
-  pagination.pageSize = Math.max(1, parseNumber(result.data.meta?.pageSize, pagination.pageSize))
+  pagination.totalCount = parseNumberOr(result.data.meta?.totalCount, articles.value.length)
+  pagination.totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
+  pagination.page = Math.max(1, parseNumberOr(result.data.meta?.currentPage, pagination.page))
+  pagination.pageSize = Math.max(1, parseNumberOr(result.data.meta?.pageSize, pagination.pageSize))
 }
 
 function searchArticles() {
@@ -204,24 +199,12 @@ function submitSelection() {
         </div>
 
         <div class="max-h-75 overflow-y-auto space-y-2">
-          <div
-            v-if="listState.error"
-            class="rounded-lg border border-red-200/60 bg-red-50/60 px-4 py-3 text-sm text-red-600"
-          >
-            {{ listState.error }}
-          </div>
-          <div
-            v-else-if="listState.loading"
-            class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-          >
-            Loading articles.
-          </div>
-          <div
-            v-else-if="!articles.length"
-            class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-          >
-            {{ listState.empty }}
-          </div>
+          <StatusMessages
+            v-if="listState.error || listState.loading || !articles.length"
+            :error="listState.error"
+            :loading="listState.loading ? 'Loading articles.' : false"
+            :empty="!listState.loading && !listState.error && !articles.length ? listState.empty : false"
+          />
           <div
             v-else
             class="space-y-2"

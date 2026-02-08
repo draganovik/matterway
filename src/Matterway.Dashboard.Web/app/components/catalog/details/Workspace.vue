@@ -3,6 +3,7 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { QueryDetailResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
+import { normalizeSlug } from '~/utils/normalization'
 
 type DetailForm = {
   slug: string
@@ -34,13 +35,6 @@ const form = ref<DetailForm>({
 })
 
 const canDelete = computed(() => Boolean(selectedSlug.value))
-
-function normalizeSlug(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-}
 
 function sortDetails(items: QueryDetailResponse[]) {
   return [...items].sort((a, b) => {
@@ -360,7 +354,7 @@ onMounted(() => {
               </UButton>
             </div>
 
-            <FormStatus
+            <StatusMessages
               :error="saveState.error || removeState.error"
               :success="saveState.success || removeState.success"
             />

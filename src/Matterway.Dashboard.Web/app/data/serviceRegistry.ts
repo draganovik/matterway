@@ -1,4 +1,5 @@
-import { allFeatures } from '~/data/serviceDefinitions'
+import { allFeatures, serviceSections } from '~/data/serviceDefinitions'
+import type { PermissionLevel, ServiceSection } from '~/types/services/definitions'
 
 export {
   serviceSections,
@@ -13,6 +14,20 @@ export type {
 } from '~/types/services/definitions'
 
 export { permissionLevels, permissionServices } from '~/data/permissionOptions'
+
+type HasPermission = (service: ServiceSection['service'], minimum: PermissionLevel) => boolean
+
+export function getAuthorizedSections(hasPermission: HasPermission) {
+  return serviceSections
+    .filter(section => hasPermission(section.service, section.minimum))
+    .map(section => ({
+      ...section,
+      features: section.features.filter(feature =>
+        hasPermission(feature.service, feature.minimum)
+      )
+    }))
+    .filter(section => section.features.length > 0)
+}
 
 export function getFeatureByRoute(route: string) {
   for (const feature of allFeatures) {

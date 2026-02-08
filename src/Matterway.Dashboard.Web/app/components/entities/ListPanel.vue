@@ -115,24 +115,12 @@ function updatePageSize(value: number) {
     </div>
 
     <div class="flex min-h-0 flex-1 flex-col gap-3">
-      <div
-        v-if="error"
-        class="rounded-lg border border-red-200/60 bg-red-50/60 px-4 py-3 text-sm text-red-600"
-      >
-        {{ error }}
-      </div>
-      <div
-        v-else-if="loading"
-        class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-      >
-        Loading results.
-      </div>
-      <div
-        v-else-if="!items.length"
-        class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
-      >
-        {{ emptyMessage }}
-      </div>
+      <StatusMessages
+        v-if="error || loading || !items.length"
+        :error="error"
+        :loading="loading ? 'Loading results.' : false"
+        :empty="!loading && !error && !items.length ? emptyMessage : false"
+      />
       <div
         v-else
         class="flex flex-col gap-2"

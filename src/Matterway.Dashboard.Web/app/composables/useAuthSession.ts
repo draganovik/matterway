@@ -2,6 +2,12 @@ import { decodeJwtPayload, getJwtArrayClaim, getJwtStringClaim, type JwtPayload 
 import type { AuthSession, LoginResponse } from '~/types/auth/session'
 
 const refreshCookieName = 'mw_refresh'
+const authPath = '/api/v1.0/public/auth'
+const authJsonHeaders = {
+  'Content-Type': 'application/json',
+  'accept': 'application/json'
+} as const
+
 const permissionLevels = {
   observer: 0,
   operator: 1,
@@ -61,6 +67,23 @@ export function useAuthSession() {
   const isEmployee = computed(() => role.value?.toLowerCase() === 'employee')
 
   const isLoggedIn = computed(() => Boolean(session.value.accessToken) && !isAccessExpired())
+
+  function getAuthBaseUrl() {
+    const config = useRuntimeConfig()
+    return `${config.public.identityApiBaseUrl}${authPath}`
+  }
+
+  function authFetch(path: 'login' | 'logout' | 'refresh', options: RequestInit) {
+    return fetch(`${getAuthBaseUrl()}/${path}`, options)
+  }
+
+  function authJsonPost(path: 'login' | 'refresh', body: Record<string, unknown>) {
+    return authFetch(path, {
+      method: 'POST',
+      headers: authJsonHeaders,
+      body: JSON.stringify(body)
+    })
+  }
 
   function clearRefreshTimer() {
     if (refreshTimer.value) {
@@ -128,16 +151,7 @@ export function useAuthSession() {
   }
 
   async function login(email: string, password: string) {
-    const config = useRuntimeConfig()
-    const baseUrl = `${config.public.identityApiBaseUrl}/api/v1.0/public/auth`
-    const response = await fetch(`${baseUrl}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    })
+    const response = await authJsonPost('login', { email, password })
 
     if (!response.ok) {
       const payload = await response.json().catch(() => null)
@@ -153,11 +167,9 @@ export function useAuthSession() {
   }
 
   async function logout() {
-    const config = useRuntimeConfig()
-    const baseUrl = `${config.public.identityApiBaseUrl}/api/v1.0/public/auth`
     const token = getAccessToken()
     if (token) {
-      await fetch(`${baseUrl}/logout`, {
+      await authFetch('logout', {
         method: 'POST',
         headers: {
           Authorization: token
@@ -173,16 +185,7 @@ export function useAuthSession() {
     if (!refreshToken) return
     refreshPromise = (async () => {
       try {
-        const config = useRuntimeConfig()
-        const baseUrl = `${config.public.identityApiBaseUrl}/api/v1.0/public/auth`
-        const response = await fetch(`${baseUrl}/refresh`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'accept': 'application/json'
-          },
-          body: JSON.stringify({ refreshToken })
-        })
+        const response = await authJsonPost('refresh', { refreshToken })
 
         if (!response.ok) {
           clearSession()

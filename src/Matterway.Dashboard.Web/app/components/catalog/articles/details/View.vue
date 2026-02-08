@@ -217,7 +217,7 @@ async function handleDetailSubmit(payload: {
         </div>
       </section>
 
-      <FormStatus
+      <StatusMessages
         :error="mutateState.error || removeState.error"
         :success="mutateState.success || removeState.success"
       />

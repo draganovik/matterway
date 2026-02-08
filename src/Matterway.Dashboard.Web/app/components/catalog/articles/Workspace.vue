@@ -3,6 +3,7 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { CreateArticleResponse, GetArticleByIdResponse, QueryArticleResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
+import { parseNumberOr } from '~/utils/numbers'
 
 const auth = useAuthSession()
 const api = useCatalogApi()
@@ -24,12 +25,6 @@ const selectedArticle = ref<GetArticleByIdResponse | null>(null)
 const articleState = useRequestState()
 
 const createModalOpen = ref(false)
-
-function parseNumber(value: number | string | undefined, fallback: number) {
-  if (value === undefined || value === null || value === '') return fallback
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
-}
 
 async function loadArticles() {
   listState.loading = true
@@ -57,10 +52,10 @@ async function loadArticles() {
   }
 
   articles.value = result.data.data || []
-  pagination.totalCount = parseNumber(result.data.meta?.totalCount, articles.value.length)
-  pagination.totalPages = Math.max(1, parseNumber(result.data.meta?.totalPages, 1))
-  pagination.page = Math.max(1, parseNumber(result.data.meta?.currentPage, pagination.page))
-  pagination.pageSize = Math.max(1, parseNumber(result.data.meta?.pageSize, pagination.pageSize))
+  pagination.totalCount = parseNumberOr(result.data.meta?.totalCount, articles.value.length)
+  pagination.totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
+  pagination.page = Math.max(1, parseNumberOr(result.data.meta?.currentPage, pagination.page))
+  pagination.pageSize = Math.max(1, parseNumberOr(result.data.meta?.pageSize, pagination.pageSize))
 
   if (selectedId.value && !articles.value.some(item => item.id === selectedId.value)) {
     selectedId.value = null

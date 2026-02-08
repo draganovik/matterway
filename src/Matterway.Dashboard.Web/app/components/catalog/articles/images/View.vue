@@ -230,8 +230,8 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
       </div>
 
       <div class="flex flex-wrap gap-4">
-        <FormStatus :error="addState.error || updateState.error || removeState.error" />
-        <FormStatus :success="addState.success || updateState.success || removeState.success" />
+        <StatusMessages :error="addState.error || updateState.error || removeState.error" />
+        <StatusMessages :success="addState.success || updateState.success || removeState.success" />
       </div>
     </div>
   </div>
