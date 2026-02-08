@@ -47,7 +47,7 @@ const sections = computed(() => {
                 Matterway Operations
               </h1>
               <p class="text-sm text-muted">
-                Manage Catalog, Customers, Sales, and Identity with permission-aware tooling.
+                Manage the Catalog domain with permission-aware tooling.
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -61,7 +61,7 @@ const sections = computed(() => {
                 color="neutral"
                 variant="soft"
               >
-                JWT Access
+                Catalog Focus
               </UBadge>
               <UBadge
                 color="neutral"

@@ -11,8 +11,8 @@ type DetailSubmitPayload = {
 }
 
 const props = withDefaults(defineProps<{
-  open: boolean
-  mode: 'add' | 'edit'
+  open?: boolean
+  mode?: 'add' | 'edit'
   detail?: ArticleDetailProperty | null
   canEdit?: boolean
   loading?: boolean

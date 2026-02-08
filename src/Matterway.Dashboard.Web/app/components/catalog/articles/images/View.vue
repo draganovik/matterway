@@ -46,7 +46,7 @@ function updateImages(next: ArticleImageProperty[]) {
   emit('update:modelValue', images.value)
 }
 
-function openAddImageModal() {
+function openAddImagesModal() {
   addState.error = ''
   addState.success = ''
   if (!props.articleId) {
@@ -58,7 +58,7 @@ function openAddImageModal() {
   imageModalOpen.value = true
 }
 
-function openEditImageModal(image: ArticleImageProperty) {
+function openEditImagesModal(image: ArticleImageProperty) {
   updateState.error = ''
   updateState.success = ''
   imageModalMode.value = 'edit'
@@ -169,7 +169,7 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
         color="primary"
         variant="outline"
         :disabled="!canEdit || !articleId"
-        @click="openAddImageModal"
+        @click="openAddImagesModal"
       >
         Add Image
       </UButton>
@@ -212,7 +212,7 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
                 variant="outline"
                 :disabled="!canEdit"
                 class="justify-center"
-                @click="openEditImageModal(image)"
+                @click="openEditImagesModal(image)"
               >
                 Edit
               </UButton>
@@ -237,7 +237,7 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
     </div>
   </div>
 
-  <ArticleImageModal
+  <CatalogArticlesImagesModal
     v-model:open="imageModalOpen"
     :mode="imageModalMode"
     :image="activeImage"

@@ -144,7 +144,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
         </div>
 
         <div class="mt-4">
-          <ArticleFieldsForm
+          <CatalogArticlesBaseForm
             v-model="form"
             :disabled="!canEdit"
           />
@@ -168,7 +168,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
       </section>
 
       <section class="space-y-3">
-        <ArticleImagesGroup
+        <CatalogArticlesImagesView
           :article-id="article.id"
           :model-value="article.images || []"
           :can-edit="canEdit"
@@ -177,7 +177,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
       </section>
 
       <section class="space-y-3">
-        <ArticleDetailsSpecsGroup
+        <CatalogArticlesDetailsView
           :article-id="article.id"
           :details="article.details || []"
           :can-edit="canEdit"

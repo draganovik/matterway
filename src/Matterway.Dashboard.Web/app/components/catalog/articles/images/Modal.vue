@@ -8,8 +8,8 @@ type ImageSubmitPayload = {
 }
 
 const props = withDefaults(defineProps<{
-  open: boolean
-  mode: 'add' | 'edit'
+  open?: boolean
+  mode?: 'add' | 'edit'
   image?: ArticleImageProperty | null
   canEdit?: boolean
   loading?: boolean

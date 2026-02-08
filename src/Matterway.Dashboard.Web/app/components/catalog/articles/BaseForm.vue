@@ -7,45 +7,11 @@ type ArticleForm = {
   isAvailable: boolean
 }
 
-const props = withDefaults(defineProps<{
-  modelValue: ArticleForm
+const { disabled = false } = defineProps<{
   disabled?: boolean
-}>(), {
-  disabled: false
-})
-
-const emit = defineEmits<{
-  (event: 'update:modelValue', value: ArticleForm): void
 }>()
 
-const form = reactive<ArticleForm>({
-  articleCode: '',
-  title: '',
-  basePrice: '',
-  description: '',
-  isAvailable: true
-})
-
-watch(
-  () => props.modelValue,
-  (value) => {
-    if (!value) return
-    form.articleCode = value.articleCode
-    form.title = value.title
-    form.basePrice = value.basePrice
-    form.description = value.description
-    form.isAvailable = value.isAvailable
-  },
-  { immediate: true }
-)
-
-watch(
-  form,
-  () => {
-    emit('update:modelValue', { ...form })
-  },
-  { deep: true }
-)
+const form = defineModel<ArticleForm>({ required: true })
 </script>
 
 <template>

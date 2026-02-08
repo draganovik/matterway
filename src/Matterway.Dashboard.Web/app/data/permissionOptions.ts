@@ -9,4 +9,4 @@ export const permissionLevels = [
 export const permissionServices = serviceSections.map(service => ({
   label: service.label,
   value: service.service
-})) as const
+}))

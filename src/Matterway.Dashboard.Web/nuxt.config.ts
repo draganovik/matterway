@@ -1,21 +1,6 @@
-import { fileURLToPath } from 'node:url'
-import { resolve } from 'node:path'
-
-const projectRoot = fileURLToPath(new URL('.', import.meta.url))
-const withRoot = (...segments: string[]) => resolve(projectRoot, ...segments)
-const env = process.env
+const env = import.meta.env as Record<string, string | undefined>
 
 const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
-
-const alias = {
-  '@assets': withRoot('app/assets'),
-  '@components': withRoot('app/components'),
-  '@composables': withRoot('app/composables'),
-  '@layouts': withRoot('app/layouts'),
-  '@middleware': withRoot('app/middleware'),
-  '@pages': withRoot('app/pages'),
-  '@plugins': withRoot('app/plugins')
-} satisfies Record<string, string>
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -27,8 +12,7 @@ export default defineNuxtConfig({
   ssr: false,
   components: [
     {
-      path: '~/components',
-      pathPrefix: false
+      path: '~/components'
     }
   ],
 
@@ -50,12 +34,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       identityApiBaseUrl: publicEnv('IDENTITY_API_BASE_URL'),
-      catalogApiBaseUrl: publicEnv('CATALOG_API_BASE_URL'),
-      customersApiBaseUrl: publicEnv('CUSTOMERS_API_BASE_URL'),
-      salesApiBaseUrl: publicEnv('SALES_API_BASE_URL')
+      catalogApiBaseUrl: publicEnv('CATALOG_API_BASE_URL')
     }
   },
-  alias,
 
   compatibilityDate: '2025-01-15',
 

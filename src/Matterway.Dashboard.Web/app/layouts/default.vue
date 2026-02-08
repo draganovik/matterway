@@ -7,10 +7,7 @@ const auth = useAuthSession()
 const open = ref(false)
 
 const iconMap: Record<string, string> = {
-  catalog: 'i-lucide-package',
-  customers: 'i-lucide-users',
-  sales: 'i-lucide-shopping-bag',
-  identity: 'i-lucide-shield'
+  catalog: 'i-lucide-package'
 }
 
 const navItems = computed<NavigationMenuItem[]>(() => {
@@ -74,7 +71,7 @@ const searchGroups = computed(() => [{
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
+        <SidebarBrandButton :collapsed="collapsed" />
       </template>
 
       <template #default="{ collapsed }">
@@ -101,7 +98,7 @@ const searchGroups = computed(() => [{
       </template>
 
       <template #footer="{ collapsed }">
-        <UserMenu :collapsed="collapsed" />
+        <SidebarUserDropdown :collapsed="collapsed" />
       </template>
     </UDashboardSidebar>
 

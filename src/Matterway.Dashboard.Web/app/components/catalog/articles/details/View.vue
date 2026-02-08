@@ -53,7 +53,7 @@ async function removeDetail(detail: ArticleDetailProperty) {
   removeState.success = 'Detail removed.'
 }
 
-function openAddDetailModal() {
+function openAddDetailsModal() {
   mutateState.error = ''
   mutateState.success = ''
   if (!props.articleId) {
@@ -65,7 +65,7 @@ function openAddDetailModal() {
   detailModalOpen.value = true
 }
 
-function openEditDetailModal(detail: ArticleDetailProperty) {
+function openEditDetailsModal(detail: ArticleDetailProperty) {
   mutateState.error = ''
   mutateState.success = ''
   detailModalMode.value = 'edit'
@@ -154,7 +154,7 @@ async function handleDetailSubmit(payload: {
         color="primary"
         variant="outline"
         :disabled="!canEdit || !articleId"
-        @click="openAddDetailModal"
+        @click="openAddDetailsModal"
       >
         Add Detail
       </UButton>
@@ -199,7 +199,7 @@ async function handleDetailSubmit(payload: {
               <UButton
                 variant="outline"
                 :disabled="!canEdit"
-                @click="openEditDetailModal(detail)"
+                @click="openEditDetailsModal(detail)"
               >
                 Edit
               </UButton>
@@ -223,7 +223,7 @@ async function handleDetailSubmit(payload: {
     </div>
   </div>
 
-  <ArticleDetailModal
+  <CatalogArticlesDetailsModal
     v-model:open="detailModalOpen"
     :mode="detailModalMode"
     :detail="activeDetail"

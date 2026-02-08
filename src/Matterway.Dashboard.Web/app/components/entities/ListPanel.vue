@@ -163,7 +163,7 @@ function updatePageSize(value: number) {
           :model-value="pageSize"
           value-key="value"
           label-key="label"
-          class="min-w-[8.5rem]"
+          class="min-w-34"
           @update:model-value="updatePageSize"
         />
         <div class="flex items-center gap-1">

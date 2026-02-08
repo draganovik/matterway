@@ -30,7 +30,7 @@ const fields = [
 const submitConfig = {
   label: 'Sign in',
   color: 'primary'
-}
+} as const
 const error = ref('')
 const loading = ref(false)
 
@@ -52,7 +52,7 @@ function getFirstRoute() {
   return '/'
 }
 
-async function handleSubmit(event: { data: Record<string, string> }) {
+async function handleSubmit(event: { data: Record<'email' | 'password', string> }) {
   error.value = ''
   loading.value = true
   try {
@@ -78,7 +78,7 @@ async function handleSubmit(event: { data: Record<string, string> }) {
             Management Plane
           </h1>
           <p class="max-w-md text-sm text-muted">
-            Secure operational access for Catalog, Customers, Sales, and Identity services.
+            Secure operational access for Catalog workflows.
             Sign in with an Employee account to continue.
           </p>
         </div>

@@ -1,6 +1,6 @@
 import { useAuthSession } from '~/composables/useAuthSession'
 
-type ApiService = 'identity' | 'catalog' | 'customers' | 'sales'
+type ApiService = 'catalog'
 
 type ApiResult<T> = {
   ok: boolean
@@ -12,24 +12,15 @@ type ApiResult<T> = {
 
 function getBaseUrl(service: ApiService) {
   const config = useRuntimeConfig()
-  switch (service) {
-    case 'identity':
-      return config.public.identityApiBaseUrl
-    case 'catalog':
-      return config.public.catalogApiBaseUrl
-    case 'customers':
-      return config.public.customersApiBaseUrl
-    case 'sales':
-      return config.public.salesApiBaseUrl
-    default:
-      return config.public.identityApiBaseUrl
-  }
+  if (service === 'catalog') return config.public.catalogApiBaseUrl
+  return null
 }
 
 function getValidationErrors(payload: unknown): Record<string, string[]> | undefined {
   if (!payload || typeof payload !== 'object') return undefined
-  if (!payload.errors || typeof payload.errors !== 'object') return undefined
-  return payload.errors as Record<string, string[]>
+  const payloadWithErrors = payload as { errors?: unknown }
+  if (!payloadWithErrors.errors || typeof payloadWithErrors.errors !== 'object') return undefined
+  return payloadWithErrors.errors as Record<string, string[]>
 }
 
 function formatValidationErrors(errors?: Record<string, string[]>) {
@@ -59,8 +50,7 @@ export function useApiClient() {
         error: `Missing API base URL for ${service}. Check runtimeConfig.public.${service}ApiBaseUrl.`
       }
     }
-    const apiVersion = service === 'catalog' ? 'v1' : 'v1.0'
-    const url = `${baseUrl}/api/${apiVersion}/${path}`
+    const url = `${baseUrl}/api/v1/${path}`
     const headers = new Headers(options.headers || {})
     if (!headers.has('Accept')) headers.set('Accept', 'application/json')
     if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
