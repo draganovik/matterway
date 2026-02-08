@@ -128,6 +128,67 @@ export type QueryDetailResponse = {
   unit?: string | null
 }
 
+export type PutDetailRequest = {
+  title: string
+  unit?: string | null
+}
+
+export type PutDetailResponse = {
+  slug?: string | null
+  title?: string | null
+  unit?: string | null
+}
+
+export type DeleteDetailResponse = {
+  slug: string
+  message: string
+}
+
+export type CreateDiscountRequest = {
+  code: string
+  percentage: number | string
+  validFrom: string
+  validTo?: string | null
+  articleIds: string[]
+}
+
+export type CreatedDiscountResponse = {
+  code: string
+  percentage: number | string
+  validFrom: string
+  validTo?: string | null
+  articleId: string
+}
+
+export type UpdateDiscountRequest = {
+  percentage: number | string
+  validFrom: string
+  validTo?: string | null
+  articleIds: string[]
+}
+
+export type UpdatedDiscountResponse = {
+  code: string
+  percentage: number | string
+  validFrom: string
+  validTo?: string | null
+  articleId: string
+}
+
+export type QueryDiscountResponse = {
+  code?: string | null
+  percentage?: number | string | null
+  validFrom?: string | null
+  validTo?: string | null
+  articleId?: string | null
+}
+
+export type DeleteDiscountResponse = {
+  code: string
+  removedCount?: number | string
+  message?: string | null
+}
+
 export function useCatalogApi() {
   const api = useApiClient()
 
@@ -228,6 +289,43 @@ export function useCatalogApi() {
     return api.request<QueryDetailResponse[]>('catalog', `admin/details${query}`)
   }
 
+  async function putDetail(slug: string, payload: PutDetailRequest) {
+    return api.request<PutDetailResponse>('catalog', `admin/details/${encodeURIComponent(slug)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async function deleteDetail(slug: string) {
+    return api.request<DeleteDetailResponse>('catalog', `admin/details/${encodeURIComponent(slug)}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async function createDiscounts(payload: CreateDiscountRequest) {
+    return api.request<CreatedDiscountResponse[]>('catalog', 'admin/discounts', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async function queryDiscounts() {
+    return api.request<QueryDiscountResponse[]>('catalog', 'admin/discounts')
+  }
+
+  async function updateDiscount(code: string, payload: UpdateDiscountRequest) {
+    return api.request<UpdatedDiscountResponse>('catalog', `admin/discounts/${encodeURIComponent(code)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async function deleteDiscount(code: string) {
+    return api.request<DeleteDiscountResponse>('catalog', `admin/discounts/${encodeURIComponent(code)}`, {
+      method: 'DELETE'
+    })
+  }
+
   return {
     queryArticles,
     getArticleById,
@@ -240,6 +338,12 @@ export function useCatalogApi() {
     addArticleDetail,
     updateArticleDetail,
     removeArticleDetail,
-    queryDetails
+    queryDetails,
+    putDetail,
+    deleteDetail,
+    queryDiscounts,
+    createDiscounts,
+    updateDiscount,
+    deleteDiscount
   }
 }

@@ -11,6 +11,8 @@ const props = withDefaults(defineProps<{
   loading?: boolean
   error?: string
   emptyMessage?: string
+  filterInputType?: 'textarea' | 'input'
+  filterPlaceholder?: string
   page?: number
   pageSize?: number
   totalCount?: number
@@ -25,6 +27,8 @@ const props = withDefaults(defineProps<{
   loading: false,
   error: '',
   emptyMessage: 'No results found.',
+  filterInputType: 'textarea',
+  filterPlaceholder: 'Search, use RSQL filters (e.g. title==chair; available==true).',
   page: 1,
   pageSize: 20,
   totalCount: 0,
@@ -86,10 +90,19 @@ function updatePageSize(value: number) {
 
     <div class="flex flex-col gap-3">
       <UTextarea
+        v-if="filterInputType === 'textarea'"
         v-model="filterInput"
-        placeholder="Search, use RSQL filters (e.g. title==chair; available==true)."
+        :placeholder="filterPlaceholder"
         size="md"
         :rows="3"
+      />
+      <UInput
+        v-else
+        v-model="filterInput"
+        :placeholder="filterPlaceholder"
+        size="lg"
+        class="w-full"
+        @keydown.enter.prevent="applySearch"
       />
       <UButton
         color="primary"

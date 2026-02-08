@@ -119,9 +119,21 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
     <div
       v-else-if="!article"
-      class="rounded-lg border border-default bg-background px-4 py-6 text-center text-sm text-muted"
+      class="space-y-4"
     >
-      Select an article to start editing.
+      <div class="space-y-1">
+        <h3 class="text-base font-semibold text-foreground">
+          Article Editor
+        </h3>
+        <p class="text-sm text-muted">
+          {{ canEdit ? 'Operator permission is required for create, update, and delete.' : 'Read-only mode: operator permission required for changes.' }}
+        </p>
+      </div>
+
+      <EntitiesEmptyState
+        title="Nothing selected"
+        description="Select an item from the list to start editing."
+      />
     </div>
 
     <div
@@ -139,7 +151,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
             </p>
           </div>
           <div class="text-sm text-muted">
-            ID: {{ article.id }}
+            ID: {{ article?.id }}
           </div>
         </div>
 
@@ -150,7 +162,9 @@ function updateImages(images: GetArticleByIdResponse['images']) {
           />
         </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-3">
+        <div
+          class="mt-4 flex flex-wrap items-center gap-3"
+        >
           <UButton
             size="lg"
             color="primary"
@@ -169,8 +183,8 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
       <section class="space-y-3">
         <CatalogArticlesImagesView
-          :article-id="article.id"
-          :model-value="article.images || []"
+          :article-id="article?.id ?? null"
+          :model-value="article?.images || []"
           :can-edit="canEdit"
           @update:model-value="updateImages"
         />
@@ -178,8 +192,8 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
       <section class="space-y-3">
         <CatalogArticlesDetailsView
-          :article-id="article.id"
-          :details="article.details || []"
+          :article-id="article?.id ?? null"
+          :details="article?.details || []"
           :can-edit="canEdit"
           @update:details="updateDetails"
         />
