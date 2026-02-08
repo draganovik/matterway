@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCatalogApi, type GetArticleByIdResponse } from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { GetArticleByIdResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
 const props = withDefaults(defineProps<{
@@ -172,7 +173,7 @@ function updateImages(images: GetArticleByIdResponse['images']) {
             :disabled="!canEdit"
             @click="saveArticle"
           >
-            Update Article
+            Save Changes
           </UButton>
           <FormStatus
             :error="updateState.error"

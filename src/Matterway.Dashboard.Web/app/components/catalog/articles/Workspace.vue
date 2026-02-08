@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCatalogApi, type CreateArticleResponse, type GetArticleByIdResponse, type QueryArticleResponse } from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { CreateArticleResponse, GetArticleByIdResponse, QueryArticleResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 

@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import {
-  useCatalogApi,
-  type QueryArticleResponse,
-  type QueryDiscountResponse
-} from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { QueryArticleResponse, QueryDiscountResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 
@@ -169,16 +166,14 @@ async function loadDiscountsFromArticlesFallback() {
     page += 1
   }
 
-  type DiscountFromArticle = NonNullable<QueryArticleResponse['discount']> & { code?: string | null }
   const grouped = new Map<string, DiscountListItem>()
 
   for (const article of articleRows) {
     if (!article.discount || !article.id) continue
-    const discount = article.discount as DiscountFromArticle
-    const code = normalizeCode((discount.code ?? '').toString())
-    const percentage = discount.percentage
-    const validFrom = discount.validFrom
-    const validTo = discount.validTo ?? null
+    const code = normalizeCode((article.discount.code ?? '').toString())
+    const percentage = article.discount.percentage
+    const validFrom = article.discount.validFrom
+    const validTo = article.discount.validTo ?? null
     const key = code || `${percentage}|${validFrom}|${validTo || ''}`
 
     const existing = grouped.get(key)

@@ -1,14 +1,16 @@
 import { allFeatures } from '~/data/serviceDefinitions'
 
 export {
-  type PermissionLevel,
-  type ActionKey,
-  type FeatureAction,
-  type FeatureDefinition,
-  type ServiceSection,
   serviceSections,
   allFeatures
 } from '~/data/serviceDefinitions'
+export type {
+  PermissionLevel,
+  ActionKey,
+  FeatureAction,
+  FeatureDefinition,
+  ServiceSection
+} from '~/types/services/definitions'
 
 export { permissionLevels, permissionServices } from '~/data/permissionOptions'
 

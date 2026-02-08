@@ -5,9 +5,16 @@ const colorMode = useColorMode()
 const color = computed(() => (colorMode.value === 'dark' ? '#0c0a09' : '#fff7ed'))
 const auth = useAuthSession()
 const route = useRoute()
+const appTitle = 'Matterway Dashboard'
 const isBooting = computed(() => !auth.isInitialized.value && !route.meta?.public)
+const pageTitle = computed(() => {
+  const title = route.meta?.title
+  return typeof title === 'string' && title.trim().length ? title : undefined
+})
 
 useHead({
+  title: pageTitle,
+  titleTemplate: titleChunk => titleChunk ? `${titleChunk} - ${appTitle}` : appTitle,
   meta: [
     { charset: 'utf-8' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },

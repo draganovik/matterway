@@ -1,4 +1,5 @@
 import { decodeJwtPayload, getJwtArrayClaim, getJwtStringClaim, type JwtPayload } from '~/utils/jwt'
+import type { AuthSession, LoginResponse } from '~/types/auth/session'
 
 const refreshCookieName = 'mw_refresh'
 const permissionLevels = {
@@ -9,23 +10,6 @@ const permissionLevels = {
 
 let refreshPromise: Promise<void> | null = null
 let initPromise: Promise<void> | null = null
-
-type AuthSession = {
-  accessToken: string | null
-  tokenType: string
-  created: string | null
-  expires: string | null
-  refreshExpires: string | null
-}
-
-type LoginResponse = {
-  token: string
-  refreshToken: string
-  tokenType: string
-  created: string
-  expires: string
-  refreshExpires: string
-}
 
 function useSessionState() {
   return useState<AuthSession>('auth-session', () => ({

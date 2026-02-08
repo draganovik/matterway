@@ -22,7 +22,6 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      titleTemplate: '%s - Matterway Dashboard',
       link: [
         { rel: 'icon', href: '/favicon.svg' }
       ]

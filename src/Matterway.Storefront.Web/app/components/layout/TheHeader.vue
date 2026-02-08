@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useCartStore } from "@stores/cart";
 import { useSessionStore } from "@stores/session";
-import logoUrl from "@assets/brand/logo.svg?url";
+import logoUrl from "@assets/brand/matterway-logo-blue.svg?url";
 
 const router = useRouter();
 const route = useRoute();

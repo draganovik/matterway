@@ -1,14 +1,5 @@
 import { useAuthSession } from '~/composables/useAuthSession'
-
-type ApiService = 'catalog'
-
-type ApiResult<T> = {
-  ok: boolean
-  status: number
-  data?: T
-  error?: string
-  validationErrors?: Record<string, string[]>
-}
+import type { ApiResult, ApiService } from '~/types/common/api'
 
 function getBaseUrl(service: ApiService) {
   const config = useRuntimeConfig()

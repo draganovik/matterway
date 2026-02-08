@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCatalogApi, type ArticleDetailProperty, type QueryDetailResponse } from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { ArticleDetailProperty, QueryDetailResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
 type DetailSubmitPayload = {

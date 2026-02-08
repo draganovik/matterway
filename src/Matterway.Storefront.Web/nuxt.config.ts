@@ -29,12 +29,11 @@ export default defineNuxtConfig({
   alias,
   app: {
     head: {
-      titleTemplate: "%s - Matterway Web Store",
+      titleTemplate: "%s - Matterway Storefront",
       link: [
         {
           rel: "icon",
-          type: "image/svg+xml",
-          href: "/logo.svg",
+          href: "/favicon.svg",
         },
       ],
     },

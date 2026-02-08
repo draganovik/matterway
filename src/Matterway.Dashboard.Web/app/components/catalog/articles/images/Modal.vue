@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ArticleImageProperty } from '~/composables/useCatalogApi'
+import type { ArticleImageProperty } from '~/types/catalog'
 
 type ImageSubmitPayload = {
   orderIndex: number

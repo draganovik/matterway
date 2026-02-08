@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCatalogApi, type ArticleImageProperty } from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { ArticleImageProperty } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
 const props = withDefaults(defineProps<{
@@ -89,9 +90,7 @@ async function addImage(payload: { orderIndex: number, imageAlt: string, file?: 
     return
   }
   const next = [...images.value]
-  if (result.data && typeof result.data === 'object') {
-    next.push(result.data as ArticleImageProperty)
-  }
+  if (result.data) next.push(result.data)
   updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
   addState.success = 'Image added.'
   imageModalOpen.value = false

@@ -110,9 +110,8 @@ async function handleSubmit(event: { data: Record<'email' | 'password', string> 
                 color="error"
                 variant="soft"
                 icon="i-lucide-alert-triangle"
-              >
-                {{ error }}
-              </UAlert>
+                :title="error"
+              />
             </template>
           </UAuthForm>
         </UCard>

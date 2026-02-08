@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useCatalogApi, type QueryArticleResponse } from '~/composables/useCatalogApi'
+import { useCatalogApi } from '~/composables/useCatalogApi'
+import type { QueryArticleResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
 const props = withDefaults(defineProps<{
