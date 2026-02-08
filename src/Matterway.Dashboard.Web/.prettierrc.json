@@ -1,0 +1,6 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "never",
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
