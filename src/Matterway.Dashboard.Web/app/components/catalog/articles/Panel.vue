@@ -3,17 +3,20 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { GetArticleByIdResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
-const props = withDefaults(defineProps<{
-  article?: GetArticleByIdResponse | null
-  loading?: boolean
-  error?: string
-  canEdit?: boolean
-}>(), {
-  article: null,
-  loading: false,
-  error: '',
-  canEdit: false
-})
+const props = withDefaults(
+  defineProps<{
+    article?: GetArticleByIdResponse | null
+    loading?: boolean
+    error?: string
+    canEdit?: boolean
+  }>(),
+  {
+    article: null,
+    loading: false,
+    error: '',
+    canEdit: false
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:article', value: GetArticleByIdResponse | null): void
@@ -104,26 +107,19 @@ function updateImages(images: GetArticleByIdResponse['images']) {
 
 <template>
   <div class="flex flex-col gap-5">
-    <StatusMessages
-      v-if="error"
-      :error="error"
-    />
+    <StatusMessages v-if="error" :error="error" />
 
-    <StatusMessages
-      v-else-if="loading"
-      loading="Loading article."
-    />
+    <StatusMessages v-else-if="loading" loading="Loading article." />
 
-    <div
-      v-else-if="!article"
-      class="space-y-4"
-    >
+    <div v-else-if="!article" class="space-y-4">
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
-          Article Editor
-        </h3>
-        <p class="text-sm text-muted">
-          {{ canEdit ? 'Operator permission is required for create, update, and delete.' : 'Read-only mode: operator permission required for changes.' }}
+        <h3 class="text-foreground text-base font-semibold">Article Editor</h3>
+        <p class="text-muted text-sm">
+          {{
+            canEdit
+              ? 'Operator permission is required for create, update, and delete.'
+              : 'Read-only mode: operator permission required for changes.'
+          }}
         </p>
       </div>
 
@@ -133,35 +129,25 @@ function updateImages(images: GetArticleByIdResponse['images']) {
       />
     </div>
 
-    <div
-      v-else
-      class="grid gap-5"
-    >
+    <div v-else class="grid gap-5">
       <section>
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 class="text-base font-semibold text-foreground">
+            <h3 class="text-foreground text-base font-semibold">
               Article Fields
             </h3>
-            <p class="text-sm text-muted">
+            <p class="text-muted text-sm">
               Update primary details and availability.
             </p>
           </div>
-          <div class="text-sm text-muted">
-            ID: {{ article?.id }}
-          </div>
+          <div class="text-muted text-sm">ID: {{ article?.id }}</div>
         </div>
 
         <div class="mt-4">
-          <CatalogArticlesBaseForm
-            v-model="form"
-            :disabled="!canEdit"
-          />
+          <CatalogArticlesBaseForm v-model="form" :disabled="!canEdit" />
         </div>
 
-        <div
-          class="mt-4 flex flex-wrap items-center gap-3"
-        >
+        <div class="mt-4 flex flex-wrap items-center gap-3">
           <UButton
             size="lg"
             color="primary"

@@ -44,7 +44,7 @@ onMounted(async () => {
 function getFirstRoute() {
   for (const service of serviceSections) {
     if (!auth.hasPermission(service.service, service.minimum)) continue
-    const feature = service.features.find(item =>
+    const feature = service.features.find((item) =>
       auth.hasPermission(item.service, item.minimum)
     )
     if (feature) return feature.route
@@ -52,7 +52,9 @@ function getFirstRoute() {
   return '/'
 }
 
-async function handleSubmit(event: { data: Record<'email' | 'password', string> }) {
+async function handleSubmit(event: {
+  data: Record<'email' | 'password', string>
+}) {
   error.value = ''
   loading.value = true
   try {
@@ -67,22 +69,26 @@ async function handleSubmit(event: { data: Record<'email' | 'password', string> 
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950">
-    <div class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6">
+  <div
+    class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950"
+  >
+    <div
+      class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6"
+    >
       <div class="grid w-full gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="hidden flex-col justify-center gap-6 lg:flex">
-          <p class="text-sm uppercase tracking-[0.4em] text-orange-600">
+          <p class="text-sm tracking-[0.4em] text-orange-600 uppercase">
             Matterway
           </p>
-          <h1 class="text-4xl font-semibold text-foreground">
+          <h1 class="text-foreground text-4xl font-semibold">
             Management Plane
           </h1>
-          <p class="max-w-md text-sm text-muted">
-            Secure operational access for Catalog workflows.
-            Sign in with an Employee account to continue.
+          <p class="text-muted max-w-md text-sm">
+            Secure operational access for Catalog workflows. Sign in with an
+            Employee account to continue.
           </p>
         </div>
-        <UCard class="border border-default shadow-xl">
+        <UCard class="border-default border shadow-xl">
           <UAuthForm
             title="Sign in"
             description="Use your employee credentials."
@@ -93,22 +99,15 @@ async function handleSubmit(event: { data: Record<'email' | 'password', string> 
           >
             <template #header>
               <div class="space-y-1">
-                <p class="text-sm uppercase tracking-[0.3em] text-orange-600">
+                <p class="text-sm tracking-[0.3em] text-orange-600 uppercase">
                   Operator Access
                 </p>
-                <h2 class="text-2xl font-semibold text-foreground">
-                  Sign in
-                </h2>
-                <p class="text-sm text-muted">
-                  Use your employee credentials.
-                </p>
+                <h2 class="text-foreground text-2xl font-semibold">Sign in</h2>
+                <p class="text-muted text-sm">Use your employee credentials.</p>
               </div>
             </template>
             <template #validation>
-              <StatusMessages
-                v-if="error"
-                :error="error"
-              />
+              <StatusMessages v-if="error" :error="error" />
             </template>
           </UAuthForm>
         </UCard>

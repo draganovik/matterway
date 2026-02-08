@@ -7,21 +7,24 @@ type ImageSubmitPayload = {
   file?: File | null
 }
 
-const props = withDefaults(defineProps<{
-  open?: boolean
-  mode?: 'add' | 'edit'
-  image?: ArticleImageProperty | null
-  canEdit?: boolean
-  loading?: boolean
-  error?: string
-}>(), {
-  open: false,
-  mode: 'add',
-  image: null,
-  canEdit: false,
-  loading: false,
-  error: ''
-})
+const props = withDefaults(
+  defineProps<{
+    open?: boolean
+    mode?: 'add' | 'edit'
+    image?: ArticleImageProperty | null
+    canEdit?: boolean
+    loading?: boolean
+    error?: string
+  }>(),
+  {
+    open: false,
+    mode: 'add',
+    image: null,
+    canEdit: false,
+    loading: false,
+    error: ''
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:open', value: boolean): void
@@ -83,22 +86,22 @@ function submit() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
+        <h3 class="text-foreground text-base font-semibold">
           {{ mode === 'edit' ? 'Edit Image' : 'Add Image' }}
         </h3>
-        <p class="text-sm text-muted">
-          {{ mode === 'edit' ? 'Update image metadata and order.' : 'Upload a new image for the article.' }}
+        <p class="text-muted text-sm">
+          {{
+            mode === 'edit'
+              ? 'Update image metadata and order.'
+              : 'Upload a new image for the article.'
+          }}
         </p>
       </div>
     </template>
 
     <template #body>
       <div class="grid gap-4">
-        <UFormField
-          v-if="mode === 'add'"
-          label="File"
-          required
-        >
+        <UFormField v-if="mode === 'add'" label="File" required>
           <UFileUpload
             v-model="file"
             accept="image/*"
@@ -110,10 +113,7 @@ function submit() {
           />
         </UFormField>
 
-        <UFormField
-          label="Order Index"
-          required
-        >
+        <UFormField label="Order Index" required>
           <UInput
             v-model="orderIndex"
             type="number"
@@ -123,10 +123,7 @@ function submit() {
         </UFormField>
 
         <UFormField label="Image Alt">
-          <UInput
-            v-model="imageAlt"
-            :disabled="!canEdit"
-          />
+          <UInput v-model="imageAlt" :disabled="!canEdit" />
         </UFormField>
 
         <StatusMessages :error="validationError || error" />
@@ -135,11 +132,7 @@ function submit() {
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton
-          variant="ghost"
-          :disabled="loading"
-          @click="isOpen = false"
-        >
+        <UButton variant="ghost" :disabled="loading" @click="isOpen = false">
           Cancel
         </UButton>
         <UButton

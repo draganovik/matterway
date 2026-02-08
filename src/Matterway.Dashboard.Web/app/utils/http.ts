@@ -27,6 +27,7 @@ export function normalizeList<T>(payload: unknown): T[] {
     if (Array.isArray(candidate)) return candidate as T[]
   }
   const nestedItems = record.items as Record<string, unknown> | undefined
-  if (nestedItems && Array.isArray(nestedItems.items)) return nestedItems.items as T[]
+  if (nestedItems && Array.isArray(nestedItems.items))
+    return nestedItems.items as T[]
   return []
 }

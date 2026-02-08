@@ -22,10 +22,18 @@ const showError = computed(() => hasState(props.error))
 const showSuccess = computed(() => hasState(props.success))
 const showEmpty = computed(() => hasState(props.empty))
 
-const loadingMessage = computed(() => resolveMessage(props.loading, 'Loading...'))
-const errorMessage = computed(() => resolveMessage(props.error, 'Something went wrong.'))
-const successMessage = computed(() => resolveMessage(props.success, 'Operation completed successfully.'))
-const emptyMessage = computed(() => resolveMessage(props.empty, 'No data available.'))
+const loadingMessage = computed(() =>
+  resolveMessage(props.loading, 'Loading...')
+)
+const errorMessage = computed(() =>
+  resolveMessage(props.error, 'Something went wrong.')
+)
+const successMessage = computed(() =>
+  resolveMessage(props.success, 'Operation completed successfully.')
+)
+const emptyMessage = computed(() =>
+  resolveMessage(props.empty, 'No data available.')
+)
 </script>
 
 <template>

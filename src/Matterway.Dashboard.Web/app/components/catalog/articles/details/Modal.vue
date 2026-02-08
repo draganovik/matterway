@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { ArticleDetailProperty, QueryDetailResponse } from '~/types/catalog'
+import type {
+  ArticleDetailProperty,
+  QueryDetailResponse
+} from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
 type DetailSubmitPayload = {
@@ -11,21 +14,24 @@ type DetailSubmitPayload = {
   numericValue?: number | null
 }
 
-const props = withDefaults(defineProps<{
-  open?: boolean
-  mode?: 'add' | 'edit'
-  detail?: ArticleDetailProperty | null
-  canEdit?: boolean
-  loading?: boolean
-  error?: string
-}>(), {
-  open: false,
-  mode: 'add',
-  detail: null,
-  canEdit: false,
-  loading: false,
-  error: ''
-})
+const props = withDefaults(
+  defineProps<{
+    open?: boolean
+    mode?: 'add' | 'edit'
+    detail?: ArticleDetailProperty | null
+    canEdit?: boolean
+    loading?: boolean
+    error?: string
+  }>(),
+  {
+    open: false,
+    mode: 'add',
+    detail: null,
+    canEdit: false,
+    loading: false,
+    error: ''
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:open', value: boolean): void
@@ -48,8 +54,8 @@ const isOpen = computed({
 
 const optionItems = computed(() =>
   detailOptions.value
-    .filter(option => option.slug)
-    .map(option => ({
+    .filter((option) => option.slug)
+    .map((option) => ({
       id: option.slug as string,
       slug: option.slug as string,
       label: (option.title ?? option.slug ?? '').toString(),
@@ -58,7 +64,9 @@ const optionItems = computed(() =>
 )
 
 const selectedOption = computed(() => {
-  const match = optionItems.value.find(option => option.id === selectedKey.value)
+  const match = optionItems.value.find(
+    (option) => option.id === selectedKey.value
+  )
   if (match) return match
   if (props.detail?.detailSlug) {
     return {
@@ -69,7 +77,12 @@ const selectedOption = computed(() => {
     }
   }
   if (!selectedKey.value) return null
-  return { id: selectedKey.value, slug: selectedKey.value, label: selectedKey.value, unit: '' }
+  return {
+    id: selectedKey.value,
+    slug: selectedKey.value,
+    label: selectedKey.value,
+    unit: ''
+  }
 })
 
 const isNumeric = computed(() => {
@@ -94,7 +107,8 @@ watch(
     }
     if (props.mode === 'edit' && props.detail?.detailSlug) {
       selectedKey.value = props.detail.detailSlug
-      valueInput.value = props.detail.textValue ?? props.detail.numericValue?.toString() ?? ''
+      valueInput.value =
+        props.detail.textValue ?? props.detail.numericValue?.toString() ?? ''
     } else {
       selectedKey.value = ''
       valueInput.value = ''
@@ -122,9 +136,8 @@ async function loadDefinitions() {
 
 function submit() {
   validationError.value = ''
-  const slug = props.mode === 'edit'
-    ? props.detail?.detailSlug ?? ''
-    : selectedKey.value
+  const slug =
+    props.mode === 'edit' ? (props.detail?.detailSlug ?? '') : selectedKey.value
   if (!slug) {
     validationError.value = 'Select a detail.'
     return
@@ -163,11 +176,15 @@ function submit() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
+        <h3 class="text-foreground text-base font-semibold">
           {{ mode === 'edit' ? 'Edit Detail' : 'Add Detail' }}
         </h3>
-        <p class="text-sm text-muted">
-          {{ mode === 'edit' ? 'Update the selected detail value.' : 'Attach a new detail to the article.' }}
+        <p class="text-muted text-sm">
+          {{
+            mode === 'edit'
+              ? 'Update the selected detail value.'
+              : 'Attach a new detail to the article.'
+          }}
         </p>
       </div>
     </template>
@@ -175,10 +192,7 @@ function submit() {
     <template #body>
       <div class="grid gap-4">
         <div class="grid gap-3 md:grid-cols-[1fr_auto]">
-          <UFormField
-            label="Detail"
-            required
-          >
+          <UFormField label="Detail" required>
             <USelectMenu
               v-model="selectedKey"
               v-model:search-term="searchTerm"
@@ -203,10 +217,7 @@ function submit() {
           </div>
         </div>
 
-        <UFormField
-          :label="isNumeric ? 'Numeric Value' : 'Value'"
-          required
-        >
+        <UFormField :label="isNumeric ? 'Numeric Value' : 'Value'" required>
           <UInput
             v-model="valueInput"
             :type="isNumeric ? 'number' : 'text'"
@@ -215,17 +226,15 @@ function submit() {
           />
         </UFormField>
 
-        <StatusMessages :error="validationError || definitionState.error || error" />
+        <StatusMessages
+          :error="validationError || definitionState.error || error"
+        />
       </div>
     </template>
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton
-          variant="ghost"
-          :disabled="loading"
-          @click="isOpen = false"
-        >
+        <UButton variant="ghost" :disabled="loading" @click="isOpen = false">
           Cancel
         </UButton>
         <UButton

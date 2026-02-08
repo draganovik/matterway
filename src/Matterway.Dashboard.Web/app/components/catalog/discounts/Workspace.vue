@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { QueryArticleResponse, QueryDiscountResponse } from '~/types/catalog'
+import type {
+  QueryArticleResponse,
+  QueryDiscountResponse
+} from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 import { normalizeCode } from '~/utils/normalization'
@@ -110,7 +113,8 @@ function applyDiscountToEditor(discount: DiscountListItem) {
   form.value = {
     code: discount.code,
     percentage: discount.percentage,
-    validFrom: toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
+    validFrom:
+      toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
     validTo: toLocalDateTimeInput(discount.validTo)
   }
   selectedArticleIds.value = [...discount.articleIds]
@@ -118,7 +122,7 @@ function applyDiscountToEditor(discount: DiscountListItem) {
 }
 
 function selectDiscount(key: string) {
-  const discount = discounts.value.find(item => item.key === key)
+  const discount = discounts.value.find((item) => item.key === key)
   if (!discount) return
   applyDiscountToEditor(discount)
 }
@@ -130,10 +134,11 @@ function applySearch() {
 const filteredDiscounts = computed(() => {
   const search = activeSearch.value
   if (!search) return discounts.value
-  return discounts.value.filter(item =>
-    item.code.toLowerCase().includes(search)
-    || item.validFrom.toLowerCase().includes(search)
-    || `${item.percentage}`.toLowerCase().includes(search)
+  return discounts.value.filter(
+    (item) =>
+      item.code.toLowerCase().includes(search) ||
+      item.validFrom.toLowerCase().includes(search) ||
+      `${item.percentage}`.toLowerCase().includes(search)
   )
 })
 
@@ -153,7 +158,10 @@ async function loadDiscountsFromArticlesFallback() {
     if (result.status === 204 || !result.data) break
 
     articleRows.push(...(result.data.data || []))
-    const totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
+    const totalPages = Math.max(
+      1,
+      parseNumberOr(result.data.meta?.totalPages, 1)
+    )
     if (page >= totalPages) break
     page += 1
   }
@@ -239,7 +247,8 @@ async function loadDiscounts() {
 
   if (!selectedKey.value) return
 
-  const selected = discounts.value.find(item => item.key === selectedKey.value) || null
+  const selected =
+    discounts.value.find((item) => item.key === selectedKey.value) || null
   if (!selected) {
     beginCreate()
     return
@@ -320,7 +329,9 @@ async function saveDiscount() {
   }
 
   discounts.value = sortDiscounts([
-    ...discounts.value.filter(item => item.key !== key && item.code !== built.code),
+    ...discounts.value.filter(
+      (item) => item.key !== key && item.code !== built.code
+    ),
     next
   ])
 
@@ -348,7 +359,9 @@ async function removeDiscount() {
     return
   }
 
-  discounts.value = discounts.value.filter(item => item.code !== code && item.key !== code)
+  discounts.value = discounts.value.filter(
+    (item) => item.code !== code && item.key !== code
+  )
   beginCreate()
   deleteState.success = result.data?.message || `Discount ${code} removed.`
 }
@@ -361,13 +374,14 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-    <div class="shrink-0 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-base font-semibold text-foreground">
+        <h2 class="text-foreground text-base font-semibold">
           Manage Discounts
         </h2>
-        <p class="text-sm text-muted">
-          Pick an existing discount from the list or create a new code, then update article links and validity.
+        <p class="text-muted text-sm">
+          Pick an existing discount from the list or create a new code, then
+          update article links and validity.
         </p>
       </div>
       <UButton
@@ -404,23 +418,30 @@ onMounted(() => {
 
         <div class="mt-3 grid gap-2">
           <StatusMessages
-            v-if="listState.error || listState.loading || !filteredDiscounts.length"
+            v-if="
+              listState.error || listState.loading || !filteredDiscounts.length
+            "
             :error="listState.error"
             :loading="listState.loading ? 'Loading discounts.' : false"
-            :empty="!listState.loading && !listState.error && !filteredDiscounts.length ? listState.empty : false"
+            :empty="
+              !listState.loading &&
+              !listState.error &&
+              !filteredDiscounts.length
+                ? listState.empty
+                : false
+            "
           />
-          <div
-            v-else
-            class="grid gap-2"
-          >
+          <div v-else class="grid gap-2">
             <button
               v-for="discount in filteredDiscounts"
               :key="discount.key"
               type="button"
               class="w-full rounded-xl border px-4 py-3 text-left transition"
-              :class="selectedKey === discount.key
-                ? 'border-primary/40 bg-primary/5'
-                : 'border-transparent bg-background hover:border-default hover:bg-muted/40'"
+              :class="
+                selectedKey === discount.key
+                  ? 'border-primary/40 bg-primary/5'
+                  : 'bg-background hover:border-default hover:bg-muted/40 border-transparent'
+              "
               @click="selectDiscount(discount.key)"
             >
               <CatalogDiscountsDiscountListItem :item="discount" />
@@ -432,10 +453,10 @@ onMounted(() => {
       <template #detail>
         <div class="grid gap-5">
           <div class="space-y-1">
-            <h3 class="text-base font-semibold text-foreground">
+            <h3 class="text-foreground text-base font-semibold">
               {{ selectedDiscount ? 'Edit Discount' : 'Create Discount' }}
             </h3>
-            <p class="text-sm text-muted">
+            <p class="text-muted text-sm">
               PUT is used for save operations. Delete removes all rows by code.
             </p>
           </div>
@@ -471,10 +492,7 @@ onMounted(() => {
               />
             </UFormField>
 
-            <UFormField
-              label="Valid From"
-              required
-            >
+            <UFormField label="Valid From" required>
               <UInput
                 v-model="form.validFrom"
                 type="datetime-local"

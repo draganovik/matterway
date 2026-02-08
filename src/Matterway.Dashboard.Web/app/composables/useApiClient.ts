@@ -7,10 +7,13 @@ function getBaseUrl(service: ApiService) {
   return null
 }
 
-function getValidationErrors(payload: unknown): Record<string, string[]> | undefined {
+function getValidationErrors(
+  payload: unknown
+): Record<string, string[]> | undefined {
   if (!payload || typeof payload !== 'object') return undefined
   const payloadWithErrors = payload as { errors?: unknown }
-  if (!payloadWithErrors.errors || typeof payloadWithErrors.errors !== 'object') return undefined
+  if (!payloadWithErrors.errors || typeof payloadWithErrors.errors !== 'object')
+    return undefined
   return payloadWithErrors.errors as Record<string, string[]>
 }
 
@@ -72,7 +75,9 @@ export function useApiClient() {
 
     const contentType = response.headers.get('content-type') || ''
     const isJson = contentType.includes('application/json')
-    const payload = isJson ? await response.json().catch(() => null) : await response.text().catch(() => null)
+    const payload = isJson
+      ? await response.json().catch(() => null)
+      : await response.text().catch(() => null)
 
     if (response.ok) {
       return { ok: true, status: response.status, data: payload as T }
@@ -84,7 +89,9 @@ export function useApiClient() {
     return {
       ok: false,
       status: response.status,
-      error: validationMessage ? `${baseError} ${validationMessage}` : baseError,
+      error: validationMessage
+        ? `${baseError} ${validationMessage}`
+        : baseError,
       validationErrors
     }
   }

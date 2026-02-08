@@ -1,11 +1,16 @@
-import { decodeJwtPayload, getJwtArrayClaim, getJwtStringClaim, type JwtPayload } from '~/utils/jwt'
+import {
+  decodeJwtPayload,
+  getJwtArrayClaim,
+  getJwtStringClaim,
+  type JwtPayload
+} from '~/utils/jwt'
 import type { AuthSession, LoginResponse } from '~/types/auth/session'
 
 const refreshCookieName = 'mw_refresh'
 const authPath = '/api/v1.0/public/auth'
 const authJsonHeaders = {
   'Content-Type': 'application/json',
-  'accept': 'application/json'
+  accept: 'application/json'
 } as const
 
 const permissionLevels = {
@@ -34,7 +39,9 @@ function parseDate(value: string | null | undefined): Date | null {
 }
 
 function getCookieOptions() {
-  const secure = import.meta.client ? window.location.protocol === 'https:' : false
+  const secure = import.meta.client
+    ? window.location.protocol === 'https:'
+    : false
   return {
     sameSite: 'lax' as const,
     secure,
@@ -48,7 +55,10 @@ export function useAuthSession() {
     ...getCookieOptions(),
     default: () => null
   })
-  const refreshTimer = useState<ReturnType<typeof setTimeout> | null>('auth-refresh-timer', () => null)
+  const refreshTimer = useState<ReturnType<typeof setTimeout> | null>(
+    'auth-refresh-timer',
+    () => null
+  )
   const isInitialized = useState('auth-is-initialized', () => false)
 
   const payload = computed<JwtPayload | null>(() => {
@@ -58,26 +68,37 @@ export function useAuthSession() {
 
   const role = computed(
     () =>
-      getJwtStringClaim(payload.value, 'role')
-      || getJwtStringClaim(payload.value, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role')
+      getJwtStringClaim(payload.value, 'role') ||
+      getJwtStringClaim(
+        payload.value,
+        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+      )
   )
 
   const permissions = computed(() => getJwtArrayClaim(payload.value, 'perm'))
 
   const isEmployee = computed(() => role.value?.toLowerCase() === 'employee')
 
-  const isLoggedIn = computed(() => Boolean(session.value.accessToken) && !isAccessExpired())
+  const isLoggedIn = computed(
+    () => Boolean(session.value.accessToken) && !isAccessExpired()
+  )
 
   function getAuthBaseUrl() {
     const config = useRuntimeConfig()
     return `${config.public.identityApiBaseUrl}${authPath}`
   }
 
-  function authFetch(path: 'login' | 'logout' | 'refresh', options: RequestInit) {
+  function authFetch(
+    path: 'login' | 'logout' | 'refresh',
+    options: RequestInit
+  ) {
     return fetch(`${getAuthBaseUrl()}/${path}`, options)
   }
 
-  function authJsonPost(path: 'login' | 'refresh', body: Record<string, unknown>) {
+  function authJsonPost(
+    path: 'login' | 'refresh',
+    body: Record<string, unknown>
+  ) {
     return authFetch(path, {
       method: 'POST',
       headers: authJsonHeaders,
@@ -99,7 +120,11 @@ export function useAuthSession() {
       document.cookie = `${refreshCookieName}=; Max-Age=0; Path=/; SameSite=Lax`
       return
     }
-    const attrs = [`${refreshCookieName}=${encodeURIComponent(token)}`, 'Path=/', 'SameSite=Lax']
+    const attrs = [
+      `${refreshCookieName}=${encodeURIComponent(token)}`,
+      'Path=/',
+      'SameSite=Lax'
+    ]
     if (expires) attrs.push(`Expires=${expires.toUTCString()}`)
     if (window.location.protocol === 'https:') attrs.push('Secure')
     document.cookie = attrs.join('; ')
@@ -209,7 +234,10 @@ export function useAuthSession() {
     }
   }
 
-  function hasPermission(service: string, minimumLevel: 'observer' | 'operator' | 'administrator' = 'observer') {
+  function hasPermission(
+    service: string,
+    minimumLevel: 'observer' | 'operator' | 'administrator' = 'observer'
+  ) {
     if (!isEmployee.value) return false
     const required = permissionLevels[minimumLevel]
     const normalizedService = service.toLowerCase()
@@ -217,7 +245,8 @@ export function useAuthSession() {
       const [permService, permLevel] = perm.split(':', 2)
       if (!permService || !permLevel) return false
       if (permService.toLowerCase() !== normalizedService) return false
-      const normalizedLevel = permLevel.toLowerCase() as keyof typeof permissionLevels
+      const normalizedLevel =
+        permLevel.toLowerCase() as keyof typeof permissionLevels
       if (permissionLevels[normalizedLevel] === undefined) return false
       return permissionLevels[normalizedLevel] >= required
     })

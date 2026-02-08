@@ -4,15 +4,18 @@ import type { QueryArticleResponse } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { parseNumberOr } from '~/utils/numbers'
 
-const props = withDefaults(defineProps<{
-  open?: boolean
-  selectedIds?: string[]
-  canEdit?: boolean
-}>(), {
-  open: false,
-  selectedIds: () => [],
-  canEdit: false
-})
+const props = withDefaults(
+  defineProps<{
+    open?: boolean
+    selectedIds?: string[]
+    canEdit?: boolean
+  }>(),
+  {
+    open: false,
+    selectedIds: () => [],
+    canEdit: false
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:open', value: boolean): void
@@ -37,13 +40,21 @@ const pagination = reactive({
   totalPages: 1
 })
 
-const pageSizes = [10, 20, 50, 100].map(value => ({ label: `${value} / page`, value }))
+const pageSizes = [10, 20, 50, 100].map((value) => ({
+  label: `${value} / page`,
+  value
+}))
 
-const selectedOnPageCount = computed(() =>
-  articles.value.filter(item => item.id && selectedArticleIds.value.includes(item.id)).length
+const selectedOnPageCount = computed(
+  () =>
+    articles.value.filter(
+      (item) => item.id && selectedArticleIds.value.includes(item.id)
+    ).length
 )
-const allCurrentPageSelected = computed(() =>
-  articles.value.length > 0 && selectedOnPageCount.value === articles.value.length
+const allCurrentPageSelected = computed(
+  () =>
+    articles.value.length > 0 &&
+    selectedOnPageCount.value === articles.value.length
 )
 
 watch(
@@ -89,10 +100,22 @@ async function loadArticles() {
   }
 
   articles.value = result.data.data || []
-  pagination.totalCount = parseNumberOr(result.data.meta?.totalCount, articles.value.length)
-  pagination.totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
-  pagination.page = Math.max(1, parseNumberOr(result.data.meta?.currentPage, pagination.page))
-  pagination.pageSize = Math.max(1, parseNumberOr(result.data.meta?.pageSize, pagination.pageSize))
+  pagination.totalCount = parseNumberOr(
+    result.data.meta?.totalCount,
+    articles.value.length
+  )
+  pagination.totalPages = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.totalPages, 1)
+  )
+  pagination.page = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.currentPage, pagination.page)
+  )
+  pagination.pageSize = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.pageSize, pagination.pageSize)
+  )
 }
 
 function searchArticles() {
@@ -120,7 +143,9 @@ function isSelected(id: string) {
 
 function toggleSelection(id: string) {
   if (isSelected(id)) {
-    selectedArticleIds.value = selectedArticleIds.value.filter(item => item !== id)
+    selectedArticleIds.value = selectedArticleIds.value.filter(
+      (item) => item !== id
+    )
     return
   }
   selectedArticleIds.value = [...selectedArticleIds.value, id]
@@ -128,18 +153,20 @@ function toggleSelection(id: string) {
 
 function togglePageSelection() {
   const currentIds = articles.value
-    .map(item => item.id)
+    .map((item) => item.id)
     .filter((id): id is string => Boolean(id))
 
   if (!currentIds.length) return
 
   if (allCurrentPageSelected.value) {
-    selectedArticleIds.value = selectedArticleIds.value.filter(id => !currentIds.includes(id))
+    selectedArticleIds.value = selectedArticleIds.value.filter(
+      (id) => !currentIds.includes(id)
+    )
     return
   }
 
   const next = new Set(selectedArticleIds.value)
-  currentIds.forEach(id => next.add(id))
+  currentIds.forEach((id) => next.add(id))
   selectedArticleIds.value = [...next]
 }
 
@@ -157,10 +184,8 @@ function submitSelection() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
-          Select Articles
-        </h3>
-        <p class="text-sm text-muted">
+        <h3 class="text-foreground text-base font-semibold">Select Articles</h3>
+        <p class="text-muted text-sm">
           Search and select the articles attached to this discount.
         </p>
       </div>
@@ -198,25 +223,28 @@ function submitSelection() {
           </UButton>
         </div>
 
-        <div class="max-h-75 overflow-y-auto space-y-2">
+        <div class="max-h-75 space-y-2 overflow-y-auto">
           <StatusMessages
             v-if="listState.error || listState.loading || !articles.length"
             :error="listState.error"
             :loading="listState.loading ? 'Loading articles.' : false"
-            :empty="!listState.loading && !listState.error && !articles.length ? listState.empty : false"
+            :empty="
+              !listState.loading && !listState.error && !articles.length
+                ? listState.empty
+                : false
+            "
           />
-          <div
-            v-else
-            class="space-y-2"
-          >
+          <div v-else class="space-y-2">
             <button
               v-for="article in articles"
               :key="article.id"
               type="button"
               class="w-full rounded-xl border px-4 py-3 text-left transition"
-              :class="isSelected(article.id)
-                ? 'border-primary/40 bg-primary/5'
-                : 'border-transparent bg-background hover:border-default hover:bg-muted/40'"
+              :class="
+                isSelected(article.id)
+                  ? 'border-primary/40 bg-primary/5'
+                  : 'bg-background hover:border-default hover:bg-muted/40 border-transparent'
+              "
               @click="toggleSelection(article.id)"
             >
               <CatalogDiscountsListItem
@@ -227,9 +255,12 @@ function submitSelection() {
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-default pt-3">
-          <div class="text-sm text-muted">
-            Page {{ pagination.page }} of {{ pagination.totalPages }} - {{ pagination.totalCount }} total
+        <div
+          class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
+        >
+          <div class="text-muted text-sm">
+            Page {{ pagination.page }} of {{ pagination.totalPages }} -
+            {{ pagination.totalCount }} total
           </div>
           <div class="flex items-center gap-2">
             <USelectMenu
@@ -263,17 +294,8 @@ function submitSelection() {
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton
-          variant="ghost"
-          @click="isOpen = false"
-        >
-          Cancel
-        </UButton>
-        <UButton
-          color="primary"
-          :disabled="!canEdit"
-          @click="submitSelection"
-        >
+        <UButton variant="ghost" @click="isOpen = false"> Cancel </UButton>
+        <UButton color="primary" :disabled="!canEdit" @click="submitSelection">
           Save Selection ({{ selectedArticleIds.length }})
         </UButton>
       </div>

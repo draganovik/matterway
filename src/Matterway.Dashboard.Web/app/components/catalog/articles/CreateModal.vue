@@ -57,7 +57,8 @@ async function createArticle() {
   const description = payload.description.trim()
 
   if (!articleCode || !title || !payload.basePrice || !description) {
-    createState.error = 'Fill in all required fields before creating the article.'
+    createState.error =
+      'Fill in all required fields before creating the article.'
     return
   }
 
@@ -85,10 +86,10 @@ async function createArticle() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
+        <h3 class="text-foreground text-base font-semibold">
           Create New Article
         </h3>
-        <p class="text-sm text-muted">
+        <p class="text-muted text-sm">
           Save core article data, then continue editing it in the browse view.
         </p>
       </div>

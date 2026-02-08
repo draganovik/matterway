@@ -4,11 +4,7 @@ const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui'
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/ui'],
   ssr: false,
   components: [
     {
@@ -22,9 +18,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      link: [
-        { rel: 'icon', href: '/favicon.svg' }
-      ]
+      link: [{ rel: 'icon', href: '/favicon.svg' }]
     }
   },
 

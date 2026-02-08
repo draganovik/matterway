@@ -3,9 +3,5 @@ import logoUrl from '~/assets/brand/matterway-logo-red.svg'
 </script>
 
 <template>
-  <img
-    :src="logoUrl"
-    alt="Matterway"
-    class="block"
-  >
+  <img :src="logoUrl" alt="Matterway" class="block" />
 </template>

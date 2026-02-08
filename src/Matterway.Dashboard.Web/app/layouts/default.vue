@@ -11,7 +11,7 @@ const iconMap: Record<string, string> = {
 
 const navItems = computed<NavigationMenuItem[]>(() => {
   return authorizedSections.value
-    .map(section => ({
+    .map((section) => ({
       label: section.label,
       icon: iconMap[section.key] || 'i-lucide-folder',
       to: `/${section.key}`,
@@ -21,7 +21,7 @@ const navItems = computed<NavigationMenuItem[]>(() => {
       onSelect: () => {
         open.value = false
       },
-      children: section.features.map(feature => ({
+      children: section.features.map((feature) => ({
         label: feature.label,
         to: feature.route,
         exact: false,
@@ -30,30 +30,35 @@ const navItems = computed<NavigationMenuItem[]>(() => {
         }
       }))
     }))
-    .filter(section => Array.isArray(section.children) && section.children.length > 0)
+    .filter(
+      (section) =>
+        Array.isArray(section.children) && section.children.length > 0
+    )
 })
 
-const secondaryItems = computed<NavigationMenuItem[]>(() => ([
+const secondaryItems = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Solution Repository',
     icon: 'i-lucide-github',
     to: 'https://github.com/draganovik/aspire-matterway',
     target: '_blank'
   }
-]))
+])
 
-const searchGroups = computed(() => [{
-  id: 'services',
-  label: 'Navigation',
-  items: navItems.value.flatMap(section =>
-    (section.children || []).map((child: NavigationMenuItem) => ({
-      id: `${section.label}-${child.label}`,
-      label: child.label,
-      icon: section.icon,
-      to: child.to
-    }))
-  )
-}])
+const searchGroups = computed(() => [
+  {
+    id: 'services',
+    label: 'Navigation',
+    items: navItems.value.flatMap((section) =>
+      (section.children || []).map((child: NavigationMenuItem) => ({
+        id: `${section.label}-${child.label}`,
+        label: child.label,
+        icon: section.icon,
+        to: child.to
+      }))
+    )
+  }
+])
 </script>
 
 <template>
@@ -73,7 +78,7 @@ const searchGroups = computed(() => [{
       <template #default="{ collapsed }">
         <UDashboardSearchButton
           :collapsed="collapsed"
-          class="bg-transparent ring-default"
+          class="ring-default bg-transparent"
         />
 
         <UNavigationMenu

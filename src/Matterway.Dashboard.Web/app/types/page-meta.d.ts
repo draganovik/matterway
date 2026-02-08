@@ -1,4 +1,8 @@
-import type { ActionKey, PermissionLevel, ServiceSection } from '~/types/services/definitions'
+import type {
+  ActionKey,
+  PermissionLevel,
+  ServiceSection
+} from '~/types/services/definitions'
 
 declare module '#app' {
   interface PageMeta {

@@ -11,10 +11,7 @@ const sections = useAuthorizedSections()
 <template>
   <UDashboardPanel id="home">
     <template #header>
-      <UDashboardNavbar
-        title="Overview"
-        :ui="{ right: 'gap-3' }"
-      >
+      <UDashboardNavbar title="Overview" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -25,36 +22,27 @@ const sections = useAuthorizedSections()
 
     <template #body>
       <div class="space-y-8">
-        <UCard class="border border-default bg-elevated/20">
-          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <UCard class="border-default bg-elevated/20 border">
+          <div
+            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+          >
             <div>
-              <p class="text-xs uppercase tracking-[0.3em] text-orange-600 dark:text-orange-400">
+              <p
+                class="text-xs tracking-[0.3em] text-orange-600 uppercase dark:text-orange-400"
+              >
                 Dashboard
               </p>
-              <h1 class="text-3xl font-semibold text-foreground">
+              <h1 class="text-foreground text-3xl font-semibold">
                 Matterway Operations
               </h1>
-              <p class="text-sm text-muted">
+              <p class="text-muted text-sm">
                 Manage the Catalog domain with permission-aware tooling.
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
-              <UBadge
-                color="primary"
-                variant="soft"
-              >
-                Employee
-              </UBadge>
-              <UBadge
-                color="neutral"
-                variant="soft"
-              >
-                Catalog Focus
-              </UBadge>
-              <UBadge
-                color="neutral"
-                variant="soft"
-              >
+              <UBadge color="primary" variant="soft"> Employee </UBadge>
+              <UBadge color="neutral" variant="soft"> Catalog Focus </UBadge>
+              <UBadge color="neutral" variant="soft">
                 Permission Scoped
               </UBadge>
             </div>
@@ -65,14 +53,16 @@ const sections = useAuthorizedSections()
           <UCard
             v-for="section in sections"
             :key="section.key"
-            class="border border-default bg-elevated/10"
+            class="border-default bg-elevated/10 border"
           >
             <template #header>
               <div>
-                <p class="text-xs uppercase tracking-[0.3em] text-orange-600 dark:text-orange-400">
+                <p
+                  class="text-xs tracking-[0.3em] text-orange-600 uppercase dark:text-orange-400"
+                >
                   {{ section.label }}
                 </p>
-                <h2 class="text-xl font-semibold text-foreground">
+                <h2 class="text-foreground text-xl font-semibold">
                   Service features
                 </h2>
               </div>
@@ -82,10 +72,10 @@ const sections = useAuthorizedSections()
                 v-for="feature in section.features"
                 :key="feature.key"
                 :to="feature.route"
-                class="flex items-center justify-between rounded-lg border border-default px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary/10"
+                class="border-default hover:border-primary/30 hover:bg-primary/10 flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition"
               >
                 <span>{{ feature.label }}</span>
-                <span class="text-xs text-muted">Open</span>
+                <span class="text-muted text-xs">Open</span>
               </NuxtLink>
             </div>
           </UCard>

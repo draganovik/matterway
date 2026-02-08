@@ -13,7 +13,10 @@ const userLabel = computed(() => {
   const payload = auth.payload.value
   const candidates = [
     getJwtStringClaim(payload, 'email'),
-    getJwtStringClaim(payload, 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'),
+    getJwtStringClaim(
+      payload,
+      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+    ),
     getJwtStringClaim(payload, 'preferred_username'),
     getJwtStringClaim(payload, 'upn'),
     getJwtStringClaim(payload, 'unique_name'),
@@ -21,50 +24,68 @@ const userLabel = computed(() => {
     getJwtStringClaim(payload, 'sub')
   ].filter(Boolean) as string[]
 
-  const isUuid = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+  const isUuid = (value: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value
+    )
   const isHexish = (value: string) => /^[0-9a-f]{16,}$/i.test(value)
 
-  const raw = candidates.find(value => value && !isUuid(value) && !isHexish(value)) || ''
+  const raw =
+    candidates.find((value) => value && !isUuid(value) && !isHexish(value)) ||
+    ''
   const prefix = raw.split('@')[0] || ''
   return prefix || auth.role.value || 'Employee'
 })
-const items = computed<DropdownMenuItem[][]>(() => ([[{
-  type: 'label',
-  label: userLabel.value,
-  icon: 'i-lucide-shield'
-}], [{
-  label: 'Light',
-  icon: 'i-lucide-sun',
-  type: 'checkbox',
-  checked: colorMode.value === 'light',
-  onSelect(e: Event) {
-    e.preventDefault()
-    colorMode.preference = 'light'
-  }
-}, {
-  label: 'Dark',
-  icon: 'i-lucide-moon',
-  type: 'checkbox',
-  checked: colorMode.value === 'dark',
-  onSelect(e: Event) {
-    e.preventDefault()
-    colorMode.preference = 'dark'
-  }
-}], [{
-  label: 'Log out',
-  icon: 'i-lucide-log-out',
-  onSelect: async () => {
-    await auth.logout()
-    await navigateTo('/login')
-  }
-}]]))
+const items = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      type: 'label',
+      label: userLabel.value,
+      icon: 'i-lucide-shield'
+    }
+  ],
+  [
+    {
+      label: 'Light',
+      icon: 'i-lucide-sun',
+      type: 'checkbox',
+      checked: colorMode.value === 'light',
+      onSelect(e: Event) {
+        e.preventDefault()
+        colorMode.preference = 'light'
+      }
+    },
+    {
+      label: 'Dark',
+      icon: 'i-lucide-moon',
+      type: 'checkbox',
+      checked: colorMode.value === 'dark',
+      onSelect(e: Event) {
+        e.preventDefault()
+        colorMode.preference = 'dark'
+      }
+    }
+  ],
+  [
+    {
+      label: 'Log out',
+      icon: 'i-lucide-log-out',
+      onSelect: async () => {
+        await auth.logout()
+        await navigateTo('/login')
+      }
+    }
+  ]
+])
 </script>
 
 <template>
   <UDropdownMenu
     :items="items"
     :content="{ align: 'center', collisionPadding: 12 }"
-    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }"
+    :ui="{
+      content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)'
+    }"
   >
     <UButton
       :label="collapsed ? undefined : userLabel"

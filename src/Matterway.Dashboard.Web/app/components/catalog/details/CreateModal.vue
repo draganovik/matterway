@@ -81,10 +81,10 @@ async function createDetail() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-base font-semibold text-foreground">
+        <h3 class="text-foreground text-base font-semibold">
           Create New Detail
         </h3>
-        <p class="text-sm text-muted">
+        <p class="text-muted text-sm">
           Create a detail definition, then manage it from the editor panel.
         </p>
       </div>
@@ -105,10 +105,7 @@ async function createDetail() {
           />
         </UFormField>
 
-        <UFormField
-          label="Title"
-          required
-        >
+        <UFormField label="Title" required>
           <UInput
             v-model="form.title"
             placeholder="Screen Size"

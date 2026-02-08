@@ -88,7 +88,8 @@ async function loadDetails() {
   details.value = sortDetails(result.data || [])
 
   if (selectedSlug.value) {
-    const match = details.value.find(item => item.slug === selectedSlug.value) || null
+    const match =
+      details.value.find((item) => item.slug === selectedSlug.value) || null
     selectedDetail.value = match
     if (!match) {
       selectedSlug.value = null
@@ -105,7 +106,7 @@ function beginCreate() {
 }
 
 function selectDetail(slug: string) {
-  const match = details.value.find(item => item.slug === slug)
+  const match = details.value.find((item) => item.slug === slug)
   if (!match) return
 
   selectedSlug.value = slug
@@ -163,7 +164,9 @@ async function saveDetail() {
     unit: result.data?.unit ?? (unit || null)
   }
 
-  const withoutCurrent = details.value.filter(item => item.slug !== nextDetail.slug)
+  const withoutCurrent = details.value.filter(
+    (item) => item.slug !== nextDetail.slug
+  )
   details.value = sortDetails([...withoutCurrent, nextDetail])
 
   selectedSlug.value = nextDetail.slug || slug
@@ -193,7 +196,7 @@ async function removeDetail() {
     return
   }
 
-  details.value = details.value.filter(item => item.slug !== slug)
+  details.value = details.value.filter((item) => item.slug !== slug)
   selectedSlug.value = null
   selectedDetail.value = null
   applyDetailToForm(null)
@@ -202,7 +205,7 @@ async function removeDetail() {
 }
 
 function handleDetailCreated(detail: QueryDetailResponse) {
-  const next = details.value.filter(item => item.slug !== detail.slug)
+  const next = details.value.filter((item) => item.slug !== detail.slug)
   details.value = sortDetails([...next, detail])
 
   const slug = detail.slug || ''
@@ -220,21 +223,16 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-    <div class="shrink-0 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-base font-semibold text-foreground">
-          Manage Details
-        </h2>
-        <p class="text-sm text-muted">
-          Create and maintain detail definitions used across article detail values.
+        <h2 class="text-foreground text-base font-semibold">Manage Details</h2>
+        <p class="text-muted text-sm">
+          Create and maintain detail definitions used across article detail
+          values.
         </p>
       </div>
 
-      <UButton
-        color="primary"
-        :disabled="!canEdit"
-        @click="beginCreate"
-      >
+      <UButton color="primary" :disabled="!canEdit" @click="beginCreate">
         Create New
       </UButton>
     </div>
@@ -277,11 +275,15 @@ onMounted(() => {
       <template #detail>
         <div class="space-y-4">
           <div class="space-y-1">
-            <h3 class="text-base font-semibold text-foreground">
+            <h3 class="text-foreground text-base font-semibold">
               {{ selectedDetail ? 'Edit Detail' : 'Detail Editor' }}
             </h3>
-            <p class="text-sm text-muted">
-              {{ canEdit ? 'Operator permission is required for create, update, and delete.' : 'Read-only mode: operator permission required for changes.' }}
+            <p class="text-muted text-sm">
+              {{
+                canEdit
+                  ? 'Operator permission is required for create, update, and delete.'
+                  : 'Read-only mode: operator permission required for changes.'
+              }}
             </p>
           </div>
 
@@ -291,10 +293,7 @@ onMounted(() => {
             description="Select an item from the list to start editing."
           />
 
-          <div
-            v-else
-            class="grid gap-4"
-          >
+          <div v-else class="grid gap-4">
             <UFormField
               label="Slug"
               required
@@ -308,10 +307,7 @@ onMounted(() => {
               />
             </UFormField>
 
-            <UFormField
-              label="Title"
-              required
-            >
+            <UFormField label="Title" required>
               <UInput
                 v-model="form.title"
                 placeholder="Screen Size"

@@ -17,15 +17,22 @@ export function decodeJwtPayload(token: string): JwtPayload | null {
   }
 }
 
-export function getJwtArrayClaim(payload: JwtPayload | null, key: string): string[] {
+export function getJwtArrayClaim(
+  payload: JwtPayload | null,
+  key: string
+): string[] {
   if (!payload) return []
   const raw = payload[key]
-  if (Array.isArray(raw)) return raw.filter((item): item is string => typeof item === 'string')
+  if (Array.isArray(raw))
+    return raw.filter((item): item is string => typeof item === 'string')
   if (typeof raw === 'string') return [raw]
   return []
 }
 
-export function getJwtStringClaim(payload: JwtPayload | null, key: string): string | null {
+export function getJwtStringClaim(
+  payload: JwtPayload | null,
+  key: string
+): string | null {
   if (!payload) return null
   const raw = payload[key]
   return typeof raw === 'string' ? raw : null

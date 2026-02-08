@@ -20,19 +20,17 @@ function formatDateTime(value?: string | null) {
 <template>
   <div class="grid gap-2">
     <div class="flex items-start justify-between gap-2">
-      <p class="text-base font-medium text-foreground">
+      <p class="text-foreground text-base font-medium">
         {{ item.code || 'Missing Code' }}
       </p>
-      <UBadge
-        color="neutral"
-        variant="subtle"
-      >
+      <UBadge color="neutral" variant="subtle">
         {{ item.articleIds.length }} articles
       </UBadge>
     </div>
 
-    <div class="text-xs text-muted">
-      {{ item.percentage }} | {{ formatDateTime(item.validFrom) }} - {{ formatDateTime(item.validTo) }}
+    <div class="text-muted text-xs">
+      {{ item.percentage }} | {{ formatDateTime(item.validFrom) }} -
+      {{ formatDateTime(item.validTo) }}
     </div>
   </div>
 </template>

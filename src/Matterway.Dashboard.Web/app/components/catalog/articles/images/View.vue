@@ -3,15 +3,18 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { ArticleImageProperty } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
-const props = withDefaults(defineProps<{
-  articleId?: string | null
-  modelValue?: ArticleImageProperty[]
-  canEdit?: boolean
-}>(), {
-  articleId: null,
-  modelValue: () => [],
-  canEdit: false
-})
+const props = withDefaults(
+  defineProps<{
+    articleId?: string | null
+    modelValue?: ArticleImageProperty[]
+    canEdit?: boolean
+  }>(),
+  {
+    articleId: null,
+    modelValue: () => [],
+    canEdit: false
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: ArticleImageProperty[]): void
@@ -67,7 +70,11 @@ function openEditImagesModal(image: ArticleImageProperty) {
   imageModalOpen.value = true
 }
 
-async function addImage(payload: { orderIndex: number, imageAlt: string, file?: File | null }) {
+async function addImage(payload: {
+  orderIndex: number
+  imageAlt: string
+  file?: File | null
+}) {
   addState.error = ''
   addState.success = ''
   if (!props.articleId) {
@@ -96,7 +103,7 @@ async function addImage(payload: { orderIndex: number, imageAlt: string, file?: 
   imageModalOpen.value = false
 }
 
-async function updateImage(payload: { orderIndex: number, imageAlt: string }) {
+async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   updateState.error = ''
   updateState.success = ''
   if (!props.articleId) return
@@ -110,10 +117,14 @@ async function updateImage(payload: { orderIndex: number, imageAlt: string }) {
     return
   }
   updateState.loading = true
-  const result = await api.updateArticleImage(props.articleId, targetOrderIndex, {
-    imageAlt: payload.imageAlt,
-    orderIndex: payload.orderIndex
-  })
+  const result = await api.updateArticleImage(
+    props.articleId,
+    targetOrderIndex,
+    {
+      imageAlt: payload.imageAlt,
+      orderIndex: payload.orderIndex
+    }
+  )
   updateState.loading = false
   if (!result.ok) {
     updateState.error = result.error || 'Unable to update image.'
@@ -145,11 +156,15 @@ async function removeImage(image: ArticleImageProperty) {
     removeState.error = result.error || 'Unable to remove image.'
     return
   }
-  updateImages(images.value.filter(item => item.id !== image.id))
+  updateImages(images.value.filter((item) => item.id !== image.id))
   removeState.success = 'Image removed.'
 }
 
-async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string, file?: File | null }) {
+async function handleImageSubmit(payload: {
+  orderIndex: number
+  imageAlt: string
+  file?: File | null
+}) {
   if (imageModalMode.value === 'add') {
     await addImage(payload)
     return
@@ -161,9 +176,7 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-base font-semibold text-foreground">
-        Images
-      </h3>
+      <h3 class="text-foreground text-base font-semibold">Images</h3>
       <UButton
         color="primary"
         variant="outline"
@@ -176,32 +189,31 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
 
     <div
       v-if="!articleId"
-      class="rounded-lg border border-default bg-background px-4 py-4 text-sm text-muted"
+      class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
       Create the article first to attach images.
     </div>
 
-    <div
-      v-else
-      class="grid gap-4 @container"
-    >
-      <div class="rounded-md border grid @sm:grid-cols-2 @md:grid-cols-3 @lg:grid-cols-4 border-default/40">
+    <div v-else class="@container grid gap-4">
+      <div
+        class="border-default/40 grid rounded-md border @sm:grid-cols-2 @md:grid-cols-3 @lg:grid-cols-4"
+      >
         <div
           v-for="image in images"
           :key="image.id"
-          class="border-t border-default/40 px-3 py-3 first:border-t-0"
+          class="border-default/40 border-t px-3 py-3 first:border-t-0"
         >
           <div class="grid gap-3">
-            <div class="aspect-4/3 overflow-hidden rounded-md bg-muted/60">
+            <div class="bg-muted/60 aspect-4/3 overflow-hidden rounded-md">
               <img
                 v-if="image.imageUrl"
                 :src="image.imageUrl"
                 :alt="image.imageAlt || ''"
-                class="w-full h-full object-cover"
-              >
+                class="h-full w-full object-cover"
+              />
               <div
                 v-else
-                class="flex w-full h-full items-center justify-center text-xs text-muted"
+                class="text-muted flex h-full w-full items-center justify-center text-xs"
               >
                 No image
               </div>
@@ -230,8 +242,14 @@ async function handleImageSubmit(payload: { orderIndex: number, imageAlt: string
       </div>
 
       <div class="flex flex-wrap gap-4">
-        <StatusMessages :error="addState.error || updateState.error || removeState.error" />
-        <StatusMessages :success="addState.success || updateState.success || removeState.success" />
+        <StatusMessages
+          :error="addState.error || updateState.error || removeState.error"
+        />
+        <StatusMessages
+          :success="
+            addState.success || updateState.success || removeState.success
+          "
+        />
       </div>
     </div>
   </div>

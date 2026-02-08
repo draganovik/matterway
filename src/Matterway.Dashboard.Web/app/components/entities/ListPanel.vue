@@ -1,39 +1,43 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  title: string
-  description?: string
-  items: Array<Record<string, unknown>>
-  itemKey?: string
-  itemTitleKey?: string
-  itemSubtitleKey?: string
-  selectedId?: string | null
-  filter?: string
-  loading?: boolean
-  error?: string
-  emptyMessage?: string
-  filterInputType?: 'textarea' | 'input'
-  filterPlaceholder?: string
-  page?: number
-  pageSize?: number
-  totalCount?: number
-  totalPages?: number
-}>(), {
-  description: '',
-  itemKey: 'id',
-  itemTitleKey: 'title',
-  itemSubtitleKey: '',
-  selectedId: null,
-  filter: '',
-  loading: false,
-  error: '',
-  emptyMessage: 'No results found.',
-  filterInputType: 'textarea',
-  filterPlaceholder: 'Search, use RSQL filters (e.g. title==chair; available==true).',
-  page: 1,
-  pageSize: 20,
-  totalCount: 0,
-  totalPages: 1
-})
+const props = withDefaults(
+  defineProps<{
+    title: string
+    description?: string
+    items: Array<Record<string, unknown>>
+    itemKey?: string
+    itemTitleKey?: string
+    itemSubtitleKey?: string
+    selectedId?: string | null
+    filter?: string
+    loading?: boolean
+    error?: string
+    emptyMessage?: string
+    filterInputType?: 'textarea' | 'input'
+    filterPlaceholder?: string
+    page?: number
+    pageSize?: number
+    totalCount?: number
+    totalPages?: number
+  }>(),
+  {
+    description: '',
+    itemKey: 'id',
+    itemTitleKey: 'title',
+    itemSubtitleKey: '',
+    selectedId: null,
+    filter: '',
+    loading: false,
+    error: '',
+    emptyMessage: 'No results found.',
+    filterInputType: 'textarea',
+    filterPlaceholder:
+      'Search, use RSQL filters (e.g. title==chair; available==true).',
+    page: 1,
+    pageSize: 20,
+    totalCount: 0,
+    totalPages: 1
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:filter' | 'select', value: string): void
@@ -50,9 +54,14 @@ watch(
   }
 )
 
-const pageSizes = [10, 20, 50, 100].map(value => ({ label: `${value} / page`, value }))
+const pageSizes = [10, 20, 50, 100].map((value) => ({
+  label: `${value} / page`,
+  value
+}))
 
-const safeTotalPages = computed(() => Math.max(1, Number(props.totalPages) || 1))
+const safeTotalPages = computed(() =>
+  Math.max(1, Number(props.totalPages) || 1)
+)
 
 function applySearch() {
   emit('update:filter', filterInput.value.trim())
@@ -77,13 +86,10 @@ function updatePageSize(value: number) {
 <template>
   <div class="flex flex-col gap-5">
     <header class="space-y-1">
-      <h2 class="text-base font-semibold text-foreground">
+      <h2 class="text-foreground text-base font-semibold">
         {{ title }}
       </h2>
-      <p
-        v-if="description"
-        class="text-sm text-muted"
-      >
+      <p v-if="description" class="text-muted text-sm">
         {{ description }}
       </p>
     </header>
@@ -121,18 +127,17 @@ function updatePageSize(value: number) {
         :loading="loading ? 'Loading results.' : false"
         :empty="!loading && !error && !items.length ? emptyMessage : false"
       />
-      <div
-        v-else
-        class="flex flex-col gap-2"
-      >
+      <div v-else class="flex flex-col gap-2">
         <button
           v-for="item in items"
           :key="String(item[itemKey])"
           type="button"
-          class="flex w-full min-h-19 flex-col gap-2 rounded-xl border border-transparent bg-background px-4 py-3 text-left transition"
-          :class="selectedId === String(item[itemKey])
-            ? 'border-primary/40 bg-primary/5'
-            : 'hover:border-default hover:bg-muted/40'"
+          class="bg-background flex min-h-19 w-full flex-col gap-2 rounded-xl border border-transparent px-4 py-3 text-left transition"
+          :class="
+            selectedId === String(item[itemKey])
+              ? 'border-primary/40 bg-primary/5'
+              : 'hover:border-default hover:bg-muted/40'
+          "
           @click="selectItem(item)"
         >
           <slot
@@ -140,12 +145,12 @@ function updatePageSize(value: number) {
             :item="item"
             :selected="selectedId === String(item[itemKey])"
           >
-            <div class="text-base font-medium text-foreground">
+            <div class="text-foreground text-base font-medium">
               {{ item[itemTitleKey] || 'Untitled' }}
             </div>
             <div
               v-if="itemSubtitleKey && item[itemSubtitleKey]"
-              class="text-sm text-muted"
+              class="text-muted text-sm"
             >
               {{ item[itemSubtitleKey] }}
             </div>
@@ -154,8 +159,10 @@ function updatePageSize(value: number) {
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-default pt-3">
-      <div class="text-sm text-muted">
+    <div
+      class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
+    >
+      <div class="text-muted text-sm">
         Page {{ page }} of {{ safeTotalPages }} - {{ totalCount }} total
       </div>
       <div class="flex items-center gap-2">

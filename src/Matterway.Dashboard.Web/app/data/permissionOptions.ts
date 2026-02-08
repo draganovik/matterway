@@ -6,7 +6,7 @@ export const permissionLevels = [
   { label: 'Administrator', value: 'administrator' }
 ] as const
 
-export const permissionServices = serviceSections.map(service => ({
+export const permissionServices = serviceSections.map((service) => ({
   label: service.label,
   value: service.service
 }))

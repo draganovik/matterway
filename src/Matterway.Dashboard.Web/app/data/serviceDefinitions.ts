@@ -35,4 +35,6 @@ export const serviceSections: ServiceSection[] = [
   }
 ]
 
-export const allFeatures = serviceSections.flatMap(section => section.features)
+export const allFeatures = serviceSections.flatMap(
+  (section) => section.features
+)

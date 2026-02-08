@@ -16,11 +16,7 @@ const form = defineModel<ArticleForm>({ required: true })
 
 <template>
   <div class="grid gap-4">
-    <UFormField
-      label="Title"
-      required
-      class="md:col-span-3"
-    >
+    <UFormField label="Title" required class="md:col-span-3">
       <UInput
         v-model="form.title"
         placeholder="Article title"
@@ -43,10 +39,7 @@ const form = defineModel<ArticleForm>({ required: true })
       />
     </UFormField>
 
-    <UFormField
-      label="Base Price"
-      required
-    >
+    <UFormField label="Base Price" required>
       <UInput
         v-model="form.basePrice"
         type="number"
@@ -67,11 +60,7 @@ const form = defineModel<ArticleForm>({ required: true })
       />
     </UFormField>
 
-    <UFormField
-      label="Description"
-      required
-      class="md:col-span-3"
-    >
+    <UFormField label="Description" required class="md:col-span-3">
       <UTextarea
         v-model="form.description"
         :rows="5"

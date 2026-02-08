@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { CreateArticleResponse, GetArticleByIdResponse, QueryArticleResponse } from '~/types/catalog'
+import type {
+  CreateArticleResponse,
+  GetArticleByIdResponse,
+  QueryArticleResponse
+} from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 import { parseNumberOr } from '~/utils/numbers'
@@ -52,12 +56,27 @@ async function loadArticles() {
   }
 
   articles.value = result.data.data || []
-  pagination.totalCount = parseNumberOr(result.data.meta?.totalCount, articles.value.length)
-  pagination.totalPages = Math.max(1, parseNumberOr(result.data.meta?.totalPages, 1))
-  pagination.page = Math.max(1, parseNumberOr(result.data.meta?.currentPage, pagination.page))
-  pagination.pageSize = Math.max(1, parseNumberOr(result.data.meta?.pageSize, pagination.pageSize))
+  pagination.totalCount = parseNumberOr(
+    result.data.meta?.totalCount,
+    articles.value.length
+  )
+  pagination.totalPages = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.totalPages, 1)
+  )
+  pagination.page = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.currentPage, pagination.page)
+  )
+  pagination.pageSize = Math.max(
+    1,
+    parseNumberOr(result.data.meta?.pageSize, pagination.pageSize)
+  )
 
-  if (selectedId.value && !articles.value.some(item => item.id === selectedId.value)) {
+  if (
+    selectedId.value &&
+    !articles.value.some((item) => item.id === selectedId.value)
+  ) {
     selectedId.value = null
     selectedArticle.value = null
     articleState.error = ''
@@ -90,7 +109,7 @@ function updateSelectedArticle(article: GetArticleByIdResponse | null) {
   selectedArticle.value = article
   if (!article) return
 
-  articles.value = articles.value.map(item =>
+  articles.value = articles.value.map((item) =>
     item.id === article.id
       ? {
           ...item,
@@ -106,7 +125,7 @@ function updateSelectedArticle(article: GetArticleByIdResponse | null) {
 }
 
 function handleArticleCreated(created: CreateArticleResponse) {
-  if (!articles.value.some(item => item.id === created.id)) {
+  if (!articles.value.some((item) => item.id === created.id)) {
     articles.value = [
       {
         id: created.id,
@@ -154,13 +173,12 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-    <div class="shrink-0 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-base font-semibold text-foreground">
-          Browse Articles
-        </h2>
-        <p class="text-sm text-muted">
-          Search existing articles and enrich a selected article with images and details.
+        <h2 class="text-foreground text-base font-semibold">Browse Articles</h2>
+        <p class="text-muted text-sm">
+          Search existing articles and enrich a selected article with images and
+          details.
         </p>
       </div>
 

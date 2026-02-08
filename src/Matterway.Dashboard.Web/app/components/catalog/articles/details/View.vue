@@ -3,15 +3,18 @@ import { useCatalogApi } from '~/composables/useCatalogApi'
 import type { ArticleDetailProperty } from '~/types/catalog'
 import { useRequestState } from '~/composables/useRequestState'
 
-const props = withDefaults(defineProps<{
-  articleId?: string | null
-  details?: ArticleDetailProperty[]
-  canEdit?: boolean
-}>(), {
-  articleId: null,
-  details: () => [],
-  canEdit: false
-})
+const props = withDefaults(
+  defineProps<{
+    articleId?: string | null
+    details?: ArticleDetailProperty[]
+    canEdit?: boolean
+  }>(),
+  {
+    articleId: null,
+    details: () => [],
+    canEdit: false
+  }
+)
 
 const emit = defineEmits<{
   (event: 'update:details', value: ArticleDetailProperty[]): void
@@ -44,13 +47,18 @@ async function removeDetail(detail: ArticleDetailProperty) {
   removeState.success = ''
   if (!props.articleId || !detail.detailSlug) return
   removeState.loading = true
-  const result = await api.removeArticleDetail(props.articleId, detail.detailSlug)
+  const result = await api.removeArticleDetail(
+    props.articleId,
+    detail.detailSlug
+  )
   removeState.loading = false
   if (!result.ok) {
     removeState.error = result.error || 'Unable to remove detail.'
     return
   }
-  updateDetails(detailList.value.filter(item => item.detailSlug !== detail.detailSlug))
+  updateDetails(
+    detailList.value.filter((item) => item.detailSlug !== detail.detailSlug)
+  )
   removeState.success = 'Detail removed.'
 }
 
@@ -89,7 +97,9 @@ async function handleDetailSubmit(payload: {
   }
 
   mutateState.loading = true
-  const existing = detailList.value.find(item => item.detailSlug === payload.detailSlug)
+  const existing = detailList.value.find(
+    (item) => item.detailSlug === payload.detailSlug
+  )
   if (detailModalMode.value === 'edit' && activeDetail.value?.detailSlug) {
     const targetSlug = activeDetail.value.detailSlug
     const result = await api.updateArticleDetail(props.articleId, targetSlug, {
@@ -101,15 +111,17 @@ async function handleDetailSubmit(payload: {
       mutateState.error = result.error || 'Unable to update detail.'
       return
     }
-    updateDetails(detailList.value.map(item =>
-      item.detailSlug === targetSlug
-        ? {
-            ...item,
-            textValue: payload.textValue ?? null,
-            numericValue: payload.numericValue ?? null
-          }
-        : item
-    ))
+    updateDetails(
+      detailList.value.map((item) =>
+        item.detailSlug === targetSlug
+          ? {
+              ...item,
+              textValue: payload.textValue ?? null,
+              numericValue: payload.numericValue ?? null
+            }
+          : item
+      )
+    )
     mutateState.success = 'Detail updated.'
     detailModalOpen.value = false
     return
@@ -148,9 +160,7 @@ async function handleDetailSubmit(payload: {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-base font-semibold text-foreground">
-        Details
-      </h3>
+      <h3 class="text-foreground text-base font-semibold">Details</h3>
       <UButton
         color="primary"
         variant="outline"
@@ -163,37 +173,29 @@ async function handleDetailSubmit(payload: {
 
     <div
       v-if="!articleId"
-      class="rounded-lg border border-default bg-background px-4 py-4 text-sm text-muted"
+      class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
       Create the article first to attach details.
     </div>
 
-    <div
-      v-else
-      class="grid gap-4"
-    >
+    <div v-else class="grid gap-4">
       <section class="space-y-2">
-        <div
-          v-if="!detailList.length"
-          class="text-sm text-muted"
-        >
+        <div v-if="!detailList.length" class="text-muted text-sm">
           No details attached.
         </div>
-        <div
-          v-else
-          class="rounded-md border border-default/40"
-        >
+        <div v-else class="border-default/40 rounded-md border">
           <div
             v-for="detail in detailList"
             :key="detail.detailSlug ?? detail.title ?? 'detail-unknown'"
-            class="flex flex-wrap items-center justify-between gap-2 border-t border-default/40 px-3 py-2 first:border-t-0"
+            class="border-default/40 flex flex-wrap items-center justify-between gap-2 border-t px-3 py-2 first:border-t-0"
           >
             <div class="min-w-0">
-              <div class="text-sm font-medium text-foreground">
+              <div class="text-foreground text-sm font-medium">
                 {{ detail.title || detail.detailSlug }}
               </div>
-              <div class="text-xs text-muted">
-                {{ detail.textValue ?? detail.numericValue ?? 'No value' }} {{ detail.unit || '' }}
+              <div class="text-muted text-xs">
+                {{ detail.textValue ?? detail.numericValue ?? 'No value' }}
+                {{ detail.unit || '' }}
               </div>
             </div>
             <div class="flex items-center gap-2">
