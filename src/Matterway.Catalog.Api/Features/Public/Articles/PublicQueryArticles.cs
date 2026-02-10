@@ -26,8 +26,8 @@ public class PublicQueryArticles : IEndpoint
 
                 const string filterDescription =
                     "RSQL filter string. Use ';' for AND and ',' for OR. Details (text) support ==, !=, in, out; " +
-                    "specifications (numeric) support eq, !=, ge, le, in, out. " +
-                    "Fields: title, code, description, price, available, detail slugs, specification slugs.";
+                    "numeric details support eq, !=, ge, le, in, out. " +
+                    "Fields: title, code, description, price, available, detail slugs.";
 
                 filterParam?.Description = filterDescription;
 
@@ -71,8 +71,8 @@ public class PublicQueryArticles : IEndpoint
     {
         /// <summary>
         /// RSQL filter string. Use ';' for AND, and ',' for OR. Text fields (details) support ==/!=/in/out;
-        /// numeric fields (price, specifications) support eq/!=/ge/le/in/out. Fields:
-        /// title, code, description, price, available, detail slugs, and specification slugs.
+        /// numeric fields (price, numeric details) support eq/!=/ge/le/in/out. Fields:
+        /// title, code, description, price, available, and detail slugs.
         /// NOTE: eq and == are equivalent and validate if a field contains the given value for strings.
         /// </summary>
         public string? Filter { get; init; }

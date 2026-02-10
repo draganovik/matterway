@@ -26,13 +26,16 @@ public class AdminDeleteDiscount : IEndpoint
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
     {
-        var deletedCount = await discountRepository.Delete(code, cancellationToken);
+        var normalizedCode = code.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedCode)) return TypedResults.NotFound();
+
+        var deletedCount = await discountRepository.Delete(normalizedCode, cancellationToken);
 
         if (deletedCount == 0) return TypedResults.NotFound();
 
         return TypedResults.Ok(new DeleteDiscountResponse
         {
-            Code = code,
+            Code = normalizedCode,
             RemovedCount = deletedCount
         });
     }

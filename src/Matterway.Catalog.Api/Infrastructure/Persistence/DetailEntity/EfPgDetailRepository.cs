@@ -37,28 +37,42 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
         CancellationToken cancellationToken = default)
     {
         var normalizedSlug = requestModel.Slug.Trim().ToLower();
+        var normalizedUnit = string.IsNullOrWhiteSpace(requestModel.Unit)
+            ? null
+            : requestModel.Unit.Trim();
         requestModel = new Detail
         {
             Slug = normalizedSlug,
-            Title = requestModel.Title.Trim()
+            Title = requestModel.Title.Trim(),
+            Unit = normalizedUnit
         };
-
-        var inUseBySpecification =
-            await context.Specification.AnyAsync(s => s.Slug == normalizedSlug, cancellationToken);
-        if (inUseBySpecification)
-            return null;
 
         var existing = await context.Detail.FirstOrDefaultAsync(d => d.Slug == normalizedSlug, cancellationToken);
         if (existing is null)
         {
-            if (!await context.AttributeSlug.AnyAsync(a => a.Slug == normalizedSlug, cancellationToken))
-                context.AttributeSlug.Add(new AttributeSlug { Slug = normalizedSlug });
-
             context.Detail.Add(requestModel);
         }
         else
         {
+            var unitChanged = !string.Equals(existing.Unit, requestModel.Unit, StringComparison.Ordinal);
+            if (unitChanged)
+            {
+                if (requestModel.Unit is not null)
+                {
+                    var hasTextDetails = await context.ArticleDetailText
+                        .AnyAsync(d => d.DetailSlug == normalizedSlug, cancellationToken);
+                    if (hasTextDetails) return null;
+                }
+                else
+                {
+                    var hasNumericDetails = await context.ArticleDetailNumeric
+                        .AnyAsync(d => d.DetailSlug == normalizedSlug, cancellationToken);
+                    if (hasNumericDetails) return null;
+                }
+            }
+
             existing.Title = requestModel.Title;
+            existing.Unit = requestModel.Unit;
             context.Detail.Update(existing);
         }
 
@@ -72,7 +86,9 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
     public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)
     {
         var normalizedSlug = slug.Trim().ToLower();
-        var inUse = await context.ArticleDetail.AnyAsync(pd => pd.DetailSlug == normalizedSlug, cancellationToken);
+        var inUse = await context.ArticleDetailText.AnyAsync(pd => pd.DetailSlug == normalizedSlug, cancellationToken)
+                    || await context.ArticleDetailNumeric.AnyAsync(pd => pd.DetailSlug == normalizedSlug,
+                        cancellationToken);
         if (inUse) return false;
 
         var entity = await context.Detail.FirstOrDefaultAsync(d => d.Slug == normalizedSlug, cancellationToken);
@@ -80,21 +96,6 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
 
         context.Detail.Remove(entity);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected <= 0) return false;
-
-        var stillUsedBySpecifications =
-            await context.Specification.AnyAsync(s => s.Slug == normalizedSlug, cancellationToken);
-        if (!stillUsedBySpecifications)
-        {
-            var attr = await context.AttributeSlug.FirstOrDefaultAsync(a => a.Slug == normalizedSlug,
-                cancellationToken);
-            if (attr is not null)
-            {
-                context.AttributeSlug.Remove(attr);
-                await context.SaveChangesAsync(cancellationToken);
-            }
-        }
-
-        return true;
+        return affected > 0;
     }
 }

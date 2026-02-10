@@ -14,22 +14,29 @@ public class AdminUpdateDiscount : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("admin/discounts/{code}", Handle)
-            .WithName("AdminUpdateDiscount").WithSummary("Replace a discount across article ids (admin).")
+            .WithName("AdminUpdateDiscount").WithSummary("Create or replace a discount across article ids (admin).")
             .WithTags(nameof(Discount))
             .Produces<UpdatedDiscountResponse>()
-            .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<UpdatedDiscountResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
+    private static async Task<Results<Ok<UpdatedDiscountResponse>, BadRequest<ProblemDetails>>> Handle(
         string code,
         UpdateDiscountRequest request,
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
     {
+        var normalizedCode = code.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedCode))
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Code is required",
+                Status = StatusCodes.Status400BadRequest
+            });
+
         var validFrom = request.ValidFrom.ToUniversalTime();
         var validTo = request.ValidTo?.ToUniversalTime();
 
@@ -49,15 +56,12 @@ public class AdminUpdateDiscount : IEndpoint
                 Detail = "At least one articleId is required."
             });
 
-        var existing = await discountRepository.GetBy(code, cancellationToken);
-        if (existing.Count == 0) return TypedResults.NotFound();
-
-        var newDiscounts = MapToEntities(code, request, validFrom, validTo).ToList();
+        var newDiscounts = MapToEntities(normalizedCode, request, validFrom, validTo).ToList();
 
         IReadOnlyCollection<Discount> updated;
         try
         {
-            updated = await discountRepository.Update(code, newDiscounts, cancellationToken);
+            updated = await discountRepository.Update(normalizedCode, newDiscounts, cancellationToken);
         }
         catch (InvalidOperationException ex)
         {
@@ -68,8 +72,6 @@ public class AdminUpdateDiscount : IEndpoint
                 Detail = ex.Message
             });
         }
-
-        if (updated.Count == 0) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(updated.First()));
     }

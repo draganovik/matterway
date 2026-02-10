@@ -44,6 +44,7 @@ public class AdminQueryDetails : IEndpoint
     {
         public string? Slug { get; init; }
         public string? Title { get; init; }
+        public string? Unit { get; init; }
     }
 
     public static QueryDetailResponse MapToResponse(Detail entity)
@@ -51,7 +52,8 @@ public class AdminQueryDetails : IEndpoint
         return new QueryDetailResponse
         {
             Slug = entity.Slug,
-            Title = entity.Title
+            Title = entity.Title,
+            Unit = entity.Unit
         };
     }
 }

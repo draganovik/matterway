@@ -40,7 +40,6 @@ public class PublicGetArticleById : IEndpoint
         public ArticleDiscountProperty? Discount { get; set; }
         public string? Description { get; init; }
         public ICollection<ArticleDetailProperty>? Details { get; init; } = [];
-        public ICollection<ArticleSpecificationProperty>? Specifications { get; init; } = [];
         public ICollection<ArticleImageProperty>? Images { get; init; } = [];
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
@@ -58,15 +57,9 @@ public class PublicGetArticleById : IEndpoint
     {
         public string? DetailSlug { get; init; }
         public string? Title { get; init; }
-        public string? Value { get; init; }
-    }
-
-    public record ArticleSpecificationProperty
-    {
-        public string? SpecificationSlug { get; init; }
-        public string? Title { get; init; }
-        public decimal Value { get; init; }
         public string? Unit { get; init; }
+        public string? TextValue { get; init; }
+        public decimal? NumericValue { get; init; }
     }
 
     public record ArticleImageProperty
@@ -98,10 +91,7 @@ public class PublicGetArticleById : IEndpoint
                     ValidTo = discount.ValidTo
                 },
             Description = entity.Description,
-            Details = entity.ArticleDetails?
-                .Select(MapDetailToResponse).ToList(),
-            Specifications = entity.ArticleSpecifications?
-                .Select(MapSpecificationToResponse).ToList(),
+            Details = MergeDetails(entity),
             Images = entity.ArticleImages?
                 .OrderBy(pi => pi.OrderIndex)
                 .Select(MapImageToResponse).ToList(),
@@ -111,25 +101,41 @@ public class PublicGetArticleById : IEndpoint
         };
     }
 
-    public static ArticleDetailProperty MapDetailToResponse(ArticleDetail entity)
+    public static ArticleDetailProperty MapDetailToResponse(ArticleDetailText entity)
     {
         return new ArticleDetailProperty
         {
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
-            Value = entity.Value
+            Unit = entity.Detail?.Unit,
+            TextValue = entity.Value,
+            NumericValue = null
         };
     }
 
-    public static ArticleSpecificationProperty MapSpecificationToResponse(ArticleSpecification entity)
+    public static ArticleDetailProperty MapDetailToResponse(ArticleDetailNumeric entity)
     {
-        return new ArticleSpecificationProperty
+        return new ArticleDetailProperty
         {
-            SpecificationSlug = entity.SpecificationSlug,
-            Title = entity.Specification?.Title,
-            Value = entity.Value,
-            Unit = entity.Specification?.Unit
+            DetailSlug = entity.DetailSlug,
+            Title = entity.Detail?.Title,
+            Unit = entity.Detail?.Unit,
+            TextValue = null,
+            NumericValue = entity.Value
         };
+    }
+
+    private static ICollection<ArticleDetailProperty> MergeDetails(Article entity)
+    {
+        var details = new List<ArticleDetailProperty>();
+        if (entity.ArticleDetailTexts is not null)
+            details.AddRange(entity.ArticleDetailTexts.Select(MapDetailToResponse));
+        if (entity.ArticleDetailNumerics is not null)
+            details.AddRange(entity.ArticleDetailNumerics.Select(MapDetailToResponse));
+
+        return details
+            .OrderBy(d => d.Title)
+            .ToList();
     }
 
     public static ArticleImageProperty MapImageToResponse(ArticleImage entity)

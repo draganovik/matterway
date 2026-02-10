@@ -138,43 +138,6 @@ public static class ModelDataLoader
 
         #endregion
 
-        #region AttributeSlug data
-
-        modelBuilder.Entity<AttributeSlug>().HasData(
-            // Details
-            new AttributeSlug { Slug = "audio" },
-            new AttributeSlug { Slug = "audio-quality" },
-            new AttributeSlug { Slug = "battery" },
-            new AttributeSlug { Slug = "brand" },
-            new AttributeSlug { Slug = "camera" },
-            new AttributeSlug { Slug = "color" },
-            new AttributeSlug { Slug = "color-temperature" },
-            new AttributeSlug { Slug = "compatibility" },
-            new AttributeSlug { Slug = "connectivity" },
-            new AttributeSlug { Slug = "display" },
-            new AttributeSlug { Slug = "features" },
-            new AttributeSlug { Slug = "material" },
-            new AttributeSlug { Slug = "model" },
-            new AttributeSlug { Slug = "operating-system" },
-            new AttributeSlug { Slug = "ports" },
-            new AttributeSlug { Slug = "processor" },
-            new AttributeSlug { Slug = "resolution" },
-            new AttributeSlug { Slug = "video-quality" },
-            // Specifications
-            new AttributeSlug { Slug = "battery-size" },
-            new AttributeSlug { Slug = "depth" },
-            new AttributeSlug { Slug = "height" },
-            new AttributeSlug { Slug = "power" },
-            new AttributeSlug { Slug = "ram-size" },
-            new AttributeSlug { Slug = "refresh-rate" },
-            new AttributeSlug { Slug = "screen-size" },
-            new AttributeSlug { Slug = "storage" },
-            new AttributeSlug { Slug = "weight" },
-            new AttributeSlug { Slug = "width" }
-        );
-
-        #endregion
-
         #region Details data
 
         modelBuilder.Entity<Detail>().HasData(
@@ -195,75 +158,85 @@ public static class ModelDataLoader
             new Detail { Slug = "ports", Title = "Ports" },
             new Detail { Slug = "processor", Title = "Processor" },
             new Detail { Slug = "resolution", Title = "Resolution" },
-            new Detail { Slug = "video-quality", Title = "Video Quality" }
+            new Detail { Slug = "video-quality", Title = "Video Quality" },
+            new Detail { Slug = "battery-size", Title = "Battery Size", Unit = "mAh" },
+            new Detail { Slug = "depth", Title = "Depth", Unit = "millimeters" },
+            new Detail { Slug = "height", Title = "Height", Unit = "millimeters" },
+            new Detail { Slug = "power", Title = "Power", Unit = "watts" },
+            new Detail { Slug = "ram-size", Title = "RAM Size", Unit = "GB" },
+            new Detail { Slug = "refresh-rate", Title = "Refresh Rate", Unit = "Hz" },
+            new Detail { Slug = "screen-size", Title = "Screen Size", Unit = "inches" },
+            new Detail { Slug = "storage", Title = "Storage", Unit = "GB" },
+            new Detail { Slug = "weight", Title = "Weight", Unit = "grams" },
+            new Detail { Slug = "width", Title = "Width", Unit = "millimeters" }
         );
 
         #endregion
 
-        #region ArticleDetails data
+        #region ArticleDetailTexts data
 
-        modelBuilder.Entity<ArticleDetail>().HasData(
-            new ArticleDetail
+        modelBuilder.Entity<ArticleDetailText>().HasData(
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 DetailSlug = "compatibility",
                 Value = "Works with Alexa, Google Assistant, and Apple HomeKit"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
                 DetailSlug = "display",
                 Value = "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 DetailSlug = "connectivity",
                 Value = "Wi-Fi and Bluetooth"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 DetailSlug = "compatibility",
                 Value = "Works with Alexa, Google Assistant, and Siri"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
                 DetailSlug = "battery",
                 Value = "Uses four AA batteries (included), lasts up to 6 months depending on usage"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 DetailSlug = "color-temperature",
                 Value = "Adjustable from warm white (2700K) to daylight (6500K)"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
                 DetailSlug = "compatibility",
                 Value = "Works with Alexa, Google Assistant, and Samsung SmartThings"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
                 DetailSlug = "connectivity",
                 Value = "Wi-Fi and Bluetooth"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 DetailSlug = "video-quality",
                 Value = "1080p HD"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 DetailSlug = "audio-quality",
                 Value = "Two-way audio with noise cancellation"
             },
-            new ArticleDetail
+            new ArticleDetailText
             {
                 ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
                 DetailSlug = "connectivity",
@@ -273,102 +246,85 @@ public static class ModelDataLoader
 
         #endregion
 
-        #region Specifications data
+        #region ArticleDetailNumerics data
 
-        modelBuilder.Entity<Specification>().HasData(
-            new Specification { Slug = "battery-size", Title = "Battery Size", Unit = "mAh" },
-            new Specification { Slug = "depth", Title = "Depth", Unit = "millimeters" },
-            new Specification { Slug = "height", Title = "Height", Unit = "millimeters" },
-            new Specification { Slug = "power", Title = "Power", Unit = "watts" },
-            new Specification { Slug = "ram-size", Title = "RAM Size", Unit = "GB" },
-            new Specification { Slug = "refresh-rate", Title = "Refresh Rate", Unit = "Hz" },
-            new Specification { Slug = "screen-size", Title = "Screen Size", Unit = "inches" },
-            new Specification { Slug = "storage", Title = "Storage", Unit = "GB" },
-            new Specification { Slug = "weight", Title = "Weight", Unit = "grams" },
-            new Specification { Slug = "width", Title = "Width", Unit = "millimeters" }
-        );
-
-        #endregion
-
-        #region ArticleSpecifications data
-
-        modelBuilder.Entity<ArticleSpecification>().HasData(
-            new ArticleSpecification
+        modelBuilder.Entity<ArticleDetailNumeric>().HasData(
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                SpecificationSlug = "power",
+                DetailSlug = "power",
                 Value = 24m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                SpecificationSlug = "width",
+                DetailSlug = "width",
                 Value = 84m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                SpecificationSlug = "height",
+                DetailSlug = "height",
                 Value = 84m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                SpecificationSlug = "depth",
+                DetailSlug = "depth",
                 Value = 28m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                SpecificationSlug = "screen-size",
+                DetailSlug = "screen-size",
                 Value = 2.0m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                SpecificationSlug = "battery-size",
+                DetailSlug = "battery-size",
                 Value = 3000m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                SpecificationSlug = "weight",
+                DetailSlug = "weight",
                 Value = 400m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                SpecificationSlug = "power",
+                DetailSlug = "power",
                 Value = 9m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                SpecificationSlug = "weight",
+                DetailSlug = "weight",
                 Value = 72m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                SpecificationSlug = "weight",
+                DetailSlug = "weight",
                 Value = 970m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                SpecificationSlug = "power",
+                DetailSlug = "power",
                 Value = 15m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                SpecificationSlug = "power",
+                DetailSlug = "power",
                 Value = 8m
             },
-            new ArticleSpecification
+            new ArticleDetailNumeric
             {
                 ArticleId = Guid.Parse("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                SpecificationSlug = "weight",
+                DetailSlug = "weight",
                 Value = 480m
             }
         );

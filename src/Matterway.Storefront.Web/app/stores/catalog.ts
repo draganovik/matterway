@@ -12,11 +12,6 @@ interface CatalogState {
 export interface DetailOption {
   slug: string;
   title?: string;
-}
-
-export interface SpecificationOption {
-  slug: string;
-  title?: string;
   unit?: string | null;
 }
 
@@ -236,8 +231,11 @@ export const useCatalogStore = defineStore("catalog", {
 
     async createArticleDetail(
       articleId: string,
-      detailSlug: string,
-      value: string,
+      payload: {
+        detailSlug: string;
+        textValue?: string;
+        numericValue?: number;
+      },
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
@@ -245,8 +243,9 @@ export const useCatalogStore = defineStore("catalog", {
         {
           method: "POST",
           body: JSON.stringify({
-            detailSlug: detailSlug,
-            value,
+            detailSlug: payload.detailSlug,
+            textValue: payload.textValue,
+            numericValue: payload.numericValue,
           }),
         },
       );
@@ -266,58 +265,17 @@ export const useCatalogStore = defineStore("catalog", {
     async updateArticleDetail(
       articleId: string,
       detailSlug: string,
-      value: string,
+      payload: { textValue?: string; numericValue?: number },
     ): Promise<Response> {
       const config = useRuntimeConfig();
       return await request(
         `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/details/${encodeURIComponent(detailSlug)}`,
         {
           method: "PATCH",
-          body: JSON.stringify({ value }),
-        },
-      );
-    },
-
-    async createArticleSpecification(
-      articleId: string,
-      specificationSlug: string,
-      value: number,
-    ): Promise<Response> {
-      const config = useRuntimeConfig();
-      return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications`,
-        {
-          method: "POST",
           body: JSON.stringify({
-            specificationSlug,
-            value,
+            textValue: payload.textValue,
+            numericValue: payload.numericValue,
           }),
-        },
-      );
-    },
-    async deleteArticleSpecification(
-      articleId: string,
-      specificationSlug: string,
-    ): Promise<Response> {
-      const config = useRuntimeConfig();
-      return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications/${encodeURIComponent(specificationSlug)}`,
-        {
-          method: "DELETE",
-        },
-      );
-    },
-    async updateArticleSpecification(
-      articleId: string,
-      specificationSlug: string,
-      value: number,
-    ): Promise<Response> {
-      const config = useRuntimeConfig();
-      return await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/articles/${articleId}/specifications/${encodeURIComponent(specificationSlug)}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ value }),
         },
       );
     },
@@ -342,28 +300,6 @@ export const useCatalogStore = defineStore("catalog", {
         {
           method: "GET",
         },
-      );
-      return (await response.json()) ?? [];
-    },
-
-    async querySpecifications(
-      searchTerm: string,
-      limit: number = 10,
-    ): Promise<SpecificationOption[]> {
-      const config = useRuntimeConfig();
-      const params = new URLSearchParams();
-      if (searchTerm?.trim()) {
-        params.set("titleLike", searchTerm.trim());
-      }
-      if (limit) {
-        params.set("limit", limit.toString());
-      }
-      const query = params.toString();
-      const response = await request(
-        `${config.public.catalogApiBaseUrl}/api/v1.0/admin/specifications${
-          query ? `?${query}` : ""
-        }`,
-        { method: "GET" },
       );
       return (await response.json()) ?? [];
     },

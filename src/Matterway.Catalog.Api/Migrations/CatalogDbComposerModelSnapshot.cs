@@ -121,7 +121,107 @@ namespace Matterway.Catalog.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetail", b =>
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailNumeric", b =>
+                {
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DetailSlug")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("ArticleId", "DetailSlug");
+
+                    b.HasIndex("DetailSlug");
+
+                    b.ToTable("ArticleDetailNumeric", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            DetailSlug = "power",
+                            Value = 24m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            DetailSlug = "width",
+                            Value = 84m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            DetailSlug = "height",
+                            Value = 84m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            DetailSlug = "depth",
+                            Value = 28m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            DetailSlug = "screen-size",
+                            Value = 2.0m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            DetailSlug = "battery-size",
+                            Value = 3000m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            DetailSlug = "weight",
+                            Value = 400m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            DetailSlug = "power",
+                            Value = 9m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            DetailSlug = "weight",
+                            Value = 72m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
+                            DetailSlug = "weight",
+                            Value = 970m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
+                            DetailSlug = "power",
+                            Value = 15m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            DetailSlug = "power",
+                            Value = 8m
+                        },
+                        new
+                        {
+                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            DetailSlug = "weight",
+                            Value = 480m
+                        });
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailText", b =>
                 {
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uuid");
@@ -139,7 +239,7 @@ namespace Matterway.Catalog.Api.Migrations
 
                     b.HasIndex("DetailSlug");
 
-                    b.ToTable("ArticleDetail", (string)null);
+                    b.ToTable("ArticleDetailText", (string)null);
 
                     b.HasData(
                         new
@@ -281,234 +381,6 @@ namespace Matterway.Catalog.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleSpecification", b =>
-                {
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("SpecificationSlug")
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
-                    b.Property<decimal>("Value")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.HasKey("ArticleId", "SpecificationSlug");
-
-                    b.HasIndex("SpecificationSlug");
-
-                    b.ToTable("ArticleSpecification", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            SpecificationSlug = "power",
-                            Value = 24m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            SpecificationSlug = "width",
-                            Value = 84m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            SpecificationSlug = "height",
-                            Value = 84m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            SpecificationSlug = "depth",
-                            Value = 28m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            SpecificationSlug = "screen-size",
-                            Value = 2.0m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            SpecificationSlug = "battery-size",
-                            Value = 3000m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            SpecificationSlug = "weight",
-                            Value = 400m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            SpecificationSlug = "power",
-                            Value = 9m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            SpecificationSlug = "weight",
-                            Value = 72m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            SpecificationSlug = "weight",
-                            Value = 970m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            SpecificationSlug = "power",
-                            Value = 15m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            SpecificationSlug = "power",
-                            Value = 8m
-                        },
-                        new
-                        {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            SpecificationSlug = "weight",
-                            Value = 480m
-                        });
-                });
-
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", b =>
-                {
-                    b.Property<string>("Slug")
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
-                    b.HasKey("Slug");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("AttributeSlug", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Slug = "audio"
-                        },
-                        new
-                        {
-                            Slug = "audio-quality"
-                        },
-                        new
-                        {
-                            Slug = "battery"
-                        },
-                        new
-                        {
-                            Slug = "brand"
-                        },
-                        new
-                        {
-                            Slug = "camera"
-                        },
-                        new
-                        {
-                            Slug = "color"
-                        },
-                        new
-                        {
-                            Slug = "color-temperature"
-                        },
-                        new
-                        {
-                            Slug = "compatibility"
-                        },
-                        new
-                        {
-                            Slug = "connectivity"
-                        },
-                        new
-                        {
-                            Slug = "display"
-                        },
-                        new
-                        {
-                            Slug = "features"
-                        },
-                        new
-                        {
-                            Slug = "material"
-                        },
-                        new
-                        {
-                            Slug = "model"
-                        },
-                        new
-                        {
-                            Slug = "operating-system"
-                        },
-                        new
-                        {
-                            Slug = "ports"
-                        },
-                        new
-                        {
-                            Slug = "processor"
-                        },
-                        new
-                        {
-                            Slug = "resolution"
-                        },
-                        new
-                        {
-                            Slug = "video-quality"
-                        },
-                        new
-                        {
-                            Slug = "battery-size"
-                        },
-                        new
-                        {
-                            Slug = "depth"
-                        },
-                        new
-                        {
-                            Slug = "height"
-                        },
-                        new
-                        {
-                            Slug = "power"
-                        },
-                        new
-                        {
-                            Slug = "ram-size"
-                        },
-                        new
-                        {
-                            Slug = "refresh-rate"
-                        },
-                        new
-                        {
-                            Slug = "screen-size"
-                        },
-                        new
-                        {
-                            Slug = "storage"
-                        },
-                        new
-                        {
-                            Slug = "weight"
-                        },
-                        new
-                        {
-                            Slug = "width"
-                        });
-                });
-
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
                 {
                     b.Property<string>("Slug")
@@ -519,6 +391,10 @@ namespace Matterway.Catalog.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.HasKey("Slug");
 
@@ -614,64 +490,7 @@ namespace Matterway.Catalog.Api.Migrations
                         {
                             Slug = "video-quality",
                             Title = "Video Quality"
-                        });
-                });
-
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Discount", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("ValidFrom")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ValidTo")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Code", "ArticleId");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("Discount", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Code = "WINTER25",
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            Percentage = 0.25m,
-                            ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
-                            ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
-                        });
-                });
-
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Specification", b =>
-                {
-                    b.Property<string>("Slug")
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)");
-
-                    b.Property<string>("Unit")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.HasKey("Slug");
-
-                    b.ToTable("Specification", (string)null);
-
-                    b.HasData(
+                        },
                         new
                         {
                             Slug = "battery-size",
@@ -734,10 +553,64 @@ namespace Matterway.Catalog.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetail", b =>
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Discount", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ValidTo")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Code", "ArticleId");
+
+                    b.HasIndex("ArticleId");
+
+                    b.ToTable("Discount", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "WINTER25",
+                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            Percentage = 0.25m,
+                            ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
+                            ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailNumeric", b =>
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
-                        .WithMany("ArticleDetails")
+                        .WithMany("ArticleDetailNumerics")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.Detail", "Detail")
+                        .WithMany()
+                        .HasForeignKey("DetailSlug")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Article");
+
+                    b.Navigation("Detail");
+                });
+
+            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailText", b =>
+                {
+                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
+                        .WithMany("ArticleDetailTexts")
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -764,34 +637,6 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Navigation("Article");
                 });
 
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleSpecification", b =>
-                {
-                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
-                        .WithMany("ArticleSpecifications")
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.Specification", "Specification")
-                        .WithMany()
-                        .HasForeignKey("SpecificationSlug")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
-
-                    b.Navigation("Specification");
-                });
-
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>
-                {
-                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
-                        .WithMany()
-                        .HasForeignKey("Slug")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Discount", b =>
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
@@ -803,22 +648,13 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Navigation("Article");
                 });
 
-            modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Specification", b =>
-                {
-                    b.HasOne("Matterway.Catalog.Api.Domain.Entities.AttributeSlug", null)
-                        .WithMany()
-                        .HasForeignKey("Slug")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Article", b =>
                 {
-                    b.Navigation("ArticleDetails");
+                    b.Navigation("ArticleDetailNumerics");
+
+                    b.Navigation("ArticleDetailTexts");
 
                     b.Navigation("ArticleImages");
-
-                    b.Navigation("ArticleSpecifications");
 
                     b.Navigation("Discounts");
                 });

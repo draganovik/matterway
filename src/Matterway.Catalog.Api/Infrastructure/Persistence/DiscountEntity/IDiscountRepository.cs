@@ -4,8 +4,7 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 
 public interface IDiscountRepository
 {
-    Task<IReadOnlyCollection<Discount>> CreateBulk(IEnumerable<Discount> discounts,
-        CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<Discount>> Query(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyCollection<Discount>> GetBy(string code, CancellationToken cancellationToken = default);
 

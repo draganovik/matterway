@@ -36,7 +36,7 @@ package "Identity" {
   }
 
   class IdentityUserClaim {
-    +id: Integer
+    +id: Numeric
     --
     +userId: UUID
     ..
@@ -55,7 +55,7 @@ package "Catalog" {
     --
     +articleId: UUID
     ..
-    +percentage: Decimal
+    +percentage: Numeric
     +validFrom: DateTime
     +validTo: DateTime?
   }
@@ -72,37 +72,21 @@ package "Catalog" {
     +updatedAt: DateTime
   }
 
-  class ArticleDetail {
+  class ArticleDetailText {
     +articleId: UUID
     +detailSlug: String
     --
     +value: String
   }
 
-  class Detail {
-    +slug: String
-    --
-    +title: String
-  }
-
-  class AttributeSlug {
-    +slug: String
-  }
-
-  note top of AttributeSlug
-  Shared, unique slug namespace
-  for Detail & Specification
-  (lowercase normalized)
-  end note
-
-  class ArticleSpecification {
+  class ArticleDetailNumeric {
     +articleId: UUID
-    +specificationSlug: String
+    +detailSlug: String
     --
-    +value: Decimal
+    +value: Numeric
   }
 
-  class Specification {
+  class Detail {
     +slug: String
     --
     +title: String
@@ -114,19 +98,17 @@ package "Catalog" {
     --
     +articleId: UUID
     ..
-    +orderIndex: Integer
+    +orderIndex: Numeric
     +imageUrl: String
     +imageAlt: String?
   }
 
   Discount "0..*" -- "1" Article : articleId
-  ArticleDetail "0..*" -- "1" Article : articleId
-  ArticleDetail "0..*" -- "1" Detail : detailSlug
-  ArticleSpecification "0..*" -- "1" Article : articleId
-  ArticleSpecification "0..*" -- "1" Specification : specificationSlug
+  ArticleDetailText "0..*" -- "1" Article : articleId
+  ArticleDetailText "0..*" -- "1" Detail : detailSlug
+  ArticleDetailNumeric "0..*" -- "1" Article : articleId
+  ArticleDetailNumeric "0..*" -- "1" Detail : detailSlug
   ArticleImage "0..*" -- "1" Article : articleId
-  Detail -- AttributeSlug : slug (PK/FK)
-  Specification -- AttributeSlug : slug (PK/FK)
 }
 
 package "Customers" {
@@ -160,7 +142,7 @@ package "Customers" {
     +orderId: UUID?
     +articleName: String?
     +unitPrice: Money?
-    +quantity: Integer
+    +quantity: Numeric
   }
 
   class CustomerOrder {
@@ -171,10 +153,10 @@ package "Customers" {
     +placedAt: DateTime
   }
 
-  CustomerOrder "0..*" -up- "1" Customer : customerId
+  CustomerOrder "0..*" -- "1" Customer : customerId
   Customer "1" -- "0..1" Address : customerId
   CustomerArticle "0..*" -- "1" Customer : customerId
-  CustomerArticle "0..*" -right- "0..1" CustomerOrder : orderId
+  CustomerArticle "0..*" -- "0..1" CustomerOrder : orderId
 }
 
 package "Sales" {
@@ -208,10 +190,10 @@ package "Sales" {
     +articleId: UUID
     +articleTitle: String
     +unitPrice: Money
-    +quantity: Integer
+    +quantity: Numeric
   }
 
-  note left of Order
+  note right of Order
     Flow (happy path)
     Customer -> Sales: Place order
     Sales -> Inventory: Request stock reservation
@@ -236,7 +218,7 @@ package "Sales" {
   }
 
   class OrderStatus {
-    +id: Integer
+    +id: Numeric
     --
     +orderId: UUID
     ..
@@ -270,115 +252,14 @@ package "Sales" {
   Payment "0..*" -- "1" Order : orderId
 }
 
-package "Inventory" {
-
-  enum ReservationStatus {
-    Pending
-    Ready
-    Fulfilled
-    Expired
-  }
-
-  enum AllocationStatus {
-    Pending
-    Allocated
-    Processed
-    Cancelled
-  }
-
-  class Warehouse {
-    +warehouseId: UUID
-    +warehouseCode: String <<unique>>
-    --
-    +title: String
-    +country: String
-    +city: String
-    +zip: String
-    +street: String
-    +note: String?
-  }
-
-  ' Summary per (warehouseId, articleId).
-  ' available = onHandQty - allocatedQty
-  class StockUnit {
-    +warehouseId: UUID
-    +articleId: UUID
-    --
-    +availableQty: Integer
-    +allocatedQty: Integer
-  }
-
-  note left of StockUnit
-    Summary/read model:
-    available = onHandQty - allocatedQty
-
-    Keep onHandQty in sync with StockUnitBatch.initial/remaining
-    Keep allocatedQty in sync with active Reservations
-    Use optimistic concurrency via version.
-  end note
-
-  ' What warehouse workers add when receiving goods
-  class StockUnitBatch {
-    +stockUnitBatchId: UUID
-    --
-    +warehouseId: UUID
-    +articleId: UUID
-    ..
-    +supplierRef: String?
-    +receivedAt: DateTime
-    +initialQty: Integer
-    +remainingQty: Integer
-    +expiryDate: DateOnly?
-    +note: String?
-  }
-
-  note left of StockUnitBatch
-    remainingQty decreases on picking/dispatch.
-    If you later need audit/history,
-    reintroduce StockMovement.
-  end note
-
-  ' Business promise: reserve quantity for an order line
-  class Reservation {
-    +orderId: String
-    --
-    +status: ReservationStatus
-    +reservedAt: DateTime
-    +note: String?
-  }
-
-  ' Physical planning: which batches satisfy the reservation (FIFO/FEFO)
-  class ReservationAllocation {
-    +orderId: String
-    +stockUnitBatchId: UUID
-    --
-    +quantity: Integer
-    +status: AllocationStatus
-  }
-
-  ' Relationships
-  Warehouse "1" -- "0..*" StockUnit : holds
-
-  ' Conceptual link: batches + reservations roll up into StockUnit
-  StockUnit "1" -- "0..*" StockUnitBatch : (warehouseId, articleId)
-
-  Reservation "1" -- "0..*" ReservationAllocation : allocates
-  StockUnitBatch "1" -- "0..*" ReservationAllocation : takenFrom
-}
-
 ' =======================
 ' RELATIONSHIPS
 ' =======================
 
 ' Identity
-SystemUser "1" .. "0..1" Customer
+SystemUser "1" .up. "0..1" Customer
 
 ' Customers
 CustomerArticle "0..*" .. "1" Article
 CustomerOrder "0..1" .. "1" Order
-
-' Inventory
-StockUnit "0..1" .. "1" Article
-Reservation "1" .. "1" Order
-ReservationAllocation "1..*" .. "1" OrderItem
 @enduml

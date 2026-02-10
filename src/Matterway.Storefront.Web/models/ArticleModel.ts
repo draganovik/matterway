@@ -7,7 +7,6 @@ export default class ArticleModel {
   discount: ArticleDiscount | null;
   description: string;
   articleDetails: ArticleDetail[];
-  articleSpecifications: ArticleSpecification[];
   articleImages: ArticleImages[];
   thumbnailImage: ArticleThumbnail | null;
   createdAt?: string;
@@ -41,16 +40,11 @@ export default class ArticleModel {
     this.description = initial?.description ?? "";
     this.articleDetails =
       initial?.articleDetails?.map((detail) => ({
-        detailSlug: detail.detailSlug ?? detail.typeSlug ?? null,
+        detailSlug: detail.detailSlug ?? null,
         title: detail.title,
-        value: detail.value,
-      })) ?? [];
-    this.articleSpecifications =
-      initial?.articleSpecifications?.map((spec) => ({
-        specificationSlug: spec.specificationSlug ?? null,
-        title: spec.title,
-        value: typeof spec.value === "string" ? Number(spec.value) : spec.value,
-        unit: spec.unit ?? null,
+        unit: detail.unit ?? null,
+        textValue: detail.textValue ?? undefined,
+        numericValue: detail.numericValue ?? undefined,
       })) ?? [];
     this.articleImages =
       initial?.articleImages?.map((image) => ({ ...image })) ?? [];
@@ -81,7 +75,6 @@ export default class ArticleModel {
           : null,
       isAvailable: response.isAvailable ?? false,
       articleDetails: [],
-      articleSpecifications: [],
       articleImages: [],
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
@@ -105,24 +98,16 @@ export default class ArticleModel {
       price: response.price ?? response.basePrice,
       discount: response.discount ?? null,
       description: response.description,
-      articleDetails: (response.details ?? response.articleDetails ?? []).map(
-        (detail: any) => ({
-          detailSlug:
-            detail.detailSlug ?? detail.typeSlug ?? detail.slug ?? null,
-          title: detail.title,
-          value: detail.value,
-        }),
-      ),
-      articleSpecifications: (response.specifications ?? []).map(
-        (spec: any) => ({
-          specificationSlug:
-            spec.specificationSlug ?? spec.slug ?? spec.typeSlug ?? null,
-          title: spec.title,
-          value:
-            typeof spec.value === "string" ? Number(spec.value) : spec.value,
-          unit: spec.unit ?? null,
-        }),
-      ),
+      articleDetails: (response.details ?? []).map((detail: any) => ({
+        detailSlug: detail.detailSlug ?? null,
+        title: detail.title,
+        unit: detail.unit ?? null,
+        textValue: detail.textValue ?? null,
+        numericValue:
+          typeof detail.numericValue === "string"
+            ? Number(detail.numericValue)
+            : (detail.numericValue ?? null),
+      })),
       articleImages: orderedImages,
       thumbnailImage: response.thumbnailImage
         ? { ...response.thumbnailImage }
@@ -142,14 +127,9 @@ export default class ArticleModel {
 export class ArticleDetail {
   detailSlug?: string | null;
   title?: string;
-  value?: string;
-}
-
-export class ArticleSpecification {
-  specificationSlug?: string | null;
-  title?: string;
-  value?: number | null;
   unit?: string | null;
+  textValue?: string | null;
+  numericValue?: number | null;
 }
 
 export class ArticleImages {
