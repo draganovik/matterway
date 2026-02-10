@@ -6,7 +6,8 @@ const open = ref(false)
 const authorizedSections = useAuthorizedSections()
 
 const iconMap: Record<string, string> = {
-  catalog: 'i-lucide-package'
+  catalog: 'i-lucide-package',
+  customers: 'i-lucide-users'
 }
 
 const navItems = computed<NavigationMenuItem[]>(() => {

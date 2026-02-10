@@ -4,6 +4,7 @@ import type { ApiResult, ApiService } from '~/types/common/api'
 function getBaseUrl(service: ApiService) {
   const config = useRuntimeConfig()
   if (service === 'catalog') return config.public.catalogApiBaseUrl
+  if (service === 'customers') return config.public.customersApiBaseUrl
   return null
 }
 

@@ -36,12 +36,13 @@ const sections = useAuthorizedSections()
                 Matterway Operations
               </h1>
               <p class="text-muted text-sm">
-                Manage the Catalog domain with permission-aware tooling.
+                Manage service domains with permission-aware tooling.
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
               <UBadge color="primary" variant="soft"> Employee </UBadge>
-              <UBadge color="neutral" variant="soft"> Catalog Focus </UBadge>
+              <UBadge color="neutral" variant="soft"> Catalog </UBadge>
+              <UBadge color="neutral" variant="soft"> Customers </UBadge>
               <UBadge color="neutral" variant="soft">
                 Permission Scoped
               </UBadge>

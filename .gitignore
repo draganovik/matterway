@@ -362,13 +362,22 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# JetBrains
 .idea/**
-.DS_Store
-/.aspire
-/docker-compose-artifacts
-src/*/*.sln
 *.DotSettings
-/.codex
-/.claude
-/.agents
-/src/Matterway.Dashboard.Web/.agents
+
+# Aspire generated files
+/.aspire
+/aspire-output
+/docker-compose-artifacts
+
+# Local project based solution files
+src/*/*.sln
+
+# Skills and agent files
+*.agents
+
+# Miscellaneous
+.DS_Store
+
