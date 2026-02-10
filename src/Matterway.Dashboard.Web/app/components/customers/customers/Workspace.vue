@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCustomersApi } from '~/composables/useCustomersApi'
-import type { CustomerResponse } from '~/types/customers'
+import type { CustomerAddressResponse, CustomerResponse } from '~/types/customers'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 import { parseNumberOr } from '~/utils/numbers'
@@ -35,6 +35,7 @@ const pagination = reactive({
 const selectedId = ref<string | null>(null)
 const selectedCustomer = ref<CustomerResponse | null>(null)
 const createModalOpen = ref(false)
+const addressModalOpen = ref(false)
 
 const form = ref<CustomerForm>({
   firstName: '',
@@ -65,6 +66,7 @@ function applyCustomerToForm(customer: CustomerResponse | null) {
 function clearSelection() {
   selectedId.value = null
   selectedCustomer.value = null
+  addressModalOpen.value = false
   detailState.error = ''
   applyCustomerToForm(null)
 }
@@ -188,8 +190,38 @@ function searchCustomers() {
 
 function selectCustomer(systemUserId: string) {
   selectedId.value = systemUserId
+  addressModalOpen.value = false
   resetMessages()
   void loadCustomer(systemUserId)
+}
+
+const selectedCustomerName = computed(() => {
+  const first = selectedCustomer.value?.firstName?.trim() || ''
+  const last = selectedCustomer.value?.lastName?.trim() || ''
+  const fullName = `${first} ${last}`.trim()
+  return fullName || 'Selected customer'
+})
+
+function revealAddress() {
+  if (!selectedCustomer.value?.systemUserId) return
+  addressModalOpen.value = true
+}
+
+function handleAddressSaved(address: CustomerAddressResponse) {
+  if (!selectedCustomer.value) return
+
+  const next = {
+    ...selectedCustomer.value,
+    defaultAddressId: address.id
+  }
+  selectedCustomer.value = next
+  form.value.defaultAddressId = address.id
+
+  customers.value = customers.value.map((item) =>
+    item.systemUserId === next.systemUserId
+      ? { ...item, defaultAddressId: address.id }
+      : item
+  )
 }
 
 function changePage(page: number) {
@@ -449,6 +481,21 @@ onMounted(() => {
               </UButton>
             </div>
 
+            <div
+              class="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default/70 p-3"
+            >
+              <div class="space-y-1">
+                <h4 class="text-foreground text-sm font-semibold">Address</h4>
+                <p class="text-muted text-sm">
+                  Reveal and manage the selected customer's address.
+                </p>
+              </div>
+
+              <UButton variant="outline" @click="revealAddress">
+                Reveal Address
+              </UButton>
+            </div>
+
             <StatusMessages
               :error="saveState.error || removeState.error"
               :success="saveState.success || removeState.success"
@@ -463,5 +510,13 @@ onMounted(() => {
     v-model:open="createModalOpen"
     :can-edit="canEdit"
     @created="handleCustomerCreated"
+  />
+
+  <CustomersCustomersRevealAddressModal
+    v-model:open="addressModalOpen"
+    :customer-id="selectedCustomer?.systemUserId || null"
+    :customer-name="selectedCustomerName"
+    :can-edit="canEdit"
+    @saved="handleAddressSaved"
   />
 </template>

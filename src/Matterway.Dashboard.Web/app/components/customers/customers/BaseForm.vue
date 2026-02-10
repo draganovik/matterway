@@ -60,13 +60,5 @@ const form = defineModel<CustomerForm>({ required: true })
       />
     </UFormField>
 
-    <UFormField label="Default Address ID" help="Optional Address ID (GUID).">
-      <UInput
-        v-model="form.defaultAddressId"
-        placeholder="00000000-0000-0000-0000-000000000000"
-        :disabled="disabled"
-        class="w-full font-mono"
-      />
-    </UFormField>
   </div>
 </template>

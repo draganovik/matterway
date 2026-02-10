@@ -1,9 +1,11 @@
 import { buildQuery } from '~/utils/http'
 import { useApiClient } from '~/composables/useApiClient'
 import type {
+  CustomerAddressResponse,
   CustomerRequest,
   CustomerResponse,
   DeleteCustomerResponse,
+  PutCustomerAddressRequest,
   QueryCustomersParams,
   QueryCustomersResponse
 } from '~/types/customers'
@@ -29,6 +31,27 @@ export function useCustomersApi() {
     return api.request<CustomerResponse>(
       'customers',
       `${ADMIN_CUSTOMERS_PATH}/${customerId}`
+    )
+  }
+
+  async function getAddressByCustomer(customerId: string) {
+    return api.request<CustomerAddressResponse>(
+      'customers',
+      `${ADMIN_CUSTOMERS_PATH}/${customerId}/address`
+    )
+  }
+
+  async function putAddressByCustomer(
+    customerId: string,
+    payload: PutCustomerAddressRequest
+  ) {
+    return api.request<CustomerAddressResponse>(
+      'customers',
+      `${ADMIN_CUSTOMERS_PATH}/${customerId}/address`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      }
     )
   }
 
@@ -66,6 +89,8 @@ export function useCustomersApi() {
   return {
     queryCustomers,
     getCustomerById,
+    getAddressByCustomer,
+    putAddressByCustomer,
     createCustomer,
     updateCustomer,
     deleteCustomer
