@@ -30,7 +30,7 @@ const fullName = computed(() => {
     <UBadge
       color="neutral"
       variant="subtle"
-      class="shrink-0 whitespace-nowrap font-normal"
+      class="shrink-0 font-normal whitespace-nowrap"
     >
       {{ item.birthDate || 'No birth date' }}
     </UBadge>

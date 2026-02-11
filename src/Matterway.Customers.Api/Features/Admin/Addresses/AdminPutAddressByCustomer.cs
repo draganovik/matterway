@@ -14,7 +14,8 @@ public class AdminPutAddressByCustomer : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut("admin/customers/{customerId:guid}/address", Handler)
-            .WithName("AdminPutAddressByCustomer").WithSummary("Create or replace Customer address by customer id (admin).")
+            .WithName("AdminPutAddressByCustomer")
+            .WithSummary("Create or replace Customer address by customer id (admin).")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)
             .Produces<AddressResponse>(StatusCodes.Status201Created)
@@ -25,7 +26,8 @@ public class AdminPutAddressByCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Ok<AddressResponse>, Created<AddressResponse>, NotFound, BadRequest<ProblemDetails>>>
+    private static async
+        Task<Results<Ok<AddressResponse>, Created<AddressResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handler(
             Guid customerId,
             AddressRequest request,

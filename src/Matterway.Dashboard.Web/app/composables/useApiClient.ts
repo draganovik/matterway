@@ -5,6 +5,7 @@ function getBaseUrl(service: ApiService) {
   const config = useRuntimeConfig()
   if (service === 'catalog') return config.public.catalogApiBaseUrl
   if (service === 'customers') return config.public.customersApiBaseUrl
+  if (service === 'identity') return config.public.identityApiBaseUrl
   return null
 }
 

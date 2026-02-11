@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useCustomersApi } from '~/composables/useCustomersApi'
-import type { CustomerAddressResponse, CustomerResponse } from '~/types/customers'
+import type {
+  CustomerAddressResponse,
+  CustomerResponse
+} from '~/types/customers'
 import { useRequestState } from '~/composables/useRequestState'
 import { useAuthSession } from '~/composables/useAuthSession'
 import { parseNumberOr } from '~/utils/numbers'
@@ -374,14 +377,20 @@ onMounted(() => {
   <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
     <div class="flex shrink-0 flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-foreground text-base font-semibold">Manage Customers</h2>
+        <h2 class="text-foreground text-base font-semibold">
+          Manage Customers
+        </h2>
         <p class="text-muted text-sm">
           Browse customer profiles, edit selected records, and remove invalid
           entries.
         </p>
       </div>
 
-      <UButton color="primary" :disabled="!canEdit" @click="createModalOpen = true">
+      <UButton
+        color="primary"
+        :disabled="!canEdit"
+        @click="createModalOpen = true"
+      >
         Create New
       </UButton>
     </div>
@@ -482,7 +491,7 @@ onMounted(() => {
             </div>
 
             <div
-              class="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default/70 p-3"
+              class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
             >
               <div class="space-y-1">
                 <h4 class="text-foreground text-sm font-semibold">Address</h4>

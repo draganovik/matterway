@@ -15,7 +15,7 @@ export type FeatureDefinition = {
   key: string
   label: string
   route: string
-  service: 'catalog' | 'customers'
+  service: 'catalog' | 'customers' | 'identity'
   minimum: PermissionLevel
   actions: FeatureAction[]
 }

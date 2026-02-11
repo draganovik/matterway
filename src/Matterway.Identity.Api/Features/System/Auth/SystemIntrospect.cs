@@ -12,7 +12,7 @@ public class SystemIntrospect : IEndpoint
     {
         app.MapGet("system/auth/introspect", Handler)
             .WithName("SystemIntrospect")
-            .WithSummary("Introspect access token and return claims.")
+            .WithSummary("Introspect access token and return claims (system).")
             .WithTags("Auth")
             .Produces<AuthIntrospectResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)

@@ -45,7 +45,9 @@ const form = ref<AddressForm>({
   contactPhone: ''
 })
 
-const displayName = computed(() => props.customerName.trim() || 'Selected customer')
+const displayName = computed(
+  () => props.customerName.trim() || 'Selected customer'
+)
 
 function resetForm() {
   form.value = {
@@ -180,27 +182,24 @@ async function saveAddress() {
   mode.value = 'view'
 }
 
-watch(
-  [isOpen, () => props.customerId],
-  ([open]) => {
-    if (!open) {
-      if (closeResetTimer) clearTimeout(closeResetTimer)
-      closeResetTimer = setTimeout(() => {
-        resetModalState()
-        closeResetTimer = null
-      }, 200)
-      return
-    }
-
-    if (closeResetTimer) {
-      clearTimeout(closeResetTimer)
+watch([isOpen, () => props.customerId], ([open]) => {
+  if (!open) {
+    if (closeResetTimer) clearTimeout(closeResetTimer)
+    closeResetTimer = setTimeout(() => {
+      resetModalState()
       closeResetTimer = null
-    }
-
-    mode.value = 'view'
-    void loadAddress()
+    }, 200)
+    return
   }
-)
+
+  if (closeResetTimer) {
+    clearTimeout(closeResetTimer)
+    closeResetTimer = null
+  }
+
+  mode.value = 'view'
+  void loadAddress()
+})
 
 onBeforeUnmount(() => {
   if (closeResetTimer) clearTimeout(closeResetTimer)
@@ -239,42 +238,46 @@ onBeforeUnmount(() => {
         />
 
         <dl v-else-if="address" class="grid gap-3 sm:grid-cols-2">
-          <div class="rounded-md border border-default/70 px-3 py-2">
+          <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Country</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.country || '-' }}
             </dd>
           </div>
 
-          <div class="rounded-md border border-default/70 px-3 py-2">
+          <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">City</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.city || '-' }}
             </dd>
           </div>
 
-          <div class="rounded-md border border-default/70 px-3 py-2">
+          <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Zip Code</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.zipCode || '-' }}
             </dd>
           </div>
 
-          <div class="rounded-md border border-default/70 px-3 py-2">
+          <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Contact Phone</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.contactPhone || '-' }}
             </dd>
           </div>
 
-          <div class="rounded-md border border-default/70 px-3 py-2 sm:col-span-2">
+          <div
+            class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
+          >
             <dt class="text-muted text-xs">Address Line 1</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.addressLine1 || '-' }}
             </dd>
           </div>
 
-          <div class="rounded-md border border-default/70 px-3 py-2 sm:col-span-2">
+          <div
+            class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
+          >
             <dt class="text-muted text-xs">Address Line 2</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.addressLine2 || '-' }}
@@ -293,7 +296,10 @@ onBeforeUnmount(() => {
           </UFormField>
 
           <UFormField label="City" required>
-            <UInput v-model="form.city" :disabled="saveState.loading || !canEdit" />
+            <UInput
+              v-model="form.city"
+              :disabled="saveState.loading || !canEdit"
+            />
           </UFormField>
 
           <UFormField label="Zip Code" required>
@@ -353,7 +359,11 @@ onBeforeUnmount(() => {
         </UButton>
 
         <div class="flex items-center gap-2">
-          <UButton variant="ghost" :disabled="saveState.loading" @click="isOpen = false">
+          <UButton
+            variant="ghost"
+            :disabled="saveState.loading"
+            @click="isOpen = false"
+          >
             Cancel
           </UButton>
           <UButton

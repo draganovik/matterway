@@ -14,7 +14,7 @@ public class AdminGetSystemUserPerms : IEndpoint
     {
         app.MapGet("admin/system-users/{id:guid}/perms", Handler)
             .WithName("AdminGetSystemUserPerms")
-            .WithSummary("Get permissions for a system user.")
+            .WithSummary("Get permissions for a system user (admin).")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<GetSystemUserPermResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

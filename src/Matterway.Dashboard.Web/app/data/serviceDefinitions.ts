@@ -48,6 +48,22 @@ export const serviceSections: ServiceSection[] = [
         actions: []
       }
     ]
+  },
+  {
+    key: 'identity',
+    label: 'Identity',
+    service: 'identity',
+    minimum: 'operator',
+    features: [
+      {
+        key: 'system-users',
+        label: 'System Users',
+        route: '/identity/system-users',
+        service: 'identity',
+        minimum: 'operator',
+        actions: []
+      }
+    ]
   }
 ]
 

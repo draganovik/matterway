@@ -18,7 +18,7 @@ public class AdminAddSystemUserPerm : IEndpoint
     {
         app.MapPost("admin/system-users/{id:guid}/perms", Handler)
             .WithName("AdminAddSystemUserPerm")
-            .WithSummary("Add a permission to a system user.")
+            .WithSummary("Add a permission to a system user (admin).")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<AddSystemUserPermResponse>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

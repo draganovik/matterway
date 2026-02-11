@@ -15,7 +15,7 @@ public class SystemCreateCustomerUser : IEndpoint
     {
         app.MapPost("system/users/customer", Handler)
             .WithName("SystemCreateCustomerUser")
-            .WithSummary("Create a customer system user (service-to-service).")
+            .WithSummary("Create a customer system user (system).")
             .WithTags("SystemUsers")
             .Produces<CreateUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

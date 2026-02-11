@@ -3,9 +3,8 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Matterway.Identity.Api.Application;
 using Matterway.Identity.Api.Domain;
-using Matterway.Identity.Api.Domain.Entities;
+using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 
 namespace Matterway.Identity.Api.Features.Admin.SystemUsers;
 
@@ -25,19 +24,18 @@ public class AdminGetSystemUserById : IEndpoint
 
     private static async Task<Results<Ok<GetSystemUserByIdResponse>, NotFound>> Handler(
         Guid id,
-        UserManager<SystemUser> userManager)
+        ISystemUserRepository systemUserRepository,
+        CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(id.ToString());
+        var user = await systemUserRepository.GetById(id, cancellationToken);
         if (user is null) return TypedResults.NotFound();
-
-        var role = await IdentityRoleAdapter.GetPrimaryRoleAsync(userManager, user);
 
         return TypedResults.Ok(new GetSystemUserByIdResponse
         {
             Id = user.Id,
             Email = user.Email,
             Created = user.Created,
-            Role = role
+            Role = user.Role
         });
     }
 

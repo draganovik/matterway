@@ -59,6 +59,5 @@ const form = defineModel<CustomerForm>({ required: true })
         class="w-full"
       />
     </UFormField>
-
   </div>
 </template>

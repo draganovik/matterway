@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
 
 namespace Matterway.Identity.Api.Infrastructure.Persistence;
 
@@ -14,6 +15,7 @@ public static class PersistenceRegistration
 
             builder.Services.AddDbContext<IdentityDbComposer>(options =>
                 options.UseNpgsql(connectionString, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
+            builder.Services.AddScoped<ISystemUserRepository, EfPgSystemUserRepository>();
 
             return builder;
         }

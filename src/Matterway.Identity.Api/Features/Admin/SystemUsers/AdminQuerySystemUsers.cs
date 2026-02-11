@@ -3,11 +3,10 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Matterway.Identity.Api.Application;
 using Matterway.Identity.Api.Domain;
-using Matterway.Identity.Api.Domain.Entities;
+using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Identity.Api.Features.Admin.SystemUsers;
 
@@ -29,17 +28,29 @@ public class AdminQuerySystemUsers : IEndpoint
 
     private static async Task<Results<Ok<PaginationResponse<QuerySystemUsersResponse>>, NoContent,
             BadRequest<ProblemDetails>, ValidationProblem>>
-        Handler([AsParameters] PaginationRequestParameters pagingQuery,
+        Handler([AsParameters] QuerySystemUsersParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            UserManager<SystemUser> userManager)
+            ISystemUserRepository systemUserRepository,
+            CancellationToken cancellationToken)
     {
-        var total = await userManager.Users.CountAsync();
-        var entities = await userManager.Users
-            .OrderBy(user => user.Created)
-            .Skip((pagingQuery.Page - 1) * pagingQuery.PageSize)
-            .Take(pagingQuery.PageSize)
-            .ToListAsync();
+        if (!TryParseRoleFilter(queryParameters.Role, out var roleFilter))
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Role must be one of: Customer, Employee."
+            });
+
+        var total = await systemUserRepository.Count(roleFilter, cancellationToken);
+        if (total == 0) return TypedResults.NoContent();
+
+        var entities = await systemUserRepository.Query(
+            queryParameters.Page,
+            queryParameters.PageSize,
+            roleFilter,
+            cancellationToken);
+
         var baseUri = linkGenerator.GetPathByName(httpContext, "AdminQuerySystemUsers");
         if (string.IsNullOrWhiteSpace(baseUri))
             return TypedResults.BadRequest(new ProblemDetails
@@ -49,29 +60,51 @@ public class AdminQuerySystemUsers : IEndpoint
                 Detail = "Unable to resolve pagination base URL."
             });
 
-        var responseUsers = new List<QuerySystemUsersResponse>();
-        foreach (var user in entities)
-        {
-            var role = await IdentityRoleAdapter.GetPrimaryRoleAsync(userManager, user);
-            responseUsers.Add(new QuerySystemUsersResponse
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Created = user.Created,
-                Role = role
-            });
-        }
+        if (roleFilter.HasValue)
+            baseUri = QueryHelpers.AddQueryString(baseUri, "Role", roleFilter.Value.ToString());
 
         var paginationResponse = PaginationResponse<QuerySystemUsersResponse>.Create(
-            responseUsers,
+            entities
+                .Select(MapToResponse)
+                .ToList(),
             total,
-            pagingQuery.Page,
-            pagingQuery.PageSize,
+            queryParameters.Page,
+            queryParameters.PageSize,
             baseUri);
 
-        return entities.Count > 0
-            ? TypedResults.Ok(paginationResponse)
-            : TypedResults.NoContent();
+        return TypedResults.Ok(paginationResponse);
+    }
+
+    private static QuerySystemUsersResponse MapToResponse(SystemUserRepositoryModel user)
+    {
+        return new QuerySystemUsersResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Created = user.Created,
+            Role = user.Role
+        };
+    }
+
+    private static bool TryParseRoleFilter(string? rawRole, out EIdentityRole? role)
+    {
+        role = null;
+        if (string.IsNullOrWhiteSpace(rawRole)) return true;
+
+        var normalized = rawRole.Trim().ToLowerInvariant();
+        role = normalized switch
+        {
+            "customer" or "customers" => EIdentityRole.Customer,
+            "employee" or "employees" => EIdentityRole.Employee,
+            _ => null
+        };
+
+        return role.HasValue;
+    }
+
+    public sealed record QuerySystemUsersParameters : PaginationRequestParameters
+    {
+        public string? Role { get; init; }
     }
 
     public class QuerySystemUsersResponse

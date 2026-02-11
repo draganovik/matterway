@@ -18,7 +18,7 @@ public class AdminDeleteSystemUserPerm : IEndpoint
     {
         app.MapDelete("admin/system-users/{id:guid}/perms", Handler)
             .WithName("AdminDeleteSystemUserPerm")
-            .WithSummary("Remove a permission from a system user.")
+            .WithSummary("Remove a permission from a system user (admin).")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<DeleteSystemUserPermResponse>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
