@@ -25,7 +25,10 @@ export function useSalesApi() {
   }
 
   async function getOrderById(orderId: string) {
-    return api.request<OrderResponse>('sales', `${ADMIN_ORDERS_PATH}/${orderId}`)
+    return api.request<OrderResponse>(
+      'sales',
+      `${ADMIN_ORDERS_PATH}/${orderId}`
+    )
   }
 
   return {

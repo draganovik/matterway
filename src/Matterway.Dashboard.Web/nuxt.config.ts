@@ -8,7 +8,13 @@ export default defineNuxtConfig({
   ssr: false,
   components: [
     {
-      path: '~/components'
+      path: '~/components/common'
+    },
+    {
+      path: '~/components/features'
+    },
+    {
+      path: '~/components/shell'
     }
   ],
 
