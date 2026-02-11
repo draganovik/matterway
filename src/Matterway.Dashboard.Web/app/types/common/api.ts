@@ -1,4 +1,4 @@
-export type ApiService = 'catalog' | 'customers' | 'identity'
+export type ApiService = 'catalog' | 'customers' | 'identity' | 'sales'
 
 export type ApiResult<T> = {
   ok: boolean

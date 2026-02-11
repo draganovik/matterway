@@ -6,6 +6,7 @@ function getBaseUrl(service: ApiService) {
   if (service === 'catalog') return config.public.catalogApiBaseUrl
   if (service === 'customers') return config.public.customersApiBaseUrl
   if (service === 'identity') return config.public.identityApiBaseUrl
+  if (service === 'sales') return config.public.salesApiBaseUrl
   return null
 }
 

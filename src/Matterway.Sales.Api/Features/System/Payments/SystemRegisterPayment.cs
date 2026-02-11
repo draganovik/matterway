@@ -21,8 +21,6 @@ public class SystemRegisterPayment : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
-            .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -49,7 +47,7 @@ public class SystemRegisterPayment : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "GetPaymentById",
+            "AdminGetPaymentById",
             new { paymentId = created.Id });
 
         return TypedResults.Created(location, MapToResponse(created));

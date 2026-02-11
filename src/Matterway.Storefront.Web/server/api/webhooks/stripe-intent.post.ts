@@ -5,36 +5,52 @@ const config = useRuntimeConfig();
 export default defineEventHandler(async (event) => {
   const stripeEvent: StripeEventWebhookModel = await readBody(event);
 
-  switch (stripeEvent.type) {
-    case "payment_intent.created":
-      console.log("created");
-      return { success: true, message: "Payment created" };
-    case "payment_intent.succeeded":
-      console.log("succeeded");
-      return { success: true, message: "Payment succeeded" };
-    case "charge.succeeded":
-      const payment = await postPayment(stripeEvent);
-      return { success: true, message: "Data received", data: { payment } };
-    default:
-      throw createError({
-        statusCode: 400,
-        message: "Event type not supported",
-      });
+  if (stripeEvent.type !== "charge.succeeded") {
+    console.log("Stripe event type not handled:", stripeEvent.type);
+    setResponseStatus(event, 304, "Event type is not processed");
+    return { success: true, ignored: true, eventType: stripeEvent.type };
   }
+
+  const payment = await postPayment(stripeEvent);
+  if (!payment) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to register payment",
+    });
+  }
+
+  return { success: true, message: "Payment registered", data: { payment } };
 });
 
 const postPayment = async (event: StripeEventWebhookModel) => {
-  const orderId = event.data?.object.metadata.order_id;
+  if (!config.serverSalesApiBaseUrl) {
+    console.error("[stripe] missing serverSalesApiBaseUrl runtime config");
+    return null;
+  }
+
+  const stripeObject = event.data?.object;
+  const orderId = stripeObject?.metadata?.order_id;
   if (!orderId) {
     console.error("[stripe] missing order_id metadata");
     return null;
   }
-  const amount = event.data?.object.amount! / 100;
+
+  if (typeof stripeObject.amount !== "number") {
+    console.error("[stripe] missing amount in event payload");
+    return null;
+  }
+
+  const amount = stripeObject.amount / 100;
   const referenceId =
-    event.data?.object.metadata.reference_id ?? createReferenceId();
+    stripeObject.metadata?.reference_id ?? createReferenceId();
+
+  const createdAt =
+    typeof stripeObject.created === "number"
+      ? new Date(stripeObject.created * 1000)
+      : new Date();
 
   const response = await fetch(
-    `${config.serverSalesApiBaseUrl}/api/v1/Payments`,
+    `${config.serverSalesApiBaseUrl}/api/v1.0/system/payments`,
     {
       method: "POST",
       headers: {
@@ -47,7 +63,7 @@ const postPayment = async (event: StripeEventWebhookModel) => {
         referenceId,
         amount,
         status: "Charged",
-        createdAt: new Date(event.data?.object.created! * 1000),
+        createdAt,
       }),
     },
   );

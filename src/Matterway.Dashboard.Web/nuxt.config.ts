@@ -28,7 +28,8 @@ export default defineNuxtConfig({
     public: {
       identityApiBaseUrl: publicEnv('IDENTITY_API_BASE_URL'),
       catalogApiBaseUrl: publicEnv('CATALOG_API_BASE_URL'),
-      customersApiBaseUrl: publicEnv('CUSTOMERS_API_BASE_URL')
+      customersApiBaseUrl: publicEnv('CUSTOMERS_API_BASE_URL'),
+      salesApiBaseUrl: publicEnv('SALES_API_BASE_URL')
     }
   },
 

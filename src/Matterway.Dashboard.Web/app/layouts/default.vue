@@ -8,6 +8,7 @@ const authorizedSections = useAuthorizedSections()
 const iconMap: Record<string, string> = {
   catalog: 'i-lucide-package',
   customers: 'i-lucide-users',
+  sales: 'i-lucide-receipt-text',
   identity: 'i-lucide-shield-user'
 }
 
