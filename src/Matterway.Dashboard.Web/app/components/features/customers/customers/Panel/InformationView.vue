@@ -70,7 +70,9 @@ const emit = defineEmits<{
     />
 
     <div v-else class="grid gap-4">
-      <div class="text-muted text-sm">System User ID: {{ customer.systemUserId }}</div>
+      <div class="text-muted text-sm">
+        System User ID: {{ customer.systemUserId }}
+      </div>
 
       <CustomersCustomersPanelInformationForm
         v-model="form"

@@ -1,22 +1,21 @@
-// Import necessary dependencies
 import Stripe from "stripe";
-import AddressModel from "#models/AddressModel";
-import CardPaymentModel from "#models/CardPaymentModel";
-// Create a function to handle the payment
+import type {
+  CardPaymentInput,
+  PaymentAddress,
+} from "../server/types/payments";
+
 export async function payWithStripe(
-  cardPayment: CardPaymentModel,
-  address: AddressModel,
+  cardPayment: CardPaymentInput,
+  address: PaymentAddress,
   userId: string,
   orderId: string,
   secretkey: string,
 ): Promise<string> {
   const referenceId = createReferenceId();
-  // Set up your Stripe API key
   const stripe = new Stripe(secretkey, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2025-10-29.clover",
   });
   try {
-    // Create a Stripe payment method using the provided card details
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -26,11 +25,9 @@ export async function payWithStripe(
         cvc: cardPayment.cvc,
       },
     });
-    //console.log(paymentMethod);
 
-    // Create a Stripe payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: cardPayment.amount * 100, // Stripe expects the amount in cents
+      amount: Math.round(cardPayment.amount * 100),
       currency: "rsd",
       payment_method_types: ["card"],
       payment_method: paymentMethod.id,
@@ -53,11 +50,10 @@ export async function payWithStripe(
       },
     });
 
-    // Return the payment intent's client secret
     return paymentIntent.client_secret || "";
   } catch (error) {
-    console.log(error);
-    throw new Error("Payment failed. Please try again.");
+    console.error("[payments] stripe charge failed", error);
+    throw new Error("Plaćanje nije uspelo. Pokušajte ponovo.");
   }
 }
 

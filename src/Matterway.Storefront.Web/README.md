@@ -1,38 +1,35 @@
-# Matterway Storefront (Nuxt 4)
+# Matterway Storefront (Nuxt 4 + Nuxt UI)
 
-This repository contains the Nuxt 4 storefront for Matterway. The project now follows the recommended `app` source directory structure and uses componentized form building blocks for better reuse and testability.
+Customer-facing storefront for Matterway, aligned with the same Nuxt platform style used by `Matterway.Dashboard.Web`.
 
-## Requirements
+## Stack
 
-- Node.js **20.17** (LTS) or newer
-- npm **10.x**
+- Nuxt 4
+- @nuxt/ui
+- Tailwind CSS v4
+- TypeScript
+- Stripe server endpoints for payment intent + webhook registration
 
-## Getting Started
+## Key Features
+
+- Overview (front page)
+- Articles browser with query-driven filters (RSQL generation kept)
+- Cart for guest and signed-in customers
+- Checkout flow
+- Previous orders (customer accounts only)
+- Customer-only login strategy (non-customer roles are rejected)
+
+## Commands
 
 ```bash
-npm install
 npm run dev
+npm run typecheck
+npm run lint
+npm run build
 ```
 
-The development server listens on `http://localhost:3000` by default.
+## Notes
 
-## Project Structure
-
-- `app/` – Nuxt source (components, layouts, middleware, models, pages, server endpoints, stores, etc.)
-- `public/` – Static assets served as-is
-- `nuxt.config.ts` – Framework configuration (Pinia modules, runtime config, CSS, etc.)
-- `tailwind.config.ts` – Tailwind + Flowbite setup
-- `Dockerfile` – Multi-stage production build using Node 20
-
-Forms that previously lived directly in pages (authentication, checkout, article creation) are now extracted into typed components under `app/components/forms`.
-
-## Scripts
-
-```bash
-npm run dev       # Start dev server
-npm run build     # Production build
-npm run preview   # Preview the production build locally
-npm run generate  # Static site generation
-```
-
-Refer to the [Nuxt documentation](https://nuxt.com/docs) for additional guides and deployment options.
+- Runtime API URLs are configured via `NUXT_PUBLIC_*` environment variables.
+- Cart is intentionally cleared on sign in and sign out.
+- Admin/catalog management routes are disabled in Storefront.

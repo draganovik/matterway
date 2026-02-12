@@ -70,7 +70,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
     />
 
     <div v-else class="space-y-4">
-      <div class="text-muted font-mono text-sm break-all">Order ID: {{ order.id }}</div>
+      <div class="text-muted font-mono text-sm break-all">
+        Order ID: {{ order.id }}
+      </div>
 
       <div class="grid gap-3 sm:grid-cols-3">
         <div class="border-default/70 rounded-lg border px-3 py-2">
@@ -118,7 +120,11 @@ const quantitySum = computed(() => quantitySumOf(props.order))
             <UBadge color="neutral" variant="subtle" class="font-normal">
               {{ order.statusHistory?.length || 0 }} entries
             </UBadge>
-            <UButton size="xs" variant="ghost" @click="emit('revealStatusHistory')">
+            <UButton
+              size="xs"
+              variant="ghost"
+              @click="emit('revealStatusHistory')"
+            >
               Reveal Status History
             </UButton>
           </div>
@@ -134,7 +140,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
           <p class="text-muted mt-1 text-xs">
             Changed: {{ formatDateTime(latestStatus.changedAt) }}
           </p>
-          <p class="text-muted mt-1 text-xs">Note: {{ latestStatus.note || '-' }}</p>
+          <p class="text-muted mt-1 text-xs">
+            Note: {{ latestStatus.note || '-' }}
+          </p>
         </div>
 
         <p v-else class="text-muted text-sm">No status history available.</p>
@@ -158,7 +166,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
           </div>
         </div>
 
-        <p class="text-muted text-sm">Total: {{ formatMoney(order.totalAmount) }}</p>
+        <p class="text-muted text-sm">
+          Total: {{ formatMoney(order.totalAmount) }}
+        </p>
         <p class="text-muted text-sm">
           Sum of payments: {{ formatMoney(paymentSum) }}
         </p>
