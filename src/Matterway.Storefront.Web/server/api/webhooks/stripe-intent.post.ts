@@ -1,9 +1,9 @@
-import StripeEventWebhookModel from "#models/StripeEventWebhookModel";
+import type { StripeEventWebhookPayload } from "../../types/payments";
 
 const config = useRuntimeConfig();
 
 export default defineEventHandler(async (event) => {
-  const stripeEvent: StripeEventWebhookModel = await readBody(event);
+  const stripeEvent = (await readBody(event)) as StripeEventWebhookPayload;
 
   if (stripeEvent.type !== "charge.succeeded") {
     console.log("Stripe event type not handled:", stripeEvent.type);
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   return { success: true, message: "Payment registered", data: { payment } };
 });
 
-const postPayment = async (event: StripeEventWebhookModel) => {
+const postPayment = async (event: StripeEventWebhookPayload) => {
   if (!config.serverSalesApiBaseUrl) {
     console.error("[stripe] missing serverSalesApiBaseUrl runtime config");
     return null;

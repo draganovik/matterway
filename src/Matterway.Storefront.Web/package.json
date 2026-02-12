@@ -1,29 +1,32 @@
 {
-  "name": "matterway-storefront",
+  "name": "Matterway-Storefront-Web",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "prettier": "prettier --write --ignore-unknown ."
-  },
-  "devDependencies": {
-    "@types/node": "^24.10.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.7.1"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write --ignore-unknown",
+    "format:check": "prettier . --check --ignore-unknown",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxt/icon": "^2.1.0",
-    "@pinia/nuxt": "^0.11.3",
-    "@tailwindcss/vite": "^4.1.17",
-    "flowbite": "^3.1.2",
-    "nuxt": "^4.2.1",
-    "pinia": "^3.0.4",
-    "pinia-plugin-persistedstate": "^4.7.1",
+    "@iconify-json/lucide": "^1.2.86",
+    "@nuxt/ui": "^4.4.0",
+    "nuxt": "^4.2.2",
     "stripe": "^19.3.0",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.12.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.2.2"
   }
 }

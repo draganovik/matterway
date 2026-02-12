@@ -1,80 +1,47 @@
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import tailwindcss from "@tailwindcss/vite";
+const env = import.meta.env as Record<string, string | undefined>;
 
-const projectRoot = fileURLToPath(new URL(".", import.meta.url));
-const withRoot = (...segments: string[]) => resolve(projectRoot, ...segments);
+const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key];
 
-const alias = {
-  "@assets": withRoot("app/assets"),
-  "@components": withRoot("app/components"),
-  "@composables": withRoot("app/composables"),
-  "@layouts": withRoot("app/layouts"),
-  "@middleware": withRoot("app/middleware"),
-  "@pages": withRoot("app/pages"),
-  "@plugins": withRoot("app/plugins"),
-  "@stores": withRoot("app/stores"),
-  $api: withRoot("server/api"),
-  "#models": withRoot("models"),
-  "#services": withRoot("services"),
-} satisfies Record<string, string>;
-const isDev = process.env.NODE_ENV !== "production";
-const noCacheHeaders = {
-  "Cache-Control":
-    "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
-};
-
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  alias,
-  app: {
-    head: {
-      titleTemplate: "%s - Matterway Storefront",
-      link: [
-        {
-          rel: "icon",
-          href: "/favicon.svg",
-        },
-      ],
-    },
-  },
+  modules: ["@nuxt/eslint", "@nuxt/ui"],
+  ssr: false,
+
   components: [
     {
-      path: alias["@components"],
-      pathPrefix: false,
+      path: "~/components",
     },
   ],
-  runtimeConfig: {
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    serverSalesApiBaseUrl:
-      process.env.NUXT_SERVER_SALES_API_BASE_URL ??
-      process.env.SERVER_SALES_API_BASE_URL ??
-      process.env.SALES_API_BASE_URL,
-    public: {
-      appDomain: "localhost",
-      authApiBaseUrl: process.env.AUTH_API_BASE_URL,
-      catalogApiBaseUrl: process.env.CATALOG_API_BASE_URL,
-      customersApiBaseUrl: process.env.CUSTOMERS_API_BASE_URL,
-      salesApiBaseUrl: process.env.SALES_API_BASE_URL,
+
+  app: {
+    head: {
+      titleTemplate: "%s - Matterway prodavnica",
+      link: [{ rel: "icon", href: "/favicon.svg" }],
     },
   },
-  css: ["@assets/css/main.css"],
-  routeRules: isDev
-    ? {
-        "/**": {
-          headers: noCacheHeaders,
-        },
-      }
-    : undefined,
-  vite: {
-    plugins: [tailwindcss()],
-    ...(isDev
-      ? {
-          server: {
-            headers: noCacheHeaders,
-          },
-        }
-      : {}),
+
+  css: ["~/assets/css/main.css"],
+
+  runtimeConfig: {
+    stripeSecretKey:
+      env.STRIPE_SECRET_KEY ?? env.NUXT_STRIPE_SECRET_KEY ?? undefined,
+    serverSalesApiBaseUrl:
+      env.NUXT_SERVER_SALES_API_BASE_URL ??
+      env.SERVER_SALES_API_BASE_URL ??
+      env.SALES_API_BASE_URL ??
+      env.NUXT_PUBLIC_SALES_API_BASE_URL ??
+      undefined,
+    public: {
+      identityApiBaseUrl:
+        publicEnv("IDENTITY_API_BASE_URL") ?? publicEnv("AUTH_API_BASE_URL"),
+      catalogApiBaseUrl: publicEnv("CATALOG_API_BASE_URL"),
+      customersApiBaseUrl: publicEnv("CUSTOMERS_API_BASE_URL"),
+      salesApiBaseUrl: publicEnv("SALES_API_BASE_URL"),
+    },
   },
-  modules: ["@pinia/nuxt", "@nuxt/icon"],
+
+  devtools: {
+    enabled: true,
+  },
+
+  compatibilityDate: "2025-01-15",
 });

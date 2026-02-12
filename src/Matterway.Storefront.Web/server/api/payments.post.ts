@@ -1,89 +1,133 @@
-import { payWithStripe } from "#services/stripeService";
-import { Console } from "console";
-import AddressModel from "#models/AddressModel";
-import CardPaymentModel from "#models/CardPaymentModel";
+import { payWithStripe } from "../../services/stripeService";
+import type { H3Event } from "h3";
+import type { CardPaymentInput, PaymentAddress } from "../types/payments";
 
 const config = useRuntimeConfig();
 
-export default defineEventHandler(async (event) => {
+type PaymentRequestBody = {
+  cardNumber?: unknown;
+  expMonth?: unknown;
+  expYear?: unknown;
+  cvc?: unknown;
+  amount?: unknown;
+  receiverName?: unknown;
+  residence?: unknown;
+  street?: unknown;
+  city?: unknown;
+  zipCode?: unknown;
+  country?: unknown;
+  contactPhone?: unknown;
+  note?: unknown;
+  orderId?: unknown;
+  userId?: unknown;
+};
+
+function asString(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function asNumber(value: unknown) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function toPositiveAmount(value: unknown) {
+  const parsed = asNumber(value);
+  return parsed > 0 ? parsed : NaN;
+}
+
+function isAddressValid(address: PaymentAddress) {
+  return [
+    address.receiverName,
+    address.residence,
+    address.street,
+    address.city,
+    address.zipCode,
+  ].every((field) => field.length > 0);
+}
+
+async function parseBody(event: H3Event) {
   const rawBody = await readBody(event);
-  let body =
-    rawBody && typeof rawBody === "string" ? rawBody.trim() : (rawBody ?? {});
-  if (typeof body === "string") {
-    if (!body.length) {
-      body = {};
-    } else {
-      try {
-        body = JSON.parse(body);
-      } catch (error) {
-        console.error("[payments] failed to parse JSON body", error);
-        throw createError({
-          statusCode: 400,
-          message: "Invalid request body",
-        });
-      }
+  if (typeof rawBody === "string") {
+    const trimmed = rawBody.trim();
+    if (!trimmed) return {} as PaymentRequestBody;
+    try {
+      return JSON.parse(trimmed) as PaymentRequestBody;
+    } catch (error) {
+      console.error("[payments] failed to parse JSON body", error);
+      throw createError({
+        statusCode: 400,
+        message: "Neispravno telo zahteva",
+      });
     }
   }
+  if (rawBody && typeof rawBody === "object") {
+    return rawBody as PaymentRequestBody;
+  }
+  return {} as PaymentRequestBody;
+}
 
-  const {
-    cardNumber,
-    expMonth,
-    expYear,
-    cvc,
-    amount,
-    receiverName,
-    residence,
-    street,
-    city,
-    zipCode,
-    note,
-    orderId,
-    userId,
-  } = body;
+export default defineEventHandler(async (event) => {
+  const body = await parseBody(event);
+  const orderId = asString(body.orderId);
   if (!orderId) {
     throw createError({
       statusCode: 400,
-      message: "OrderId is required",
+      message: "OrderId je obavezan",
     });
   }
-  // create Stripe payment intent
-  // webhook: On charge.succeeded, register payment in Sales
-  const payloadSummary = {
-    cardNumber,
-    expMonth,
-    expYear,
-    cvc,
-    amount,
-    receiverName,
-    residence,
-    street,
-    city,
-    zipCode,
-    note,
-    orderId,
-    userId,
-  };
-  console.log("[payments] received payload", payloadSummary);
-
-  const cardPayment = new CardPaymentModel(
-    cardNumber,
-    expMonth,
-    expYear,
-    cvc,
-    amount,
-  );
-  const address = new AddressModel();
-  address.receiverName = receiverName;
-  address.residence = residence;
-  address.street = street;
-  address.city = city;
-  address.zipCode = zipCode;
-
-  if (!address.validate()) {
-    console.error("[payments] invalid address", address);
+  const userId = asString(body.userId);
+  if (!userId) {
     throw createError({
       statusCode: 400,
-      message: "Address is not valid",
+      message: "UserId je obavezan",
+    });
+  }
+
+  const cardPayment: CardPaymentInput = {
+    cardNumber: asString(body.cardNumber),
+    expMonth: Math.trunc(asNumber(body.expMonth)),
+    expYear: Math.trunc(asNumber(body.expYear)),
+    cvc: asString(body.cvc),
+    amount: toPositiveAmount(body.amount),
+  };
+
+  if (
+    !cardPayment.cardNumber ||
+    !cardPayment.cvc ||
+    !Number.isFinite(cardPayment.amount) ||
+    cardPayment.expMonth < 1 ||
+    cardPayment.expMonth > 12 ||
+    cardPayment.expYear < 2000
+  ) {
+    throw createError({
+      statusCode: 400,
+      message: "Podaci za kartično plaćanje nisu ispravni",
+    });
+  }
+
+  const address: PaymentAddress = {
+    receiverName: asString(body.receiverName),
+    residence: asString(body.residence),
+    street: asString(body.street),
+    city: asString(body.city),
+    zipCode: asString(body.zipCode),
+    country: asString(body.country) || undefined,
+    contactPhone: asString(body.contactPhone) || undefined,
+    note: asString(body.note) || undefined,
+  };
+
+  if (!isAddressValid(address)) {
+    throw createError({
+      statusCode: 400,
+      message: "Adresa nije ispravna",
+    });
+  }
+
+  if (typeof config.stripeSecretKey !== "string" || !config.stripeSecretKey) {
+    throw createError({
+      statusCode: 500,
+      message: "Nedostaje konfiguracija Stripe secret ključa.",
     });
   }
 

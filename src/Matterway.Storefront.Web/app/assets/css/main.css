@@ -1,36 +1,51 @@
 @import "tailwindcss";
+@import "@nuxt/ui";
 
-@plugin 'flowbite/plugin';
+@theme static {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
 
-@source '../../../node_modules/flowbite/**/*.js';
+  --color-cyan-50: #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-800: #155e75;
+  --color-cyan-900: #164e63;
+  --color-cyan-950: #082f49;
 
-@custom-variant dark (@media (prefers-color-scheme: dark));
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
 }
 
-@layer base {
-  :root {
-    color-scheme: light dark;
-    box-sizing: border-box;
-  }
+:root,
+.light {
+  --ui-bg: var(--color-slate-50);
+  --ui-bg-muted: var(--color-slate-100);
+  --ui-bg-elevated: var(--color-white);
+  --ui-bg-accented: var(--color-slate-100);
+  --ui-border: var(--color-slate-200);
+  --ui-border-muted: var(--color-slate-200);
+  --ui-border-accented: var(--color-slate-300);
+}
 
-  body {
-    @apply bg-slate-100 font-sans text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-50;
-  }
+.dark {
+  --ui-bg: var(--color-slate-900);
+  --ui-bg-muted: var(--color-slate-800);
+  --ui-bg-elevated: var(--color-slate-800);
+  --ui-bg-accented: var(--color-slate-700);
+  --ui-border: var(--color-slate-700);
+  --ui-border-muted: var(--color-slate-700);
+  --ui-border-accented: var(--color-slate-600);
 }
