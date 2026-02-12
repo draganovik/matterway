@@ -27,3 +27,44 @@
   --color-stone-900: #1c1917;
   --color-stone-950: #0c0a09;
 }
+
+:root {
+  /* Base surfaces: neutral gray foundation, brighter elevated layers */
+  --ui-bg: var(--color-stone-100);
+  --ui-bg-muted: var(--color-stone-200);
+  --ui-bg-elevated: var(--color-stone-50);
+  --ui-bg-accented: var(--color-stone-200);
+  --ui-bg-inverted: var(--color-stone-900);
+
+  --ui-border: var(--color-stone-300);
+  --ui-border-muted: var(--color-stone-200);
+  --ui-border-accented: var(--color-stone-400);
+  --ui-border-inverted: var(--color-stone-900);
+
+  --ui-text-dimmed: var(--color-stone-500);
+  --ui-text-muted: var(--color-stone-600);
+  --ui-text-toned: var(--color-stone-700);
+  --ui-text: var(--color-stone-800);
+  --ui-text-highlighted: var(--color-stone-950);
+  --ui-text-inverted: #ffffff;
+}
+
+.dark {
+  --ui-bg: var(--color-stone-950);
+  --ui-bg-muted: var(--color-stone-900);
+  --ui-bg-elevated: var(--color-stone-900);
+  --ui-bg-accented: var(--color-stone-700);
+  --ui-bg-inverted: var(--color-stone-50);
+
+  --ui-border: var(--color-stone-800);
+  --ui-border-muted: var(--color-stone-900);
+  --ui-border-accented: var(--color-stone-700);
+  --ui-border-inverted: var(--color-stone-50);
+
+  --ui-text-dimmed: var(--color-stone-500);
+  --ui-text-muted: var(--color-stone-400);
+  --ui-text-toned: var(--color-stone-300);
+  --ui-text: var(--color-stone-200);
+  --ui-text-highlighted: var(--color-stone-50);
+  --ui-text-inverted: var(--color-stone-950);
+}

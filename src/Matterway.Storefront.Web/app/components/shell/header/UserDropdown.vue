@@ -8,6 +8,8 @@ const auth = useAuthSession();
 const cart = useCart();
 
 const userLabel = computed(() => {
+  if (auth.customerId.value?.trim()) return auth.customerId.value.trim();
+
   const payload = auth.payload.value;
   const candidates = [
     getJwtStringClaim(payload, "email"),
@@ -24,24 +26,19 @@ const userLabel = computed(() => {
   return raw.includes("@") ? raw.split("@")[0] : raw;
 });
 
+const roleLabel = computed(() => {
+  const role = auth.role.value?.trim().toLowerCase();
+  if (role === "customer") return "Kupac";
+  if (role === "employee") return "Zaposleni";
+  return auth.role.value?.trim() || "Korisnik";
+});
+
 const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       type: "label",
-      label: userLabel.value,
-      icon: "i-lucide-user-round",
-    },
-  ],
-  [
-    {
-      label: "Moje porudžbine",
-      icon: "i-lucide-package-check",
-      to: "/orders",
-    },
-    {
-      label: "Korpa",
-      icon: "i-lucide-shopping-bag",
-      to: "/cart",
+      label: roleLabel.value,
+      icon: "i-lucide-shield",
     },
   ],
   [
@@ -59,18 +56,22 @@ const items = computed<DropdownMenuItem[][]>(() => [
 </script>
 
 <template>
-  <UDropdownMenu :items="items" :content="{ align: 'end' }">
+  <UDropdownMenu
+    :items="items"
+    :content="{ align: 'end' }"
+    :ui="{ content: 'min-w-56 border border-default bg-default' }"
+  >
     <UButton
       :label="userLabel"
       icon="i-lucide-user-round"
       color="neutral"
-      variant="soft"
+      variant="ghost"
       class="hidden sm:inline-flex"
     />
     <UButton
       icon="i-lucide-user-round"
       color="neutral"
-      variant="soft"
+      variant="ghost"
       square
       class="sm:hidden"
     />

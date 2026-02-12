@@ -42,9 +42,7 @@ const availableCount = computed(
     <UCard class="border-default bg-elevated/60 border">
       <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <div class="space-y-4">
-          <p class="text-primary text-xs tracking-[0.3em] uppercase">
-            Pregled
-          </p>
+          <p class="text-primary text-xs tracking-[0.3em] uppercase">Pregled</p>
           <h1 class="text-3xl font-semibold">Prodavnica za kupce</h1>
           <p class="text-muted max-w-2xl text-sm">
             Pregledajte proizvode za pametan dom, koristite korpu kao gost ili

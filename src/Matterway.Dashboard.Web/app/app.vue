@@ -3,7 +3,7 @@ import { useAuthSession } from '~/composables/useAuthSession'
 
 const colorMode = useColorMode()
 const color = computed(() =>
-  colorMode.value === 'dark' ? '#0c0a09' : '#fff7ed'
+  colorMode.value === 'dark' ? '#0c0a09' : '#f5f5f4'
 )
 const auth = useAuthSession()
 const route = useRoute()
@@ -33,6 +33,8 @@ useHead({
 
 onMounted(() => {
   if (!import.meta.client) return
+  // Dashboard follows system theme automatically (no manual override).
+  colorMode.preference = 'system'
   void auth.initialize()
 })
 </script>
@@ -42,7 +44,7 @@ onMounted(() => {
     <NuxtLoadingIndicator />
     <div
       v-if="isBooting"
-      class="min-h-screen bg-linear-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950"
+      class="min-h-screen bg-linear-to-br from-stone-100 via-stone-50 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950"
     >
       <div
         class="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6"

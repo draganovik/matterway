@@ -1,4 +1,5 @@
 export type {
+  AddOrderStatusRequest,
   OrderDeliveryInfoResponse,
   OrderItemResponse,
   OrderResponse,

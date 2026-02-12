@@ -12,11 +12,13 @@ const props = withDefaults(
     order?: OrderResponse | null
     loading?: boolean
     error?: string
+    canManageStatuses?: boolean
   }>(),
   {
     order: null,
     loading: false,
-    error: ''
+    error: '',
+    canManageStatuses: false
   }
 )
 
@@ -25,6 +27,7 @@ const emit = defineEmits<{
     event:
       | 'revealDetails'
       | 'revealStatusHistory'
+      | 'createStatus'
       | 'revealPayments'
       | 'revealItems'
   ): void
@@ -126,6 +129,14 @@ const quantitySum = computed(() => quantitySumOf(props.order))
               @click="emit('revealStatusHistory')"
             >
               Reveal Status History
+            </UButton>
+            <UButton
+              color="primary"
+              variant="outline"
+              :disabled="!canManageStatuses"
+              @click="emit('createStatus')"
+            >
+              Update Status
             </UButton>
           </div>
         </div>

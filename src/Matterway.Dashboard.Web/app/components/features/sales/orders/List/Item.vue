@@ -13,32 +13,36 @@ const latestStatus = computed(() => {
 })
 
 const isPaymentBalanced = computed(() => paymentsBalanced(item))
+
+const shortOrderId = computed(() => {
+  const value = String(item.id || '').trim()
+  if (!value) return 'No ID'
+  const segments = value.split('-').filter(Boolean)
+  return segments.length ? segments[segments.length - 1] : value
+})
 </script>
 
 <template>
-  <div class="flex items-start justify-between gap-3">
-    <div class="min-w-0">
+  <div class="flex w-full items-end justify-between gap-3">
+    <div class="min-w-0 space-y-1">
       <p class="text-foreground truncate font-mono text-base font-medium">
-        {{ item.id || 'No ID' }}
-      </p>
-      <p class="text-muted truncate text-xs">
-        Customer: {{ item.customerId || 'N/A' }}
+        {{ shortOrderId }}
       </p>
       <p class="text-muted truncate text-xs">
         Placed: {{ formatDateTime(item.placedAt) }}
       </p>
+      <UBadge color="neutral" variant="subtle" class="w-fit font-normal">
+        {{ formatMoney(item.totalAmount) }}
+      </UBadge>
     </div>
 
     <div class="flex shrink-0 flex-col items-end gap-1">
-      <UBadge color="neutral" variant="subtle" class="font-normal">
-        {{ formatMoney(item.totalAmount) }}
-      </UBadge>
       <UBadge
-        :color="isPaymentBalanced ? 'success' : 'warning'"
+        :color="isPaymentBalanced ? 'success' : 'neutral'"
         variant="subtle"
         class="font-normal"
       >
-        {{ isPaymentBalanced ? 'Payments Match' : 'Payment Mismatch' }}
+        {{ isPaymentBalanced ? 'Paid' : 'Unpaid' }}
       </UBadge>
       <UBadge
         v-if="latestStatus"

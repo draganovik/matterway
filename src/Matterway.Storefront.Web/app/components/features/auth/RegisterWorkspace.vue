@@ -49,7 +49,8 @@ async function submit() {
     await cart.clear();
     await navigateTo(resolveNextRoute());
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "Registracija nije uspela.";
+    error.value =
+      err instanceof Error ? err.message : "Registracija nije uspela.";
   } finally {
     loading.value = false;
   }

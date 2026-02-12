@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { useSalesApi } from '~/composables/useSalesApi'
+import { useAuthSession } from '~/composables/useAuthSession'
 import type { OrderResponse } from '~/types/sales'
 import { useRequestState } from '~/composables/useRequestState'
 import { useWorkspacePagination } from '~/composables/useWorkspacePagination'
 
+const auth = useAuthSession()
 const api = useSalesApi()
+const canManageStatuses = computed(() =>
+  auth.hasPermission('sales', 'operator')
+)
 
 const listState = useRequestState({ empty: 'No orders found.' })
 const detailState = useRequestState()
@@ -26,6 +31,7 @@ const selectedOrder = ref<OrderResponse | null>(null)
 
 const revealDetailsModalOpen = ref(false)
 const revealStatusHistoryModalOpen = ref(false)
+const createStatusModalOpen = ref(false)
 const revealPaymentsModalOpen = ref(false)
 const revealItemsModalOpen = ref(false)
 
@@ -103,6 +109,7 @@ function selectOrder(orderId: string) {
   selectedId.value = orderId
   revealDetailsModalOpen.value = false
   revealStatusHistoryModalOpen.value = false
+  createStatusModalOpen.value = false
   revealPaymentsModalOpen.value = false
   revealItemsModalOpen.value = false
   void loadOrder(orderId)
@@ -116,6 +123,16 @@ function revealDetails() {
 function revealStatusHistory() {
   if (!selectedOrder.value?.id) return
   revealStatusHistoryModalOpen.value = true
+}
+
+function openCreateStatus() {
+  if (!selectedOrder.value?.id || !canManageStatuses.value) return
+  createStatusModalOpen.value = true
+}
+
+function handleStatusCreated() {
+  if (!selectedOrder.value?.id) return
+  void loadOrder(selectedOrder.value.id)
 }
 
 function revealPayments() {
@@ -192,8 +209,10 @@ onMounted(() => {
           :order="selectedOrder"
           :loading="detailState.loading"
           :error="detailState.error"
+          :can-manage-statuses="canManageStatuses"
           @reveal-details="revealDetails"
           @reveal-status-history="revealStatusHistory"
+          @create-status="openCreateStatus"
           @reveal-payments="revealPayments"
           @reveal-items="revealItems"
         />
@@ -211,6 +230,14 @@ onMounted(() => {
     v-model:open="revealStatusHistoryModalOpen"
     :order-id="selectedOrder?.id || null"
     :order-label="selectedOrderLabel"
+  />
+
+  <SalesOrdersModalCreateStatusView
+    v-model:open="createStatusModalOpen"
+    :order-id="selectedOrder?.id || null"
+    :order-label="selectedOrderLabel"
+    :can-edit="canManageStatuses"
+    @created="handleStatusCreated"
   />
 
   <SalesOrdersModalPaymentsView

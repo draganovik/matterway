@@ -128,16 +128,11 @@ function updatePageSize(value: number) {
         :empty="!loading && !error && !items.length ? emptyMessage : false"
       />
       <div v-else class="flex flex-col gap-2">
-        <button
+        <EntitiesListItem
           v-for="item in items"
           :key="String(item[itemKey])"
-          type="button"
-          class="bg-background flex min-h-19 w-full flex-col gap-2 rounded-xl border border-transparent px-4 py-3 text-left transition"
-          :class="
-            selectedId === String(item[itemKey])
-              ? 'border-primary/40 bg-primary/5'
-              : 'hover:border-default hover:bg-muted/40'
-          "
+          :selected="selectedId === String(item[itemKey])"
+          class="flex min-h-19 flex-col gap-2"
           @click="selectItem(item)"
         >
           <slot
@@ -155,7 +150,7 @@ function updatePageSize(value: number) {
               {{ item[itemSubtitleKey] }}
             </div>
           </slot>
-        </button>
+        </EntitiesListItem>
       </div>
     </div>
 

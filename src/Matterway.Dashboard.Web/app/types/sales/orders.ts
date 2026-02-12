@@ -6,6 +6,11 @@ export type QueryOrdersParams = {
   customerId?: string
 }
 
+export type AddOrderStatusRequest = {
+  status: OrderStatusType
+  note?: string | null
+}
+
 export type OrderType = 'Retail' | 'Ecommerce' | string
 
 export type OrderStatusType =

@@ -8,7 +8,6 @@ defineProps<{
 }>()
 
 const auth = useAuthSession()
-const colorMode = useColorMode()
 const userLabel = computed(() => {
   const payload = auth.payload.value
   const candidates = [
@@ -36,34 +35,26 @@ const userLabel = computed(() => {
   const prefix = raw.split('@')[0] || ''
   return prefix || auth.role.value || 'Employee'
 })
+
+const buttonLabel = computed(() => {
+  const payload = auth.payload.value
+  const guidCandidates = [
+    getJwtStringClaim(payload, 'sub'),
+    getJwtStringClaim(
+      payload,
+      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+    )
+  ].filter(Boolean) as string[]
+
+  const guid = guidCandidates[0]?.trim()
+  return guid || userLabel.value
+})
 const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       type: 'label',
       label: userLabel.value,
       icon: 'i-lucide-shield'
-    }
-  ],
-  [
-    {
-      label: 'Light',
-      icon: 'i-lucide-sun',
-      type: 'checkbox',
-      checked: colorMode.value === 'light',
-      onSelect(e: Event) {
-        e.preventDefault()
-        colorMode.preference = 'light'
-      }
-    },
-    {
-      label: 'Dark',
-      icon: 'i-lucide-moon',
-      type: 'checkbox',
-      checked: colorMode.value === 'dark',
-      onSelect(e: Event) {
-        e.preventDefault()
-        colorMode.preference = 'dark'
-      }
     }
   ],
   [
@@ -84,11 +75,13 @@ const items = computed<DropdownMenuItem[][]>(() => [
     :items="items"
     :content="{ align: 'center', collisionPadding: 12 }"
     :ui="{
-      content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)'
+      content: collapsed
+        ? 'min-w-56 w-56'
+        : 'min-w-56 w-(--reka-dropdown-menu-trigger-width)'
     }"
   >
     <UButton
-      :label="collapsed ? undefined : userLabel"
+      :label="collapsed ? undefined : buttonLabel"
       icon="i-lucide-user"
       color="neutral"
       variant="ghost"
