@@ -432,20 +432,14 @@ onMounted(() => {
             "
           />
           <div v-else class="grid gap-2">
-            <button
+            <EntitiesListItem
               v-for="discount in filteredDiscounts"
               :key="discount.key"
-              type="button"
-              class="w-full rounded-xl border px-4 py-3 text-left transition"
-              :class="
-                selectedKey === discount.key
-                  ? 'border-primary/40 bg-primary/5'
-                  : 'bg-background hover:border-default hover:bg-muted/40 border-transparent'
-              "
+              :selected="selectedKey === discount.key"
               @click="selectDiscount(discount.key)"
             >
               <CatalogDiscountsListItem :item="discount" />
-            </button>
+            </EntitiesListItem>
           </div>
         </div>
       </template>

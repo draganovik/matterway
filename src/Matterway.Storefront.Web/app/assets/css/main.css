@@ -45,7 +45,16 @@
   --ui-bg-muted: var(--color-slate-800);
   --ui-bg-elevated: var(--color-slate-800);
   --ui-bg-accented: var(--color-slate-700);
-  --ui-border: var(--color-slate-700);
-  --ui-border-muted: var(--color-slate-700);
-  --ui-border-accented: var(--color-slate-600);
+  --ui-border: var(--color-slate-800);
+  --ui-border-muted: var(--color-slate-900);
+  --ui-border-accented: var(--color-slate-700);
+}
+
+@layer utilities {
+  /* Keep outlines subtle and consistently thin across the app. */
+  .ring:not(.ring-0),
+  .ring-inset:not(.ring-0) {
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+      calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  }
 }

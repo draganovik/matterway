@@ -4,7 +4,6 @@ const { item } = defineProps<{
     systemUserId?: string | null
     firstName?: string | null
     lastName?: string | null
-    birthDate?: string | null
   }
 }>()
 
@@ -17,22 +16,12 @@ const fullName = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-start justify-between gap-3">
-    <div class="min-w-0">
-      <p class="text-foreground truncate text-base font-medium">
-        {{ fullName }}
-      </p>
-      <p class="text-muted truncate font-mono text-xs">
-        {{ item.systemUserId || 'No ID' }}
-      </p>
-    </div>
-
-    <UBadge
-      color="neutral"
-      variant="subtle"
-      class="shrink-0 font-normal whitespace-nowrap"
-    >
-      {{ item.birthDate || 'No birth date' }}
-    </UBadge>
+  <div class="min-w-0">
+    <p class="text-foreground truncate text-base font-medium">
+      {{ fullName }}
+    </p>
+    <p class="text-muted truncate font-mono text-xs">
+      {{ item.systemUserId || 'No ID' }}
+    </p>
   </div>
 </template>

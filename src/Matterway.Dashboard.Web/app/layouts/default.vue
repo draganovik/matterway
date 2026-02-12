@@ -71,7 +71,7 @@ const searchGroups = computed(() => [
       v-model:open="open"
       collapsible
       resizable
-      class="bg-elevated/25"
+      class="bg-default"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">

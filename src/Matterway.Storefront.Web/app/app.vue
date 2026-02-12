@@ -49,7 +49,7 @@ onMounted(() => {
       >
         <div class="flex flex-col items-center gap-4 text-center">
           <div
-            class="h-10 w-10 animate-spin rounded-full border-2 border-slate-500 border-t-transparent dark:border-slate-400"
+            class="h-10 w-10 animate-spin rounded-full border border-slate-500 border-t-transparent dark:border-slate-400"
           />
         </div>
       </div>

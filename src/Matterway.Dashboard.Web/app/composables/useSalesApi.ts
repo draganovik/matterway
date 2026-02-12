@@ -1,7 +1,9 @@
 import { buildQuery } from '~/utils/http'
 import { useApiClient } from '~/composables/useApiClient'
 import type {
+  AddOrderStatusRequest,
   OrderResponse,
+  OrderStatusResponse,
   QueryOrdersParams,
   QueryOrdersResponse
 } from '~/types/sales'
@@ -31,8 +33,23 @@ export function useSalesApi() {
     )
   }
 
+  async function addOrderStatus(
+    orderId: string,
+    payload: AddOrderStatusRequest
+  ) {
+    return api.request<OrderStatusResponse>(
+      'sales',
+      `${ADMIN_ORDERS_PATH}/${orderId}/statuses`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }
+    )
+  }
+
   return {
     queryOrders,
-    getOrderById
+    getOrderById,
+    addOrderStatus
   }
 }

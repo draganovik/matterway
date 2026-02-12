@@ -70,7 +70,7 @@ async function handleSubmit(event: {
 
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-orange-950"
+    class="min-h-screen bg-gradient-to-br from-stone-100 via-stone-50 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950"
   >
     <div
       class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6"
@@ -88,7 +88,7 @@ async function handleSubmit(event: {
             Employee account to continue.
           </p>
         </div>
-        <UCard class="border-default border shadow-xl">
+        <UCard class="!border-default !bg-elevated/75 !border !shadow-sm">
           <UAuthForm
             title="Sign in"
             description="Use your employee credentials."

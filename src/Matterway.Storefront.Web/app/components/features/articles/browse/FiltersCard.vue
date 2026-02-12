@@ -116,9 +116,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             @set-max="emit('setDetailFilterMax', { index, value: $event })"
           />
         </div>
-        <p v-else class="text-muted text-xs">
-          Nema izabranih filtera detalja.
-        </p>
+        <p v-else class="text-muted text-xs">Nema izabranih filtera detalja.</p>
       </div>
 
       <div class="space-y-2">

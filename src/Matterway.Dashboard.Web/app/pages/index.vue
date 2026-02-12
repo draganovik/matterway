@@ -22,7 +22,7 @@ const sections = useAuthorizedSections()
 
     <template #body>
       <div class="space-y-8">
-        <UCard class="border-default bg-elevated/20 border">
+        <UCard class="!border-default !bg-elevated/75 !border !shadow-sm">
           <div
             class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
           >
@@ -54,7 +54,7 @@ const sections = useAuthorizedSections()
           <UCard
             v-for="section in sections"
             :key="section.key"
-            class="border-default bg-elevated/10 border"
+            class="!border-default !bg-elevated/75 !border !shadow-sm"
           >
             <template #header>
               <div>

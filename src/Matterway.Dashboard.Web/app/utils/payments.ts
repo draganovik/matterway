@@ -57,7 +57,7 @@ export function roundCurrency(value: number) {
 
 export function sumPaymentAmounts(payments: unknown[] | null | undefined) {
   return roundCurrency(
-    (payments || []).reduce((sum, row) => {
+    (payments || []).reduce<number>((sum, row) => {
       if (!row || typeof row !== 'object') return sum + parseLooseAmount(row)
       const record = row as Record<string, unknown>
       return sum + parseLooseAmount(record.amount ?? record.Amount)

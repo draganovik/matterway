@@ -235,23 +235,17 @@ function submitSelection() {
             "
           />
           <div v-else class="space-y-2">
-            <button
+            <EntitiesListItem
               v-for="article in articles"
               :key="article.id"
-              type="button"
-              class="w-full rounded-xl border px-4 py-3 text-left transition"
-              :class="
-                isSelected(article.id)
-                  ? 'border-primary/40 bg-primary/5'
-                  : 'bg-background hover:border-default hover:bg-muted/40 border-transparent'
-              "
+              :selected="isSelected(article.id)"
               @click="toggleSelection(article.id)"
             >
               <CatalogDiscountsListArticleItem
                 :item="article"
                 :selected="isSelected(article.id)"
               />
-            </button>
+            </EntitiesListItem>
           </div>
         </div>
 
