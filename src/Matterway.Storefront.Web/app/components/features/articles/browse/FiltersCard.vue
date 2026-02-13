@@ -2,43 +2,43 @@
 import type {
   DetailFilterDefinition,
   DetailFilterState,
-} from "~/composables/useArticleFilters";
+} from "~/composables/useArticleFilters"
 
 type FiltersState = {
-  search: string;
-  minPrice?: number;
-  maxPrice?: number;
-  detailFilters: DetailFilterState[];
-};
+  search: string
+  minPrice?: number
+  maxPrice?: number
+  detailFilters: DetailFilterState[]
+}
 
 const props = defineProps<{
-  filters: FiltersState;
-  detailDefinitions: DetailFilterDefinition[];
-  detailDefinitionsLoading: boolean;
-}>();
+  filters: FiltersState
+  detailDefinitions: DetailFilterDefinition[]
+  detailDefinitionsLoading: boolean
+}>()
 
 const emit = defineEmits<{
-  submit: [];
-  reset: [];
-  addDetailFilter: [];
-  removeDetailFilter: [index: number];
-  setSearch: [value: string];
-  setMinPrice: [value: number | undefined];
-  setMaxPrice: [value: number | undefined];
-  setDetailFilterSlug: [payload: { index: number; slug: string }];
-  setDetailFilterValue: [payload: { index: number; value: string }];
-  setDetailFilterMin: [payload: { index: number; value: number | undefined }];
-  setDetailFilterMax: [payload: { index: number; value: number | undefined }];
-}>();
+  submit: []
+  reset: []
+  addDetailFilter: []
+  removeDetailFilter: [index: number]
+  setSearch: [value: string]
+  setMinPrice: [value: number | undefined]
+  setMaxPrice: [value: number | undefined]
+  setDetailFilterSlug: [payload: { index: number; slug: string }]
+  setDetailFilterValue: [payload: { index: number; value: string }]
+  setDetailFilterMin: [payload: { index: number; value: number | undefined }]
+  setDetailFilterMax: [payload: { index: number; value: number | undefined }]
+}>()
 
 function toNumberOrUndefined(value: string | number | null | undefined) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
 }
 </script>
 
 <template>
-  <UCard class="border-default bg-elevated/60 border h-fit">
+  <UCard class="border-default bg-elevated/60 h-fit border">
     <template #header>
       <div class="space-y-1">
         <p class="text-primary text-xs tracking-[0.3em] uppercase">Pretraga</p>
@@ -97,7 +97,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
         </p>
 
         <div v-if="filters.detailFilters.length" class="space-y-3">
-          <FeaturesArticlesBrowseDetailFilterCard
+          <ArticlesBrowseDetailFilterCard
             v-for="(detailFilter, index) in filters.detailFilters"
             :key="`detail-filter-${index}-${detailFilter.slug}`"
             :detail-filter="detailFilter"

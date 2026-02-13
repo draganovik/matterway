@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useSalesApi } from '~/composables/useSalesApi'
-import { useAuthSession } from '~/composables/useAuthSession'
-import type { OrderResponse } from '~/types/sales'
-import { useRequestState } from '~/composables/useRequestState'
-import { useWorkspacePagination } from '~/composables/useWorkspacePagination'
+import { useSalesApi } from "~/composables/useSalesApi"
+import { useAuthSession } from "~/composables/useAuthSession"
+import type { OrderResponse } from "~/types/sales"
+import { useRequestState } from "~/composables/useRequestState"
+import { useWorkspacePagination } from "~/composables/useWorkspacePagination"
 
 const auth = useAuthSession()
 const api = useSalesApi()
 const canManageStatuses = computed(() =>
-  auth.hasPermission('sales', 'operator')
+  auth.hasPermission("sales", "operator"),
 )
 
-const listState = useRequestState({ empty: 'No orders found.' })
+const listState = useRequestState({ empty: "No orders found." })
 const detailState = useRequestState()
 
 const orders = ref<OrderResponse[]>([])
-const filter = ref('')
+const filter = ref("")
 const {
   pagination,
   resetTotals,
@@ -23,7 +23,7 @@ const {
   changePage,
   changePageSize,
   searchWithPageReset,
-  watchPagination
+  watchPagination,
 } = useWorkspacePagination({ pageSize: 20 })
 
 const selectedId = ref<string | null>(null)
@@ -42,23 +42,23 @@ function clearSelection() {
   revealStatusHistoryModalOpen.value = false
   revealPaymentsModalOpen.value = false
   revealItemsModalOpen.value = false
-  detailState.error = ''
+  detailState.error = ""
 }
 
 async function loadOrders() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const result = await api.queryOrders({
     page: pagination.page,
     pageSize: pagination.pageSize,
-    customerId: filter.value.trim() || undefined
+    customerId: filter.value.trim() || undefined,
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load orders.'
+    listState.error = result.error || "Unable to load orders."
     orders.value = []
     resetTotals()
     clearSelection()
@@ -84,20 +84,20 @@ async function loadOrders() {
 
 async function loadOrder(orderId: string) {
   detailState.loading = true
-  detailState.error = ''
+  detailState.error = ""
 
   const result = await api.getOrderById(orderId)
   detailState.loading = false
 
   if (!result.ok || !result.data) {
-    detailState.error = result.error || 'Unable to load order details.'
+    detailState.error = result.error || "Unable to load order details."
     selectedOrder.value = null
     return
   }
 
   selectedOrder.value = result.data
   orders.value = orders.value.map((item) =>
-    item.id === result.data?.id ? result.data : item
+    item.id === result.data?.id ? result.data : item,
   )
 }
 
@@ -146,7 +146,7 @@ function revealItems() {
 }
 
 const selectedOrderLabel = computed(
-  () => selectedOrder.value?.id || 'Selected order'
+  () => selectedOrder.value?.id || "Selected order",
 )
 
 watchPagination(loadOrders)

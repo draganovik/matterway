@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Pregled",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesOverviewWorkspace />
+  <OverviewWorkspace />
 </template>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession";
+import { useAuthSession } from "~/composables/useAuthSession"
 
-const colorMode = useColorMode();
+const colorMode = useColorMode()
 const color = computed(() =>
   colorMode.value === "dark" ? "#020617" : "#f1f5f9",
-);
-const auth = useAuthSession();
-const route = useRoute();
-const appTitle = "Matterway prodavnica";
+)
+const auth = useAuthSession()
+const route = useRoute()
+const appTitle = "Matterway prodavnica"
 const isBooting = computed(
   () => !auth.isInitialized.value && !route.meta?.public,
-);
+)
 const pageTitle = computed(() => {
-  const title = route.meta?.title;
-  return typeof title === "string" && title.trim().length ? title : undefined;
-});
+  const title = route.meta?.title
+  return typeof title === "string" && title.trim().length ? title : undefined
+})
 
 useHead({
   title: pageTitle,
@@ -29,12 +29,12 @@ useHead({
   htmlAttrs: {
     lang: "sr",
   },
-});
+})
 
 onMounted(() => {
-  if (!import.meta.client) return;
-  void auth.initialize();
-});
+  if (!import.meta.client) return
+  void auth.initialize()
+})
 </script>
 
 <template>

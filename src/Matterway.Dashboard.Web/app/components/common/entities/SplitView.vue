@@ -5,9 +5,9 @@ const props = withDefaults(
     detailClass?: string
   }>(),
   {
-    listClass: '',
-    detailClass: ''
-  }
+    listClass: "",
+    detailClass: "",
+  },
 )
 </script>
 

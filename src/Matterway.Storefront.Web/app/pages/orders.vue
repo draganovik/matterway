@@ -1,9 +1,9 @@
 <script setup lang="ts">
 definePageMeta({
   title: "Moje porudžbine",
-});
+})
 </script>
 
 <template>
-  <FeaturesOrdersWorkspace />
+  <OrdersWorkspace />
 </template>

@@ -5,5 +5,5 @@ export type {
   DeleteCustomerResponse,
   PutCustomerAddressRequest,
   QueryCustomersParams,
-  QueryCustomersResponse
-} from './customers'
+  QueryCustomersResponse,
+} from "./customers"

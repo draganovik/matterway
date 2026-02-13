@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Artikli",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesArticlesBrowseWorkspace />
+  <ArticlesBrowseWorkspace />
 </template>

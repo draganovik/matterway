@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { serviceSections } from '~/data/serviceRegistry'
-import { useAuthSession } from '~/composables/useAuthSession'
+import { serviceSections } from "~/data/serviceRegistry"
+import { useAuthSession } from "~/composables/useAuthSession"
 
 definePageMeta({
   layout: false,
   public: true,
-  title: 'Sign In'
+  title: "Sign In",
 })
 
 const auth = useAuthSession()
 const fields = [
   {
-    name: 'email',
-    label: 'Email',
-    type: 'email',
-    placeholder: 'name@matterway.local',
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "name@matterway.local",
     required: true,
-    autocomplete: 'email'
+    autocomplete: "email",
   },
   {
-    name: 'password',
-    label: 'Password',
-    type: 'password',
-    placeholder: '••••••••',
+    name: "password",
+    label: "Password",
+    type: "password",
+    placeholder: "••••••••",
     required: true,
-    autocomplete: 'current-password'
-  }
+    autocomplete: "current-password",
+  },
 ]
 const submitConfig = {
-  label: 'Sign in',
-  color: 'primary'
+  label: "Sign in",
+  color: "primary",
 } as const
-const error = ref('')
+const error = ref("")
 const loading = ref(false)
 
 onMounted(async () => {
@@ -45,23 +45,23 @@ function getFirstRoute() {
   for (const service of serviceSections) {
     if (!auth.hasPermission(service.service, service.minimum)) continue
     const feature = service.features.find((item) =>
-      auth.hasPermission(item.service, item.minimum)
+      auth.hasPermission(item.service, item.minimum),
     )
     if (feature) return feature.route
   }
-  return '/'
+  return "/"
 }
 
 async function handleSubmit(event: {
-  data: Record<'email' | 'password', string>
+  data: Record<"email" | "password", string>
 }) {
-  error.value = ''
+  error.value = ""
   loading.value = true
   try {
     await auth.login(event.data.email, event.data.password)
     await navigateTo(getFirstRoute())
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Login failed.'
+    error.value = err instanceof Error ? err.message : "Login failed."
   } finally {
     loading.value = false
   }

@@ -1,23 +1,23 @@
 <script setup lang="ts">
 defineOptions({
-  inheritAttrs: false
+  inheritAttrs: false,
 })
 
 const props = withDefaults(
   defineProps<{
     selected?: boolean
     disabled?: boolean
-    type?: 'button' | 'submit' | 'reset'
+    type?: "button" | "submit" | "reset"
   }>(),
   {
     selected: false,
     disabled: false,
-    type: 'button'
-  }
+    type: "button",
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'click', payload: MouseEvent): void
+  (event: "click", payload: MouseEvent): void
 }>()
 </script>
 

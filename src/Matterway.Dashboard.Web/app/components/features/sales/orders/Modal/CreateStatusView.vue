@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useResetOnModalOpen } from '~/composables/useResetOnModalOpen'
-import { useRequestState } from '~/composables/useRequestState'
-import { useSalesApi } from '~/composables/useSalesApi'
-import type { OrderStatusType } from '~/types/sales'
+import { useResetOnModalOpen } from "~/composables/useResetOnModalOpen"
+import { useRequestState } from "~/composables/useRequestState"
+import { useSalesApi } from "~/composables/useSalesApi"
+import type { OrderStatusType } from "~/types/sales"
 
 const props = withDefaults(
   defineProps<{
@@ -12,32 +12,32 @@ const props = withDefaults(
   }>(),
   {
     orderId: null,
-    orderLabel: '',
-    canEdit: false
-  }
+    orderLabel: "",
+    canEdit: false,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'created'): void
+  (event: "created"): void
 }>()
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 const api = useSalesApi()
 const createState = useRequestState()
 
 const statusOptions: Array<{ label: string; value: OrderStatusType }> = [
-  { label: 'Processing', value: 'Processing' },
-  { label: 'Reserved', value: 'Reserved' },
-  { label: 'Delivery', value: 'Delivery' },
-  { label: 'Completed', value: 'Completed' },
-  { label: 'Cancelled', value: 'Cancelled' }
+  { label: "Processing", value: "Processing" },
+  { label: "Reserved", value: "Reserved" },
+  { label: "Delivery", value: "Delivery" },
+  { label: "Completed", value: "Completed" },
+  { label: "Cancelled", value: "Cancelled" },
 ]
 
-const status = ref<OrderStatusType | ''>('')
-const note = ref('')
+const status = ref<OrderStatusType | "">("")
+const note = ref("")
 
 const displayLabel = computed(
-  () => props.orderLabel?.trim() || props.orderId?.trim() || 'Selected order'
+  () => props.orderLabel?.trim() || props.orderId?.trim() || "Selected order",
 )
 
 const canSubmit = computed(
@@ -45,31 +45,31 @@ const canSubmit = computed(
     props.canEdit &&
     Boolean(props.orderId?.trim()) &&
     Boolean(String(status.value).trim()) &&
-    !createState.loading
+    !createState.loading,
 )
 
 function resetForm() {
-  status.value = ''
-  note.value = ''
-  createState.error = ''
-  createState.success = ''
+  status.value = ""
+  note.value = ""
+  createState.error = ""
+  createState.success = ""
 }
 
 useResetOnModalOpen(isOpen, resetForm)
 
 async function createStatus() {
-  createState.error = ''
+  createState.error = ""
   if (!props.canEdit) return
 
   const orderId = props.orderId?.trim()
   if (!orderId) {
-    createState.error = 'Select an order first.'
+    createState.error = "Select an order first."
     return
   }
 
   const statusValue = String(status.value).trim()
   if (!statusValue) {
-    createState.error = 'Status is required.'
+    createState.error = "Status is required."
     return
   }
 
@@ -77,17 +77,17 @@ async function createStatus() {
 
   const result = await api.addOrderStatus(orderId, {
     status: statusValue as OrderStatusType,
-    note: note.value.trim() || null
+    note: note.value.trim() || null,
   })
 
   createState.loading = false
 
   if (!result.ok) {
-    createState.error = result.error || 'Unable to create status entry.'
+    createState.error = result.error || "Unable to create status entry."
     return
   }
 
-  emit('created')
+  emit("created")
   isOpen.value = false
 }
 </script>

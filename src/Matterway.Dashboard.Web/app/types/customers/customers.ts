@@ -1,4 +1,4 @@
-import type { PaginationResponse } from '../common/pagination'
+import type { PaginationResponse } from "../common/pagination"
 
 export type QueryCustomersParams = {
   page: number

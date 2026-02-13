@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useOrderReveal } from '~/composables/useOrderReveal'
-import { formatDateTime, formatMoney } from '~/utils/formatters'
+import { useOrderReveal } from "~/composables/useOrderReveal"
+import { formatDateTime, formatMoney } from "~/utils/formatters"
 
 const props = withDefaults(
   defineProps<{
@@ -9,17 +9,17 @@ const props = withDefaults(
   }>(),
   {
     orderId: null,
-    orderLabel: ''
-  }
+    orderLabel: "",
+  },
 )
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const { order, notFound, loadState, displayLabel } = useOrderReveal({
   isOpen,
-  orderId: toRef(props, 'orderId'),
-  orderLabel: toRef(props, 'orderLabel'),
-  revealErrorMessage: 'Unable to reveal order details.'
+  orderId: toRef(props, "orderId"),
+  orderLabel: toRef(props, "orderLabel"),
+  revealErrorMessage: "Unable to reveal order details.",
 })
 </script>
 
@@ -66,7 +66,7 @@ const { order, notFound, loadState, displayLabel } = useOrderReveal({
                 <dd
                   class="text-foreground mt-1 font-mono text-sm font-medium break-all"
                 >
-                  {{ order.customerId || '-' }}
+                  {{ order.customerId || "-" }}
                 </dd>
               </div>
 
@@ -101,28 +101,28 @@ const { order, notFound, loadState, displayLabel } = useOrderReveal({
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Country</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.country || '-' }}
+                  {{ order.deliveryInfo.country || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">City</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.city || '-' }}
+                  {{ order.deliveryInfo.city || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Zip Code</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.zipCode || '-' }}
+                  {{ order.deliveryInfo.zipCode || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Contact Phone</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.contactPhone || '-' }}
+                  {{ order.deliveryInfo.contactPhone || "-" }}
                 </dd>
               </div>
 
@@ -131,7 +131,7 @@ const { order, notFound, loadState, displayLabel } = useOrderReveal({
               >
                 <dt class="text-muted text-xs">Address Line 1</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.addressLine1 || '-' }}
+                  {{ order.deliveryInfo.addressLine1 || "-" }}
                 </dd>
               </div>
 
@@ -140,7 +140,7 @@ const { order, notFound, loadState, displayLabel } = useOrderReveal({
               >
                 <dt class="text-muted text-xs">Address Line 2</dt>
                 <dd class="text-foreground mt-1 text-sm font-medium">
-                  {{ order.deliveryInfo.addressLine2 || '-' }}
+                  {{ order.deliveryInfo.addressLine2 || "-" }}
                 </dd>
               </div>
             </dl>

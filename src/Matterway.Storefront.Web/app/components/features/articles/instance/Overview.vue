@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { useCart } from "~/composables/useCart";
-import type { CatalogArticle } from "~/types/catalog/articles";
-import { formatDate, formatMoney } from "~/utils/formatters";
+import { useCart } from "~/composables/useCart"
+import type { CatalogArticle } from "~/types/catalog/articles"
+import { formatDate, formatMoney } from "~/utils/formatters"
 
 const props = defineProps<{
-  article: CatalogArticle;
-}>();
+  article: CatalogArticle
+}>()
 
-const cart = useCart();
-const quantity = computed(() => cart.quantityFor(props.article.id));
+const cart = useCart()
+const quantity = computed(() => cart.quantityFor(props.article.id))
 
 const hasDiscount = computed(
   () =>
     (props.article.discount?.percentage ?? 0) > 0 &&
     (props.article.basePrice ?? 0) > (props.article.price ?? 0),
-);
+)
 </script>
 
 <template>

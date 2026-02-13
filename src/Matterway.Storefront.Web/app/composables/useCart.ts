@@ -1,13 +1,13 @@
-import type { CatalogArticle } from "~/types/catalog/articles";
-import type { CartItem } from "~/types/cart";
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCustomersApi } from "~/composables/useCustomersApi";
+import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CartItem } from "~/types/cart"
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCustomersApi } from "~/composables/useCustomersApi"
 
-const storageKey = "mw-storefront-cart-v1";
+const storageKey = "mw-storefront-cart-v1"
 
 function normalizeNumber(value: unknown, fallback = 0) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
 }
 
 function createCartItem(article: CatalogArticle): CartItem {
@@ -19,35 +19,35 @@ function createCartItem(article: CatalogArticle): CartItem {
     quantity: 1,
     imageUrl: article.thumbnailImage?.imageUrl,
     imageAlt: article.thumbnailImage?.imageAlt,
-  };
+  }
 }
 
 export function useCart() {
-  const auth = useAuthSession();
-  const customers = useCustomersApi();
-  const items = useState<CartItem[]>("storefront-cart-items", () => []);
-  const hydrated = useState("storefront-cart-hydrated", () => false);
-  const watchStarted = useState("storefront-cart-watch-started", () => false);
+  const auth = useAuthSession()
+  const customers = useCustomersApi()
+  const items = useState<CartItem[]>("storefront-cart-items", () => [])
+  const hydrated = useState("storefront-cart-hydrated", () => false)
+  const watchStarted = useState("storefront-cart-watch-started", () => false)
 
   function hydrate() {
-    if (!import.meta.client || hydrated.value) return;
+    if (!import.meta.client || hydrated.value) return
     try {
-      const raw = window.localStorage.getItem(storageKey);
+      const raw = window.localStorage.getItem(storageKey)
       if (!raw) {
-        hydrated.value = true;
-        return;
+        hydrated.value = true
+        return
       }
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw)
       if (!Array.isArray(parsed)) {
-        hydrated.value = true;
-        return;
+        hydrated.value = true
+        return
       }
       items.value = parsed
         .map((item) => {
           const source =
             item && typeof item === "object"
               ? (item as Record<string, unknown>)
-              : {};
+              : {}
           return {
             articleId: String(source.articleId ?? ""),
             articleCode: String(source.articleCode ?? ""),
@@ -56,123 +56,121 @@ export function useCart() {
             quantity: Math.max(1, normalizeNumber(source.quantity, 1)),
             imageUrl: source.imageUrl ? String(source.imageUrl) : undefined,
             imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
-          };
+          }
         })
-        .filter((item: CartItem) => item.articleId);
+        .filter((item: CartItem) => item.articleId)
     } catch {
-      items.value = [];
+      items.value = []
     } finally {
-      hydrated.value = true;
+      hydrated.value = true
     }
   }
 
   function persist() {
-    if (!import.meta.client || !hydrated.value) return;
-    window.localStorage.setItem(storageKey, JSON.stringify(items.value));
+    if (!import.meta.client || !hydrated.value) return
+    window.localStorage.setItem(storageKey, JSON.stringify(items.value))
   }
 
   if (import.meta.client && !watchStarted.value) {
     watch(
       items,
       () => {
-        persist();
+        persist()
       },
       { deep: true },
-    );
-    watchStarted.value = true;
+    )
+    watchStarted.value = true
   }
 
   onMounted(() => {
-    hydrate();
-  });
+    hydrate()
+  })
 
   async function syncItem(articleId: string, quantity: number) {
-    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return;
-    await customers.upsertSelfCartItem(articleId, quantity);
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
+    await customers.upsertSelfCartItem(articleId, quantity)
   }
 
   async function removeRemoteItem(articleId: string) {
-    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return;
-    await customers.deleteSelfCartItem(articleId);
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
+    await customers.deleteSelfCartItem(articleId)
   }
 
   async function add(article: CatalogArticle) {
-    hydrate();
-    const existing = items.value.find((item) => item.articleId === article.id);
+    hydrate()
+    const existing = items.value.find((item) => item.articleId === article.id)
     if (existing) {
-      existing.quantity += 1;
-      await syncItem(existing.articleId, existing.quantity);
-      return;
+      existing.quantity += 1
+      await syncItem(existing.articleId, existing.quantity)
+      return
     }
 
-    const item = createCartItem(article);
-    items.value = [...items.value, item];
-    await syncItem(item.articleId, item.quantity);
+    const item = createCartItem(article)
+    items.value = [...items.value, item]
+    await syncItem(item.articleId, item.quantity)
   }
 
   async function increase(articleId: string) {
-    hydrate();
-    const existing = items.value.find((item) => item.articleId === articleId);
-    if (!existing) return;
+    hydrate()
+    const existing = items.value.find((item) => item.articleId === articleId)
+    if (!existing) return
 
-    existing.quantity += 1;
-    await syncItem(existing.articleId, existing.quantity);
+    existing.quantity += 1
+    await syncItem(existing.articleId, existing.quantity)
   }
 
   async function decrease(articleId: string) {
-    hydrate();
-    const existing = items.value.find((item) => item.articleId === articleId);
-    if (!existing) return;
+    hydrate()
+    const existing = items.value.find((item) => item.articleId === articleId)
+    if (!existing) return
 
     if (existing.quantity <= 1) {
-      await remove(articleId);
-      return;
+      await remove(articleId)
+      return
     }
 
-    existing.quantity -= 1;
-    await syncItem(existing.articleId, existing.quantity);
+    existing.quantity -= 1
+    await syncItem(existing.articleId, existing.quantity)
   }
 
   async function remove(articleId: string) {
-    hydrate();
-    items.value = items.value.filter((item) => item.articleId !== articleId);
-    await removeRemoteItem(articleId);
+    hydrate()
+    items.value = items.value.filter((item) => item.articleId !== articleId)
+    await removeRemoteItem(articleId)
   }
 
   async function clearRemote() {
-    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return;
-    const remote = await customers.listSelfCartItems(1, 100);
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
+    const remote = await customers.listSelfCartItems(1, 100)
     const uniqueIds = Array.from(
       new Set(remote.items.map((item) => item.articleId).filter(Boolean)),
-    ) as string[];
+    ) as string[]
 
-    await Promise.all(
-      uniqueIds.map((articleId) => removeRemoteItem(articleId)),
-    );
+    await Promise.all(uniqueIds.map((articleId) => removeRemoteItem(articleId)))
   }
 
   async function clear() {
-    hydrate();
-    await clearRemote().catch(() => null);
-    items.value = [];
+    hydrate()
+    await clearRemote().catch(() => null)
+    items.value = []
   }
 
   const totalItems = computed(() =>
     items.value.reduce((sum, item) => sum + item.quantity, 0),
-  );
+  )
 
   const totalPrice = computed(() =>
     items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
-  );
+  )
 
   function hasArticle(articleId: string) {
-    return items.value.some((item) => item.articleId === articleId);
+    return items.value.some((item) => item.articleId === articleId)
   }
 
   function quantityFor(articleId: string) {
     return (
       items.value.find((item) => item.articleId === articleId)?.quantity ?? 0
-    );
+    )
   }
 
   return {
@@ -186,5 +184,5 @@ export function useCart() {
     clear,
     hasArticle,
     quantityFor,
-  };
+  }
 }

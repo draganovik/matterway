@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logoUrl from "~/assets/brand/matterway-logo-cyan.svg";
+import logoUrl from "~/assets/brand/matterway-logo-cyan.svg"
 </script>
 
 <template>

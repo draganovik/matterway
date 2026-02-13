@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
+import { useCatalogApi } from "~/composables/useCatalogApi"
 import type {
   CreateArticleResponse,
   GetArticleByIdResponse,
-  QueryArticleResponse
-} from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { useWorkspacePagination } from '~/composables/useWorkspacePagination'
-import { useAuthSession } from '~/composables/useAuthSession'
+  QueryArticleResponse,
+} from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { useWorkspacePagination } from "~/composables/useWorkspacePagination"
+import { useAuthSession } from "~/composables/useAuthSession"
 
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission('catalog', 'operator'))
+const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
 
-const listState = useRequestState({ empty: 'No articles found.' })
+const listState = useRequestState({ empty: "No articles found." })
 const articles = ref<QueryArticleResponse[]>([])
-const filter = ref('')
+const filter = ref("")
 const {
   pagination,
   resetTotals,
@@ -24,7 +24,7 @@ const {
   changePage,
   changePageSize,
   searchWithPageReset,
-  watchPagination
+  watchPagination,
 } = useWorkspacePagination({ pageSize: 20 })
 
 const selectedId = ref<string | null>(null)
@@ -35,18 +35,18 @@ const createModalOpen = ref(false)
 
 async function loadArticles() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const result = await api.queryArticles({
     filter: filter.value.trim() || undefined,
     page: pagination.page,
-    pageSize: pagination.pageSize
+    pageSize: pagination.pageSize,
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load articles.'
+    listState.error = result.error || "Unable to load articles."
     articles.value = []
     return
   }
@@ -66,20 +66,20 @@ async function loadArticles() {
   ) {
     selectedId.value = null
     selectedArticle.value = null
-    articleState.error = ''
+    articleState.error = ""
   }
 }
 
 async function loadArticle(id: string) {
   articleState.loading = true
-  articleState.error = ''
+  articleState.error = ""
 
   const result = await api.getArticleById(id)
 
   articleState.loading = false
 
   if (!result.ok) {
-    articleState.error = result.error || 'Unable to load article.'
+    articleState.error = result.error || "Unable to load article."
     selectedArticle.value = null
     return
   }
@@ -105,9 +105,9 @@ function updateSelectedArticle(article: GetArticleByIdResponse | null) {
           basePrice: article.basePrice,
           price: article.price,
           description: article.description,
-          isAvailable: article.isAvailable
+          isAvailable: article.isAvailable,
         }
-      : item
+      : item,
   )
 }
 
@@ -121,9 +121,9 @@ function handleArticleCreated(created: CreateArticleResponse) {
         basePrice: created.basePrice,
         price: created.price,
         description: created.description,
-        isAvailable: created.isAvailable
+        isAvailable: created.isAvailable,
       },
-      ...articles.value
+      ...articles.value,
     ]
     pagination.totalCount += 1
   }

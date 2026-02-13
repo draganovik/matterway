@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
+import { useCatalogApi } from "~/composables/useCatalogApi"
 import type {
   QueryArticleResponse,
-  QueryDiscountResponse
-} from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { useAuthSession } from '~/composables/useAuthSession'
-import { normalizeCode } from '~/utils/normalization'
-import { parseNumberOr } from '~/utils/numbers'
+  QueryDiscountResponse,
+} from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { useAuthSession } from "~/composables/useAuthSession"
+import { normalizeCode } from "~/utils/normalization"
+import { parseNumberOr } from "~/utils/numbers"
 
 type DiscountListItem = {
   key: string
@@ -28,35 +28,35 @@ type DiscountForm = {
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission('catalog', 'operator'))
+const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
 
-const listState = useRequestState({ empty: 'No discounts found.' })
+const listState = useRequestState({ empty: "No discounts found." })
 const submitState = useRequestState()
 const deleteState = useRequestState()
 
 const discounts = ref<DiscountListItem[]>([])
-const searchInput = ref('')
-const activeSearch = ref('')
+const searchInput = ref("")
+const activeSearch = ref("")
 
 const selectedKey = ref<string | null>(null)
 const selectedDiscount = ref<DiscountListItem | null>(null)
 const isCreateMode = computed(() => !selectedDiscount.value)
 
 const form = ref<DiscountForm>({
-  code: '',
-  percentage: '',
+  code: "",
+  percentage: "",
   validFrom: getDefaultDateTimeLocal(),
-  validTo: ''
+  validTo: "",
 })
 const selectedArticleIds = ref<string[]>([])
 
 function getDefaultDateTimeLocal() {
   const now = new Date()
   const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  const hour = String(now.getHours()).padStart(2, '0')
-  const minute = String(now.getMinutes()).padStart(2, '0')
+  const month = String(now.getMonth() + 1).padStart(2, "0")
+  const day = String(now.getDate()).padStart(2, "0")
+  const hour = String(now.getHours()).padStart(2, "0")
+  const minute = String(now.getMinutes()).padStart(2, "0")
   return `${year}-${month}-${day}T${hour}:${minute}`
 }
 
@@ -67,41 +67,41 @@ function toIsoDateTime(value: string) {
 }
 
 function toLocalDateTimeInput(value?: string | null) {
-  if (!value) return ''
+  if (!value) return ""
   const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return ''
+  if (Number.isNaN(parsed.getTime())) return ""
   const year = parsed.getFullYear()
-  const month = String(parsed.getMonth() + 1).padStart(2, '0')
-  const day = String(parsed.getDate()).padStart(2, '0')
-  const hour = String(parsed.getHours()).padStart(2, '0')
-  const minute = String(parsed.getMinutes()).padStart(2, '0')
+  const month = String(parsed.getMonth() + 1).padStart(2, "0")
+  const day = String(parsed.getDate()).padStart(2, "0")
+  const hour = String(parsed.getHours()).padStart(2, "0")
+  const minute = String(parsed.getMinutes()).padStart(2, "0")
   return `${year}-${month}-${day}T${hour}:${minute}`
 }
 
 function sortDiscounts(items: DiscountListItem[]) {
   return [...items].sort((a, b) => {
-    const leftCode = (a.code || '').toLowerCase()
-    const rightCode = (b.code || '').toLowerCase()
+    const leftCode = (a.code || "").toLowerCase()
+    const rightCode = (b.code || "").toLowerCase()
     if (leftCode !== rightCode) return leftCode.localeCompare(rightCode)
-    return (b.validFrom || '').localeCompare(a.validFrom || '')
+    return (b.validFrom || "").localeCompare(a.validFrom || "")
   })
 }
 
 function resetMessages() {
-  submitState.error = ''
-  submitState.success = ''
-  deleteState.error = ''
-  deleteState.success = ''
+  submitState.error = ""
+  submitState.success = ""
+  deleteState.error = ""
+  deleteState.success = ""
 }
 
 function beginCreate() {
   selectedKey.value = null
   selectedDiscount.value = null
   form.value = {
-    code: '',
-    percentage: '',
+    code: "",
+    percentage: "",
     validFrom: getDefaultDateTimeLocal(),
-    validTo: ''
+    validTo: "",
   }
   selectedArticleIds.value = []
   resetMessages()
@@ -115,7 +115,7 @@ function applyDiscountToEditor(discount: DiscountListItem) {
     percentage: discount.percentage,
     validFrom:
       toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
-    validTo: toLocalDateTimeInput(discount.validTo)
+    validTo: toLocalDateTimeInput(discount.validTo),
   }
   selectedArticleIds.value = [...discount.articleIds]
   resetMessages()
@@ -138,7 +138,7 @@ const filteredDiscounts = computed(() => {
     (item) =>
       item.code.toLowerCase().includes(search) ||
       item.validFrom.toLowerCase().includes(search) ||
-      `${item.percentage}`.toLowerCase().includes(search)
+      `${item.percentage}`.toLowerCase().includes(search),
   )
 })
 
@@ -151,7 +151,7 @@ async function loadDiscountsFromArticlesFallback() {
     const result = await api.queryArticles({ page, pageSize })
 
     if (!result.ok) {
-      listState.error = result.error || 'Unable to load discounts.'
+      listState.error = result.error || "Unable to load discounts."
       return
     }
 
@@ -160,7 +160,7 @@ async function loadDiscountsFromArticlesFallback() {
     articleRows.push(...(result.data.data || []))
     const totalPages = Math.max(
       1,
-      parseNumberOr(result.data.meta?.totalPages, 1)
+      parseNumberOr(result.data.meta?.totalPages, 1),
     )
     if (page >= totalPages) break
     page += 1
@@ -170,11 +170,11 @@ async function loadDiscountsFromArticlesFallback() {
 
   for (const article of articleRows) {
     if (!article.discount || !article.id) continue
-    const code = normalizeCode((article.discount.code ?? '').toString())
+    const code = normalizeCode((article.discount.code ?? "").toString())
     const percentage = article.discount.percentage
     const validFrom = article.discount.validFrom
     const validTo = article.discount.validTo ?? null
-    const key = code || `${percentage}|${validFrom}|${validTo || ''}`
+    const key = code || `${percentage}|${validFrom}|${validTo || ""}`
 
     const existing = grouped.get(key)
     if (!existing) {
@@ -184,7 +184,7 @@ async function loadDiscountsFromArticlesFallback() {
         percentage,
         validFrom,
         validTo,
-        articleIds: [article.id]
+        articleIds: [article.id],
       })
       continue
     }
@@ -200,12 +200,12 @@ function buildDiscountList(rows: QueryDiscountResponse[]) {
   const grouped = new Map<string, DiscountListItem>()
 
   for (const row of rows) {
-    const code = normalizeCode((row.code ?? '').toString())
-    const percentage = row.percentage ?? ''
-    const validFrom = row.validFrom ?? ''
+    const code = normalizeCode((row.code ?? "").toString())
+    const percentage = row.percentage ?? ""
+    const validFrom = row.validFrom ?? ""
     const validTo = row.validTo ?? null
-    const key = code || `${percentage}|${validFrom}|${validTo || ''}`
-    const articleId = row.articleId?.toString() ?? ''
+    const key = code || `${percentage}|${validFrom}|${validTo || ""}`
+    const articleId = row.articleId?.toString() ?? ""
 
     const existing = grouped.get(key)
     if (!existing) {
@@ -215,7 +215,7 @@ function buildDiscountList(rows: QueryDiscountResponse[]) {
         percentage,
         validFrom,
         validTo,
-        articleIds: articleId ? [articleId] : []
+        articleIds: articleId ? [articleId] : [],
       })
       continue
     }
@@ -229,7 +229,7 @@ function buildDiscountList(rows: QueryDiscountResponse[]) {
 
 async function loadDiscounts() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const result = await api.queryDiscounts()
 
@@ -240,7 +240,7 @@ async function loadDiscounts() {
     await loadDiscountsFromArticlesFallback()
     listState.loading = false
   } else {
-    listState.error = result.error || 'Unable to load discounts.'
+    listState.error = result.error || "Unable to load discounts."
     discounts.value = []
     listState.loading = false
   }
@@ -265,29 +265,29 @@ function buildPayload() {
   const validTo = validToInput ? toIsoDateTime(validToInput) : null
 
   if (!code) {
-    submitState.error = 'Code is required.'
+    submitState.error = "Code is required."
     return null
   }
   if (!Number.isFinite(percentage) || percentage < 0.01 || percentage > 1) {
-    submitState.error = 'Percentage must be between 0.01 and 1.'
+    submitState.error = "Percentage must be between 0.01 and 1."
     return null
   }
   if (!validFrom) {
-    submitState.error = 'Valid From must be a valid date-time.'
+    submitState.error = "Valid From must be a valid date-time."
     return null
   }
   if (validToInput && !validTo) {
-    submitState.error = 'Valid To must be a valid date-time.'
+    submitState.error = "Valid To must be a valid date-time."
     return null
   }
   if (validTo && new Date(validTo) < new Date(validFrom)) {
-    submitState.error = 'Valid To must be greater than or equal to Valid From.'
+    submitState.error = "Valid To must be greater than or equal to Valid From."
     return null
   }
 
   const articleIds = [...new Set(selectedArticleIds.value)]
   if (!articleIds.length) {
-    submitState.error = 'Select at least one article.'
+    submitState.error = "Select at least one article."
     return null
   }
 
@@ -297,8 +297,8 @@ function buildPayload() {
       percentage,
       validFrom,
       validTo,
-      articleIds
-    }
+      articleIds,
+    },
   }
 }
 
@@ -314,7 +314,7 @@ async function saveDiscount() {
   submitState.loading = false
 
   if (!result.ok) {
-    submitState.error = result.error || 'Unable to save discount.'
+    submitState.error = result.error || "Unable to save discount."
     return
   }
 
@@ -325,14 +325,14 @@ async function saveDiscount() {
     percentage: built.payload.percentage,
     validFrom: built.payload.validFrom,
     validTo: built.payload.validTo,
-    articleIds: built.payload.articleIds
+    articleIds: built.payload.articleIds,
   }
 
   discounts.value = sortDiscounts([
     ...discounts.value.filter(
-      (item) => item.key !== key && item.code !== built.code
+      (item) => item.key !== key && item.code !== built.code,
     ),
-    next
+    next,
   ])
 
   applyDiscountToEditor(next)
@@ -340,13 +340,13 @@ async function saveDiscount() {
 }
 
 async function removeDiscount() {
-  deleteState.error = ''
-  deleteState.success = ''
+  deleteState.error = ""
+  deleteState.success = ""
   if (!canEdit.value) return
 
   const code = normalizeCode(form.value.code)
   if (!code) {
-    deleteState.error = 'Provide a code to delete.'
+    deleteState.error = "Provide a code to delete."
     return
   }
 
@@ -355,12 +355,12 @@ async function removeDiscount() {
   deleteState.loading = false
 
   if (!result.ok) {
-    deleteState.error = result.error || 'Unable to delete discount.'
+    deleteState.error = result.error || "Unable to delete discount."
     return
   }
 
   discounts.value = discounts.value.filter(
-    (item) => item.code !== code && item.key !== code
+    (item) => item.code !== code && item.key !== code,
   )
   beginCreate()
   deleteState.success = result.data?.message || `Discount ${code} removed.`
@@ -448,7 +448,7 @@ onMounted(() => {
         <div class="grid gap-5">
           <div class="space-y-1">
             <h3 class="text-foreground text-base font-semibold">
-              {{ selectedDiscount ? 'Edit Discount' : 'Create Discount' }}
+              {{ selectedDiscount ? "Edit Discount" : "Create Discount" }}
             </h3>
             <p class="text-muted text-sm">
               PUT is used for save operations. Delete removes all rows by code.

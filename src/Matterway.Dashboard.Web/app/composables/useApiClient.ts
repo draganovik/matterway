@@ -1,30 +1,30 @@
-import { useAuthSession } from '~/composables/useAuthSession'
-import type { ApiResult, ApiService } from '~/types/common/api'
+import { useAuthSession } from "~/composables/useAuthSession"
+import type { ApiResult, ApiService } from "~/types/common/api"
 
 function getBaseUrl(service: ApiService) {
   const config = useRuntimeConfig()
-  if (service === 'catalog') return config.public.catalogApiBaseUrl
-  if (service === 'customers') return config.public.customersApiBaseUrl
-  if (service === 'identity') return config.public.identityApiBaseUrl
-  if (service === 'sales') return config.public.salesApiBaseUrl
+  if (service === "catalog") return config.public.catalogApiBaseUrl
+  if (service === "customers") return config.public.customersApiBaseUrl
+  if (service === "identity") return config.public.identityApiBaseUrl
+  if (service === "sales") return config.public.salesApiBaseUrl
   return null
 }
 
 function getValidationErrors(
-  payload: unknown
+  payload: unknown,
 ): Record<string, string[]> | undefined {
-  if (!payload || typeof payload !== 'object') return undefined
+  if (!payload || typeof payload !== "object") return undefined
   const payloadWithErrors = payload as { errors?: unknown }
-  if (!payloadWithErrors.errors || typeof payloadWithErrors.errors !== 'object')
+  if (!payloadWithErrors.errors || typeof payloadWithErrors.errors !== "object")
     return undefined
   return payloadWithErrors.errors as Record<string, string[]>
 }
 
 function formatValidationErrors(errors?: Record<string, string[]>) {
-  if (!errors) return ''
+  if (!errors) return ""
   return Object.entries(errors)
-    .map(([field, messages]) => `${field}: ${messages.join(' ')}`)
-    .join(' | ')
+    .map(([field, messages]) => `${field}: ${messages.join(" ")}`)
+    .join(" | ")
 }
 
 export function useApiClient() {
@@ -34,7 +34,7 @@ export function useApiClient() {
     service: ApiService,
     path: string,
     options: RequestInit = {},
-    allowUnauthorized = false
+    allowUnauthorized = false,
   ): Promise<ApiResult<T>> {
     if (!auth.isInitialized.value) {
       await auth.initialize()
@@ -44,23 +44,23 @@ export function useApiClient() {
       return {
         ok: false,
         status: 0,
-        error: `Missing API base URL for ${service}. Check runtimeConfig.public.${service}ApiBaseUrl.`
+        error: `Missing API base URL for ${service}. Check runtimeConfig.public.${service}ApiBaseUrl.`,
       }
     }
     const url = `${baseUrl}/api/v1/${path}`
     const headers = new Headers(options.headers || {})
-    if (!headers.has('Accept')) headers.set('Accept', 'application/json')
-    if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
-      headers.set('Content-Type', 'application/json')
+    if (!headers.has("Accept")) headers.set("Accept", "application/json")
+    if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+      headers.set("Content-Type", "application/json")
     }
 
     const accessToken = auth.getAccessToken()
-    if (accessToken) headers.set('Authorization', accessToken)
+    if (accessToken) headers.set("Authorization", accessToken)
 
     const runFetch = async () =>
       fetch(url, {
         ...options,
-        headers
+        headers,
       })
 
     let response = await runFetch()
@@ -68,7 +68,7 @@ export function useApiClient() {
     if (response.status === 401 && !allowUnauthorized) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) headers.set('Authorization', refreshedToken)
+      if (refreshedToken) headers.set("Authorization", refreshedToken)
       response = await runFetch()
     }
 
@@ -76,8 +76,8 @@ export function useApiClient() {
       return { ok: true, status: response.status }
     }
 
-    const contentType = response.headers.get('content-type') || ''
-    const isJson = contentType.includes('application/json')
+    const contentType = response.headers.get("content-type") || ""
+    const isJson = contentType.includes("application/json")
     const payload = isJson
       ? await response.json().catch(() => null)
       : await response.text().catch(() => null)
@@ -87,7 +87,7 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const baseError = payload?.title || payload?.detail || 'Request failed.'
+    const baseError = payload?.title || payload?.detail || "Request failed."
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,
@@ -95,7 +95,7 @@ export function useApiClient() {
       error: validationMessage
         ? `${baseError} ${validationMessage}`
         : baseError,
-      validationErrors
+      validationErrors,
     }
   }
 

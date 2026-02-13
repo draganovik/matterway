@@ -1,13 +1,13 @@
 <script setup lang="ts">
 const props = defineProps<{
-  totalCount: number;
-  pageSize: number;
-  pageOptions: number[];
-}>();
+  totalCount: number
+  pageSize: number
+  pageOptions: number[]
+}>()
 
 const emit = defineEmits<{
-  "update:pageSize": [value: number];
-}>();
+  "update:pageSize": [value: number]
+}>()
 </script>
 
 <template>

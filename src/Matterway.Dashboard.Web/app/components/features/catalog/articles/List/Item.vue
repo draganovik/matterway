@@ -13,10 +13,10 @@ const { item } = defineProps<{
 <template>
   <div class="flex flex-wrap items-center justify-between gap-1">
     <p class="text-foreground w-full text-base font-medium">
-      {{ item.title || 'Untitled Article' }}
+      {{ item.title || "Untitled Article" }}
     </p>
     <p class="text-muted text-sm">
-      {{ item.code || 'No code' }}
+      {{ item.code || "No code" }}
     </p>
   </div>
 
@@ -24,8 +24,8 @@ const { item } = defineProps<{
     class="text-muted mt-2 flex place-items-center justify-between gap-2 text-sm"
   >
     <UBadge :color="item.isAvailable ? 'success' : 'neutral'" variant="subtle">
-      {{ item.isAvailable ? 'Available' : 'Unavailable' }}
+      {{ item.isAvailable ? "Available" : "Unavailable" }}
     </UBadge>
-    Price: {{ item.price ?? item.basePrice ?? 'N/A' }}
+    Price: {{ item.price ?? item.basePrice ?? "N/A" }}
   </div>
 </template>

@@ -1,8 +1,8 @@
 export function parseNumberOr(
   value: number | string | null | undefined,
-  fallback: number
+  fallback: number,
 ) {
-  if (value === undefined || value === null || value === '') return fallback
+  if (value === undefined || value === null || value === "") return fallback
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
 }

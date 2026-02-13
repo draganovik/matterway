@@ -1,6 +1,6 @@
-const env = import.meta.env as Record<string, string | undefined>;
+const env = import.meta.env as Record<string, string | undefined>
 
-const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key];
+const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
 
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
@@ -8,7 +8,13 @@ export default defineNuxtConfig({
 
   components: [
     {
-      path: "~/components",
+      path: "~/components/common",
+    },
+    {
+      path: "~/components/features",
+    },
+    {
+      path: "~/components/shell",
     },
   ],
 
@@ -22,14 +28,8 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   runtimeConfig: {
-    stripeSecretKey:
-      env.STRIPE_SECRET_KEY ?? env.NUXT_STRIPE_SECRET_KEY ?? undefined,
-    serverSalesApiBaseUrl:
-      env.NUXT_SERVER_SALES_API_BASE_URL ??
-      env.SERVER_SALES_API_BASE_URL ??
-      env.SALES_API_BASE_URL ??
-      env.NUXT_PUBLIC_SALES_API_BASE_URL ??
-      undefined,
+    stripeSecretKey: env.STRIPE_SECRET_KEY,
+    serverSalesApiBaseUrl: env.SERVER_SALES_API_BASE_URL,
     public: {
       identityApiBaseUrl:
         publicEnv("IDENTITY_API_BASE_URL") ?? publicEnv("AUTH_API_BASE_URL"),
@@ -44,4 +44,4 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2025-01-15",
-});
+})

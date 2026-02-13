@@ -6,12 +6,12 @@ const props = withDefaults(
   }>(),
   {
     modelValue: () => [],
-    canEdit: false
-  }
+    canEdit: false,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: string[]): void
+  (event: "update:modelValue", value: string[]): void
 }>()
 
 const articleModalOpen = ref(false)
@@ -20,7 +20,7 @@ const selectedIds = computed(() => props.modelValue || [])
 const previewIds = computed(() => selectedIds.value.slice(0, 8))
 
 function applySelection(next: string[]) {
-  emit('update:modelValue', next)
+  emit("update:modelValue", next)
 }
 </script>
 

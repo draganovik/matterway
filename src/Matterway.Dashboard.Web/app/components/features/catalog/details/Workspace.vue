@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { QueryDetailResponse } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { useAuthSession } from '~/composables/useAuthSession'
-import { normalizeSlug } from '~/utils/normalization'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { QueryDetailResponse } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { useAuthSession } from "~/composables/useAuthSession"
+import { normalizeSlug } from "~/utils/normalization"
 
 type DetailForm = {
   slug: string
@@ -14,14 +14,14 @@ type DetailForm = {
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission('catalog', 'operator'))
+const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
 
-const listState = useRequestState({ empty: 'No detail definitions found.' })
+const listState = useRequestState({ empty: "No detail definitions found." })
 const saveState = useRequestState()
 const removeState = useRequestState()
 
 const details = ref<QueryDetailResponse[]>([])
-const filter = ref('')
+const filter = ref("")
 const limit = ref(20)
 
 const selectedSlug = ref<string | null>(null)
@@ -29,17 +29,17 @@ const selectedDetail = ref<QueryDetailResponse | null>(null)
 const createModalOpen = ref(false)
 
 const form = ref<DetailForm>({
-  slug: '',
-  title: '',
-  unit: ''
+  slug: "",
+  title: "",
+  unit: "",
 })
 
 const canDelete = computed(() => Boolean(selectedSlug.value))
 
 function sortDetails(items: QueryDetailResponse[]) {
   return [...items].sort((a, b) => {
-    const left = (a.title || a.slug || '').toLowerCase()
-    const right = (b.title || b.slug || '').toLowerCase()
+    const left = (a.title || a.slug || "").toLowerCase()
+    const right = (b.title || b.slug || "").toLowerCase()
     return left.localeCompare(right)
   })
 }
@@ -47,40 +47,40 @@ function sortDetails(items: QueryDetailResponse[]) {
 function applyDetailToForm(detail: QueryDetailResponse | null) {
   if (!detail) {
     form.value = {
-      slug: '',
-      title: '',
-      unit: ''
+      slug: "",
+      title: "",
+      unit: "",
     }
     return
   }
 
   form.value = {
-    slug: detail.slug || '',
-    title: detail.title || '',
-    unit: detail.unit || ''
+    slug: detail.slug || "",
+    title: detail.title || "",
+    unit: detail.unit || "",
   }
 }
 
 function resetMessages() {
-  saveState.error = ''
-  saveState.success = ''
-  removeState.error = ''
-  removeState.success = ''
+  saveState.error = ""
+  saveState.success = ""
+  removeState.error = ""
+  removeState.success = ""
 }
 
 async function loadDetails() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const result = await api.queryDetails({
     limit: Math.min(50, Math.max(1, limit.value)),
-    titleLike: filter.value.trim() || undefined
+    titleLike: filter.value.trim() || undefined,
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load detail definitions.'
+    listState.error = result.error || "Unable to load detail definitions."
     details.value = []
     return
   }
@@ -131,16 +131,16 @@ async function saveDetail() {
 
   if (!canEdit.value) return
 
-  const slug = normalizeSlug(selectedSlug.value || '')
+  const slug = normalizeSlug(selectedSlug.value || "")
   const title = form.value.title.trim()
   const unit = form.value.unit.trim()
 
   if (!slug) {
-    saveState.error = 'Select a detail to update.'
+    saveState.error = "Select a detail to update."
     return
   }
   if (!title) {
-    saveState.error = 'Title is required.'
+    saveState.error = "Title is required."
     return
   }
 
@@ -148,24 +148,24 @@ async function saveDetail() {
 
   const result = await api.putDetail(slug, {
     title,
-    unit: unit || null
+    unit: unit || null,
   })
 
   saveState.loading = false
 
   if (!result.ok) {
-    saveState.error = result.error || 'Unable to save detail.'
+    saveState.error = result.error || "Unable to save detail."
     return
   }
 
   const nextDetail: QueryDetailResponse = {
     slug: result.data?.slug ?? slug,
     title: result.data?.title ?? title,
-    unit: result.data?.unit ?? (unit || null)
+    unit: result.data?.unit ?? (unit || null),
   }
 
   const withoutCurrent = details.value.filter(
-    (item) => item.slug !== nextDetail.slug
+    (item) => item.slug !== nextDetail.slug,
   )
   details.value = sortDetails([...withoutCurrent, nextDetail])
 
@@ -173,7 +173,7 @@ async function saveDetail() {
   selectedDetail.value = nextDetail
   applyDetailToForm(nextDetail)
 
-  saveState.success = 'Detail updated.'
+  saveState.success = "Detail updated."
 }
 
 async function removeDetail() {
@@ -183,7 +183,7 @@ async function removeDetail() {
 
   const slug = selectedSlug.value || normalizeSlug(form.value.slug)
   if (!slug) {
-    removeState.error = 'Select a detail to delete.'
+    removeState.error = "Select a detail to delete."
     return
   }
 
@@ -192,7 +192,7 @@ async function removeDetail() {
   removeState.loading = false
 
   if (!result.ok) {
-    removeState.error = result.error || 'Unable to delete detail.'
+    removeState.error = result.error || "Unable to delete detail."
     return
   }
 
@@ -201,14 +201,14 @@ async function removeDetail() {
   selectedDetail.value = null
   applyDetailToForm(null)
 
-  removeState.success = result.data?.message || 'Detail removed.'
+  removeState.success = result.data?.message || "Detail removed."
 }
 
 function handleDetailCreated(detail: QueryDetailResponse) {
   const next = details.value.filter((item) => item.slug !== detail.slug)
   details.value = sortDetails([...next, detail])
 
-  const slug = detail.slug || ''
+  const slug = detail.slug || ""
   if (!slug) return
 
   selectedSlug.value = slug
@@ -276,13 +276,13 @@ onMounted(() => {
         <div class="space-y-4">
           <div class="space-y-1">
             <h3 class="text-foreground text-base font-semibold">
-              {{ selectedDetail ? 'Edit Detail' : 'Detail Editor' }}
+              {{ selectedDetail ? "Edit Detail" : "Detail Editor" }}
             </h3>
             <p class="text-muted text-sm">
               {{
                 canEdit
-                  ? 'Operator permission is required for create, update, and delete.'
-                  : 'Read-only mode: operator permission required for changes.'
+                  ? "Operator permission is required for create, update, and delete."
+                  : "Read-only mode: operator permission required for changes."
               }}
             </p>
           </div>

@@ -1,4 +1,4 @@
-import type { Ref, WatchSource } from 'vue'
+import type { Ref, WatchSource } from "vue"
 
 type UseModalCloseResetOptions = {
   isOpen: Ref<boolean>
@@ -14,7 +14,7 @@ export function useModalCloseReset(options: UseModalCloseResetOptions) {
 
   const sources: WatchSource<unknown>[] = [
     options.isOpen,
-    ...(options.watchSources || [])
+    ...(options.watchSources || []),
   ]
 
   watch(sources, (values) => {

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from "@nuxt/ui";
-import { getJwtStringClaim } from "~/utils/jwt";
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCart } from "~/composables/useCart";
+import type { DropdownMenuItem } from "@nuxt/ui"
+import { getJwtStringClaim } from "~/utils/jwt"
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
 
-const auth = useAuthSession();
-const cart = useCart();
+const auth = useAuthSession()
+const cart = useCart()
 
 const userLabel = computed(() => {
-  if (auth.customerId.value?.trim()) return auth.customerId.value.trim();
+  if (auth.customerId.value?.trim()) return auth.customerId.value.trim()
 
-  const payload = auth.payload.value;
+  const payload = auth.payload.value
   const candidates = [
     getJwtStringClaim(payload, "email"),
     getJwtStringClaim(
@@ -20,18 +20,18 @@ const userLabel = computed(() => {
     getJwtStringClaim(payload, "preferred_username"),
     getJwtStringClaim(payload, "name"),
     getJwtStringClaim(payload, "sub"),
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[]
 
-  const raw = candidates[0] || "Kupac";
-  return raw.includes("@") ? raw.split("@")[0] : raw;
-});
+  const raw = candidates[0] || "Kupac"
+  return raw.includes("@") ? raw.split("@")[0] : raw
+})
 
 const roleLabel = computed(() => {
-  const role = auth.role.value?.trim().toLowerCase();
-  if (role === "customer") return "Kupac";
-  if (role === "employee") return "Zaposleni";
-  return auth.role.value?.trim() || "Korisnik";
-});
+  const role = auth.role.value?.trim().toLowerCase()
+  if (role === "customer") return "Kupac"
+  if (role === "employee") return "Zaposleni"
+  return auth.role.value?.trim() || "Korisnik"
+})
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [
@@ -46,13 +46,13 @@ const items = computed<DropdownMenuItem[][]>(() => [
       label: "Odjavi se",
       icon: "i-lucide-log-out",
       onSelect: async () => {
-        await cart.clear();
-        await auth.logout();
-        await navigateTo("/");
+        await cart.clear()
+        await auth.logout()
+        await navigateTo("/")
       },
     },
   ],
-]);
+])
 </script>
 
 <template>

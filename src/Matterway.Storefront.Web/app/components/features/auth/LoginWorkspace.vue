@@ -1,48 +1,48 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCart } from "~/composables/useCart";
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
 
-const auth = useAuthSession();
-const cart = useCart();
-const route = useRoute();
+const auth = useAuthSession()
+const cart = useCart()
+const route = useRoute()
 
 const model = reactive({
   email: "",
   password: "",
-});
-const loading = ref(false);
-const error = ref("");
+})
+const loading = ref(false)
+const error = ref("")
 
 function resolveNextRoute() {
-  const next = route.query.next;
+  const next = route.query.next
   if (typeof next === "string" && next.startsWith("/")) {
-    return next;
+    return next
   }
-  return "/";
+  return "/"
 }
 
 onMounted(async () => {
-  await auth.initialize();
+  await auth.initialize()
   if (auth.isLoggedIn.value && auth.isCustomer.value) {
-    await navigateTo(resolveNextRoute());
+    await navigateTo(resolveNextRoute())
   }
-});
+})
 
 async function submit() {
-  error.value = "";
-  loading.value = true;
+  error.value = ""
+  loading.value = true
   try {
     await auth.login({
       email: model.email,
       password: model.password,
-    });
+    })
 
-    await cart.clear();
-    await navigateTo(resolveNextRoute());
+    await cart.clear()
+    await navigateTo(resolveNextRoute())
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "Prijava nije uspela.";
+    error.value = err instanceof Error ? err.message : "Prijava nije uspela."
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

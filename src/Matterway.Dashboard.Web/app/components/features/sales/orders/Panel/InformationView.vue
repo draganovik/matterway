@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { OrderResponse, OrderStatusResponse } from '~/types/sales'
-import { formatDateTime, formatMoney } from '~/utils/formatters'
+import type { OrderResponse, OrderStatusResponse } from "~/types/sales"
+import { formatDateTime, formatMoney } from "~/utils/formatters"
 import {
   paymentSumOf,
   paymentsBalanced,
-  quantitySumOf
-} from '~/utils/salesOrderMetrics'
+  quantitySumOf,
+} from "~/utils/salesOrderMetrics"
 
 const props = withDefaults(
   defineProps<{
@@ -17,19 +17,19 @@ const props = withDefaults(
   {
     order: null,
     loading: false,
-    error: '',
-    canManageStatuses: false
-  }
+    error: "",
+    canManageStatuses: false,
+  },
 )
 
 const emit = defineEmits<{
   (
     event:
-      | 'revealDetails'
-      | 'revealStatusHistory'
-      | 'createStatus'
-      | 'revealPayments'
-      | 'revealItems'
+      | "revealDetails"
+      | "revealStatusHistory"
+      | "createStatus"
+      | "revealPayments"
+      | "revealItems",
   ): void
 }>()
 
@@ -39,7 +39,7 @@ function latestStatusOf(order: OrderResponse | null | undefined) {
 }
 
 const latestStatus = computed<OrderStatusResponse | null>(() =>
-  latestStatusOf(props.order)
+  latestStatusOf(props.order),
 )
 
 const paymentSum = computed(() => paymentSumOf(props.order))
@@ -52,7 +52,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ order ? 'Order Summary' : 'Order Viewer' }}
+        {{ order ? "Order Summary" : "Order Viewer" }}
       </h3>
       <p class="text-muted text-sm">
         Reveal loads a fresh snapshot from the Sales API for each selected
@@ -152,7 +152,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
             Changed: {{ formatDateTime(latestStatus.changedAt) }}
           </p>
           <p class="text-muted mt-1 text-xs">
-            Note: {{ latestStatus.note || '-' }}
+            Note: {{ latestStatus.note || "-" }}
           </p>
         </div>
 
@@ -169,7 +169,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
               variant="subtle"
               class="font-normal"
             >
-              {{ paymentBalanced ? 'Amounts Match' : 'Amounts Do Not Match' }}
+              {{ paymentBalanced ? "Amounts Match" : "Amounts Do Not Match" }}
             </UBadge>
             <UButton size="xs" variant="ghost" @click="emit('revealPayments')">
               Reveal Payments

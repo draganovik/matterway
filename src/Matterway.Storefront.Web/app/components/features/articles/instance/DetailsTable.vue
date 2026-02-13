@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { CatalogArticleDetail } from "~/types/catalog/articles";
+import type { CatalogArticleDetail } from "~/types/catalog/articles"
 
 const props = withDefaults(
   defineProps<{
-    details?: CatalogArticleDetail[] | null;
+    details?: CatalogArticleDetail[] | null
   }>(),
   {
     details: () => [],
   },
-);
+)
 
 const detailRows = computed(() =>
   [...(props.details ?? [])]
@@ -23,7 +23,7 @@ const detailRows = computed(() =>
         sensitivity: "base",
       }),
     ),
-);
+)
 </script>
 
 <template>

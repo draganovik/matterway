@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useCustomersApi } from '~/composables/useCustomersApi'
-import type { CustomerResponse } from '~/types/customers'
-import { useRequestState } from '~/composables/useRequestState'
-import { useResetOnModalOpen } from '~/composables/useResetOnModalOpen'
+import { useCustomersApi } from "~/composables/useCustomersApi"
+import type { CustomerResponse } from "~/types/customers"
+import { useRequestState } from "~/composables/useRequestState"
+import { useResetOnModalOpen } from "~/composables/useResetOnModalOpen"
 
 type CustomerCreateForm = {
   systemUserId: string
@@ -20,34 +20,34 @@ const emit = defineEmits<{
   created: [customer: CustomerResponse]
 }>()
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const api = useCustomersApi()
 const createState = useRequestState()
 
 const form = ref<CustomerCreateForm>({
-  systemUserId: '',
-  firstName: '',
-  lastName: '',
-  birthDate: '',
-  defaultAddressId: ''
+  systemUserId: "",
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  defaultAddressId: "",
 })
 
 function resetForm() {
   form.value = {
-    systemUserId: '',
-    firstName: '',
-    lastName: '',
-    birthDate: '',
-    defaultAddressId: ''
+    systemUserId: "",
+    firstName: "",
+    lastName: "",
+    birthDate: "",
+    defaultAddressId: "",
   }
-  createState.error = ''
+  createState.error = ""
 }
 
 useResetOnModalOpen(isOpen, resetForm)
 
 async function createCustomer() {
-  createState.error = ''
+  createState.error = ""
   if (!canEdit) return
 
   const payload = {
@@ -55,7 +55,7 @@ async function createCustomer() {
     firstName: form.value.firstName.trim(),
     lastName: form.value.lastName.trim(),
     birthDate: form.value.birthDate.trim(),
-    defaultAddressId: form.value.defaultAddressId.trim() || null
+    defaultAddressId: form.value.defaultAddressId.trim() || null,
   }
 
   if (
@@ -64,7 +64,7 @@ async function createCustomer() {
     !payload.lastName ||
     !payload.birthDate
   ) {
-    createState.error = 'Fill in all required fields before creating.'
+    createState.error = "Fill in all required fields before creating."
     return
   }
 
@@ -73,11 +73,11 @@ async function createCustomer() {
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || 'Unable to create customer.'
+    createState.error = result.error || "Unable to create customer."
     return
   }
 
-  emit('created', result.data)
+  emit("created", result.data)
   isOpen.value = false
 }
 </script>

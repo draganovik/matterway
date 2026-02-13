@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useArticleBrowser } from "~/composables/features/useArticleBrowser";
+import { useArticleBrowser } from "~/composables/features/useArticleBrowser"
 
 const {
   filters,
@@ -26,13 +26,13 @@ const {
   setDetailFilterMax,
   goToPage,
   changePageSize,
-} = useArticleBrowser();
+} = useArticleBrowser()
 </script>
 
 <template>
   <div class="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
     <div class="space-y-5">
-      <FeaturesArticlesBrowseFiltersCard
+      <ArticlesBrowseFiltersCard
         :filters="filters"
         :detail-definitions="detailDefinitions"
         :detail-definitions-loading="detailDefinitionsLoading"
@@ -49,7 +49,7 @@ const {
         @set-detail-filter-max="setDetailFilterMax"
       />
 
-      <FeaturesArticlesBrowseResultsToolbar
+      <ArticlesBrowseResultsToolbar
         :total-count="meta?.totalCount ?? 0"
         :page-size="pagination.pageSize"
         :page-options="pageOptions"
@@ -71,7 +71,7 @@ const {
         />
       </div>
 
-      <CommonEmptyState
+      <EmptyState
         v-else-if="!items.length"
         title="Nema odgovarajućih artikala"
         description="Prilagodite filtere ili ih poništite za pregled celog kataloga."
@@ -80,14 +80,14 @@ const {
         <UButton color="neutral" variant="soft" @click="resetFilters"
           >Poništi filtere</UButton
         >
-      </CommonEmptyState>
+      </EmptyState>
 
       <div
         v-else
         class="grid gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-3"
         :class="{ 'opacity-70': isRefreshing }"
       >
-        <FeaturesArticlesBrowseListItem
+        <ArticlesBrowseListItem
           v-for="article in items"
           :key="article.id"
           :article="article"

@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Artikal",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesArticlesInstanceWorkspace />
+  <ArticlesInstanceWorkspace />
 </template>

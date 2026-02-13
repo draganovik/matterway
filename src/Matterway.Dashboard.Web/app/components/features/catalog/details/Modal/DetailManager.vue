@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { QueryDetailResponse } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { useResetOnModalOpen } from '~/composables/useResetOnModalOpen'
-import { normalizeSlug } from '~/utils/normalization'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { QueryDetailResponse } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { useResetOnModalOpen } from "~/composables/useResetOnModalOpen"
+import { normalizeSlug } from "~/utils/normalization"
 
 type DetailCreateForm = {
   slug: string
@@ -19,30 +19,30 @@ const emit = defineEmits<{
   created: [detail: QueryDetailResponse]
 }>()
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const api = useCatalogApi()
 const createState = useRequestState()
 
 const form = ref<DetailCreateForm>({
-  slug: '',
-  title: '',
-  unit: ''
+  slug: "",
+  title: "",
+  unit: "",
 })
 
 function resetForm() {
   form.value = {
-    slug: '',
-    title: '',
-    unit: ''
+    slug: "",
+    title: "",
+    unit: "",
   }
-  createState.error = ''
+  createState.error = ""
 }
 
 useResetOnModalOpen(isOpen, resetForm)
 
 async function createDetail() {
-  createState.error = ''
+  createState.error = ""
   if (!canEdit) return
 
   const slug = normalizeSlug(form.value.slug)
@@ -50,26 +50,26 @@ async function createDetail() {
   const unit = form.value.unit.trim()
 
   if (!slug || !title) {
-    createState.error = 'Slug and title are required.'
+    createState.error = "Slug and title are required."
     return
   }
 
   createState.loading = true
   const result = await api.putDetail(slug, {
     title,
-    unit: unit || null
+    unit: unit || null,
   })
   createState.loading = false
 
   if (!result.ok) {
-    createState.error = result.error || 'Unable to create detail.'
+    createState.error = result.error || "Unable to create detail."
     return
   }
 
-  emit('created', {
+  emit("created", {
     slug: result.data?.slug ?? slug,
     title: result.data?.title ?? title,
-    unit: result.data?.unit ?? (unit || null)
+    unit: result.data?.unit ?? (unit || null),
   })
 
   isOpen.value = false

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SystemUserResponse } from '~/types/identity'
-import { formatDateTime } from '~/utils/formatters'
+import type { SystemUserResponse } from "~/types/identity"
+import { formatDateTime } from "~/utils/formatters"
 
 type SystemUserForm = {
   email: string
@@ -26,20 +26,20 @@ const props = withDefaults(
   {
     systemUser: null,
     loading: false,
-    error: '',
+    error: "",
     canOperate: false,
     canManage: false,
     saveLoading: false,
     removeLoading: false,
-    saveError: '',
-    removeError: '',
-    saveSuccess: '',
-    removeSuccess: ''
-  }
+    saveError: "",
+    removeError: "",
+    saveSuccess: "",
+    removeSuccess: "",
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'save' | 'remove' | 'revealRoles'): void
+  (event: "save" | "remove" | "revealRoles"): void
 }>()
 
 const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
@@ -49,13 +49,13 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ systemUser ? 'Edit System User' : 'System User Editor' }}
+        {{ systemUser ? "Edit System User" : "System User Editor" }}
       </h3>
       <p class="text-muted text-sm">
         {{
           canOperate
-            ? 'Operator permission is required for updates. Administrator permission is required for role changes and delete.'
-            : 'Read-only mode: operator permission required for updates.'
+            ? "Operator permission is required for updates. Administrator permission is required for role changes and delete."
+            : "Read-only mode: operator permission required for updates."
         }}
       </p>
     </div>

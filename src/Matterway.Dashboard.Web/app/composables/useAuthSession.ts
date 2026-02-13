@@ -2,33 +2,33 @@ import {
   decodeJwtPayload,
   getJwtArrayClaim,
   getJwtStringClaim,
-  type JwtPayload
-} from '~/utils/jwt'
-import type { AuthSession, LoginResponse } from '~/types/auth/session'
+  type JwtPayload,
+} from "~/utils/jwt"
+import type { AuthSession, LoginResponse } from "~/types/auth/session"
 
-const refreshCookieName = 'mw_refresh'
-const authPath = '/api/v1.0/public/auth'
+const refreshCookieName = "mw_refresh"
+const authPath = "/api/v1.0/public/auth"
 const authJsonHeaders = {
-  'Content-Type': 'application/json',
-  accept: 'application/json'
+  "Content-Type": "application/json",
+  accept: "application/json",
 } as const
 
 const permissionLevels = {
   observer: 0,
   operator: 1,
-  administrator: 2
+  administrator: 2,
 } as const
 
 let refreshPromise: Promise<void> | null = null
 let initPromise: Promise<void> | null = null
 
 function useSessionState() {
-  return useState<AuthSession>('auth-session', () => ({
+  return useState<AuthSession>("auth-session", () => ({
     accessToken: null,
-    tokenType: 'Bearer',
+    tokenType: "Bearer",
     created: null,
     expires: null,
-    refreshExpires: null
+    refreshExpires: null,
   }))
 }
 
@@ -40,12 +40,12 @@ function parseDate(value: string | null | undefined): Date | null {
 
 function getCookieOptions() {
   const secure = import.meta.client
-    ? window.location.protocol === 'https:'
+    ? window.location.protocol === "https:"
     : false
   return {
-    sameSite: 'lax' as const,
+    sameSite: "lax" as const,
     secure,
-    path: '/'
+    path: "/",
   }
 }
 
@@ -53,13 +53,13 @@ export function useAuthSession() {
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
     ...getCookieOptions(),
-    default: () => null
+    default: () => null,
   })
   const refreshTimer = useState<ReturnType<typeof setTimeout> | null>(
-    'auth-refresh-timer',
-    () => null
+    "auth-refresh-timer",
+    () => null,
   )
-  const isInitialized = useState('auth-is-initialized', () => false)
+  const isInitialized = useState("auth-is-initialized", () => false)
 
   const payload = computed<JwtPayload | null>(() => {
     if (!session.value.accessToken) return null
@@ -68,19 +68,19 @@ export function useAuthSession() {
 
   const role = computed(
     () =>
-      getJwtStringClaim(payload.value, 'role') ||
+      getJwtStringClaim(payload.value, "role") ||
       getJwtStringClaim(
         payload.value,
-        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-      )
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+      ),
   )
 
-  const permissions = computed(() => getJwtArrayClaim(payload.value, 'perm'))
+  const permissions = computed(() => getJwtArrayClaim(payload.value, "perm"))
 
-  const isEmployee = computed(() => role.value?.toLowerCase() === 'employee')
+  const isEmployee = computed(() => role.value?.toLowerCase() === "employee")
 
   const isLoggedIn = computed(
-    () => Boolean(session.value.accessToken) && !isAccessExpired()
+    () => Boolean(session.value.accessToken) && !isAccessExpired(),
   )
 
   function getAuthBaseUrl() {
@@ -89,20 +89,20 @@ export function useAuthSession() {
   }
 
   function authFetch(
-    path: 'login' | 'logout' | 'refresh',
-    options: RequestInit
+    path: "login" | "logout" | "refresh",
+    options: RequestInit,
   ) {
     return fetch(`${getAuthBaseUrl()}/${path}`, options)
   }
 
   function authJsonPost(
-    path: 'login' | 'refresh',
-    body: Record<string, unknown>
+    path: "login" | "refresh",
+    body: Record<string, unknown>,
   ) {
     return authFetch(path, {
-      method: 'POST',
+      method: "POST",
       headers: authJsonHeaders,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     })
   }
 
@@ -122,21 +122,21 @@ export function useAuthSession() {
     }
     const attrs = [
       `${refreshCookieName}=${encodeURIComponent(token)}`,
-      'Path=/',
-      'SameSite=Lax'
+      "Path=/",
+      "SameSite=Lax",
     ]
     if (expires) attrs.push(`Expires=${expires.toUTCString()}`)
-    if (window.location.protocol === 'https:') attrs.push('Secure')
-    document.cookie = attrs.join('; ')
+    if (window.location.protocol === "https:") attrs.push("Secure")
+    document.cookie = attrs.join("; ")
   }
 
   function setSession(data: LoginResponse) {
     session.value = {
       accessToken: data.token,
-      tokenType: data.tokenType || 'Bearer',
+      tokenType: data.tokenType || "Bearer",
       created: data.created,
       expires: data.expires,
-      refreshExpires: data.refreshExpires
+      refreshExpires: data.refreshExpires,
     }
     const refreshExpires = parseDate(data.refreshExpires)
     writeRefreshCookie(data.refreshToken, refreshExpires)
@@ -146,10 +146,10 @@ export function useAuthSession() {
   function clearSession() {
     session.value = {
       accessToken: null,
-      tokenType: 'Bearer',
+      tokenType: "Bearer",
       created: null,
       expires: null,
-      refreshExpires: null
+      refreshExpires: null,
     }
     writeRefreshCookie(null, null)
     clearRefreshTimer()
@@ -176,29 +176,29 @@ export function useAuthSession() {
   }
 
   async function login(email: string, password: string) {
-    const response = await authJsonPost('login', { email, password })
+    const response = await authJsonPost("login", { email, password })
 
     if (!response.ok) {
       const payload = await response.json().catch(() => null)
-      throw new Error(payload?.title || 'Login failed.')
+      throw new Error(payload?.title || "Login failed.")
     }
 
     const data = (await response.json()) as LoginResponse
     setSession(data)
     if (!isEmployee.value) {
       clearSession()
-      throw new Error('Employee role required for dashboard access.')
+      throw new Error("Employee role required for dashboard access.")
     }
   }
 
   async function logout() {
     const token = getAccessToken()
     if (token) {
-      await authFetch('logout', {
-        method: 'POST',
+      await authFetch("logout", {
+        method: "POST",
         headers: {
-          Authorization: token
-        }
+          Authorization: token,
+        },
       }).catch(() => null)
     }
     clearSession()
@@ -210,7 +210,7 @@ export function useAuthSession() {
     if (!refreshToken) return
     refreshPromise = (async () => {
       try {
-        const response = await authJsonPost('refresh', { refreshToken })
+        const response = await authJsonPost("refresh", { refreshToken })
 
         if (!response.ok) {
           clearSession()
@@ -236,13 +236,13 @@ export function useAuthSession() {
 
   function hasPermission(
     service: string,
-    minimumLevel: 'observer' | 'operator' | 'administrator' = 'observer'
+    minimumLevel: "observer" | "operator" | "administrator" = "observer",
   ) {
     if (!isEmployee.value) return false
     const required = permissionLevels[minimumLevel]
     const normalizedService = service.toLowerCase()
     return permissions.value.some((perm) => {
-      const [permService, permLevel] = perm.split(':', 2)
+      const [permService, permLevel] = perm.split(":", 2)
       if (!permService || !permLevel) return false
       if (permService.toLowerCase() !== normalizedService) return false
       const normalizedLevel =
@@ -301,6 +301,6 @@ export function useAuthSession() {
     hasPermission,
     initialize,
     isAccessExpired,
-    isInitialized
+    isInitialized,
   }
 }

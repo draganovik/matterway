@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({
-  title: 'System Users',
-  service: 'identity',
-  level: 'operator'
+  title: "System Users",
+  service: "identity",
+  level: "operator",
 })
 </script>
 

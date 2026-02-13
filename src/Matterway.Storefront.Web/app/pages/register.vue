@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Registracija",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesAuthRegisterWorkspace />
+  <AuthRegisterWorkspace />
 </template>

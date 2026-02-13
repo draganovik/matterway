@@ -5,9 +5,9 @@ withDefaults(
     description?: string
   }>(),
   {
-    title: 'Nothing selected',
-    description: 'Select an item from the list to start editing.'
-  }
+    title: "Nothing selected",
+    description: "Select an item from the list to start editing.",
+  },
 )
 </script>
 

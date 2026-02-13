@@ -10,5 +10,5 @@ export type {
   SystemUserPermResponse,
   SystemUserResponse,
   UpdateSystemUserRequest,
-  UpdateSystemUserResponse
-} from './system-users'
+  UpdateSystemUserResponse,
+} from "./system-users"

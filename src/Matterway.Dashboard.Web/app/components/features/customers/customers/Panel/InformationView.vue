@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomerResponse } from '~/types/customers'
+import type { CustomerResponse } from "~/types/customers"
 
 type CustomerForm = {
   firstName: string
@@ -26,19 +26,19 @@ withDefaults(
   {
     customer: null,
     loading: false,
-    error: '',
+    error: "",
     canEdit: false,
     saveLoading: false,
     removeLoading: false,
-    saveError: '',
-    removeError: '',
-    saveSuccess: '',
-    removeSuccess: ''
-  }
+    saveError: "",
+    removeError: "",
+    saveSuccess: "",
+    removeSuccess: "",
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'save' | 'remove' | 'revealAddress'): void
+  (event: "save" | "remove" | "revealAddress"): void
 }>()
 </script>
 
@@ -46,13 +46,13 @@ const emit = defineEmits<{
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ customer ? 'Edit Customer' : 'Customer Editor' }}
+        {{ customer ? "Edit Customer" : "Customer Editor" }}
       </h3>
       <p class="text-muted text-sm">
         {{
           canEdit
-            ? 'Operator permission is required for create, update, and delete.'
-            : 'Read-only mode: operator permission required for changes.'
+            ? "Operator permission is required for create, update, and delete."
+            : "Read-only mode: operator permission required for changes."
         }}
       </p>
     </div>

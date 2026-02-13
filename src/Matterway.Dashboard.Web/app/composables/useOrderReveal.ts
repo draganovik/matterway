@@ -1,8 +1,8 @@
-import type { Ref } from 'vue'
-import type { OrderResponse } from '~/types/sales'
-import { useSalesApi } from '~/composables/useSalesApi'
-import { useModalCloseReset } from '~/composables/useModalCloseReset'
-import { useRequestState } from '~/composables/useRequestState'
+import type { Ref } from "vue"
+import type { OrderResponse } from "~/types/sales"
+import { useSalesApi } from "~/composables/useSalesApi"
+import { useModalCloseReset } from "~/composables/useModalCloseReset"
+import { useRequestState } from "~/composables/useRequestState"
 
 type NullableString = string | null | undefined
 
@@ -24,12 +24,12 @@ export function useOrderReveal(options: UseOrderRevealOptions) {
     () =>
       options.orderLabel?.value?.trim() ||
       options.orderId.value?.trim() ||
-      'Selected order'
+      "Selected order",
   )
 
   function resetModalState() {
     loadState.loading = false
-    loadState.error = ''
+    loadState.error = ""
     order.value = null
     notFound.value = false
   }
@@ -38,14 +38,14 @@ export function useOrderReveal(options: UseOrderRevealOptions) {
     const orderId = options.orderId.value?.trim()
 
     if (!orderId) {
-      loadState.error = 'Select an order first.'
+      loadState.error = "Select an order first."
       order.value = null
       notFound.value = false
       return
     }
 
     loadState.loading = true
-    loadState.error = ''
+    loadState.error = ""
     order.value = null
     notFound.value = false
 
@@ -77,7 +77,7 @@ export function useOrderReveal(options: UseOrderRevealOptions) {
     onCloseReset: resetModalState,
     onOpen: async () => {
       await loadOrder()
-    }
+    },
   })
 
   return {
@@ -86,6 +86,6 @@ export function useOrderReveal(options: UseOrderRevealOptions) {
     loadState,
     displayLabel,
     loadOrder,
-    resetModalState
+    resetModalState,
   }
 }

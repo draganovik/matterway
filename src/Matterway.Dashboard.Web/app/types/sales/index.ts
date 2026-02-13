@@ -9,5 +9,5 @@ export type {
   PaymentSnapshotResponse,
   PaymentStatusType,
   QueryOrdersParams,
-  QueryOrdersResponse
-} from './orders'
+  QueryOrdersResponse,
+} from "./orders"

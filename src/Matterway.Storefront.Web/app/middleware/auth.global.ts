@@ -1,17 +1,17 @@
-import { useAuthSession } from "~/composables/useAuthSession";
+import { useAuthSession } from "~/composables/useAuthSession"
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthSession();
+  const auth = useAuthSession()
 
   if (to.meta.public) {
-    void auth.initialize();
-    return;
+    void auth.initialize()
+    return
   }
 
-  await auth.initialize();
+  await auth.initialize()
 
   if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
-    const nextPath = encodeURIComponent(to.fullPath);
-    return navigateTo(`/login?next=${nextPath}`);
+    const nextPath = encodeURIComponent(to.fullPath)
+    return navigateTo(`/login?next=${nextPath}`)
   }
-});
+})

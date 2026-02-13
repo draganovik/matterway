@@ -1,78 +1,78 @@
 export type CatalogArticleDiscount = {
-  percentage?: number | null;
-  validFrom?: string | null;
-  validTo?: string | null;
-};
+  percentage?: number | null
+  validFrom?: string | null
+  validTo?: string | null
+}
 
 export type CatalogArticleImage = {
-  id?: string;
-  orderIndex?: number;
-  imageUrl?: string;
-  imageAlt?: string;
-};
+  id?: string
+  orderIndex?: number
+  imageUrl?: string
+  imageAlt?: string
+}
 
 export type CatalogArticleDetail = {
-  detailSlug?: string | null;
-  title?: string;
-  unit?: string | null;
-  textValue?: string | null;
-  numericValue?: number | null;
-};
+  detailSlug?: string | null
+  title?: string
+  unit?: string | null
+  textValue?: string | null
+  numericValue?: number | null
+}
 
 export type CatalogArticle = {
-  id: string;
-  articleCode: string;
-  title: string;
-  basePrice: number;
-  price: number;
-  discount: CatalogArticleDiscount | null;
-  description: string;
-  isAvailable: boolean;
-  thumbnailImage: CatalogArticleImage | null;
-  articleImages: CatalogArticleImage[];
-  articleDetails: CatalogArticleDetail[];
-  createdAt?: string;
-  updatedAt?: string;
-};
+  id: string
+  articleCode: string
+  title: string
+  basePrice: number
+  price: number
+  discount: CatalogArticleDiscount | null
+  description: string
+  isAvailable: boolean
+  thumbnailImage: CatalogArticleImage | null
+  articleImages: CatalogArticleImage[]
+  articleDetails: CatalogArticleDetail[]
+  createdAt?: string
+  updatedAt?: string
+}
 
-type AnyRecord = Record<string, unknown>;
+type AnyRecord = Record<string, unknown>
 
 function asNumber(value: unknown, fallback = 0) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
 }
 
 function asRecord(value: unknown): AnyRecord {
-  return value && typeof value === "object" ? (value as AnyRecord) : {};
+  return value && typeof value === "object" ? (value as AnyRecord) : {}
 }
 
 function asArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : [];
+  return Array.isArray(value) ? value : []
 }
 
 function readDiscount(value: unknown): CatalogArticleDiscount | null {
-  const source = asRecord(value);
-  if (!Object.keys(source).length) return null;
+  const source = asRecord(value)
+  if (!Object.keys(source).length) return null
   return {
     percentage: asNumber(source.percentage, 0),
     validFrom: typeof source.validFrom === "string" ? source.validFrom : null,
     validTo: typeof source.validTo === "string" ? source.validTo : null,
-  };
+  }
 }
 
 function readImage(value: unknown): CatalogArticleImage | null {
-  const source = asRecord(value);
-  if (!source.imageUrl) return null;
+  const source = asRecord(value)
+  if (!source.imageUrl) return null
   return {
     id: typeof source.id === "string" ? source.id : undefined,
     orderIndex: asNumber(source.orderIndex, 0),
     imageUrl: String(source.imageUrl),
     imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
-  };
+  }
 }
 
 export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
-  const source = asRecord(payload);
+  const source = asRecord(payload)
   const thumbnail =
     readImage(source.thumbnailImage) ||
     (source.thumbnailUrl
@@ -82,7 +82,7 @@ export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
             ? String(source.thumbnailAlt)
             : undefined,
         }
-      : null);
+      : null)
 
   return {
     id: String(source.id ?? ""),
@@ -100,11 +100,11 @@ export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
       typeof source.createdAt === "string" ? source.createdAt : undefined,
     updatedAt:
       typeof source.updatedAt === "string" ? source.updatedAt : undefined,
-  };
+  }
 }
 
 export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
-  const source = asRecord(payload);
+  const source = asRecord(payload)
 
   const images = [...asArray(source.images), ...asArray(source.articleImages)]
     .map(readImage)
@@ -113,19 +113,19 @@ export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
       (a, b) =>
         Number(a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
         Number(b.orderIndex ?? Number.MAX_SAFE_INTEGER),
-    );
+    )
 
-  const thumbnail = readImage(source.thumbnailImage) || images[0] || null;
+  const thumbnail = readImage(source.thumbnailImage) || images[0] || null
 
   const details = asArray(source.details).map((detailValue) => {
-    const detail = asRecord(detailValue);
-    const numericValueRaw = detail.numericValue;
+    const detail = asRecord(detailValue)
+    const numericValueRaw = detail.numericValue
     const numericValue =
       typeof numericValueRaw === "number"
         ? numericValueRaw
         : numericValueRaw !== undefined && numericValueRaw !== null
           ? Number(numericValueRaw)
-          : null;
+          : null
 
     return {
       detailSlug: detail.detailSlug ? String(detail.detailSlug) : null,
@@ -133,8 +133,8 @@ export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
       unit: detail.unit ? String(detail.unit) : null,
       textValue: detail.textValue ? String(detail.textValue) : null,
       numericValue: Number.isFinite(numericValue ?? NaN) ? numericValue : null,
-    };
-  });
+    }
+  })
 
   return {
     id: String(source.id ?? ""),
@@ -152,5 +152,5 @@ export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
       typeof source.createdAt === "string" ? source.createdAt : undefined,
     updatedAt:
       typeof source.updatedAt === "string" ? source.updatedAt : undefined,
-  };
+  }
 }

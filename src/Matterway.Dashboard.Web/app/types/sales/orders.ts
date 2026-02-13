@@ -1,4 +1,4 @@
-import type { PaginationResponse } from '../common/pagination'
+import type { PaginationResponse } from "../common/pagination"
 
 export type QueryOrdersParams = {
   page: number
@@ -11,21 +11,21 @@ export type AddOrderStatusRequest = {
   note?: string | null
 }
 
-export type OrderType = 'Retail' | 'Ecommerce' | string
+export type OrderType = "Retail" | "Ecommerce" | string
 
 export type OrderStatusType =
-  | 'Processing'
-  | 'Reserved'
-  | 'Delivery'
-  | 'Completed'
-  | 'Cancelled'
+  | "Processing"
+  | "Reserved"
+  | "Delivery"
+  | "Completed"
+  | "Cancelled"
   | string
 
 export type PaymentStatusType =
-  | 'Reserved'
-  | 'Charged'
-  | 'Failed'
-  | 'Refunded'
+  | "Reserved"
+  | "Charged"
+  | "Failed"
+  | "Refunded"
   | string
 
 export type OrderDeliveryInfoResponse = {

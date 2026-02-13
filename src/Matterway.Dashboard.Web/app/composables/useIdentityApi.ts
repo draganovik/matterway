@@ -1,5 +1,5 @@
-import { buildQuery } from '~/utils/http'
-import { useApiClient } from '~/composables/useApiClient'
+import { buildQuery } from "~/utils/http"
+import { useApiClient } from "~/composables/useApiClient"
 import type {
   AddSystemUserPermRequest,
   AddSystemUserPermResponse,
@@ -10,10 +10,10 @@ import type {
   SystemUserPermResponse,
   SystemUserResponse,
   UpdateSystemUserRequest,
-  UpdateSystemUserResponse
-} from '~/types/identity'
+  UpdateSystemUserResponse,
+} from "~/types/identity"
 
-const ADMIN_SYSTEM_USERS_PATH = 'admin/system-users'
+const ADMIN_SYSTEM_USERS_PATH = "admin/system-users"
 
 export function useIdentityApi() {
   const api = useApiClient()
@@ -22,74 +22,74 @@ export function useIdentityApi() {
     const query = buildQuery({
       Page: params.page,
       PageSize: params.pageSize,
-      Role: params.role || undefined
+      Role: params.role || undefined,
     })
 
     return api.request<QuerySystemUsersResponse>(
-      'identity',
-      `${ADMIN_SYSTEM_USERS_PATH}${query}`
+      "identity",
+      `${ADMIN_SYSTEM_USERS_PATH}${query}`,
     )
   }
 
   async function getSystemUserById(id: string) {
     return api.request<SystemUserResponse>(
-      'identity',
-      `${ADMIN_SYSTEM_USERS_PATH}/${id}`
+      "identity",
+      `${ADMIN_SYSTEM_USERS_PATH}/${id}`,
     )
   }
 
   async function updateSystemUser(
     id: string,
-    payload: UpdateSystemUserRequest
+    payload: UpdateSystemUserRequest,
   ) {
     return api.request<UpdateSystemUserResponse>(
-      'identity',
+      "identity",
       `${ADMIN_SYSTEM_USERS_PATH}/${id}`,
       {
-        method: 'PATCH',
-        body: JSON.stringify(payload)
-      }
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      },
     )
   }
 
   async function deleteSystemUser(id: string) {
-    return api.request('identity', `${ADMIN_SYSTEM_USERS_PATH}/${id}`, {
-      method: 'DELETE'
+    return api.request("identity", `${ADMIN_SYSTEM_USERS_PATH}/${id}`, {
+      method: "DELETE",
     })
   }
 
   async function getSystemUserPerms(id: string) {
     return api.request<SystemUserPermResponse[]>(
-      'identity',
-      `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`
+      "identity",
+      `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
     )
   }
 
   async function addSystemUserPerm(
     id: string,
-    payload: AddSystemUserPermRequest
+    payload: AddSystemUserPermRequest,
   ) {
     return api.request<AddSystemUserPermResponse[]>(
-      'identity',
+      "identity",
       `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
       {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      }
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
     )
   }
 
   async function deleteSystemUserPerm(
     id: string,
-    payload: DeleteSystemUserPermRequest
+    payload: DeleteSystemUserPermRequest,
   ) {
     return api.request<DeleteSystemUserPermResponse[]>(
-      'identity',
+      "identity",
       `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
       {
-        method: 'DELETE',
-        body: JSON.stringify(payload)
-      }
+        method: "DELETE",
+        body: JSON.stringify(payload),
+      },
     )
   }
 
@@ -100,6 +100,6 @@ export function useIdentityApi() {
     deleteSystemUser,
     getSystemUserPerms,
     addSystemUserPerm,
-    deleteSystemUserPerm
+    deleteSystemUserPerm,
   }
 }

@@ -1,15 +1,15 @@
-import { useApiClient } from "~/composables/useApiClient";
-import type { PaginatedPayload } from "~/types/common/api";
-import type { PlaceOrderPayload, SalesOrder } from "~/types/sales/orders";
+import { useApiClient } from "~/composables/useApiClient"
+import type { PaginatedPayload } from "~/types/common/api"
+import type { PlaceOrderPayload, SalesOrder } from "~/types/sales/orders"
 
 export function useSalesApi() {
-  const api = useApiClient();
+  const api = useApiClient()
 
   async function placeSelfOrder(payload: PlaceOrderPayload) {
     return api.request<SalesOrder>("sales", "self/orders", {
       method: "POST",
       body: JSON.stringify(payload),
-    });
+    })
   }
 
   async function listSelfOrders(page = 1, pageSize = 20) {
@@ -19,11 +19,11 @@ export function useSalesApi() {
       {
         method: "GET",
       },
-    );
+    )
   }
 
   return {
     placeSelfOrder,
     listSelfOrders,
-  };
+  }
 }

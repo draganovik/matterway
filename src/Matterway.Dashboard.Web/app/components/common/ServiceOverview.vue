@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FeatureDefinition } from '~/data/serviceRegistry'
+import type { FeatureDefinition } from "~/data/serviceRegistry"
 
 defineProps<{
   title: string
@@ -31,7 +31,7 @@ defineProps<{
       :ui="{
         container: 'p-0 sm:p-0 gap-y-0',
         wrapper: 'items-stretch',
-        header: 'p-4 mb-0 border-b border-default'
+        header: 'p-4 mb-0 border-b border-default',
       }"
     >
       <template #header>

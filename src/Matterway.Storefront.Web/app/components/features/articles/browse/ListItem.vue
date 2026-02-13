@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import type { CatalogArticle } from "~/types/catalog/articles";
-import { useCart } from "~/composables/useCart";
-import { formatMoney } from "~/utils/formatters";
+import type { CatalogArticle } from "~/types/catalog/articles"
+import { useCart } from "~/composables/useCart"
+import { formatMoney } from "~/utils/formatters"
 
 const props = defineProps<{
-  article: CatalogArticle;
-}>();
+  article: CatalogArticle
+}>()
 
-const cart = useCart();
+const cart = useCart()
 
 const hasDiscount = computed(
   () =>
     (props.article.discount?.percentage ?? 0) > 0 &&
     (props.article.basePrice ?? 0) > (props.article.price ?? 0),
-);
+)
 
 const discountLabel = computed(() =>
   hasDiscount.value
     ? `${Math.round((props.article.discount?.percentage ?? 0) * 100)}%`
     : null,
-);
+)
 
-const currentQty = computed(() => cart.quantityFor(props.article.id));
+const currentQty = computed(() => cart.quantityFor(props.article.id))
 </script>
 
 <template>
@@ -35,7 +35,7 @@ const currentQty = computed(() => cart.quantityFor(props.article.id));
   >
     <template #header>
       <NuxtLink :to="`/articles/${article.id}`" class="block">
-        <div class="bg-elevated w-full aspect-[4/3] overflow-hidden">
+        <div class="bg-elevated aspect-[4/3] w-full overflow-hidden">
           <img
             v-if="article.thumbnailImage?.imageUrl"
             :src="article.thumbnailImage.imageUrl"

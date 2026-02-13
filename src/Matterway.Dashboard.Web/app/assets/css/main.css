@@ -1,8 +1,8 @@
-@import 'tailwindcss';
-@import '@nuxt/ui';
+@import "tailwindcss";
+@import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
 
   --color-orange-50: #fff3f0;
   --color-orange-100: #ffe6de;

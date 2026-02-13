@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useCustomersApi } from '~/composables/useCustomersApi'
+import { useCustomersApi } from "~/composables/useCustomersApi"
 import type {
   CustomerAddressResponse,
-  CustomerResponse
-} from '~/types/customers'
-import { useRequestState } from '~/composables/useRequestState'
-import { useWorkspacePagination } from '~/composables/useWorkspacePagination'
-import { useAuthSession } from '~/composables/useAuthSession'
+  CustomerResponse,
+} from "~/types/customers"
+import { useRequestState } from "~/composables/useRequestState"
+import { useWorkspacePagination } from "~/composables/useWorkspacePagination"
+import { useAuthSession } from "~/composables/useAuthSession"
 
 type CustomerForm = {
   firstName: string
@@ -18,16 +18,16 @@ type CustomerForm = {
 const auth = useAuthSession()
 const api = useCustomersApi()
 
-const canEdit = computed(() => auth.hasPermission('customers', 'operator'))
+const canEdit = computed(() => auth.hasPermission("customers", "operator"))
 const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-const listState = useRequestState({ empty: 'No customers found.' })
+const listState = useRequestState({ empty: "No customers found." })
 const detailState = useRequestState()
 const saveState = useRequestState()
 const removeState = useRequestState()
 
 const customers = ref<CustomerResponse[]>([])
-const filter = ref('')
+const filter = ref("")
 const {
   pagination,
   resetTotals,
@@ -36,7 +36,7 @@ const {
   changePage,
   changePageSize,
   searchWithPageReset,
-  watchPagination
+  watchPagination,
 } = useWorkspacePagination({ pageSize: 20 })
 
 const selectedId = ref<string | null>(null)
@@ -45,28 +45,28 @@ const createModalOpen = ref(false)
 const addressModalOpen = ref(false)
 
 const form = ref<CustomerForm>({
-  firstName: '',
-  lastName: '',
-  birthDate: '',
-  defaultAddressId: ''
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  defaultAddressId: "",
 })
 
 function applyCustomerToForm(customer: CustomerResponse | null) {
   if (!customer) {
     form.value = {
-      firstName: '',
-      lastName: '',
-      birthDate: '',
-      defaultAddressId: ''
+      firstName: "",
+      lastName: "",
+      birthDate: "",
+      defaultAddressId: "",
     }
     return
   }
 
   form.value = {
-    firstName: customer.firstName || '',
-    lastName: customer.lastName || '',
-    birthDate: (customer.birthDate || '').split('T')[0] || '',
-    defaultAddressId: customer.defaultAddressId || ''
+    firstName: customer.firstName || "",
+    lastName: customer.lastName || "",
+    birthDate: (customer.birthDate || "").split("T")[0] || "",
+    defaultAddressId: customer.defaultAddressId || "",
   }
 }
 
@@ -74,20 +74,20 @@ function clearSelection() {
   selectedId.value = null
   selectedCustomer.value = null
   addressModalOpen.value = false
-  detailState.error = ''
+  detailState.error = ""
   applyCustomerToForm(null)
 }
 
 function resetMessages() {
-  saveState.error = ''
-  saveState.success = ''
-  removeState.error = ''
-  removeState.success = ''
+  saveState.error = ""
+  saveState.success = ""
+  removeState.error = ""
+  removeState.success = ""
 }
 
 async function loadCustomers() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const lookupId = filter.value.trim()
   if (lookupId) {
@@ -95,7 +95,7 @@ async function loadCustomers() {
     listState.loading = false
 
     if (!result.ok || !result.data) {
-      listState.error = result.error || 'Unable to load customer.'
+      listState.error = result.error || "Unable to load customer."
       customers.value = []
       setSinglePageTotal(0)
       clearSelection()
@@ -113,13 +113,13 @@ async function loadCustomers() {
 
   const result = await api.queryCustomers({
     page: pagination.page,
-    pageSize: pagination.pageSize
+    pageSize: pagination.pageSize,
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load customers.'
+    listState.error = result.error || "Unable to load customers."
     customers.value = []
     resetTotals()
     clearSelection()
@@ -146,13 +146,13 @@ async function loadCustomers() {
 
 async function loadCustomer(customerId: string) {
   detailState.loading = true
-  detailState.error = ''
+  detailState.error = ""
 
   const result = await api.getCustomerById(customerId)
   detailState.loading = false
 
   if (!result.ok || !result.data) {
-    detailState.error = result.error || 'Unable to load customer details.'
+    detailState.error = result.error || "Unable to load customer details."
     selectedCustomer.value = null
     applyCustomerToForm(null)
     return
@@ -162,14 +162,14 @@ async function loadCustomer(customerId: string) {
   applyCustomerToForm(result.data)
 
   customers.value = customers.value.map((item) =>
-    item.systemUserId === result.data?.systemUserId ? result.data : item
+    item.systemUserId === result.data?.systemUserId ? result.data : item,
   )
 }
 
 function searchCustomers() {
   searchWithPageReset(
     loadCustomers,
-    () => !filter.value.trim() && pagination.page !== 1
+    () => !filter.value.trim() && pagination.page !== 1,
   )
 }
 
@@ -181,10 +181,10 @@ function selectCustomer(systemUserId: string) {
 }
 
 const selectedCustomerName = computed(() => {
-  const first = selectedCustomer.value?.firstName?.trim() || ''
-  const last = selectedCustomer.value?.lastName?.trim() || ''
+  const first = selectedCustomer.value?.firstName?.trim() || ""
+  const last = selectedCustomer.value?.lastName?.trim() || ""
   const fullName = `${first} ${last}`.trim()
-  return fullName || 'Selected customer'
+  return fullName || "Selected customer"
 })
 
 function revealAddress() {
@@ -197,7 +197,7 @@ function handleAddressSaved(address: CustomerAddressResponse) {
 
   const next = {
     ...selectedCustomer.value,
-    defaultAddressId: address.id
+    defaultAddressId: address.id,
   }
   selectedCustomer.value = next
   form.value.defaultAddressId = address.id
@@ -205,7 +205,7 @@ function handleAddressSaved(address: CustomerAddressResponse) {
   customers.value = customers.value.map((item) =>
     item.systemUserId === next.systemUserId
       ? { ...item, defaultAddressId: address.id }
-      : item
+      : item,
   )
 }
 
@@ -221,13 +221,13 @@ async function saveCustomer() {
   const defaultAddressId = form.value.defaultAddressId.trim() || null
 
   if (!customerId) {
-    saveState.error = 'Select a customer to update.'
+    saveState.error = "Select a customer to update."
     return
   }
 
   if (!firstName || !lastName || !birthDate) {
     saveState.error =
-      'First name, last name, and birth date are required for updates.'
+      "First name, last name, and birth date are required for updates."
     return
   }
 
@@ -237,12 +237,12 @@ async function saveCustomer() {
     firstName,
     lastName,
     birthDate,
-    defaultAddressId
+    defaultAddressId,
   })
   saveState.loading = false
 
   if (!result.ok) {
-    saveState.error = result.error || 'Unable to update customer.'
+    saveState.error = result.error || "Unable to update customer."
     return
   }
 
@@ -251,7 +251,7 @@ async function saveCustomer() {
     firstName: result.data?.firstName ?? firstName,
     lastName: result.data?.lastName ?? lastName,
     birthDate: result.data?.birthDate || birthDate,
-    defaultAddressId: result.data?.defaultAddressId ?? defaultAddressId
+    defaultAddressId: result.data?.defaultAddressId ?? defaultAddressId,
   }
 
   selectedId.value = updated.systemUserId
@@ -259,10 +259,10 @@ async function saveCustomer() {
   applyCustomerToForm(updated)
 
   customers.value = customers.value.map((item) =>
-    item.systemUserId === updated.systemUserId ? updated : item
+    item.systemUserId === updated.systemUserId ? updated : item,
   )
 
-  saveState.success = 'Customer updated.'
+  saveState.success = "Customer updated."
 }
 
 async function removeCustomer() {
@@ -272,7 +272,7 @@ async function removeCustomer() {
 
   const customerId = selectedId.value
   if (!customerId) {
-    removeState.error = 'Select a customer to delete.'
+    removeState.error = "Select a customer to delete."
     return
   }
 
@@ -281,12 +281,12 @@ async function removeCustomer() {
   removeState.loading = false
 
   if (!result.ok) {
-    removeState.error = result.error || 'Unable to delete customer.'
+    removeState.error = result.error || "Unable to delete customer."
     return
   }
 
   customers.value = customers.value.filter(
-    (item) => item.systemUserId !== customerId
+    (item) => item.systemUserId !== customerId,
   )
 
   if (!isLookupMode.value) {
@@ -304,7 +304,7 @@ async function removeCustomer() {
   selectedCustomer.value = null
   applyCustomerToForm(null)
 
-  removeState.success = result.data?.message || 'Customer removed.'
+  removeState.success = result.data?.message || "Customer removed."
 }
 
 function handleCustomerCreated(customer: CustomerResponse) {
@@ -316,13 +316,13 @@ function handleCustomerCreated(customer: CustomerResponse) {
     setSinglePageTotal(1)
   } else {
     const exists = customers.value.some(
-      (item) => item.systemUserId === customer.systemUserId
+      (item) => item.systemUserId === customer.systemUserId,
     )
     customers.value = [
       customer,
       ...customers.value.filter(
-        (item) => item.systemUserId !== customer.systemUserId
-      )
+        (item) => item.systemUserId !== customer.systemUserId,
+      ),
     ]
     if (!exists) pagination.totalCount += 1
   }

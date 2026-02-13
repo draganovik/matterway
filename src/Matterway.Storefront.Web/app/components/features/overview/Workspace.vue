@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { useCatalogApi } from "~/composables/useCatalogApi";
-import { useCart } from "~/composables/useCart";
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import { useCart } from "~/composables/useCart"
 
-const catalogApi = useCatalogApi();
-const cart = useCart();
+const catalogApi = useCatalogApi()
+const cart = useCart()
 
-const loading = ref(true);
-const error = ref("");
+const loading = ref(true)
+const error = ref("")
 const articles = ref(
   [] as Awaited<ReturnType<typeof catalogApi.browseArticles>>["items"],
-);
-const totalCount = ref(0);
+)
+const totalCount = ref(0)
 
 async function loadOverview() {
-  loading.value = true;
-  error.value = "";
+  loading.value = true
+  error.value = ""
 
   const result = await catalogApi.browseArticles({
     page: 1,
     pageSize: 8,
-  });
+  })
 
-  if (result.error) error.value = result.error;
-  articles.value = result.items;
-  totalCount.value = result.meta?.totalCount ?? result.items.length;
-  loading.value = false;
+  if (result.error) error.value = result.error
+  articles.value = result.items
+  totalCount.value = result.meta?.totalCount ?? result.items.length
+  loading.value = false
 }
 
 onMounted(() => {
-  void loadOverview();
-});
+  void loadOverview()
+})
 
-const featured = computed(() => articles.value.slice(0, 4));
+const featured = computed(() => articles.value.slice(0, 4))
 const availableCount = computed(
   () => articles.value.filter((article) => article.isAvailable).length,
-);
+)
 </script>
 
 <template>
@@ -72,7 +72,7 @@ const availableCount = computed(
             <p class="text-muted text-xs">Trenutno dostupno</p>
             <p class="text-2xl font-semibold">{{ availableCount }}</p>
           </UCard>
-          <UCard class="border-default bg-default border col-span-2">
+          <UCard class="border-default bg-default col-span-2 border">
             <p class="text-muted text-xs">Stavki u vašoj korpi</p>
             <p class="text-2xl font-semibold">{{ cart.totalItems.value }}</p>
           </UCard>
@@ -103,14 +103,14 @@ const availableCount = computed(
         />
       </div>
 
-      <CommonEmptyState
+      <EmptyState
         v-else-if="!featured.length"
         title="Nema dostupnih artikala"
         description="Katalog je trenutno prazan."
       />
 
       <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <FeaturesArticlesBrowseListItem
+        <ArticlesBrowseListItem
           v-for="article in featured"
           :key="article.id"
           :article="article"

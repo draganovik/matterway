@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { GetArticleByIdResponse } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { GetArticleByIdResponse } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
 
 const props = withDefaults(
   defineProps<{
@@ -13,14 +13,14 @@ const props = withDefaults(
   {
     article: null,
     loading: false,
-    error: '',
-    canEdit: false
-  }
+    error: "",
+    canEdit: false,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:article', value: GetArticleByIdResponse | null): void
-  (event: 'updated', value: GetArticleByIdResponse): void
+  (event: "update:article", value: GetArticleByIdResponse | null): void
+  (event: "updated", value: GetArticleByIdResponse): void
 }>()
 
 const api = useCatalogApi()
@@ -36,11 +36,11 @@ type ArticleForm = {
 }
 
 const form = ref<ArticleForm>({
-  articleCode: '',
-  title: '',
-  basePrice: '',
-  description: '',
-  isAvailable: true
+  articleCode: "",
+  title: "",
+  basePrice: "",
+  description: "",
+  isAvailable: true,
 })
 
 watch(
@@ -48,28 +48,28 @@ watch(
   (article) => {
     if (!article) return
     form.value = {
-      articleCode: article.code || '',
-      title: article.title || '',
-      basePrice: article.basePrice ?? '',
-      description: article.description || '',
-      isAvailable: article.isAvailable
+      articleCode: article.code || "",
+      title: article.title || "",
+      basePrice: article.basePrice ?? "",
+      description: article.description || "",
+      isAvailable: article.isAvailable,
     }
-    updateState.error = ''
-    updateState.success = ''
+    updateState.error = ""
+    updateState.success = ""
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 function updateArticleData(patch: Partial<GetArticleByIdResponse>) {
   if (!props.article) return
   const next = { ...props.article, ...patch }
-  emit('update:article', next)
-  emit('updated', next)
+  emit("update:article", next)
+  emit("updated", next)
 }
 
 async function saveArticle() {
-  updateState.error = ''
-  updateState.success = ''
+  updateState.error = ""
+  updateState.success = ""
   if (!props.article) return
   if (!props.canEdit) return
   updateState.loading = true
@@ -78,11 +78,11 @@ async function saveArticle() {
     title: form.value.title || null,
     basePrice: form.value.basePrice || null,
     description: form.value.description || null,
-    isAvailable: form.value.isAvailable
+    isAvailable: form.value.isAvailable,
   })
   updateState.loading = false
   if (!result.ok) {
-    updateState.error = result.error || 'Unable to update article.'
+    updateState.error = result.error || "Unable to update article."
     return
   }
   updateArticleData({
@@ -91,16 +91,16 @@ async function saveArticle() {
     basePrice: result.data?.basePrice ?? form.value.basePrice,
     description: result.data?.description ?? form.value.description,
     isAvailable: result.data?.isAvailable ?? form.value.isAvailable,
-    updatedAt: result.data?.updatedAt ?? props.article.updatedAt
+    updatedAt: result.data?.updatedAt ?? props.article.updatedAt,
   })
-  updateState.success = 'Article updated.'
+  updateState.success = "Article updated."
 }
 
-function updateDetails(details: GetArticleByIdResponse['details']) {
+function updateDetails(details: GetArticleByIdResponse["details"]) {
   updateArticleData({ details })
 }
 
-function updateImages(images: GetArticleByIdResponse['images']) {
+function updateImages(images: GetArticleByIdResponse["images"]) {
   updateArticleData({ images })
 }
 </script>
@@ -117,8 +117,8 @@ function updateImages(images: GetArticleByIdResponse['images']) {
         <p class="text-muted text-sm">
           {{
             canEdit
-              ? 'Operator permission is required for create, update, and delete.'
-              : 'Read-only mode: operator permission required for changes.'
+              ? "Operator permission is required for create, update, and delete."
+              : "Read-only mode: operator permission required for changes."
           }}
         </p>
       </div>

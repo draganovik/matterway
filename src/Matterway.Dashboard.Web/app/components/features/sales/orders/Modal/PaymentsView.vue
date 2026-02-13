@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useOrderReveal } from '~/composables/useOrderReveal'
-import { formatDateTime, formatMoney } from '~/utils/formatters'
-import { paymentSumOf, paymentsBalanced } from '~/utils/salesOrderMetrics'
+import { useOrderReveal } from "~/composables/useOrderReveal"
+import { formatDateTime, formatMoney } from "~/utils/formatters"
+import { paymentSumOf, paymentsBalanced } from "~/utils/salesOrderMetrics"
 
 const props = withDefaults(
   defineProps<{
@@ -10,17 +10,17 @@ const props = withDefaults(
   }>(),
   {
     orderId: null,
-    orderLabel: ''
-  }
+    orderLabel: "",
+  },
 )
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const { order, notFound, loadState, displayLabel } = useOrderReveal({
   isOpen,
-  orderId: toRef(props, 'orderId'),
-  orderLabel: toRef(props, 'orderLabel'),
-  revealErrorMessage: 'Unable to reveal payments.'
+  orderId: toRef(props, "orderId"),
+  orderLabel: toRef(props, "orderLabel"),
+  revealErrorMessage: "Unable to reveal payments.",
 })
 
 const paymentSum = computed(() => paymentSumOf(order.value))
@@ -73,7 +73,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                   variant="subtle"
                 >
                   {{
-                    isPaymentBalanced ? 'Amounts Match' : 'Amounts Do Not Match'
+                    isPaymentBalanced ? "Amounts Match" : "Amounts Do Not Match"
                   }}
                 </UBadge>
               </div>
@@ -123,7 +123,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                   <div>
                     <dt class="text-muted text-xs">Provider</dt>
                     <dd class="text-foreground mt-1 text-sm">
-                      {{ payment.provider || '-' }}
+                      {{ payment.provider || "-" }}
                     </dd>
                   </div>
 
@@ -132,7 +132,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                     <dd
                       class="text-foreground mt-1 font-mono text-sm break-all"
                     >
-                      {{ payment.referenceId || '-' }}
+                      {{ payment.referenceId || "-" }}
                     </dd>
                   </div>
 

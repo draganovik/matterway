@@ -8,10 +8,10 @@ const { item } = defineProps<{
 }>()
 
 const fullName = computed(() => {
-  const first = item.firstName?.trim() || ''
-  const last = item.lastName?.trim() || ''
+  const first = item.firstName?.trim() || ""
+  const last = item.lastName?.trim() || ""
   const combined = `${first} ${last}`.trim()
-  return combined || 'Unnamed customer'
+  return combined || "Unnamed customer"
 })
 </script>
 
@@ -21,7 +21,7 @@ const fullName = computed(() => {
       {{ fullName }}
     </p>
     <p class="text-muted truncate font-mono text-xs">
-      {{ item.systemUserId || 'No ID' }}
+      {{ item.systemUserId || "No ID" }}
     </p>
   </div>
 </template>

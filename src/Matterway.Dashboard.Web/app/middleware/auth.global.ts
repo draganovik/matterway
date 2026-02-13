@@ -1,5 +1,5 @@
-import { useAuthSession } from '~/composables/useAuthSession'
-import { getFeatureByRoute } from '~/data/serviceRegistry'
+import { useAuthSession } from "~/composables/useAuthSession"
+import { getFeatureByRoute } from "~/data/serviceRegistry"
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthSession()
@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   await auth.initialize()
 
   if (!auth.isLoggedIn.value || !auth.isEmployee.value) {
-    return navigateTo('/login')
+    return navigateTo("/login")
   }
 
   const feature = getFeatureByRoute(to.path)
@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (requiredService && requiredLevel) {
     if (!auth.hasPermission(requiredService, requiredLevel)) {
-      return navigateTo(feature?.route || '/')
+      return navigateTo(feature?.route || "/")
     }
   }
 })

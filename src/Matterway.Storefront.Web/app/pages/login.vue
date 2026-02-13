@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Prijava",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesAuthLoginWorkspace />
+  <AuthLoginWorkspace />
 </template>

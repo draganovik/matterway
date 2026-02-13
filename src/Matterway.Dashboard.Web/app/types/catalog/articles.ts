@@ -1,10 +1,10 @@
-import type { PaginationResponse } from '../common/pagination'
+import type { PaginationResponse } from "../common/pagination"
 import type {
   ArticleDetailProperty,
   ArticleDiscountProperty,
   ArticleImageProperty,
-  NumberInput
-} from './shared'
+  NumberInput,
+} from "./shared"
 
 export type QueryArticlesParams = {
   filter?: string

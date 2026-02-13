@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { OrderResponse } from '~/types/sales'
-import { formatDateTime, formatMoney } from '~/utils/formatters'
-import { paymentsBalanced } from '~/utils/salesOrderMetrics'
+import type { OrderResponse } from "~/types/sales"
+import { formatDateTime, formatMoney } from "~/utils/formatters"
+import { paymentsBalanced } from "~/utils/salesOrderMetrics"
 
 const { item } = defineProps<{
   item: OrderResponse
@@ -15,9 +15,9 @@ const latestStatus = computed(() => {
 const isPaymentBalanced = computed(() => paymentsBalanced(item))
 
 const shortOrderId = computed(() => {
-  const value = String(item.id || '').trim()
-  if (!value) return 'No ID'
-  const segments = value.split('-').filter(Boolean)
+  const value = String(item.id || "").trim()
+  if (!value) return "No ID"
+  const segments = value.split("-").filter(Boolean)
   return segments.length ? segments[segments.length - 1] : value
 })
 </script>
@@ -42,7 +42,7 @@ const shortOrderId = computed(() => {
         variant="subtle"
         class="font-normal"
       >
-        {{ isPaymentBalanced ? 'Paid' : 'Unpaid' }}
+        {{ isPaymentBalanced ? "Paid" : "Unpaid" }}
       </UBadge>
       <UBadge
         v-if="latestStatus"

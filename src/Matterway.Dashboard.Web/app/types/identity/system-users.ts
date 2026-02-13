@@ -1,4 +1,4 @@
-import type { PaginationResponse } from '../common/pagination'
+import type { PaginationResponse } from "../common/pagination"
 
 export type QuerySystemUsersParams = {
   page: number
@@ -6,7 +6,7 @@ export type QuerySystemUsersParams = {
   role?: IdentityRole
 }
 
-export type IdentityRole = 'Customer' | 'Employee'
+export type IdentityRole = "Customer" | "Employee"
 
 export type SystemUserResponse = {
   id: string
@@ -24,7 +24,7 @@ export type UpdateSystemUserRequest = {
 
 export type UpdateSystemUserResponse = SystemUserResponse
 
-export type SystemUserPermLevel = 'Observer' | 'Operator' | 'Administrator'
+export type SystemUserPermLevel = "Observer" | "Operator" | "Administrator"
 
 export type SystemUserPermResponse = {
   service: string

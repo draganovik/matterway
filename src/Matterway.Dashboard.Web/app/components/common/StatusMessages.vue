@@ -8,12 +8,12 @@ const props = defineProps<{
 
 function hasState(value?: string | boolean) {
   if (value === true) return true
-  if (typeof value === 'string') return value.trim().length > 0
+  if (typeof value === "string") return value.trim().length > 0
   return false
 }
 
 function resolveMessage(value: string | boolean | undefined, fallback: string) {
-  if (typeof value === 'string' && value.trim().length > 0) return value
+  if (typeof value === "string" && value.trim().length > 0) return value
   return fallback
 }
 
@@ -23,16 +23,16 @@ const showSuccess = computed(() => hasState(props.success))
 const showEmpty = computed(() => hasState(props.empty))
 
 const loadingMessage = computed(() =>
-  resolveMessage(props.loading, 'Loading...')
+  resolveMessage(props.loading, "Loading..."),
 )
 const errorMessage = computed(() =>
-  resolveMessage(props.error, 'Something went wrong.')
+  resolveMessage(props.error, "Something went wrong."),
 )
 const successMessage = computed(() =>
-  resolveMessage(props.success, 'Operation completed successfully.')
+  resolveMessage(props.success, "Operation completed successfully."),
 )
 const emptyMessage = computed(() =>
-  resolveMessage(props.empty, 'No data available.')
+  resolveMessage(props.empty, "No data available."),
 )
 </script>
 

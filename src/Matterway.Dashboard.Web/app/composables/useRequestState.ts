@@ -8,9 +8,9 @@ export type RequestState = {
 export function useRequestState(initial?: Partial<RequestState>) {
   return reactive<RequestState>({
     loading: false,
-    error: '',
-    success: '',
-    empty: '',
-    ...initial
+    error: "",
+    success: "",
+    empty: "",
+    ...initial,
   })
 }

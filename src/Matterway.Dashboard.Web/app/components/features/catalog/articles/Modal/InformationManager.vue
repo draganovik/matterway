@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { CreateArticleResponse } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { useResetOnModalOpen } from '~/composables/useResetOnModalOpen'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { CreateArticleResponse } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { useResetOnModalOpen } from "~/composables/useResetOnModalOpen"
 
 type ArticleBaseForm = {
   articleCode: string
@@ -20,34 +20,34 @@ const emit = defineEmits<{
   created: [article: CreateArticleResponse]
 }>()
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const api = useCatalogApi()
 const createState = useRequestState()
 
 const form = ref<ArticleBaseForm>({
-  articleCode: '',
-  title: '',
-  basePrice: '',
-  description: '',
-  isAvailable: true
+  articleCode: "",
+  title: "",
+  basePrice: "",
+  description: "",
+  isAvailable: true,
 })
 
 function resetForm() {
   form.value = {
-    articleCode: '',
-    title: '',
-    basePrice: '',
-    description: '',
-    isAvailable: true
+    articleCode: "",
+    title: "",
+    basePrice: "",
+    description: "",
+    isAvailable: true,
   }
-  createState.error = ''
+  createState.error = ""
 }
 
 useResetOnModalOpen(isOpen, resetForm)
 
 async function createArticle() {
-  createState.error = ''
+  createState.error = ""
   if (!canEdit) return
 
   const payload = form.value
@@ -57,7 +57,7 @@ async function createArticle() {
 
   if (!articleCode || !title || !payload.basePrice || !description) {
     createState.error =
-      'Fill in all required fields before creating the article.'
+      "Fill in all required fields before creating the article."
     return
   }
 
@@ -67,16 +67,16 @@ async function createArticle() {
     title,
     basePrice: payload.basePrice,
     description,
-    isAvailable: payload.isAvailable
+    isAvailable: payload.isAvailable,
   })
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || 'Unable to create article.'
+    createState.error = result.error || "Unable to create article."
     return
   }
 
-  emit('created', result.data)
+  emit("created", result.data)
   isOpen.value = false
 }
 </script>

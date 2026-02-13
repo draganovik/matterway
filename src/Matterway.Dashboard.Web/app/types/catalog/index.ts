@@ -1,10 +1,10 @@
-export type { PaginationMeta, PaginationResponse } from '../common/pagination'
+export type { PaginationMeta, PaginationResponse } from "../common/pagination"
 export type {
   ArticleDetailProperty,
   ArticleDiscountProperty,
   ArticleImageProperty,
-  NumberInput
-} from './shared'
+  NumberInput,
+} from "./shared"
 export type {
   AddArticleDetailRequest,
   AddArticleImageRequest,
@@ -19,20 +19,20 @@ export type {
   UpdateArticleImageRequest,
   UpdateArticleImageResponse,
   UpdateArticleRequest,
-  UpdateArticleResponse
-} from './articles'
+  UpdateArticleResponse,
+} from "./articles"
 export type {
   DeleteDetailResponse,
   PutDetailRequest,
   PutDetailResponse,
   QueryDetailResponse,
-  QueryDetailsParams
-} from './details'
+  QueryDetailsParams,
+} from "./details"
 export type {
   CreateDiscountRequest,
   CreatedDiscountResponse,
   DeleteDiscountResponse,
   QueryDiscountResponse,
   UpdateDiscountRequest,
-  UpdatedDiscountResponse
-} from './discounts'
+  UpdatedDiscountResponse,
+} from "./discounts"

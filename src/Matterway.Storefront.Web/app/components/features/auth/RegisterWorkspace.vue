@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useRegisterCustomer } from "~/composables/useRegisterCustomer";
-import { useCart } from "~/composables/useCart";
+import { useRegisterCustomer } from "~/composables/useRegisterCustomer"
+import { useCart } from "~/composables/useCart"
 
-const registerCustomer = useRegisterCustomer();
-const cart = useCart();
-const route = useRoute();
+const registerCustomer = useRegisterCustomer()
+const cart = useCart()
+const route = useRoute()
 
 const model = reactive({
   firstName: "",
@@ -16,27 +16,27 @@ const model = reactive({
   email: "",
   password: "",
   confirmPassword: "",
-});
-const loading = ref(false);
-const error = ref("");
+})
+const loading = ref(false)
+const error = ref("")
 
 function resolveNextRoute() {
-  const next = route.query.next;
+  const next = route.query.next
   if (typeof next === "string" && next.startsWith("/")) {
-    return next;
+    return next
   }
-  return "/";
+  return "/"
 }
 
 async function submit() {
-  error.value = "";
+  error.value = ""
 
   if (model.password !== model.confirmPassword) {
-    error.value = "Lozinke se ne podudaraju.";
-    return;
+    error.value = "Lozinke se ne podudaraju."
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
     await registerCustomer.registerAndSignIn({
       firstName: model.firstName,
@@ -44,15 +44,15 @@ async function submit() {
       birthDate: model.birthDate,
       email: model.email,
       password: model.password,
-    });
+    })
 
-    await cart.clear();
-    await navigateTo(resolveNextRoute());
+    await cart.clear()
+    await navigateTo(resolveNextRoute())
   } catch (err) {
     error.value =
-      err instanceof Error ? err.message : "Registracija nije uspela.";
+      err instanceof Error ? err.message : "Registracija nije uspela."
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

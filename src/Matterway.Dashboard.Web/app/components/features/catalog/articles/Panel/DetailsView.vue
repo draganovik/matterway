@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { ArticleDetailProperty } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { ArticleDetailProperty } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
 
 const props = withDefaults(
   defineProps<{
@@ -12,12 +12,12 @@ const props = withDefaults(
   {
     articleId: null,
     details: () => [],
-    canEdit: false
-  }
+    canEdit: false,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:details', value: ArticleDetailProperty[]): void
+  (event: "update:details", value: ArticleDetailProperty[]): void
 }>()
 
 const api = useCatalogApi()
@@ -26,7 +26,7 @@ const detailList = ref<ArticleDetailProperty[]>([])
 const mutateState = useRequestState()
 const removeState = useRequestState()
 const detailModalOpen = ref(false)
-const detailModalMode = ref<'add' | 'edit'>('add')
+const detailModalMode = ref<"add" | "edit">("add")
 const activeDetail = ref<ArticleDetailProperty | null>(null)
 
 watch(
@@ -34,50 +34,50 @@ watch(
   (value) => {
     detailList.value = Array.isArray(value) ? [...value] : []
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 function updateDetails(next: ArticleDetailProperty[]) {
   detailList.value = [...next]
-  emit('update:details', detailList.value)
+  emit("update:details", detailList.value)
 }
 
 async function removeDetail(detail: ArticleDetailProperty) {
-  removeState.error = ''
-  removeState.success = ''
+  removeState.error = ""
+  removeState.success = ""
   if (!props.articleId || !detail.detailSlug) return
   removeState.loading = true
   const result = await api.removeArticleDetail(
     props.articleId,
-    detail.detailSlug
+    detail.detailSlug,
   )
   removeState.loading = false
   if (!result.ok) {
-    removeState.error = result.error || 'Unable to remove detail.'
+    removeState.error = result.error || "Unable to remove detail."
     return
   }
   updateDetails(
-    detailList.value.filter((item) => item.detailSlug !== detail.detailSlug)
+    detailList.value.filter((item) => item.detailSlug !== detail.detailSlug),
   )
-  removeState.success = 'Detail removed.'
+  removeState.success = "Detail removed."
 }
 
 function openAddDetailsModal() {
-  mutateState.error = ''
-  mutateState.success = ''
+  mutateState.error = ""
+  mutateState.success = ""
   if (!props.articleId) {
-    mutateState.error = 'Create the article before adding details.'
+    mutateState.error = "Create the article before adding details."
     return
   }
-  detailModalMode.value = 'add'
+  detailModalMode.value = "add"
   activeDetail.value = null
   detailModalOpen.value = true
 }
 
 function openEditDetailsModal(detail: ArticleDetailProperty) {
-  mutateState.error = ''
-  mutateState.success = ''
-  detailModalMode.value = 'edit'
+  mutateState.error = ""
+  mutateState.success = ""
+  detailModalMode.value = "edit"
   activeDetail.value = detail
   detailModalOpen.value = true
 }
@@ -89,26 +89,26 @@ async function handleDetailSubmit(payload: {
   textValue?: string | null
   numericValue?: number | null
 }) {
-  mutateState.error = ''
-  mutateState.success = ''
+  mutateState.error = ""
+  mutateState.success = ""
   if (!props.articleId) {
-    mutateState.error = 'Create the article before adding details.'
+    mutateState.error = "Create the article before adding details."
     return
   }
 
   mutateState.loading = true
   const existing = detailList.value.find(
-    (item) => item.detailSlug === payload.detailSlug
+    (item) => item.detailSlug === payload.detailSlug,
   )
-  if (detailModalMode.value === 'edit' && activeDetail.value?.detailSlug) {
+  if (detailModalMode.value === "edit" && activeDetail.value?.detailSlug) {
     const targetSlug = activeDetail.value.detailSlug
     const result = await api.updateArticleDetail(props.articleId, targetSlug, {
       textValue: payload.textValue ?? undefined,
-      numericValue: payload.numericValue ?? undefined
+      numericValue: payload.numericValue ?? undefined,
     })
     mutateState.loading = false
     if (!result.ok) {
-      mutateState.error = result.error || 'Unable to update detail.'
+      mutateState.error = result.error || "Unable to update detail."
       return
     }
     updateDetails(
@@ -117,29 +117,29 @@ async function handleDetailSubmit(payload: {
           ? {
               ...item,
               textValue: payload.textValue ?? null,
-              numericValue: payload.numericValue ?? null
+              numericValue: payload.numericValue ?? null,
             }
-          : item
-      )
+          : item,
+      ),
     )
-    mutateState.success = 'Detail updated.'
+    mutateState.success = "Detail updated."
     detailModalOpen.value = false
     return
   }
 
   if (existing) {
     mutateState.loading = false
-    mutateState.error = 'Detail already exists.'
+    mutateState.error = "Detail already exists."
     return
   }
   const addResult = await api.addArticleDetail(props.articleId, {
     detailSlug: payload.detailSlug,
     textValue: payload.textValue ?? undefined,
-    numericValue: payload.numericValue ?? undefined
+    numericValue: payload.numericValue ?? undefined,
   })
   mutateState.loading = false
   if (!addResult.ok) {
-    mutateState.error = addResult.error || 'Unable to add detail.'
+    mutateState.error = addResult.error || "Unable to add detail."
     return
   }
   updateDetails([
@@ -149,10 +149,10 @@ async function handleDetailSubmit(payload: {
       title: payload.title ?? payload.detailSlug,
       unit: payload.unit ?? null,
       textValue: payload.textValue ?? null,
-      numericValue: payload.numericValue ?? null
-    }
+      numericValue: payload.numericValue ?? null,
+    },
   ])
-  mutateState.success = 'Detail added.'
+  mutateState.success = "Detail added."
   detailModalOpen.value = false
 }
 </script>
@@ -194,8 +194,8 @@ async function handleDetailSubmit(payload: {
                 {{ detail.title || detail.detailSlug }}
               </div>
               <div class="text-muted text-xs">
-                {{ detail.textValue ?? detail.numericValue ?? 'No value' }}
-                {{ detail.unit || '' }}
+                {{ detail.textValue ?? detail.numericValue ?? "No value" }}
+                {{ detail.unit || "" }}
               </div>
             </div>
             <div class="flex items-center gap-2">

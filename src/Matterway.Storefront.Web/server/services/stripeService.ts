@@ -1,8 +1,5 @@
-import Stripe from "stripe";
-import type {
-  CardPaymentInput,
-  PaymentAddress,
-} from "../server/types/payments";
+import Stripe from "stripe"
+import type { CardPaymentInput, PaymentAddress } from "../types/payments"
 
 export async function payWithStripe(
   cardPayment: CardPaymentInput,
@@ -11,10 +8,10 @@ export async function payWithStripe(
   orderId: string,
   secretkey: string,
 ): Promise<string> {
-  const referenceId = createReferenceId();
+  const referenceId = createReferenceId()
   const stripe = new Stripe(secretkey, {
     apiVersion: "2025-10-29.clover",
-  });
+  })
   try {
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
@@ -24,7 +21,7 @@ export async function payWithStripe(
         exp_year: cardPayment.expYear,
         cvc: cardPayment.cvc,
       },
-    });
+    })
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(cardPayment.amount * 100),
@@ -48,16 +45,16 @@ export async function payWithStripe(
         reference_id: referenceId,
         note: address.note || "",
       },
-    });
+    })
 
-    return paymentIntent.client_secret || "";
+    return paymentIntent.client_secret || ""
   } catch (error) {
-    console.error("[payments] stripe charge failed", error);
-    throw new Error("Plaćanje nije uspelo. Pokušajte ponovo.");
+    console.error("[payments] stripe charge failed", error)
+    throw new Error("Plaćanje nije uspelo. Pokušajte ponovo.")
   }
 }
 
 const createReferenceId = () => {
-  const segment = () => Math.floor(1000 + Math.random() * 9000).toString();
-  return `${segment()}-${segment()}-${segment()}-${segment()}`;
-};
+  const segment = () => Math.floor(1000 + Math.random() * 9000).toString()
+  return `${segment()}-${segment()}-${segment()}-${segment()}`
+}

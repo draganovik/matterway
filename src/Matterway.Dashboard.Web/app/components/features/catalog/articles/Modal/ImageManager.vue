@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ArticleImageProperty } from '~/types/catalog'
+import type { ArticleImageProperty } from "~/types/catalog"
 
 type ImageSubmitPayload = {
   orderIndex: number
@@ -10,7 +10,7 @@ type ImageSubmitPayload = {
 const props = withDefaults(
   defineProps<{
     open?: boolean
-    mode?: 'add' | 'edit'
+    mode?: "add" | "edit"
     image?: ArticleImageProperty | null
     canEdit?: boolean
     loading?: boolean
@@ -18,28 +18,28 @@ const props = withDefaults(
   }>(),
   {
     open: false,
-    mode: 'add',
+    mode: "add",
     image: null,
     canEdit: false,
     loading: false,
-    error: ''
-  }
+    error: "",
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:open', value: boolean): void
-  (event: 'submit', payload: ImageSubmitPayload): void
+  (event: "update:open", value: boolean): void
+  (event: "submit", payload: ImageSubmitPayload): void
 }>()
 
 const isOpen = computed({
   get: () => props.open,
-  set: (value: boolean) => emit('update:open', value)
+  set: (value: boolean) => emit("update:open", value),
 })
 
 const file = ref<File | null>(null)
 const orderIndex = ref<number | string>(0)
-const imageAlt = ref('')
-const validationError = ref('')
+const imageAlt = ref("")
+const validationError = ref("")
 
 watch(
   () => props.open,
@@ -47,37 +47,37 @@ watch(
     if (!open) {
       file.value = null
       orderIndex.value = 0
-      imageAlt.value = ''
-      validationError.value = ''
+      imageAlt.value = ""
+      validationError.value = ""
       return
     }
-    if (props.mode === 'edit' && props.image) {
+    if (props.mode === "edit" && props.image) {
       orderIndex.value = props.image.orderIndex ?? 0
-      imageAlt.value = props.image.imageAlt || ''
+      imageAlt.value = props.image.imageAlt || ""
       file.value = null
     } else {
       orderIndex.value = 0
-      imageAlt.value = ''
+      imageAlt.value = ""
       file.value = null
     }
-  }
+  },
 )
 
 function submit() {
-  validationError.value = ''
+  validationError.value = ""
   const parsedOrder = Number(orderIndex.value)
   if (!Number.isFinite(parsedOrder) || parsedOrder < 0) {
-    validationError.value = 'Order index must be a valid number.'
+    validationError.value = "Order index must be a valid number."
     return
   }
-  if (props.mode === 'add' && !file.value) {
-    validationError.value = 'Select an image file to upload.'
+  if (props.mode === "add" && !file.value) {
+    validationError.value = "Select an image file to upload."
     return
   }
-  emit('submit', {
+  emit("submit", {
     orderIndex: parsedOrder,
     imageAlt: imageAlt.value.trim(),
-    file: file.value
+    file: file.value,
   })
 }
 </script>
@@ -87,13 +87,13 @@ function submit() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          {{ mode === 'edit' ? 'Edit Image' : 'Add Image' }}
+          {{ mode === "edit" ? "Edit Image" : "Add Image" }}
         </h3>
         <p class="text-muted text-sm">
           {{
-            mode === 'edit'
-              ? 'Update image metadata and order.'
-              : 'Upload a new image for the article.'
+            mode === "edit"
+              ? "Update image metadata and order."
+              : "Upload a new image for the article."
           }}
         </p>
       </div>
@@ -141,7 +141,7 @@ function submit() {
           :disabled="!canEdit"
           @click="submit"
         >
-          {{ mode === 'edit' ? 'Save Changes' : 'Upload Image' }}
+          {{ mode === "edit" ? "Save Changes" : "Upload Image" }}
         </UButton>
       </div>
     </template>

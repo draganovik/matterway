@@ -2,43 +2,43 @@
 import type {
   DetailFilterDefinition,
   DetailFilterState,
-} from "~/composables/useArticleFilters";
+} from "~/composables/useArticleFilters"
 
 const props = defineProps<{
-  detailFilter: DetailFilterState;
-  detailDefinitions: DetailFilterDefinition[];
-}>();
+  detailFilter: DetailFilterState
+  detailDefinitions: DetailFilterDefinition[]
+}>()
 
 const emit = defineEmits<{
-  remove: [];
-  setSlug: [slug: string];
-  setValue: [value: string];
-  setMin: [value: number | undefined];
-  setMax: [value: number | undefined];
-}>();
+  remove: []
+  setSlug: [slug: string]
+  setValue: [value: string]
+  setMin: [value: number | undefined]
+  setMax: [value: number | undefined]
+}>()
 
 const definitionItems = computed(() =>
   props.detailDefinitions.map((option) => ({
     label: option.unit ? `${option.label} (${option.unit})` : option.label,
     value: option.slug,
   })),
-);
+)
 
 const selectedDefinition = computed(() =>
   props.detailDefinitions.find(
     (definition) => definition.slug === props.detailFilter.slug,
   ),
-);
+)
 
-const isNumeric = computed(() => Boolean(selectedDefinition.value?.unit));
+const isNumeric = computed(() => Boolean(selectedDefinition.value?.unit))
 
 function onSlugChange(value: string | number | null | undefined) {
-  emit("setSlug", String(value ?? ""));
+  emit("setSlug", String(value ?? ""))
 }
 
 function toNumberOrUndefined(value: string | number | null | undefined) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
 }
 </script>
 

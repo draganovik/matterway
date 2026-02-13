@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useAuthorizedSections } from '~/composables/useAuthorizedSections'
+import { useAuthorizedSections } from "~/composables/useAuthorizedSections"
 
 definePageMeta({
-  title: 'Overview'
+  title: "Overview",
 })
 
 const sections = useAuthorizedSections()

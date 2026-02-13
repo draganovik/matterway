@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { useAuthSession } from '~/composables/useAuthSession'
+import { useAuthSession } from "~/composables/useAuthSession"
 
 const colorMode = useColorMode()
 const color = computed(() =>
-  colorMode.value === 'dark' ? '#0c0a09' : '#f5f5f4'
+  colorMode.value === "dark" ? "#0c0a09" : "#f5f5f4",
 )
 const auth = useAuthSession()
 const route = useRoute()
-const appTitle = 'Matterway Dashboard'
+const appTitle = "Matterway Dashboard"
 const isBooting = computed(
-  () => !auth.isInitialized.value && !route.meta?.public
+  () => !auth.isInitialized.value && !route.meta?.public,
 )
 const pageTitle = computed(() => {
   const title = route.meta?.title
-  return typeof title === 'string' && title.trim().length ? title : undefined
+  return typeof title === "string" && title.trim().length ? title : undefined
 })
 
 useHead({
@@ -21,20 +21,20 @@ useHead({
   titleTemplate: (titleChunk) =>
     titleChunk ? `${titleChunk} - ${appTitle}` : appTitle,
   meta: [
-    { charset: 'utf-8' },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { key: 'theme-color', name: 'theme-color', content: color }
+    { charset: "utf-8" },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    { key: "theme-color", name: "theme-color", content: color },
   ],
-  link: [{ rel: 'icon', href: '/favicon.svg' }],
+  link: [{ rel: "icon", href: "/favicon.svg" }],
   htmlAttrs: {
-    lang: 'en'
-  }
+    lang: "en",
+  },
 })
 
 onMounted(() => {
   if (!import.meta.client) return
   // Dashboard follows system theme automatically (no manual override).
-  colorMode.preference = 'system'
+  colorMode.preference = "system"
   void auth.initialize()
 })
 </script>

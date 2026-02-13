@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useCatalogApi } from "~/composables/useCatalogApi";
-import type { CatalogArticle } from "~/types/catalog/articles";
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { CatalogArticle } from "~/types/catalog/articles"
 
-const catalogApi = useCatalogApi();
-const route = useRoute();
+const catalogApi = useCatalogApi()
+const route = useRoute()
 
-const article = ref<CatalogArticle | null>(null);
-const error = ref("");
-const loading = ref(true);
+const article = ref<CatalogArticle | null>(null)
+const error = ref("")
+const loading = ref(true)
 
 const gallery = computed(() => {
-  if (!article.value) return [];
+  if (!article.value) return []
   const images = [
     article.value.thumbnailImage,
     ...(article.value.articleImages ?? []),
@@ -20,42 +20,42 @@ const gallery = computed(() => {
       id: item?.id || `${index}`,
       url: item?.imageUrl as string,
       alt: item?.imageAlt || article.value?.title || "Slika artikla",
-    }));
+    }))
 
-  const unique = new Map<string, (typeof images)[number]>();
+  const unique = new Map<string, (typeof images)[number]>()
   images.forEach((img) => {
-    if (!unique.has(img.url)) unique.set(img.url, img);
-  });
-  return Array.from(unique.values());
-});
+    if (!unique.has(img.url)) unique.set(img.url, img)
+  })
+  return Array.from(unique.values())
+})
 
 async function loadArticle() {
-  const slug = route.params.slug;
+  const slug = route.params.slug
   if (typeof slug !== "string" || !slug.trim()) {
-    article.value = null;
-    loading.value = false;
-    error.value = "Artikal nije pronađen.";
-    return;
+    article.value = null
+    loading.value = false
+    error.value = "Artikal nije pronađen."
+    return
   }
 
-  loading.value = true;
-  error.value = "";
+  loading.value = true
+  error.value = ""
 
-  const result = await catalogApi.getArticle(slug);
-  article.value = result.item;
-  if (result.error) error.value = result.error;
-  if (!result.item && !result.error) error.value = "Artikal nije pronađen.";
+  const result = await catalogApi.getArticle(slug)
+  article.value = result.item
+  if (result.error) error.value = result.error
+  if (!result.item && !result.error) error.value = "Artikal nije pronađen."
 
-  loading.value = false;
+  loading.value = false
 }
 
 watch(
   () => route.params.slug,
   () => {
-    void loadArticle();
+    void loadArticle()
   },
   { immediate: true },
-);
+)
 </script>
 
 <template>
@@ -76,17 +76,13 @@ watch(
     <template v-else-if="article">
       <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex flex-col gap-6 lg:w-2/5 lg:flex-none">
-          <FeaturesArticlesInstanceImageCarousel :images="gallery" />
-          <FeaturesArticlesInstanceDescription
-            :description="article.description"
-          />
+          <ArticlesInstanceImageCarousel :images="gallery" />
+          <ArticlesInstanceDescription :description="article.description" />
         </div>
 
         <div class="flex flex-col gap-6 lg:w-3/5 lg:flex-none">
-          <FeaturesArticlesInstanceOverview :article="article" />
-          <FeaturesArticlesInstanceDetailsTable
-            :details="article.articleDetails"
-          />
+          <ArticlesInstanceOverview :article="article" />
+          <ArticlesInstanceDetailsTable :details="article.articleDetails" />
         </div>
       </div>
     </template>

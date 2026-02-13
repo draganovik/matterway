@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useOrderReveal } from '~/composables/useOrderReveal'
-import { formatDateTime } from '~/utils/formatters'
+import { useOrderReveal } from "~/composables/useOrderReveal"
+import { formatDateTime } from "~/utils/formatters"
 
 const props = withDefaults(
   defineProps<{
@@ -9,17 +9,17 @@ const props = withDefaults(
   }>(),
   {
     orderId: null,
-    orderLabel: ''
-  }
+    orderLabel: "",
+  },
 )
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const { order, notFound, loadState, displayLabel } = useOrderReveal({
   isOpen,
-  orderId: toRef(props, 'orderId'),
-  orderLabel: toRef(props, 'orderLabel'),
-  revealErrorMessage: 'Unable to reveal status history.'
+  orderId: toRef(props, "orderId"),
+  orderLabel: toRef(props, "orderLabel"),
+  revealErrorMessage: "Unable to reveal status history.",
 })
 </script>
 
@@ -79,7 +79,7 @@ const { order, notFound, loadState, displayLabel } = useOrderReveal({
                 Changed: {{ formatDateTime(entry.changedAt) }}
               </p>
               <p class="text-muted mt-1 text-xs">
-                Note: {{ entry.note || '-' }}
+                Note: {{ entry.note || "-" }}
               </p>
             </div>
           </div>

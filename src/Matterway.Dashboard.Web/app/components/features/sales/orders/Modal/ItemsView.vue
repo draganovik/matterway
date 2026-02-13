@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useOrderReveal } from '~/composables/useOrderReveal'
-import { formatMoney } from '~/utils/formatters'
-import { lineTotalOf, quantitySumOf } from '~/utils/salesOrderMetrics'
+import { useOrderReveal } from "~/composables/useOrderReveal"
+import { formatMoney } from "~/utils/formatters"
+import { lineTotalOf, quantitySumOf } from "~/utils/salesOrderMetrics"
 
 const props = withDefaults(
   defineProps<{
@@ -10,17 +10,17 @@ const props = withDefaults(
   }>(),
   {
     orderId: null,
-    orderLabel: ''
-  }
+    orderLabel: "",
+  },
 )
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const { order, notFound, loadState, displayLabel } = useOrderReveal({
   isOpen,
-  orderId: toRef(props, 'orderId'),
-  orderLabel: toRef(props, 'orderLabel'),
-  revealErrorMessage: 'Unable to reveal order items.'
+  orderId: toRef(props, "orderId"),
+  orderLabel: toRef(props, "orderLabel"),
+  revealErrorMessage: "Unable to reveal order items.",
 })
 
 const itemCount = computed(() => order.value?.items?.length || 0)
@@ -101,7 +101,7 @@ const quantitySum = computed(() => quantitySumOf(order.value))
                 <div>
                   <dt class="text-muted text-xs">Article Title</dt>
                   <dd class="text-foreground mt-1 text-sm">
-                    {{ item.articleTitle || '-' }}
+                    {{ item.articleTitle || "-" }}
                   </dd>
                 </div>
 

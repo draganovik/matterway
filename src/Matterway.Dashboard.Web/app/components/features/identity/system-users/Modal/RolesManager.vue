@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useIdentityApi } from '~/composables/useIdentityApi'
+import { useIdentityApi } from "~/composables/useIdentityApi"
 import type {
   SystemUserPermLevel,
-  SystemUserPermResponse
-} from '~/types/identity'
-import { useModalCloseReset } from '~/composables/useModalCloseReset'
-import { useRequestState } from '~/composables/useRequestState'
+  SystemUserPermResponse,
+} from "~/types/identity"
+import { useModalCloseReset } from "~/composables/useModalCloseReset"
+import { useRequestState } from "~/composables/useRequestState"
 
 type RoleForm = {
   service: string
@@ -20,12 +20,12 @@ const props = withDefaults(
   }>(),
   {
     systemUserId: null,
-    userLabel: '',
-    canManage: false
-  }
+    userLabel: "",
+    canManage: false,
+  },
 )
 
-const isOpen = defineModel<boolean>('open', { required: true })
+const isOpen = defineModel<boolean>("open", { required: true })
 
 const api = useIdentityApi()
 const loadState = useRequestState()
@@ -37,25 +37,25 @@ const notFound = ref(false)
 const removingKey = ref<string | null>(null)
 
 const serviceOptions = [
-  { label: 'Identity', value: 'identity' },
-  { label: 'Catalog', value: 'catalog' },
-  { label: 'Customers', value: 'customers' },
-  { label: 'Sales', value: 'sales' }
+  { label: "Identity", value: "identity" },
+  { label: "Catalog", value: "catalog" },
+  { label: "Customers", value: "customers" },
+  { label: "Sales", value: "sales" },
 ]
 
 const levelOptions: Array<{ label: string; value: SystemUserPermLevel }> = [
-  { label: 'Observer', value: 'Observer' },
-  { label: 'Operator', value: 'Operator' },
-  { label: 'Administrator', value: 'Administrator' }
+  { label: "Observer", value: "Observer" },
+  { label: "Operator", value: "Operator" },
+  { label: "Administrator", value: "Administrator" },
 ]
 
 const form = ref<RoleForm>({
-  service: serviceOptions[0]?.value || 'identity',
-  level: 'Observer'
+  service: serviceOptions[0]?.value || "identity",
+  level: "Observer",
 })
 
 const displayLabel = computed(
-  () => props.userLabel.trim() || 'Selected system user'
+  () => props.userLabel.trim() || "Selected system user",
 )
 
 function roleKey(role: SystemUserPermResponse) {
@@ -72,7 +72,7 @@ function normalizeRoles(items: SystemUserPermResponse[]) {
 
     map.set(`${service}:${level.toLowerCase()}`, {
       service,
-      level
+      level,
     })
   }
 
@@ -84,41 +84,41 @@ function normalizeRoles(items: SystemUserPermResponse[]) {
 }
 
 function clearMessages() {
-  saveState.error = ''
-  saveState.success = ''
-  removeState.error = ''
-  removeState.success = ''
+  saveState.error = ""
+  saveState.success = ""
+  removeState.error = ""
+  removeState.success = ""
 }
 
 function resetModalState() {
   loadState.loading = false
-  loadState.error = ''
+  loadState.error = ""
   saveState.loading = false
-  saveState.error = ''
-  saveState.success = ''
+  saveState.error = ""
+  saveState.success = ""
   removeState.loading = false
-  removeState.error = ''
-  removeState.success = ''
+  removeState.error = ""
+  removeState.success = ""
   removingKey.value = null
   roles.value = []
   notFound.value = false
   form.value = {
-    service: serviceOptions[0]?.value || 'identity',
-    level: 'Observer'
+    service: serviceOptions[0]?.value || "identity",
+    level: "Observer",
   }
 }
 
 async function loadRoles() {
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    loadState.error = 'Select a system user first.'
+    loadState.error = "Select a system user first."
     roles.value = []
     notFound.value = false
     return
   }
 
   loadState.loading = true
-  loadState.error = ''
+  loadState.error = ""
   clearMessages()
   roles.value = []
   notFound.value = false
@@ -132,7 +132,7 @@ async function loadRoles() {
       return
     }
 
-    loadState.error = result.error || 'Unable to reveal roles.'
+    loadState.error = result.error || "Unable to reveal roles."
     return
   }
 
@@ -145,17 +145,17 @@ async function addRole() {
 
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    saveState.error = 'Select a system user first.'
+    saveState.error = "Select a system user first."
     return
   }
 
   const payload = {
     service: form.value.service.trim().toLowerCase(),
-    level: form.value.level
+    level: form.value.level,
   }
 
   if (!payload.service) {
-    saveState.error = 'Select a service.'
+    saveState.error = "Select a service."
     return
   }
 
@@ -164,7 +164,7 @@ async function addRole() {
   saveState.loading = false
 
   if (!result.ok) {
-    saveState.error = result.error || 'Unable to add role.'
+    saveState.error = result.error || "Unable to add role."
     return
   }
 
@@ -173,12 +173,12 @@ async function addRole() {
       ...roles.value,
       {
         service: payload.service,
-        level: payload.level
-      }
-    ]
+        level: payload.level,
+      },
+    ],
   )
 
-  saveState.success = 'Role added.'
+  saveState.success = "Role added."
 }
 
 async function removeRole(role: SystemUserPermResponse) {
@@ -187,7 +187,7 @@ async function removeRole(role: SystemUserPermResponse) {
 
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    removeState.error = 'Select a system user first.'
+    removeState.error = "Select a system user first."
     return
   }
 
@@ -197,31 +197,31 @@ async function removeRole(role: SystemUserPermResponse) {
 
   const result = await api.deleteSystemUserPerm(systemUserId, {
     service: role.service,
-    level: role.level
+    level: role.level,
   })
 
   removeState.loading = false
   removingKey.value = null
 
   if (!result.ok) {
-    removeState.error = result.error || 'Unable to remove role.'
+    removeState.error = result.error || "Unable to remove role."
     return
   }
 
   roles.value = normalizeRoles(
-    result.data || roles.value.filter((item) => roleKey(item) !== key)
+    result.data || roles.value.filter((item) => roleKey(item) !== key),
   )
 
-  removeState.success = 'Role removed.'
+  removeState.success = "Role removed."
 }
 
 useModalCloseReset({
   isOpen,
-  watchSources: [toRef(props, 'systemUserId')],
+  watchSources: [toRef(props, "systemUserId")],
   onCloseReset: resetModalState,
   onOpen: async () => {
     await loadRoles()
-  }
+  },
 })
 </script>
 

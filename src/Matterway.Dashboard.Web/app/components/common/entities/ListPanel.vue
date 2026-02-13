@@ -12,7 +12,7 @@ const props = withDefaults(
     loading?: boolean
     error?: string
     emptyMessage?: string
-    filterInputType?: 'textarea' | 'input'
+    filterInputType?: "textarea" | "input"
     filterPlaceholder?: string
     page?: number
     pageSize?: number
@@ -20,29 +20,29 @@ const props = withDefaults(
     totalPages?: number
   }>(),
   {
-    description: '',
-    itemKey: 'id',
-    itemTitleKey: 'title',
-    itemSubtitleKey: '',
+    description: "",
+    itemKey: "id",
+    itemTitleKey: "title",
+    itemSubtitleKey: "",
     selectedId: null,
-    filter: '',
+    filter: "",
     loading: false,
-    error: '',
-    emptyMessage: 'No results found.',
-    filterInputType: 'textarea',
+    error: "",
+    emptyMessage: "No results found.",
+    filterInputType: "textarea",
     filterPlaceholder:
-      'Search, use RSQL filters (e.g. title==chair; available==true).',
+      "Search, use RSQL filters (e.g. title==chair; available==true).",
     page: 1,
     pageSize: 20,
     totalCount: 0,
-    totalPages: 1
-  }
+    totalPages: 1,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:filter' | 'select', value: string): void
-  (event: 'update:page' | 'update:pageSize', value: number): void
-  (event: 'search'): void
+  (event: "update:filter" | "select", value: string): void
+  (event: "update:page" | "update:pageSize", value: number): void
+  (event: "search"): void
 }>()
 
 const filterInput = ref(props.filter)
@@ -50,36 +50,36 @@ const filterInput = ref(props.filter)
 watch(
   () => props.filter,
   (value) => {
-    filterInput.value = value || ''
-  }
+    filterInput.value = value || ""
+  },
 )
 
 const pageSizes = [10, 20, 50, 100].map((value) => ({
   label: `${value} / page`,
-  value
+  value,
 }))
 
 const safeTotalPages = computed(() =>
-  Math.max(1, Number(props.totalPages) || 1)
+  Math.max(1, Number(props.totalPages) || 1),
 )
 
 function applySearch() {
-  emit('update:filter', filterInput.value.trim())
-  emit('search')
+  emit("update:filter", filterInput.value.trim())
+  emit("search")
 }
 
 function selectItem(item: Record<string, unknown>) {
-  const key = String(item[props.itemKey] ?? '')
-  if (key) emit('select', key)
+  const key = String(item[props.itemKey] ?? "")
+  if (key) emit("select", key)
 }
 
 function updatePage(value: number) {
   const next = Math.min(Math.max(1, value), safeTotalPages.value)
-  if (next !== props.page) emit('update:page', next)
+  if (next !== props.page) emit("update:page", next)
 }
 
 function updatePageSize(value: number) {
-  emit('update:pageSize', value)
+  emit("update:pageSize", value)
 }
 </script>
 
@@ -141,7 +141,7 @@ function updatePageSize(value: number) {
             :selected="selectedId === String(item[itemKey])"
           >
             <div class="text-foreground text-base font-medium">
-              {{ item[itemTitleKey] || 'Untitled' }}
+              {{ item[itemTitleKey] || "Untitled" }}
             </div>
             <div
               v-if="itemSubtitleKey && item[itemSubtitleKey]"

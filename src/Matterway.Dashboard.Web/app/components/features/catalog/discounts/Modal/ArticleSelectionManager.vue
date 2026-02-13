@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
-import type { QueryArticleResponse } from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
-import { parseNumberOr } from '~/utils/numbers'
+import { useCatalogApi } from "~/composables/useCatalogApi"
+import type { QueryArticleResponse } from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
+import { parseNumberOr } from "~/utils/numbers"
 
 const props = withDefaults(
   defineProps<{
@@ -13,48 +13,48 @@ const props = withDefaults(
   {
     open: false,
     selectedIds: () => [],
-    canEdit: false
-  }
+    canEdit: false,
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:open', value: boolean): void
-  (event: 'submit', value: string[]): void
+  (event: "update:open", value: boolean): void
+  (event: "submit", value: string[]): void
 }>()
 
 const isOpen = computed({
   get: () => props.open,
-  set: (value: boolean) => emit('update:open', value)
+  set: (value: boolean) => emit("update:open", value),
 })
 
 const api = useCatalogApi()
-const listState = useRequestState({ empty: 'No articles found.' })
+const listState = useRequestState({ empty: "No articles found." })
 
 const articles = ref<QueryArticleResponse[]>([])
-const filter = ref('')
+const filter = ref("")
 const selectedArticleIds = ref<string[]>([])
 const pagination = reactive({
   page: 1,
   pageSize: 20,
   totalCount: 0,
-  totalPages: 1
+  totalPages: 1,
 })
 
 const pageSizes = [10, 20, 50, 100].map((value) => ({
   label: `${value} / page`,
-  value
+  value,
 }))
 
 const selectedOnPageCount = computed(
   () =>
     articles.value.filter(
-      (item) => item.id && selectedArticleIds.value.includes(item.id)
-    ).length
+      (item) => item.id && selectedArticleIds.value.includes(item.id),
+    ).length,
 )
 const allCurrentPageSelected = computed(
   () =>
     articles.value.length > 0 &&
-    selectedOnPageCount.value === articles.value.length
+    selectedOnPageCount.value === articles.value.length,
 )
 
 watch(
@@ -64,7 +64,7 @@ watch(
     selectedArticleIds.value = [...new Set(props.selectedIds)]
     pagination.page = 1
     void loadArticles()
-  }
+  },
 )
 
 watch([() => pagination.page, () => pagination.pageSize], () => {
@@ -74,18 +74,18 @@ watch([() => pagination.page, () => pagination.pageSize], () => {
 
 async function loadArticles() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const result = await api.queryArticles({
     filter: filter.value.trim() || undefined,
     page: pagination.page,
-    pageSize: pagination.pageSize
+    pageSize: pagination.pageSize,
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load articles.'
+    listState.error = result.error || "Unable to load articles."
     articles.value = []
     pagination.totalCount = 0
     pagination.totalPages = 1
@@ -102,19 +102,19 @@ async function loadArticles() {
   articles.value = result.data.data || []
   pagination.totalCount = parseNumberOr(
     result.data.meta?.totalCount,
-    articles.value.length
+    articles.value.length,
   )
   pagination.totalPages = Math.max(
     1,
-    parseNumberOr(result.data.meta?.totalPages, 1)
+    parseNumberOr(result.data.meta?.totalPages, 1),
   )
   pagination.page = Math.max(
     1,
-    parseNumberOr(result.data.meta?.currentPage, pagination.page)
+    parseNumberOr(result.data.meta?.currentPage, pagination.page),
   )
   pagination.pageSize = Math.max(
     1,
-    parseNumberOr(result.data.meta?.pageSize, pagination.pageSize)
+    parseNumberOr(result.data.meta?.pageSize, pagination.pageSize),
   )
 }
 
@@ -144,7 +144,7 @@ function isSelected(id: string) {
 function toggleSelection(id: string) {
   if (isSelected(id)) {
     selectedArticleIds.value = selectedArticleIds.value.filter(
-      (item) => item !== id
+      (item) => item !== id,
     )
     return
   }
@@ -160,7 +160,7 @@ function togglePageSelection() {
 
   if (allCurrentPageSelected.value) {
     selectedArticleIds.value = selectedArticleIds.value.filter(
-      (id) => !currentIds.includes(id)
+      (id) => !currentIds.includes(id),
     )
     return
   }
@@ -175,7 +175,7 @@ function clearSelection() {
 }
 
 function submitSelection() {
-  emit('submit', [...new Set(selectedArticleIds.value)])
+  emit("submit", [...new Set(selectedArticleIds.value)])
   isOpen.value = false
 }
 </script>
@@ -212,7 +212,7 @@ function submitSelection() {
             :disabled="!articles.length"
             @click="togglePageSelection"
           >
-            {{ allCurrentPageSelected ? 'Unselect Page' : 'Select Page' }}
+            {{ allCurrentPageSelected ? "Unselect Page" : "Select Page" }}
           </UButton>
           <UButton
             variant="ghost"

@@ -15,10 +15,10 @@ const { item, selected = false } = defineProps<{
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
       <p class="text-foreground truncate text-base font-medium">
-        {{ item.title || 'Untitled Article' }}
+        {{ item.title || "Untitled Article" }}
       </p>
       <p class="text-muted truncate text-sm">
-        {{ item.code || 'No code' }}
+        {{ item.code || "No code" }}
       </p>
     </div>
 
@@ -27,14 +27,14 @@ const { item, selected = false } = defineProps<{
       variant="subtle"
       class="shrink-0"
     >
-      {{ selected ? 'Selected' : 'Pick' }}
+      {{ selected ? "Selected" : "Pick" }}
     </UBadge>
   </div>
 
   <div class="text-muted mt-2 flex items-center justify-between text-sm">
     <UBadge :color="item.isAvailable ? 'success' : 'neutral'" variant="soft">
-      {{ item.isAvailable ? 'Available' : 'Unavailable' }}
+      {{ item.isAvailable ? "Available" : "Unavailable" }}
     </UBadge>
-    <span>Price: {{ item.price ?? item.basePrice ?? 'N/A' }}</span>
+    <span>Price: {{ item.price ?? item.basePrice ?? "N/A" }}</span>
   </div>
 </template>

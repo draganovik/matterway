@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { useIdentityApi } from '~/composables/useIdentityApi'
-import type { IdentityRole, SystemUserResponse } from '~/types/identity'
-import { useRequestState } from '~/composables/useRequestState'
-import { useWorkspacePagination } from '~/composables/useWorkspacePagination'
-import { useAuthSession } from '~/composables/useAuthSession'
+import { useIdentityApi } from "~/composables/useIdentityApi"
+import type { IdentityRole, SystemUserResponse } from "~/types/identity"
+import { useRequestState } from "~/composables/useRequestState"
+import { useWorkspacePagination } from "~/composables/useWorkspacePagination"
+import { useAuthSession } from "~/composables/useAuthSession"
 
 type SystemUserForm = {
   email: string
   password: string
 }
 
-type RoleFilter = 'all' | 'customers' | 'employees'
+type RoleFilter = "all" | "customers" | "employees"
 
 const auth = useAuthSession()
 const api = useIdentityApi()
 
-const canOperate = computed(() => auth.hasPermission('identity', 'operator'))
+const canOperate = computed(() => auth.hasPermission("identity", "operator"))
 const canManage = computed(() =>
-  auth.hasPermission('identity', 'administrator')
+  auth.hasPermission("identity", "administrator"),
 )
 const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-const listState = useRequestState({ empty: 'No system users found.' })
+const listState = useRequestState({ empty: "No system users found." })
 const detailState = useRequestState()
 const saveState = useRequestState()
 const removeState = useRequestState()
 
 const systemUsers = ref<SystemUserResponse[]>([])
-const filter = ref('')
-const roleFilter = ref<RoleFilter>('all')
+const filter = ref("")
+const roleFilter = ref<RoleFilter>("all")
 const {
   pagination,
   resetTotals,
@@ -37,13 +37,13 @@ const {
   changePage,
   changePageSize,
   searchWithPageReset,
-  watchPagination
+  watchPagination,
 } = useWorkspacePagination({ pageSize: 20 })
 
 const roleFilterOptions = [
-  { label: 'All', value: 'all' as const },
-  { label: 'Customers', value: 'customers' as const },
-  { label: 'Employees', value: 'employees' as const }
+  { label: "All", value: "all" as const },
+  { label: "Customers", value: "customers" as const },
+  { label: "Employees", value: "employees" as const },
 ]
 
 const selectedId = ref<string | null>(null)
@@ -51,22 +51,22 @@ const selectedSystemUser = ref<SystemUserResponse | null>(null)
 const rolesModalOpen = ref(false)
 
 const form = ref<SystemUserForm>({
-  email: '',
-  password: ''
+  email: "",
+  password: "",
 })
 
 function applySystemUserToForm(systemUser: SystemUserResponse | null) {
   if (!systemUser) {
     form.value = {
-      email: '',
-      password: ''
+      email: "",
+      password: "",
     }
     return
   }
 
   form.value = {
-    email: systemUser.email || '',
-    password: ''
+    email: systemUser.email || "",
+    password: "",
   }
 }
 
@@ -74,20 +74,20 @@ function clearSelection() {
   selectedId.value = null
   selectedSystemUser.value = null
   rolesModalOpen.value = false
-  detailState.error = ''
+  detailState.error = ""
   applySystemUserToForm(null)
 }
 
 function resetMessages() {
-  saveState.error = ''
-  saveState.success = ''
-  removeState.error = ''
-  removeState.success = ''
+  saveState.error = ""
+  saveState.success = ""
+  removeState.error = ""
+  removeState.success = ""
 }
 
 async function loadSystemUsers() {
   listState.loading = true
-  listState.error = ''
+  listState.error = ""
 
   const lookupId = filter.value.trim()
   if (lookupId) {
@@ -95,7 +95,7 @@ async function loadSystemUsers() {
     listState.loading = false
 
     if (!result.ok || !result.data) {
-      listState.error = result.error || 'Unable to load system user.'
+      listState.error = result.error || "Unable to load system user."
       systemUsers.value = []
       setSinglePageTotal(0)
       clearSelection()
@@ -114,13 +114,13 @@ async function loadSystemUsers() {
   const result = await api.querySystemUsers({
     page: pagination.page,
     pageSize: pagination.pageSize,
-    role: resolveRoleFilter()
+    role: resolveRoleFilter(),
   })
 
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || 'Unable to load system users.'
+    listState.error = result.error || "Unable to load system users."
     systemUsers.value = []
     resetTotals()
     clearSelection()
@@ -146,13 +146,13 @@ async function loadSystemUsers() {
 
 async function loadSystemUser(systemUserId: string) {
   detailState.loading = true
-  detailState.error = ''
+  detailState.error = ""
 
   const result = await api.getSystemUserById(systemUserId)
   detailState.loading = false
 
   if (!result.ok || !result.data) {
-    detailState.error = result.error || 'Unable to load system user details.'
+    detailState.error = result.error || "Unable to load system user details."
     selectedSystemUser.value = null
     applySystemUserToForm(null)
     return
@@ -162,14 +162,14 @@ async function loadSystemUser(systemUserId: string) {
   applySystemUserToForm(result.data)
 
   systemUsers.value = systemUsers.value.map((item) =>
-    item.id === result.data?.id ? result.data : item
+    item.id === result.data?.id ? result.data : item,
   )
 }
 
 function searchSystemUsers() {
   searchWithPageReset(
     loadSystemUsers,
-    () => !filter.value.trim() && pagination.page !== 1
+    () => !filter.value.trim() && pagination.page !== 1,
   )
 }
 
@@ -181,7 +181,7 @@ function selectSystemUser(systemUserId: string) {
 }
 
 const selectedUserLabel = computed(() => {
-  if (!selectedSystemUser.value) return 'Selected system user'
+  if (!selectedSystemUser.value) return "Selected system user"
   return selectedSystemUser.value.email?.trim() || selectedSystemUser.value.id
 })
 
@@ -191,8 +191,8 @@ function revealRoles() {
 }
 
 function resolveRoleFilter(): IdentityRole | undefined {
-  if (roleFilter.value === 'customers') return 'Customer'
-  if (roleFilter.value === 'employees') return 'Employee'
+  if (roleFilter.value === "customers") return "Customer"
+  if (roleFilter.value === "employees") return "Employee"
   return undefined
 }
 
@@ -211,24 +211,24 @@ async function saveSystemUser() {
   const password = form.value.password.trim()
 
   if (!systemUserId) {
-    saveState.error = 'Select a system user to update.'
+    saveState.error = "Select a system user to update."
     return
   }
 
   if (!email && !password) {
-    saveState.error = 'Provide email and/or password to update.'
+    saveState.error = "Provide email and/or password to update."
     return
   }
 
   saveState.loading = true
   const result = await api.updateSystemUser(systemUserId, {
     email: email || undefined,
-    password: password || undefined
+    password: password || undefined,
   })
   saveState.loading = false
 
   if (!result.ok || !result.data) {
-    saveState.error = result.error || 'Unable to update system user.'
+    saveState.error = result.error || "Unable to update system user."
     return
   }
 
@@ -239,10 +239,10 @@ async function saveSystemUser() {
   applySystemUserToForm(updated)
 
   systemUsers.value = systemUsers.value.map((item) =>
-    item.id === updated.id ? updated : item
+    item.id === updated.id ? updated : item,
   )
 
-  saveState.success = 'System user updated.'
+  saveState.success = "System user updated."
 }
 
 async function removeSystemUser() {
@@ -252,7 +252,7 @@ async function removeSystemUser() {
 
   const systemUserId = selectedId.value
   if (!systemUserId) {
-    removeState.error = 'Select a system user to delete.'
+    removeState.error = "Select a system user to delete."
     return
   }
 
@@ -261,12 +261,12 @@ async function removeSystemUser() {
   removeState.loading = false
 
   if (!result.ok) {
-    removeState.error = result.error || 'Unable to delete system user.'
+    removeState.error = result.error || "Unable to delete system user."
     return
   }
 
   systemUsers.value = systemUsers.value.filter(
-    (item) => item.id !== systemUserId
+    (item) => item.id !== systemUserId,
   )
 
   if (!isLookupMode.value) {
@@ -284,7 +284,7 @@ async function removeSystemUser() {
   selectedSystemUser.value = null
   applySystemUserToForm(null)
 
-  removeState.success = 'System user deleted.'
+  removeState.success = "System user deleted."
 }
 
 watchPagination(loadSystemUsers, () => !filter.value.trim())

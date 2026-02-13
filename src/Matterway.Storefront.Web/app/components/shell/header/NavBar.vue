@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCart } from "~/composables/useCart";
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
 
-const auth = useAuthSession();
-const cart = useCart();
-const route = useRoute();
-const router = useRouter();
+const auth = useAuthSession()
+const cart = useCart()
+const route = useRoute()
+const router = useRouter()
 
-const mobileMenuOpen = ref(false);
-const searchTerm = ref("");
+const mobileMenuOpen = ref(false)
+const searchTerm = ref("")
 
 const navItems = [
   { label: "Pregled", to: "/" },
   { label: "Artikli", to: "/articles" },
-];
+]
 
-const cartCount = computed(() => cart.totalItems.value);
+const cartCount = computed(() => cart.totalItems.value)
 
 function isActive(to: string) {
-  return route.path === to || (to !== "/" && route.path.startsWith(`${to}/`));
+  return route.path === to || (to !== "/" && route.path.startsWith(`${to}/`))
 }
 
 function submitSearch() {
-  const query = searchTerm.value.trim();
+  const query = searchTerm.value.trim()
   router.push({
     path: "/articles",
     query: {
       articleName: query || undefined,
     },
-  });
-  mobileMenuOpen.value = false;
+  })
+  mobileMenuOpen.value = false
 }
 
 watch(
   () => route.fullPath,
   () => {
-    mobileMenuOpen.value = false;
+    mobileMenuOpen.value = false
   },
-);
+)
 </script>
 
 <template>
@@ -47,7 +47,7 @@ watch(
     <div
       class="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8"
     >
-      <ShellHeaderBrandButton />
+      <HeaderBrandButton />
 
       <nav class="ml-2 hidden items-center gap-1 lg:flex">
         <UButton
@@ -58,7 +58,7 @@ watch(
           color="neutral"
           :class="
             isActive(item.to)
-              ? 'bg-elevated text-toned ring-1 ring-inset ring-default'
+              ? 'bg-elevated text-toned ring-default ring-1 ring-inset'
               : 'hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
           "
         >
@@ -100,7 +100,7 @@ watch(
           <span v-if="cartCount">{{ cartCount }}</span>
         </UButton>
 
-        <ShellHeaderUserDropdown
+        <HeaderUserDropdown
           v-if="auth.isLoggedIn.value && auth.isCustomer.value"
         />
         <UButton
@@ -171,7 +171,7 @@ watch(
           block
           :class="
             isActive(item.to)
-              ? 'bg-elevated text-toned ring-1 ring-inset ring-default'
+              ? 'bg-elevated text-toned ring-default ring-1 ring-inset'
               : 'hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
           "
           @click="mobileMenuOpen = false"

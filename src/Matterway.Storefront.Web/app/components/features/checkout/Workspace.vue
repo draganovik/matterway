@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCart } from "~/composables/useCart";
-import { useCustomersApi } from "~/composables/useCustomersApi";
-import { useSalesApi } from "~/composables/useSalesApi";
-import { formatMoney } from "~/utils/formatters";
-import type { CheckoutAddress } from "~/types/customers/address";
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
+import { useCustomersApi } from "~/composables/useCustomersApi"
+import { useSalesApi } from "~/composables/useSalesApi"
+import { formatMoney } from "~/utils/formatters"
+import type { CheckoutAddress } from "~/types/customers/address"
 
-const auth = useAuthSession();
-const cart = useCart();
-const customersApi = useCustomersApi();
-const salesApi = useSalesApi();
+const auth = useAuthSession()
+const cart = useCart()
+const customersApi = useCustomersApi()
+const salesApi = useSalesApi()
 
 const address = reactive<CheckoutAddress>({
   receiverName: "",
@@ -20,44 +20,44 @@ const address = reactive<CheckoutAddress>({
   country: "Srbija",
   contactPhone: "",
   note: "",
-});
+})
 
 const payment = reactive({
   cardNumber: "",
   expMonth: new Date().getMonth() + 1,
   expYear: new Date().getFullYear(),
   cvc: "",
-});
+})
 
-const error = ref("");
-const loading = ref(false);
+const error = ref("")
+const loading = ref(false)
 
-const isCartEmpty = computed(() => cart.totalItems.value === 0);
+const isCartEmpty = computed(() => cart.totalItems.value === 0)
 
 function formatCardNumber(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 19);
-  return digits.replace(/(.{4})/g, "$1 ").trim();
+  const digits = value.replace(/\D/g, "").slice(0, 19)
+  return digits.replace(/(.{4})/g, "$1 ").trim()
 }
 
 watch(
   () => payment.cardNumber,
   (value) => {
-    const formatted = formatCardNumber(value);
+    const formatted = formatCardNumber(value)
     if (formatted !== value) {
-      payment.cardNumber = formatted;
+      payment.cardNumber = formatted
     }
   },
-);
+)
 
 watch(
   () => payment.cvc,
   (value) => {
-    const normalized = value.replace(/\D/g, "").slice(0, 4);
+    const normalized = value.replace(/\D/g, "").slice(0, 4)
     if (normalized !== value) {
-      payment.cvc = normalized;
+      payment.cvc = normalized
     }
   },
-);
+)
 
 function isAddressValid() {
   return [
@@ -66,53 +66,53 @@ function isAddressValid() {
     address.street,
     address.city,
     address.zipCode,
-  ].every((item) => item.trim().length > 0);
+  ].every((item) => item.trim().length > 0)
 }
 
 async function loadDefaultAddress() {
-  const response = await customersApi.getSelfAddress();
-  if (!response.ok || !response.data) return;
+  const response = await customersApi.getSelfAddress()
+  if (!response.ok || !response.data) return
 
   if (!address.street && response.data.addressLine1) {
-    address.street = response.data.addressLine1;
+    address.street = response.data.addressLine1
   }
   if (!address.residence && response.data.addressLine2) {
-    address.residence = response.data.addressLine2;
+    address.residence = response.data.addressLine2
   }
   if (!address.city && response.data.city) {
-    address.city = response.data.city;
+    address.city = response.data.city
   }
   if (!address.zipCode && response.data.zipCode) {
-    address.zipCode = response.data.zipCode;
+    address.zipCode = response.data.zipCode
   }
   if (!address.country && response.data.country) {
-    address.country = response.data.country;
+    address.country = response.data.country
   }
   if (!address.contactPhone && response.data.contactPhone) {
-    address.contactPhone = response.data.contactPhone;
+    address.contactPhone = response.data.contactPhone
   }
 }
 
 async function submitCheckout() {
-  if (loading.value) return;
-  error.value = "";
+  if (loading.value) return
+  error.value = ""
 
   if (isCartEmpty.value) {
-    error.value = "Korpa je prazna.";
-    return;
+    error.value = "Korpa je prazna."
+    return
   }
 
   if (!auth.customerId.value) {
-    error.value = "Korisnička sesija nije dostupna.";
-    return;
+    error.value = "Korisnička sesija nije dostupna."
+    return
   }
 
   if (!isAddressValid()) {
-    error.value = "Popunite sva obavezna polja za dostavu.";
-    return;
+    error.value = "Popunite sva obavezna polja za dostavu."
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
     const orderResponse = await salesApi.placeSelfOrder({
       customerId: auth.customerId.value,
@@ -125,11 +125,11 @@ async function submitCheckout() {
         addressLine2: address.residence || undefined,
         contactPhone: address.contactPhone || undefined,
       },
-    });
+    })
 
     if (!orderResponse.ok || !orderResponse.data?.id) {
-      error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo.";
-      return;
+      error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo."
+      return
     }
 
     const paymentResponse = await fetch("/api/payments", {
@@ -147,28 +147,28 @@ async function submitCheckout() {
         orderId: orderResponse.data.id,
         userId: auth.customerId.value,
       }),
-    });
+    })
 
     if (!paymentResponse.ok) {
-      const body = await paymentResponse.json().catch(() => null);
-      error.value = body?.message || "Plaćanje nije uspelo.";
-      return;
+      const body = await paymentResponse.json().catch(() => null)
+      error.value = body?.message || "Plaćanje nije uspelo."
+      return
     }
 
-    await cart.clear();
-    await navigateTo("/orders");
+    await cart.clear()
+    await navigateTo("/orders")
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 onMounted(async () => {
   if (isCartEmpty.value) {
-    await navigateTo("/cart");
-    return;
+    await navigateTo("/cart")
+    return
   }
-  await loadDefaultAddress();
-});
+  await loadDefaultAddress()
+})
 </script>
 
 <template>
@@ -302,7 +302,7 @@ onMounted(async () => {
         </template>
       </UCard>
 
-      <UCard class="border-default bg-default border h-fit">
+      <UCard class="border-default bg-default h-fit border">
         <template #header>
           <h2 class="text-base font-semibold">Pregled porudžbine</h2>
         </template>

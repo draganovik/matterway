@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession";
-import { useCart } from "~/composables/useCart";
-import { formatMoney } from "~/utils/formatters";
+import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
+import { formatMoney } from "~/utils/formatters"
 
-const auth = useAuthSession();
-const cart = useCart();
+const auth = useAuthSession()
+const cart = useCart()
 
-const isEmpty = computed(() => cart.totalItems.value === 0);
+const isEmpty = computed(() => cart.totalItems.value === 0)
 
 function goToCheckout() {
-  if (isEmpty.value) return;
+  if (isEmpty.value) return
   if (!auth.isLoggedIn.value) {
-    void navigateTo("/login?next=%2Fcheckout");
-    return;
+    void navigateTo("/login?next=%2Fcheckout")
+    return
   }
-  void navigateTo("/checkout");
+  void navigateTo("/checkout")
 }
 </script>
 
@@ -37,14 +37,14 @@ function goToCheckout() {
       </div>
     </UCard>
 
-    <CommonEmptyState
+    <EmptyState
       v-if="isEmpty"
       title="Korpa je prazna"
       description="Dodajte artikle iz kataloga da nastavite."
       icon="i-lucide-shopping-cart"
     >
       <UButton to="/articles" color="primary">Pregledaj artikle</UButton>
-    </CommonEmptyState>
+    </EmptyState>
 
     <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
       <UCard class="border-default bg-default border">
@@ -111,7 +111,7 @@ function goToCheckout() {
         </ul>
       </UCard>
 
-      <UCard class="border-default bg-default border h-fit">
+      <UCard class="border-default bg-default h-fit border">
         <div class="space-y-3">
           <div class="flex items-center justify-between text-sm">
             <span class="text-muted">Stavke</span>
@@ -144,7 +144,7 @@ function goToCheckout() {
               block
               @click="
                 () => {
-                  void cart.clear();
+                  void cart.clear()
                 }
               "
             >

@@ -1,4 +1,4 @@
-import type { NumberInput } from './shared'
+import type { NumberInput } from "./shared"
 
 export type CreateDiscountRequest = {
   code: string

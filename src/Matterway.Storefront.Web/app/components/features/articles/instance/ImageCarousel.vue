@@ -1,47 +1,47 @@
 <script setup lang="ts">
 interface CarouselImage {
-  id: string;
-  url: string;
-  alt: string;
+  id: string
+  url: string
+  alt: string
 }
 
 const props = defineProps<{
-  images: CarouselImage[];
-}>();
+  images: CarouselImage[]
+}>()
 
-const activeIndex = ref(0);
+const activeIndex = ref(0)
 
-const hasImages = computed(() => props.images.length > 0);
-const hasMultipleImages = computed(() => props.images.length > 1);
+const hasImages = computed(() => props.images.length > 0)
+const hasMultipleImages = computed(() => props.images.length > 1)
 
 const currentImage = computed(() => {
-  if (!hasImages.value) return null;
-  const index = Math.min(activeIndex.value, props.images.length - 1);
-  return props.images[index];
-});
+  if (!hasImages.value) return null
+  const index = Math.min(activeIndex.value, props.images.length - 1)
+  return props.images[index]
+})
 
 watch(
   () => props.images.length,
   () => {
     if (activeIndex.value >= props.images.length) {
-      activeIndex.value = 0;
+      activeIndex.value = 0
     }
   },
-);
+)
 
 function selectImage(index: number) {
-  activeIndex.value = index;
+  activeIndex.value = index
 }
 
 function showNext() {
-  if (!hasMultipleImages.value) return;
-  activeIndex.value = (activeIndex.value + 1) % props.images.length;
+  if (!hasMultipleImages.value) return
+  activeIndex.value = (activeIndex.value + 1) % props.images.length
 }
 
 function showPrevious() {
-  if (!hasMultipleImages.value) return;
+  if (!hasMultipleImages.value) return
   activeIndex.value =
-    (activeIndex.value - 1 + props.images.length) % props.images.length;
+    (activeIndex.value - 1 + props.images.length) % props.images.length
 }
 </script>
 

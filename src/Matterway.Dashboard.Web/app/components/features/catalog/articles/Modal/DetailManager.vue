@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useCatalogApi } from '~/composables/useCatalogApi'
+import { useCatalogApi } from "~/composables/useCatalogApi"
 import type {
   ArticleDetailProperty,
-  QueryDetailResponse
-} from '~/types/catalog'
-import { useRequestState } from '~/composables/useRequestState'
+  QueryDetailResponse,
+} from "~/types/catalog"
+import { useRequestState } from "~/composables/useRequestState"
 
 type DetailSubmitPayload = {
   detailSlug: string
@@ -17,7 +17,7 @@ type DetailSubmitPayload = {
 const props = withDefaults(
   defineProps<{
     open?: boolean
-    mode?: 'add' | 'edit'
+    mode?: "add" | "edit"
     detail?: ArticleDetailProperty | null
     canEdit?: boolean
     loading?: boolean
@@ -25,31 +25,31 @@ const props = withDefaults(
   }>(),
   {
     open: false,
-    mode: 'add',
+    mode: "add",
     detail: null,
     canEdit: false,
     loading: false,
-    error: ''
-  }
+    error: "",
+  },
 )
 
 const emit = defineEmits<{
-  (event: 'update:open', value: boolean): void
-  (event: 'submit', payload: DetailSubmitPayload): void
+  (event: "update:open", value: boolean): void
+  (event: "submit", payload: DetailSubmitPayload): void
 }>()
 
 const api = useCatalogApi()
 
 const definitionState = useRequestState()
-const searchTerm = ref('')
+const searchTerm = ref("")
 const detailOptions = ref<QueryDetailResponse[]>([])
-const selectedKey = ref('')
-const valueInput = ref('')
-const validationError = ref('')
+const selectedKey = ref("")
+const valueInput = ref("")
+const validationError = ref("")
 
 const isOpen = computed({
   get: () => props.open,
-  set: (value: boolean) => emit('update:open', value)
+  set: (value: boolean) => emit("update:open", value),
 })
 
 const optionItems = computed(() =>
@@ -58,14 +58,14 @@ const optionItems = computed(() =>
     .map((option) => ({
       id: option.slug as string,
       slug: option.slug as string,
-      label: (option.title ?? option.slug ?? '').toString(),
-      unit: option.unit || ''
-    }))
+      label: (option.title ?? option.slug ?? "").toString(),
+      unit: option.unit || "",
+    })),
 )
 
 const selectedOption = computed(() => {
   const match = optionItems.value.find(
-    (option) => option.id === selectedKey.value
+    (option) => option.id === selectedKey.value,
   )
   if (match) return match
   if (props.detail?.detailSlug) {
@@ -73,7 +73,7 @@ const selectedOption = computed(() => {
       id: props.detail.detailSlug,
       slug: props.detail.detailSlug,
       label: props.detail.title ?? props.detail.detailSlug,
-      unit: props.detail.unit ?? ''
+      unit: props.detail.unit ?? "",
     }
   }
   if (!selectedKey.value) return null
@@ -81,12 +81,12 @@ const selectedOption = computed(() => {
     id: selectedKey.value,
     slug: selectedKey.value,
     label: selectedKey.value,
-    unit: ''
+    unit: "",
   }
 })
 
 const isNumeric = computed(() => {
-  if (props.mode === 'edit') {
+  if (props.mode === "edit") {
     return Boolean(props.detail?.unit)
   }
   return Boolean(selectedOption.value?.unit)
@@ -96,36 +96,36 @@ watch(
   () => props.open,
   (open) => {
     if (!open) {
-      searchTerm.value = ''
+      searchTerm.value = ""
       detailOptions.value = []
-      selectedKey.value = ''
-      valueInput.value = ''
-      validationError.value = ''
-      definitionState.error = ''
-      definitionState.success = ''
+      selectedKey.value = ""
+      valueInput.value = ""
+      validationError.value = ""
+      definitionState.error = ""
+      definitionState.success = ""
       return
     }
-    if (props.mode === 'edit' && props.detail?.detailSlug) {
+    if (props.mode === "edit" && props.detail?.detailSlug) {
       selectedKey.value = props.detail.detailSlug
       valueInput.value =
-        props.detail.textValue ?? props.detail.numericValue?.toString() ?? ''
+        props.detail.textValue ?? props.detail.numericValue?.toString() ?? ""
     } else {
-      selectedKey.value = ''
-      valueInput.value = ''
+      selectedKey.value = ""
+      valueInput.value = ""
       void loadDefinitions()
     }
-  }
+  },
 )
 
 async function loadDefinitions() {
-  definitionState.error = ''
-  definitionState.success = ''
+  definitionState.error = ""
+  definitionState.success = ""
   definitionState.loading = true
   const titleLike = searchTerm.value.trim() || undefined
   const result = await api.queryDetails({ limit: 25, titleLike })
   definitionState.loading = false
   if (!result.ok) {
-    definitionState.error = result.error || 'Unable to load definitions.'
+    definitionState.error = result.error || "Unable to load definitions."
     return
   }
   detailOptions.value = result.data || []
@@ -135,39 +135,39 @@ async function loadDefinitions() {
 }
 
 function submit() {
-  validationError.value = ''
+  validationError.value = ""
   const slug =
-    props.mode === 'edit' ? (props.detail?.detailSlug ?? '') : selectedKey.value
+    props.mode === "edit" ? (props.detail?.detailSlug ?? "") : selectedKey.value
   if (!slug) {
-    validationError.value = 'Select a detail.'
+    validationError.value = "Select a detail."
     return
   }
   const rawValue = valueInput.value.trim()
   if (!rawValue) {
-    validationError.value = 'Provide a value.'
+    validationError.value = "Provide a value."
     return
   }
   if (isNumeric.value) {
     const numericValue = Number(rawValue)
     if (!Number.isFinite(numericValue)) {
-      validationError.value = 'Numeric value is invalid.'
+      validationError.value = "Numeric value is invalid."
       return
     }
-    emit('submit', {
+    emit("submit", {
       detailSlug: slug,
       title: selectedOption.value?.label ?? props.detail?.title ?? null,
       unit: selectedOption.value?.unit ?? props.detail?.unit ?? null,
       textValue: null,
-      numericValue
+      numericValue,
     })
     return
   }
-  emit('submit', {
+  emit("submit", {
     detailSlug: slug,
     title: selectedOption.value?.label ?? props.detail?.title ?? null,
     unit: selectedOption.value?.unit ?? props.detail?.unit ?? null,
     textValue: rawValue,
-    numericValue: null
+    numericValue: null,
   })
 }
 </script>
@@ -177,13 +177,13 @@ function submit() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          {{ mode === 'edit' ? 'Edit Detail' : 'Add Detail' }}
+          {{ mode === "edit" ? "Edit Detail" : "Add Detail" }}
         </h3>
         <p class="text-muted text-sm">
           {{
-            mode === 'edit'
-              ? 'Update the selected detail value.'
-              : 'Attach a new detail to the article.'
+            mode === "edit"
+              ? "Update the selected detail value."
+              : "Attach a new detail to the article."
           }}
         </p>
       </div>
@@ -243,7 +243,7 @@ function submit() {
           :disabled="!canEdit"
           @click="submit"
         >
-          {{ mode === 'edit' ? 'Save Changes' : 'Add Detail' }}
+          {{ mode === "edit" ? "Save Changes" : "Add Detail" }}
         </UButton>
       </div>
     </template>

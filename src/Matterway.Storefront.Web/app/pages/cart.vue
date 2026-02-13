@@ -2,9 +2,9 @@
 definePageMeta({
   title: "Korpa",
   public: true,
-});
+})
 </script>
 
 <template>
-  <FeaturesCartWorkspace />
+  <CartWorkspace />
 </template>

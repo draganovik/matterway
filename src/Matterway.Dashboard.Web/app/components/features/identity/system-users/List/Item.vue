@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatDateTime } from '~/utils/formatters'
+import { formatDateTime } from "~/utils/formatters"
 
 const { item } = defineProps<{
   item: {
@@ -10,7 +10,7 @@ const { item } = defineProps<{
   }
 }>()
 
-const displayEmail = computed(() => item.email?.trim() || 'No email')
+const displayEmail = computed(() => item.email?.trim() || "No email")
 </script>
 
 <template>
@@ -20,7 +20,7 @@ const displayEmail = computed(() => item.email?.trim() || 'No email')
         {{ displayEmail }}
       </p>
       <p class="text-muted truncate font-mono text-xs">
-        {{ item.id || 'No ID' }}
+        {{ item.id || "No ID" }}
       </p>
       <p class="text-muted text-xs">
         Created: {{ formatDateTime(item.created) }}
@@ -32,7 +32,7 @@ const displayEmail = computed(() => item.email?.trim() || 'No email')
       variant="subtle"
       class="shrink-0 font-normal whitespace-nowrap"
     >
-      {{ item.role || 'Unknown role' }}
+      {{ item.role || "Unknown role" }}
     </UBadge>
   </div>
 </template>
