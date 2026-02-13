@@ -13,10 +13,10 @@ namespace Matterway.Identity.Api.Features.Public.Auth;
 
 public class PublicCreateSystemUser : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("public/auth/signup", Handler)
-            .WithName("PublicCreateSystemUser").WithSummary("Create a new system user (customer default).")
+        endpoints.MapPost(EndpointKind.Public, "auth/signup", Handler)
+            .WithName("PublicCreateSystemUser").WithSummary("[public] Create a new system user (customer default).")
             .WithTags("Auth")
             .Produces<CreateSystemUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

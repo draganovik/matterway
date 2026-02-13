@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi;
+using Asp.Versioning;
+using Matterway.ServiceDefaults.Versioning;
 
 namespace Matterway.Catalog.Api.Application.Configurations;
 
@@ -7,43 +7,18 @@ public static class OpenApiRegistration
 {
     extension(IHostApplicationBuilder builder)
     {
-        public IHostApplicationBuilder ConfigureOpenApi()
+        public IHostApplicationBuilder ConfigureOpenApi(IReadOnlyCollection<ApiVersion> supportedApiVersions)
         {
-            builder.Services.AddOpenApi(options =>
+            foreach (var version in ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions))
             {
-                options.AddDocumentTransformer((document, _, _) =>
+                var documentName = ApiVersioningConventions.ToDocumentName(version);
+                builder.Services.AddOpenApi(documentName, options =>
                 {
-                    document.Components ??= new OpenApiComponents();
-                    document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-                    document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.Http,
-                        Scheme = "bearer",
-                        BearerFormat = "JWT",
-                        In = ParameterLocation.Header,
-                        Description = "JWT authorization header using the Bearer scheme."
-                    };
-
-                    return Task.CompletedTask;
+                    options.ShouldInclude = description =>
+                        ApiVersioningConventions.ShouldIncludeInDocument(description, version);
+                    ApiVersioningConventions.AddBearerSecurity(options);
                 });
-
-                options.AddOperationTransformer((operation, context, _) =>
-                {
-                    var isAnonymous = context.Description.ActionDescriptor
-                        .EndpointMetadata.OfType<AllowAnonymousAttribute>()
-                        .Any();
-                    if (isAnonymous) return Task.CompletedTask;
-
-                    operation.Security ??= new List<OpenApiSecurityRequirement>();
-                    var bearerReference = new OpenApiSecuritySchemeReference("Bearer");
-                    operation.Security.Add(new OpenApiSecurityRequirement
-                    {
-                        { bearerReference, [] }
-                    });
-
-                    return Task.CompletedTask;
-                });
-            });
+            }
 
             return builder;
         }

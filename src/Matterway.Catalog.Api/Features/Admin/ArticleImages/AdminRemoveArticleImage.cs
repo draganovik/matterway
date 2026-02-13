@@ -10,10 +10,10 @@ namespace Matterway.Catalog.Api.Features.Admin.ArticleImages;
 
 public class AdminRemoveArticleImage : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/articles/{articleId:guid}/images/{orderIndex:int}", Handle)
-            .WithName("AdminRemoveArticleImage").WithSummary("Remove an ArticleImage (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "articles/{articleId:guid}/images/{orderIndex:int}", Handle)
+            .WithName("AdminRemoveArticleImage").WithSummary("[admin] Remove an ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

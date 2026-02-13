@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Admin.CartItems;
 
 public class AdminGetCartItemById : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/customers/{customerId:guid}/cart-items/{articleId:guid}", Handler)
-            .WithName("AdminGetCartItemById").WithSummary("Get CartItem by id (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/cart-items/{articleId:guid}", Handler)
+            .WithName("AdminGetCartItemById").WithSummary("[admin] Get CartItem by id")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)

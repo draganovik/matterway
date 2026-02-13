@@ -10,11 +10,11 @@ namespace Matterway.Identity.Api.Features.Admin.UserPerms;
 
 public class AdminGetSystemUserPerms : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/system-users/{id:guid}/perms", Handler)
+        endpoints.MapGet(EndpointKind.Admin, "system-users/{id:guid}/perms", Handler)
             .WithName("AdminGetSystemUserPerms")
-            .WithSummary("Get permissions for a system user (admin).")
+            .WithSummary("[admin] Get permissions for a system user")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<GetSystemUserPermResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

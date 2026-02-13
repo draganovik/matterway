@@ -11,11 +11,11 @@ namespace Matterway.Identity.Api.Features.System.Users;
 
 public class SystemCreateCustomerUser : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("system/users/customer", Handler)
+        endpoints.MapPost(EndpointKind.System, "users/customer", Handler)
             .WithName("SystemCreateCustomerUser")
-            .WithSummary("Create a customer system user (system).")
+            .WithSummary("[system] Create a customer system user")
             .WithTags("SystemUsers")
             .Produces<CreateUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

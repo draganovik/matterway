@@ -11,11 +11,11 @@ namespace Matterway.Customers.Api.Features.Admin.Addresses;
 
 public class AdminPutAddressByCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPut("admin/customers/{customerId:guid}/address", Handler)
+        endpoints.MapPut(EndpointKind.Admin, "customers/{customerId:guid}/address", Handler)
             .WithName("AdminPutAddressByCustomer")
-            .WithSummary("Create or replace Customer address by customer id (admin).")
+            .WithSummary("[admin] Create or replace Customer address by customer id")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)
             .Produces<AddressResponse>(StatusCodes.Status201Created)

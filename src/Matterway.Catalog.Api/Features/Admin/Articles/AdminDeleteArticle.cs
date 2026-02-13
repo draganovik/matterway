@@ -9,10 +9,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Articles;
 
 public class AdminDeleteArticle : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/articles/{id:guid}", Handle)
-            .WithName("AdminDeleteArticle").WithSummary("Delete an Article (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "articles/{id:guid}", Handle)
+            .WithName("AdminDeleteArticle").WithSummary("[admin] Delete an Article")
             .WithTags("Articles")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

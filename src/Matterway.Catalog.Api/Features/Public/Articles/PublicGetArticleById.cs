@@ -8,10 +8,10 @@ namespace Matterway.Catalog.Api.Features.Public.Articles;
 
 public class PublicGetArticleById : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("public/articles/{id:guid}", Handle)
-            .WithName("PublicGetArticleById").WithSummary("Get an Article (public).")
+        endpoints.MapGet(EndpointKind.Public, "articles/{id:guid}", Handle)
+            .WithName("PublicGetArticleById").WithSummary("[public] Get an Article")
             .WithTags("Articles")
             .Produces<GetArticleByIdResponse>()
             .Produces(StatusCodes.Status404NotFound)

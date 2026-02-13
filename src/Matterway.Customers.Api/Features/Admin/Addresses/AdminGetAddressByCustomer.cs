@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Admin.Addresses;
 
 public class AdminGetAddressByCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/customers/{customerId:guid}/address", Handler)
-            .WithName("AdminGetAddressByCustomer").WithSummary("Get Customer address by customer id (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/address", Handler)
+            .WithName("AdminGetAddressByCustomer").WithSummary("[admin] Get Customer address by customer id")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>()
             .Produces(StatusCodes.Status404NotFound)

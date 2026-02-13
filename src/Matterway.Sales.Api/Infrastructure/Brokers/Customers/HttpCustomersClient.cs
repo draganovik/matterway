@@ -13,7 +13,7 @@ public class HttpCustomersClient(HttpClient httpClient) : ICustomersClient
         CancellationToken cancellationToken)
     {
         var httpRequest =
-            new HttpRequestMessage(HttpMethod.Post, "/api/v1.0/self/orders")
+            new HttpRequestMessage(HttpMethod.Post, "/api/self/v1.0/orders")
             {
                 Content = JsonContent.Create(request)
             };

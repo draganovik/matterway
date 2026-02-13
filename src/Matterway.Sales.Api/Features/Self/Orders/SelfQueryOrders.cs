@@ -8,10 +8,10 @@ namespace Matterway.Sales.Api.Features.Self.Orders;
 
 public class SelfQueryOrders : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("self/orders", Handler)
-            .WithName("SelfQueryOrders").WithSummary("Query own Orders.")
+        endpoints.MapGet(EndpointKind.Self, "orders", Handler)
+            .WithName("SelfQueryOrders").WithSummary("[self] Query own Orders.")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<SelfCreateOrder.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)

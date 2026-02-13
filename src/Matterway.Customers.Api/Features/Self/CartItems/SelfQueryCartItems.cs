@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Self.CartItems;
 
 public class SelfQueryCartItems : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("self/cart/items", Handler)
-            .WithName("SelfQueryCartItems").WithSummary("Query own CartItems.")
+        endpoints.MapGet(EndpointKind.Self, "cart/items", Handler)
+            .WithName("SelfQueryCartItems").WithSummary("[self] Query own CartItems.")
             .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)

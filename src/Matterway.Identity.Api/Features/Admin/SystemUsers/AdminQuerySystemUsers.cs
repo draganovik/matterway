@@ -12,10 +12,10 @@ namespace Matterway.Identity.Api.Features.Admin.SystemUsers;
 
 public class AdminQuerySystemUsers : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/system-users", Handler)
-            .WithName("AdminQuerySystemUsers").WithSummary("Query system users (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "system-users", Handler)
+            .WithName("AdminQuerySystemUsers").WithSummary("[admin] Query system users")
             .WithTags("SystemUsers")
             .Produces<PaginationResponse<QuerySystemUsersResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)

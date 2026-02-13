@@ -10,11 +10,11 @@ namespace Matterway.Identity.Api.Features.Public.Auth;
 
 public class PublicLogout : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("public/auth/logout", Handler)
+        endpoints.MapPost(EndpointKind.Public, "auth/logout", Handler)
             .WithName("PublicLogout")
-            .WithSummary("Invalidate current session tokens.")
+            .WithSummary("[public] Invalidate current session tokens.")
             .WithTags("Auth")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)

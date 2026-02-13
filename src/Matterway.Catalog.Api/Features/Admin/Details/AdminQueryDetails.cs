@@ -10,10 +10,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Details;
 
 public class AdminQueryDetails : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/details", Handle)
-            .WithName("AdminQueryDetails").WithSummary("Query available detail definitions (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "details", Handle)
+            .WithName("AdminQueryDetails").WithSummary("[admin] Query available detail definitions")
             .WithTags(nameof(Detail))
             .Produces<ICollection<QueryDetailResponse>>()
             .RequireAuthorization(policy =>

@@ -9,10 +9,10 @@ namespace Matterway.Sales.Api.Features.Admin.Payments;
 
 public class AdminQueryPayments : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/payments", Handler)
-            .WithName("AdminQueryPayments").WithSummary("Query Payments (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "payments", Handler)
+            .WithName("AdminQueryPayments").WithSummary("[admin] Query Payments")
             .WithTags(nameof(Payment))
             .Produces<PaginationResponse<SystemRegisterPayment.PaymentResponse>>()
             .Produces(StatusCodes.Status204NoContent)

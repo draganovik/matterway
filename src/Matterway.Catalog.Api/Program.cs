@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Asp.Versioning;
+using System.Text.Json.Serialization;
 using Matterway.Catalog.Api.Application.Configurations;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
@@ -25,10 +26,12 @@ builder.Services.Configure<JsonOptions>(options =>
 builder.Services.AddValidation();
 builder.AddServiceDefaults();
 
+ApiVersion[] supportedApiVersions = [new(1, 0)];
+
 builder
     .ConfigureProblemDetails()
-    .ConfigureApiVersioning()
-    .ConfigureOpenApi()
+    .ConfigureApiVersioning(supportedApiVersions)
+    .ConfigureOpenApi(supportedApiVersions)
     .ConfigureCors();
 
 builder
@@ -50,9 +53,9 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.ApplyOpenApi();
-    app.ApplyScalar();
+    app.ApplyScalar(supportedApiVersions);
 }
 
-app.ApplyEndpoints();
+app.ApplyEndpoints(supportedApiVersions);
 
 app.Run();

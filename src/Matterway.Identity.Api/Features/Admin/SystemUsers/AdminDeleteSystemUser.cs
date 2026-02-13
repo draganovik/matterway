@@ -9,10 +9,10 @@ namespace Matterway.Identity.Api.Features.Admin.SystemUsers;
 
 public class AdminDeleteSystemUser : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/system-users/{id:guid}", Handler)
-            .WithName("AdminDeleteSystemUser").WithSummary("Delete system user by id (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "system-users/{id:guid}", Handler)
+            .WithName("AdminDeleteSystemUser").WithSummary("[admin] Delete system user by id")
             .WithTags("SystemUsers")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)

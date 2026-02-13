@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Asp.Versioning;
 using Matterway.Identity.Api.Application.Configurations;
 using Matterway.Identity.Api.Infrastructure.Persistence;
 using Matterway.ServiceDefaults;
@@ -27,6 +28,7 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 builder.Services.AddValidation();
+ApiVersion[] supportedApiVersions = [new(1, 0)];
 
 builder
     .ConfigureAuthentication()
@@ -35,8 +37,8 @@ builder
     .ConfigureFeatures();
 
 builder
-    .ConfigureOpenApi()
-    .ConfigureApiVersioning()
+    .ConfigureOpenApi(supportedApiVersions)
+    .ConfigureApiVersioning(supportedApiVersions)
     .ConfigureCors();
 
 var app = builder.Build();
@@ -53,9 +55,9 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.ApplyOpenApi();
-    app.ApplyScalar();
+    app.ApplyScalar(supportedApiVersions);
 }
 
-app.ApplyEndpoints();
+app.ApplyEndpoints(supportedApiVersions);
 
 app.Run();

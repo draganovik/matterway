@@ -12,10 +12,10 @@ namespace Matterway.Customers.Api.Features.Self.Orders;
 
 public class SelfCreateOrder : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("self/orders", Handler)
-            .WithName("SelfCreateOrder").WithSummary("Create own order from cart items.")
+        endpoints.MapPost(EndpointKind.Self, "orders", Handler)
+            .WithName("SelfCreateOrder").WithSummary("[self] Create own order from cart items.")
             .WithTags(nameof(CustomerOrder))
             .Produces<CustomerOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

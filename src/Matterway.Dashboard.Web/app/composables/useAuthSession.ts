@@ -7,7 +7,7 @@ import {
 import type { AuthSession, LoginResponse } from "~/types/auth/session"
 
 const refreshCookieName = "mw_refresh"
-const authPath = "/api/v1.0/public/auth"
+const authPath = "/api/public/v1.0/auth"
 const authJsonHeaders = {
   "Content-Type": "application/json",
   accept: "application/json",

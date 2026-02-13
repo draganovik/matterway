@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Matterway.ServiceDefaults.Versioning;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Scalar.AspNetCore;
 
@@ -8,11 +9,13 @@ public static class EndpointRegistration
 {
     extension(IHostApplicationBuilder builder)
     {
-        public IHostApplicationBuilder ConfigureApiVersioning()
+        public IHostApplicationBuilder ConfigureApiVersioning(IReadOnlyCollection<ApiVersion> supportedApiVersions)
         {
+            var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
+
             builder.Services.AddApiVersioning(options =>
                 {
-                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                    options.DefaultApiVersion = versions[0];
                     options.AssumeDefaultVersionWhenUnspecified = true;
                     options.ReportApiVersions = true;
                     options.ApiVersionReader = new UrlSegmentApiVersionReader();
@@ -58,34 +61,52 @@ public static class EndpointRegistration
 
     extension(WebApplication app)
     {
-        public WebApplication ApplyEndpoints()
+        public WebApplication ApplyEndpoints(IReadOnlyCollection<ApiVersion> supportedApiVersions)
         {
-            var versionSet = app.NewApiVersionSet()
-                .HasApiVersion(new ApiVersion(1, 0))
-                .ReportApiVersions()
-                .Build();
+            var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
+
+            var versionSetBuilder = app.NewApiVersionSet()
+                .ReportApiVersions();
+
+            foreach (var version in versions)
+                versionSetBuilder.HasApiVersion(version);
+
+            var versionSet = versionSetBuilder.Build();
 
             var apiGroup = app.MapGroup("/api")
                 .DisableAntiforgery();
 
-            var versionedApiGroup = apiGroup
-                .MapGroup("/v{version:apiVersion}")
-                .WithApiVersionSet(versionSet);
+            RouteGroupBuilder MapKindGroup(EndpointKind endpointKind)
+            {
+                var endpointSegment = endpointKind.ToString().ToLowerInvariant();
+
+                return apiGroup.MapGroup($"/{endpointSegment}")
+                    .MapGroup("/v{version:apiVersion}")
+                    .WithApiVersionSet(versionSet);
+            }
+
+            var endpointGroups = Enum.GetValues<EndpointKind>()
+                .ToDictionary(endpointKind => endpointKind, MapKindGroup);
+
+            var endpointRouter = new EndpointRouter(endpointGroups);
 
             var endpoints = app.Services
                 .GetRequiredService<IEnumerable<IEndpoint>>();
 
-            foreach (var endpoint in endpoints) endpoint.MapEndpoint(versionedApiGroup);
+            foreach (var endpoint in endpoints) endpoint.MapEndpoint(endpointRouter);
 
             return app;
         }
 
-        public WebApplication ApplyScalar()
+        public WebApplication ApplyScalar(IReadOnlyCollection<ApiVersion> supportedApiVersions)
         {
-            app.MapScalarApiReference("/", options =>
+            var apiDocumentNames = ApiVersioningConventions.ToDocumentNames(supportedApiVersions);
+
+            app.MapScalarApiReference("/", (options, _) =>
             {
                 options.WithOpenApiRoutePattern("/openapi/{documentName}.yaml");
                 options.WithTitle("Matterway Identity API");
+                options.AddDocuments(apiDocumentNames);
             });
 
             return app;

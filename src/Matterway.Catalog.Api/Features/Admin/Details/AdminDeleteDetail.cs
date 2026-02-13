@@ -10,10 +10,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Details;
 
 public class AdminDeleteDetail : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/details/{slug}", Handle)
-            .WithName("AdminDeleteDetail").WithSummary("Delete a Detail definition (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "details/{slug}", Handle)
+            .WithName("AdminDeleteDetail").WithSummary("[admin] Delete a Detail definition")
             .WithTags(nameof(Detail))
             .Produces<DeleteDetailResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Admin.Customers;
 
 public class AdminQueryCustomers : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/customers", Handler)
-            .WithName("AdminQueryCustomers").WithSummary("Query Customers (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "customers", Handler)
+            .WithName("AdminQueryCustomers").WithSummary("[admin] Query Customers")
             .WithTags(nameof(Customer))
             .Produces<PaginationResponse<CustomerResponse>>()
             .Produces(StatusCodes.Status204NoContent)

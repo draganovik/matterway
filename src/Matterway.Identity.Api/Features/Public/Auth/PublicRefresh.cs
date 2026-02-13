@@ -8,11 +8,11 @@ namespace Matterway.Identity.Api.Features.Public.Auth;
 
 public class PublicRefresh : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("public/auth/refresh", Handler)
+        endpoints.MapPost(EndpointKind.Public, "auth/refresh", Handler)
             .WithName("PublicRefresh")
-            .WithSummary("Refresh access token using a refresh token.")
+            .WithSummary("[public] Refresh access token using a refresh token.")
             .WithTags("Auth")
             .Produces<RefreshResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)

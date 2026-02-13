@@ -9,10 +9,10 @@ namespace Matterway.Sales.Api.Features.Admin.Orders;
 
 public class AdminQueryOrders : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/orders", Handler)
-            .WithName("AdminQueryOrders").WithSummary("Query Orders (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "orders", Handler)
+            .WithName("AdminQueryOrders").WithSummary("[admin] Query Orders")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<SelfCreateOrder.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)

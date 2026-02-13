@@ -9,10 +9,10 @@ namespace Matterway.Sales.Api.Features.Admin.Orders;
 
 public class AdminGetOrderById : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/orders/{orderId:guid}", Handler)
-            .WithName("AdminGetOrderById").WithSummary("Get Order by id (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "orders/{orderId:guid}", Handler)
+            .WithName("AdminGetOrderById").WithSummary("[admin] Get Order by id")
             .WithTags(nameof(Order))
             .Produces<SelfCreateOrder.OrderResponse>()
             .Produces(StatusCodes.Status404NotFound)

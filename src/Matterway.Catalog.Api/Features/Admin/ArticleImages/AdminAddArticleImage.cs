@@ -12,10 +12,10 @@ namespace Matterway.Catalog.Api.Features.Admin.ArticleImages;
 
 public class AdminAddArticleImage : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("admin/articles/{articleId:guid}/images", Handle)
-            .WithName("AdminAddArticleImage").WithSummary("Add a new ArticleImage (admin).")
+        endpoints.MapPost(EndpointKind.Admin, "articles/{articleId:guid}/images", Handle)
+            .WithName("AdminAddArticleImage").WithSummary("[admin] Add a new ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<AddArticleImageResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

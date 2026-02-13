@@ -10,10 +10,10 @@ namespace Matterway.Customers.Api.Features.Self.Customers;
 
 public class SelfCreateCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("self/profile", Handler)
-            .WithName("SelfCreateCustomer").WithSummary("Create own Customer profile.")
+        endpoints.MapPost(EndpointKind.Self, "profile", Handler)
+            .WithName("SelfCreateCustomer").WithSummary("[self] Create own Customer profile.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
