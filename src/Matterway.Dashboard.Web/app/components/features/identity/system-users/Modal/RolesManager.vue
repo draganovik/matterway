@@ -298,6 +298,7 @@ useModalCloseReset({
                   :items="serviceOptions"
                   value-key="value"
                   label-key="label"
+                  placeholder="Select service"
                   class="w-full"
                   :disabled="saveState.loading"
                 />
@@ -309,6 +310,7 @@ useModalCloseReset({
                   :items="levelOptions"
                   value-key="value"
                   label-key="label"
+                  placeholder="Select level"
                   class="w-full"
                   :disabled="saveState.loading"
                 />

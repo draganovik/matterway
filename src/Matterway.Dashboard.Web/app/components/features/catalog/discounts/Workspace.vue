@@ -35,8 +35,9 @@ const submitState = useRequestState()
 const deleteState = useRequestState()
 
 const discounts = ref<DiscountListItem[]>([])
-const searchInput = ref("")
-const activeSearch = ref("")
+const discountFilter = ref("")
+const listPage = ref(1)
+const listPageSize = ref(20)
 
 const selectedKey = ref<string | null>(null)
 const selectedDiscount = ref<DiscountListItem | null>(null)
@@ -127,12 +128,12 @@ function selectDiscount(key: string) {
   applyDiscountToEditor(discount)
 }
 
-function applySearch() {
-  activeSearch.value = searchInput.value.trim().toLowerCase()
+function asDiscountItem(item: Record<string, unknown>) {
+  return item as DiscountListItem
 }
 
 const filteredDiscounts = computed(() => {
-  const search = activeSearch.value
+  const search = discountFilter.value.trim().toLowerCase()
   if (!search) return discounts.value
   return discounts.value.filter(
     (item) =>
@@ -141,6 +142,40 @@ const filteredDiscounts = computed(() => {
       `${item.percentage}`.toLowerCase().includes(search),
   )
 })
+
+const filteredDiscountCount = computed(() => filteredDiscounts.value.length)
+const filteredDiscountPages = computed(() =>
+  Math.max(1, Math.ceil(filteredDiscountCount.value / listPageSize.value)),
+)
+const visibleDiscounts = computed(() => {
+  const start = (listPage.value - 1) * listPageSize.value
+  return filteredDiscounts.value.slice(start, start + listPageSize.value)
+})
+
+watch(
+  filteredDiscountPages,
+  (totalPages) => {
+    if (listPage.value > totalPages) listPage.value = totalPages
+  },
+  { immediate: true },
+)
+
+function updateDiscountFilter(value: string) {
+  discountFilter.value = value
+}
+
+function searchDiscounts() {
+  listPage.value = 1
+}
+
+function changeListPage(value: number) {
+  listPage.value = Math.min(Math.max(1, value), filteredDiscountPages.value)
+}
+
+function changeListPageSize(value: number) {
+  listPageSize.value = Math.max(1, Number(value) || 20)
+  listPage.value = 1
+}
 
 async function loadDiscountsFromArticlesFallback() {
   const pageSize = 100
@@ -399,49 +434,33 @@ onMounted(() => {
       detail-class="overflow-y-auto"
     >
       <template #list>
-        <div class="grid gap-3">
-          <UInput
-            v-model="searchInput"
-            placeholder="Search existing discounts by code or value."
-            size="lg"
-            class="w-full"
-            @keydown.enter.prevent="applySearch"
-          />
-          <UButton
-            color="primary"
-            :loading="listState.loading"
-            @click="applySearch"
-          >
-            Search
-          </UButton>
-        </div>
-
-        <div class="mt-3 grid gap-2">
-          <StatusMessages
-            v-if="
-              listState.error || listState.loading || !filteredDiscounts.length
-            "
-            :error="listState.error"
-            :loading="listState.loading ? 'Loading discounts.' : false"
-            :empty="
-              !listState.loading &&
-              !listState.error &&
-              !filteredDiscounts.length
-                ? listState.empty
-                : false
-            "
-          />
-          <div v-else class="grid gap-2">
-            <EntitiesListItem
-              v-for="discount in filteredDiscounts"
-              :key="discount.key"
-              :selected="selectedKey === discount.key"
-              @click="selectDiscount(discount.key)"
-            >
-              <CatalogDiscountsListItem :item="discount" />
-            </EntitiesListItem>
-          </div>
-        </div>
+        <EntitiesListPanel
+          title="Discounts"
+          description="Search existing discounts by code, date, or percentage."
+          :items="visibleDiscounts"
+          item-key="key"
+          item-title-key="code"
+          :selected-id="selectedKey"
+          :filter="discountFilter"
+          filter-input-type="input"
+          filter-placeholder="Search existing discounts by code or value."
+          :loading="listState.loading"
+          :error="listState.error"
+          :empty-message="listState.empty"
+          :page="listPage"
+          :page-size="listPageSize"
+          :total-count="filteredDiscountCount"
+          :total-pages="filteredDiscountPages"
+          @update:filter="updateDiscountFilter"
+          @search="searchDiscounts"
+          @update:page="changeListPage"
+          @update:page-size="changeListPageSize"
+          @select="selectDiscount"
+        >
+          <template #item="{ item }">
+            <CatalogDiscountsListItem :item="asDiscountItem(item)" />
+          </template>
+        </EntitiesListPanel>
       </template>
 
       <template #detail>
@@ -490,6 +509,7 @@ onMounted(() => {
               <UInput
                 v-model="form.validFrom"
                 type="datetime-local"
+                placeholder="YYYY-MM-DDTHH:mm"
                 :disabled="!canEdit"
                 class="w-full"
               />
@@ -499,6 +519,7 @@ onMounted(() => {
               <UInput
                 v-model="form.validTo"
                 type="datetime-local"
+                placeholder="YYYY-MM-DDTHH:mm"
                 :disabled="!canEdit"
                 class="w-full"
               />

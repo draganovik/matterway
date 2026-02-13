@@ -45,37 +45,49 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 <template>
   <UCard class="border-default bg-default border">
     <div class="space-y-3">
-      <USelect
-        :model-value="detailFilter.slug"
-        :items="definitionItems"
-        class="w-full"
-        @update:model-value="onSlugChange"
-      />
+      <UFormField label="Detalj" required>
+        <USelect
+          :model-value="detailFilter.slug"
+          :items="definitionItems"
+          placeholder="Izaberi detalj"
+          class="w-full"
+          @update:model-value="onSlugChange"
+        />
+      </UFormField>
 
       <template v-if="isNumeric">
         <div class="grid grid-cols-2 gap-3">
-          <UInput
-            :model-value="detailFilter.min"
-            type="number"
-            min="0"
-            placeholder="Od"
-            @update:model-value="emit('setMin', toNumberOrUndefined($event))"
-          />
-          <UInput
-            :model-value="detailFilter.max"
-            type="number"
-            min="0"
-            placeholder="Do"
-            @update:model-value="emit('setMax', toNumberOrUndefined($event))"
-          />
+          <UFormField label="Od">
+            <UInput
+              :model-value="detailFilter.min"
+              type="number"
+              min="0"
+              placeholder="npr. 10"
+              class="w-full"
+              @update:model-value="emit('setMin', toNumberOrUndefined($event))"
+            />
+          </UFormField>
+          <UFormField label="Do">
+            <UInput
+              :model-value="detailFilter.max"
+              type="number"
+              min="0"
+              placeholder="npr. 100"
+              class="w-full"
+              @update:model-value="emit('setMax', toNumberOrUndefined($event))"
+            />
+          </UFormField>
         </div>
       </template>
       <template v-else>
-        <UInput
-          :model-value="detailFilter.value"
-          placeholder="Vrednost"
-          @update:model-value="emit('setValue', String($event ?? ''))"
-        />
+        <UFormField label="Vrednost">
+          <UInput
+            :model-value="detailFilter.value"
+            placeholder="Unesite vrednost"
+            class="w-full"
+            @update:model-value="emit('setValue', String($event ?? ''))"
+          />
+        </UFormField>
       </template>
 
       <div class="flex justify-end">

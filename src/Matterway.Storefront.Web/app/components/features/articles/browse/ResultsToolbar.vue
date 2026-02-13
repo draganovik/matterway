@@ -13,18 +13,21 @@ const emit = defineEmits<{
 <template>
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div class="text-sm text-slate-500">{{ props.totalCount }} rezultata</div>
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-slate-500">Po stranici</span>
-      <USelect
-        :model-value="props.pageSize"
-        :items="
-          props.pageOptions.map((size) => ({
-            label: String(size),
-            value: size,
-          }))
-        "
-        @update:model-value="emit('update:pageSize', Number($event))"
-      />
+    <div class="w-full sm:w-auto">
+      <UFormField label="Po stranici">
+        <USelect
+          :model-value="props.pageSize"
+          :items="
+            props.pageOptions.map((size) => ({
+              label: String(size),
+              value: size,
+            }))
+          "
+          placeholder="Izaberi broj"
+          class="w-full sm:w-36"
+          @update:model-value="emit('update:pageSize', Number($event))"
+        />
+      </UFormField>
     </div>
   </div>
 </template>

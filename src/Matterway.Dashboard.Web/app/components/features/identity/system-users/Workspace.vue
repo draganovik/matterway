@@ -306,16 +306,18 @@ onMounted(() => {
         </p>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span class="text-muted text-sm">Role</span>
-        <USelectMenu
-          :items="roleFilterOptions"
-          :model-value="roleFilter"
-          value-key="value"
-          label-key="label"
-          class="min-w-36"
-          @update:model-value="changeRoleFilter"
-        />
+      <div class="w-full sm:w-auto">
+        <UFormField label="Role">
+          <USelectMenu
+            :items="roleFilterOptions"
+            :model-value="roleFilter"
+            value-key="value"
+            label-key="label"
+            placeholder="All roles"
+            class="min-w-36"
+            @update:model-value="changeRoleFilter"
+          />
+        </UFormField>
       </div>
     </div>
 

@@ -278,6 +278,7 @@ useModalCloseReset({
           <UFormField label="Country" required>
             <UInput
               v-model="form.country"
+              placeholder="Serbia"
               :disabled="saveState.loading || !canEdit"
             />
           </UFormField>
@@ -285,6 +286,7 @@ useModalCloseReset({
           <UFormField label="City" required>
             <UInput
               v-model="form.city"
+              placeholder="Belgrade"
               :disabled="saveState.loading || !canEdit"
             />
           </UFormField>
@@ -292,6 +294,7 @@ useModalCloseReset({
           <UFormField label="Zip Code" required>
             <UInput
               v-model="form.zipCode"
+              placeholder="11000"
               :disabled="saveState.loading || !canEdit"
             />
           </UFormField>
@@ -299,6 +302,7 @@ useModalCloseReset({
           <UFormField label="Contact Phone" required>
             <UInput
               v-model="form.contactPhone"
+              placeholder="+381641234567"
               :disabled="saveState.loading || !canEdit"
             />
           </UFormField>
@@ -307,6 +311,7 @@ useModalCloseReset({
         <UFormField label="Address Line 1" required>
           <UInput
             v-model="form.addressLine1"
+            placeholder="Bulevar oslobodjenja 15"
             :disabled="saveState.loading || !canEdit"
           />
         </UFormField>
@@ -314,6 +319,7 @@ useModalCloseReset({
         <UFormField label="Address Line 2" required>
           <UInput
             v-model="form.addressLine2"
+            placeholder="Apartment 12"
             :disabled="saveState.loading || !canEdit"
           />
         </UFormField>

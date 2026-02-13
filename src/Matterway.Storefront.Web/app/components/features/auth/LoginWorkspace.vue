@@ -70,20 +70,27 @@ async function submit() {
       </template>
 
       <form class="space-y-4" @submit.prevent="submit">
-        <UInput
-          v-model="model.email"
-          type="email"
-          label="Imejl"
-          autocomplete="email"
-          required
-        />
-        <UInput
-          v-model="model.password"
-          type="password"
-          label="Lozinka"
-          autocomplete="current-password"
-          required
-        />
+        <UFormField label="Imejl" required>
+          <UInput
+            v-model="model.email"
+            type="email"
+            placeholder="ime.prezime@domen.com"
+            autocomplete="email"
+            class="w-full"
+            required
+          />
+        </UFormField>
+
+        <UFormField label="Lozinka" required>
+          <UInput
+            v-model="model.password"
+            type="password"
+            placeholder="Unesite lozinku"
+            autocomplete="current-password"
+            class="w-full"
+            required
+          />
+        </UFormField>
         <StatusMessages v-if="error" :error="error" />
         <div
           class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"

@@ -118,12 +118,17 @@ function submit() {
             v-model="orderIndex"
             type="number"
             min="0"
+            placeholder="0"
             :disabled="!canEdit"
           />
         </UFormField>
 
         <UFormField label="Image Alt">
-          <UInput v-model="imageAlt" :disabled="!canEdit" />
+          <UInput
+            v-model="imageAlt"
+            placeholder="Front view of article"
+            :disabled="!canEdit"
+          />
         </UFormField>
 
         <StatusMessages :error="validationError || error" />

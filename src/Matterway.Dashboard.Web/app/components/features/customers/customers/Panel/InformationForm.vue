@@ -55,6 +55,7 @@ const form = defineModel<CustomerForm>({ required: true })
       <UInput
         v-model="form.birthDate"
         type="date"
+        placeholder="YYYY-MM-DD"
         :disabled="disabled"
         class="w-full"
       />

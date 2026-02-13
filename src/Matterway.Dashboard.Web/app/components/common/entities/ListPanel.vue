@@ -95,21 +95,24 @@ function updatePageSize(value: number) {
     </header>
 
     <div class="flex flex-col gap-3">
-      <UTextarea
-        v-if="filterInputType === 'textarea'"
-        v-model="filterInput"
-        :placeholder="filterPlaceholder"
-        size="md"
-        :rows="3"
-      />
-      <UInput
-        v-else
-        v-model="filterInput"
-        :placeholder="filterPlaceholder"
-        size="lg"
-        class="w-full"
-        @keydown.enter.prevent="applySearch"
-      />
+      <UFormField>
+        <UTextarea
+          v-if="filterInputType === 'textarea'"
+          v-model="filterInput"
+          :placeholder="filterPlaceholder"
+          size="md"
+          :rows="3"
+          class="w-full"
+        />
+        <UInput
+          v-else
+          v-model="filterInput"
+          :placeholder="filterPlaceholder"
+          size="lg"
+          class="w-full"
+          @keydown.enter.prevent="applySearch"
+        />
+      </UFormField>
       <UButton
         color="primary"
         :loading="loading"
@@ -161,14 +164,17 @@ function updatePageSize(value: number) {
         Page {{ page }} of {{ safeTotalPages }} - {{ totalCount }} total
       </div>
       <div class="flex items-center gap-2">
-        <USelectMenu
-          :items="pageSizes"
-          :model-value="pageSize"
-          value-key="value"
-          label-key="label"
-          class="min-w-34"
-          @update:model-value="updatePageSize"
-        />
+        <UFormField label="Page Size">
+          <USelectMenu
+            :items="pageSizes"
+            :model-value="pageSize"
+            value-key="value"
+            label-key="label"
+            placeholder="Select size"
+            class="min-w-34"
+            @update:model-value="updatePageSize"
+          />
+        </UFormField>
         <div class="flex items-center gap-1">
           <UButton
             variant="outline"

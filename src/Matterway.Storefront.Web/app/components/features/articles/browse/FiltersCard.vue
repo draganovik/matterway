@@ -47,32 +47,41 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
     </template>
 
     <form class="space-y-4" @submit.prevent="emit('submit')">
-      <UInput
-        :model-value="filters.search"
-        label="Naziv"
-        placeholder="npr. Philips Hue"
-        class="w-full"
-        :ui="{ root: 'w-full' }"
-        @update:model-value="emit('setSearch', String($event ?? ''))"
-      />
+      <UFormField label="Naziv">
+        <UInput
+          :model-value="filters.search"
+          placeholder="npr. Philips Hue"
+          class="w-full"
+          :ui="{ root: 'w-full' }"
+          @update:model-value="emit('setSearch', String($event ?? ''))"
+        />
+      </UFormField>
 
       <div class="grid grid-cols-2 gap-3">
-        <UInput
-          :model-value="filters.minPrice"
-          type="number"
-          min="0"
-          label="Min cena"
-          placeholder="0"
-          @update:model-value="emit('setMinPrice', toNumberOrUndefined($event))"
-        />
-        <UInput
-          :model-value="filters.maxPrice"
-          type="number"
-          min="0"
-          label="Max cena"
-          placeholder="100000"
-          @update:model-value="emit('setMaxPrice', toNumberOrUndefined($event))"
-        />
+        <UFormField label="Min cena">
+          <UInput
+            :model-value="filters.minPrice"
+            type="number"
+            min="0"
+            placeholder="0"
+            class="w-full"
+            @update:model-value="
+              emit('setMinPrice', toNumberOrUndefined($event))
+            "
+          />
+        </UFormField>
+        <UFormField label="Max cena">
+          <UInput
+            :model-value="filters.maxPrice"
+            type="number"
+            min="0"
+            placeholder="100000"
+            class="w-full"
+            @update:model-value="
+              emit('setMaxPrice', toNumberOrUndefined($event))
+            "
+          />
+        </UFormField>
       </div>
 
       <div class="space-y-3">

@@ -196,53 +196,74 @@ onMounted(async () => {
         </template>
 
         <div class="grid gap-4 sm:grid-cols-2">
-          <UInput
-            v-model="address.receiverName"
-            label="Ime primaoca"
-            placeholder="npr. Petar Petrović"
-            required
-          />
-          <UInput
-            v-model="address.contactPhone"
-            label="Telefon"
-            placeholder="npr. +381 64 123 4567"
-          />
-          <UInput
-            v-model="address.street"
-            label="Ulica"
-            placeholder="npr. Bulevar oslobođenja 15"
-            required
-          />
-          <UInput
-            v-model="address.residence"
-            label="Dodatak adrese"
-            placeholder="npr. Stan 12, 3. sprat"
-            required
-          />
-          <UInput
-            v-model="address.city"
-            label="Grad"
-            placeholder="npr. Novi Sad"
-            required
-          />
-          <UInput
-            v-model="address.zipCode"
-            label="Poštanski broj"
-            placeholder="npr. 21000"
-            required
-          />
-          <UInput
-            v-model="address.country"
-            label="Država"
-            placeholder="npr. Srbija"
-            class="sm:col-span-2"
-          />
-          <UTextarea
-            v-model="address.note"
-            label="Napomena"
-            placeholder="Napomena za dostavu (opciono)"
-            class="sm:col-span-2"
-          />
+          <UFormField label="Ime primaoca" required>
+            <UInput
+              v-model="address.receiverName"
+              placeholder="npr. Petar Petrović"
+              class="w-full"
+              required
+            />
+          </UFormField>
+
+          <UFormField label="Telefon">
+            <UInput
+              v-model="address.contactPhone"
+              placeholder="npr. +381 64 123 4567"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Ulica" required>
+            <UInput
+              v-model="address.street"
+              placeholder="npr. Bulevar oslobođenja 15"
+              class="w-full"
+              required
+            />
+          </UFormField>
+
+          <UFormField label="Dodatak adrese" required>
+            <UInput
+              v-model="address.residence"
+              placeholder="npr. Stan 12, 3. sprat"
+              class="w-full"
+              required
+            />
+          </UFormField>
+
+          <UFormField label="Grad" required>
+            <UInput
+              v-model="address.city"
+              placeholder="npr. Novi Sad"
+              class="w-full"
+              required
+            />
+          </UFormField>
+
+          <UFormField label="Poštanski broj" required>
+            <UInput
+              v-model="address.zipCode"
+              placeholder="npr. 21000"
+              class="w-full"
+              required
+            />
+          </UFormField>
+
+          <UFormField label="Država" class="sm:col-span-2">
+            <UInput
+              v-model="address.country"
+              placeholder="npr. Srbija"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Napomena" class="sm:col-span-2">
+            <UTextarea
+              v-model="address.note"
+              placeholder="Napomena za dostavu (opciono)"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
         <template #footer>
@@ -256,48 +277,58 @@ onMounted(async () => {
             </span>
           </div>
           <div class="grid gap-4 sm:grid-cols-3">
-            <UInput
-              v-model="payment.cardNumber"
-              label="Broj kartice"
-              icon="i-lucide-credit-card"
-              placeholder="1234 5678 9012 3456"
-              autocomplete="cc-number"
-              inputmode="numeric"
-              maxlength="23"
-              :ui="{ base: 'font-mono tracking-[0.08em]' }"
-              class="sm:col-span-3"
-              required
-            />
-            <UInput
-              v-model.number="payment.expMonth"
-              type="number"
-              min="1"
-              max="12"
-              label="Mesec"
-              placeholder="MM"
-              autocomplete="cc-exp-month"
-              inputmode="numeric"
-              required
-            />
-            <UInput
-              v-model.number="payment.expYear"
-              type="number"
-              min="2024"
-              label="Godina"
-              placeholder="GGGG"
-              autocomplete="cc-exp-year"
-              inputmode="numeric"
-              required
-            />
-            <UInput
-              v-model="payment.cvc"
-              label="CVC"
-              placeholder="123"
-              autocomplete="cc-csc"
-              inputmode="numeric"
-              maxlength="4"
-              required
-            />
+            <UFormField label="Broj kartice" required class="sm:col-span-3">
+              <UInput
+                v-model="payment.cardNumber"
+                icon="i-lucide-credit-card"
+                placeholder="1234 5678 9012 3456"
+                autocomplete="cc-number"
+                inputmode="numeric"
+                maxlength="23"
+                :ui="{ base: 'font-mono tracking-[0.08em]' }"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Mesec" required>
+              <UInput
+                v-model.number="payment.expMonth"
+                type="number"
+                min="1"
+                max="12"
+                placeholder="MM"
+                autocomplete="cc-exp-month"
+                inputmode="numeric"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Godina" required>
+              <UInput
+                v-model.number="payment.expYear"
+                type="number"
+                min="2024"
+                placeholder="GGGG"
+                autocomplete="cc-exp-year"
+                inputmode="numeric"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="CVC" required>
+              <UInput
+                v-model="payment.cvc"
+                placeholder="123"
+                autocomplete="cc-csc"
+                inputmode="numeric"
+                maxlength="4"
+                class="w-full"
+                required
+              />
+            </UFormField>
           </div>
         </template>
       </UCard>

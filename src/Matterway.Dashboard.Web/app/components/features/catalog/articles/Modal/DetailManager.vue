@@ -221,6 +221,7 @@ function submit() {
           <UInput
             v-model="valueInput"
             :type="isNumeric ? 'number' : 'text'"
+            :placeholder="isNumeric ? 'e.g. 42' : 'Enter value'"
             :disabled="!canEdit"
             size="md"
           />

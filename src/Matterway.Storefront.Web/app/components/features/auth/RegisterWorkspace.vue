@@ -83,47 +83,67 @@ async function submit() {
 
       <form class="space-y-4" @submit.prevent="submit">
         <div class="grid gap-4 sm:grid-cols-2">
-          <UInput
-            v-model="model.firstName"
-            label="Ime"
-            required
-            autocomplete="given-name"
-          />
-          <UInput
-            v-model="model.lastName"
-            label="Prezime"
-            required
-            autocomplete="family-name"
-          />
+          <UFormField label="Ime" required>
+            <UInput
+              v-model="model.firstName"
+              placeholder="npr. Petar"
+              required
+              autocomplete="given-name"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField label="Prezime" required>
+            <UInput
+              v-model="model.lastName"
+              placeholder="npr. Petrović"
+              required
+              autocomplete="family-name"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
-        <UInput
-          v-model="model.birthDate"
-          type="date"
-          label="Datum rođenja"
-          required
-        />
-        <UInput
-          v-model="model.email"
-          type="email"
-          label="Imejl"
-          required
-          autocomplete="email"
-        />
+        <UFormField label="Datum rođenja" required>
+          <UInput
+            v-model="model.birthDate"
+            type="date"
+            placeholder="YYYY-MM-DD"
+            required
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField label="Imejl" required>
+          <UInput
+            v-model="model.email"
+            type="email"
+            placeholder="ime.prezime@domen.com"
+            required
+            autocomplete="email"
+            class="w-full"
+          />
+        </UFormField>
 
         <div class="grid gap-4 sm:grid-cols-2">
-          <UInput
-            v-model="model.password"
-            type="password"
-            label="Lozinka"
-            required
-          />
-          <UInput
-            v-model="model.confirmPassword"
-            type="password"
-            label="Potvrdi lozinku"
-            required
-          />
+          <UFormField label="Lozinka" required>
+            <UInput
+              v-model="model.password"
+              type="password"
+              placeholder="Unesite lozinku"
+              required
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Potvrdi lozinku" required>
+            <UInput
+              v-model="model.confirmPassword"
+              type="password"
+              placeholder="Ponovite lozinku"
+              required
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
         <StatusMessages v-if="error" :error="error" />

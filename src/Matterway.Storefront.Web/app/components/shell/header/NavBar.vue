@@ -68,7 +68,11 @@ watch(
 
       <div class="ml-auto hidden w-full max-w-3xl items-center gap-2 lg:flex">
         <form class="min-w-0 flex-1" @submit.prevent="submitSearch">
+          <label for="article-search-desktop" class="sr-only">
+            Pretraži artikle
+          </label>
           <UInput
+            id="article-search-desktop"
             v-model="searchTerm"
             icon="i-lucide-search"
             placeholder="Pretraži artikle"
@@ -153,7 +157,11 @@ watch(
       class="border-default bg-default border-t px-4 py-4 lg:hidden"
     >
       <form class="mb-3 w-full" @submit.prevent="submitSearch">
+        <label for="article-search-mobile" class="sr-only">
+          Pretraži artikle
+        </label>
         <UInput
+          id="article-search-mobile"
           v-model="searchTerm"
           icon="i-lucide-search"
           placeholder="Pretraži artikle"

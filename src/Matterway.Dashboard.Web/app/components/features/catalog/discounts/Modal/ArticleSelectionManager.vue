@@ -193,11 +193,14 @@ function submitSelection() {
 
     <template #body>
       <div class="grid gap-4">
-        <UTextarea
-          v-model="filter"
-          placeholder="Search with RSQL filters (e.g. title==chair;available==true)."
-          :rows="3"
-        />
+        <UFormField label="Search">
+          <UTextarea
+            v-model="filter"
+            placeholder="Search with RSQL filters (e.g. title==chair;available==true)."
+            :rows="3"
+            class="w-full"
+          />
+        </UFormField>
 
         <div class="flex flex-wrap items-center gap-2">
           <UButton
@@ -257,14 +260,17 @@ function submitSelection() {
             {{ pagination.totalCount }} total
           </div>
           <div class="flex items-center gap-2">
-            <USelectMenu
-              :items="pageSizes"
-              :model-value="pagination.pageSize"
-              value-key="value"
-              label-key="label"
-              class="min-w-34"
-              @update:model-value="changePageSize"
-            />
+            <UFormField label="Page Size">
+              <USelectMenu
+                :items="pageSizes"
+                :model-value="pagination.pageSize"
+                value-key="value"
+                label-key="label"
+                placeholder="Select size"
+                class="min-w-34"
+                @update:model-value="changePageSize"
+              />
+            </UFormField>
             <div class="flex items-center gap-1">
               <UButton
                 variant="outline"
