@@ -9,6 +9,15 @@ const article = ref<CatalogArticle | null>(null)
 const error = ref("")
 const loading = ref(true)
 
+const pageTitle = computed(() => {
+  const title = article.value?.title?.trim()
+  return title && title.length ? title : "Artikal"
+})
+
+useHead({
+  title: pageTitle,
+})
+
 const gallery = computed(() => {
   if (!article.value) return []
   const images = [
