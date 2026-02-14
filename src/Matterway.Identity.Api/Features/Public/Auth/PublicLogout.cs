@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Asp.Versioning;
-using Matterway.Identity.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 using Microsoft.AspNetCore.Http.HttpResults;

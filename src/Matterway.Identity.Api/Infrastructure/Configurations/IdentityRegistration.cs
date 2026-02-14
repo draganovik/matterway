@@ -2,7 +2,7 @@ using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
-namespace Matterway.Identity.Api.Application.Configurations;
+namespace Matterway.Identity.Api.Infrastructure.Configurations;
 
 public static class IdentityRegistration
 {

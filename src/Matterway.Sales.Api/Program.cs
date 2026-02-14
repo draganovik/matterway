@@ -1,61 +1,25 @@
 ﻿using Asp.Versioning;
-using System.Text.Json.Serialization;
-using Matterway.Sales.Api.Application.Configurations;
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 using Matterway.Sales.Api.Infrastructure.Persistence;
-using Matterway.ServiceDefaults;
-using Microsoft.AspNetCore.Http.Json;
+using Matterway.ServiceDefaults.Api;
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    Args = args,
-    ContentRootPath = Directory.GetCurrentDirectory()
-});
-
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile($"Properties/appsettings.{builder.Environment.EnvironmentName}.json", true,
-        true)
-    .AddEnvironmentVariables();
-
-builder.Services.Configure<JsonOptions>(options =>
-{
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
-
-builder.Services.AddValidation();
-builder.AddServiceDefaults();
-
+const string serviceName = "sales";
+const string scalarTitle = "Matterway Sales API";
 ApiVersion[] supportedApiVersions = [new(1, 0), new(2, 0)];
 
-builder
-    .ConfigureProblemDetails()
-    .ConfigureApiVersioning(supportedApiVersions)
-    .ConfigureOpenApi(supportedApiVersions)
-    .ConfigureCors();
+var builder = ApiTemplateRegistration.CreateApiBuilder(args);
 
 builder
-    .ConfigureAuthentication()
+    .ConfigureApiFoundation(serviceName, supportedApiVersions)
+    .ConfigureAuthentication(new ApiAuthenticationFeatureOptions())
     .ConfigureCustomersIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureFeatures(new ApiFeatureDiscoveryOptions());
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
-app.MapDefaultEndpoints();
-app.UseStatusCodePages();
-app.UseCors();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-if (app.Environment.IsDevelopment())
-{
-    app.ApplyOpenApi();
-    app.ApplyScalar(supportedApiVersions);
-}
-
+app.UseApiFoundation();
+app.ApplyDevelopmentApiDocs(scalarTitle, supportedApiVersions);
 app.ApplyEndpoints(supportedApiVersions);
 
 app.Run();

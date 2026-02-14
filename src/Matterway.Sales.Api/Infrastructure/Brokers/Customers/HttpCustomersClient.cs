@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Net;
-using Matterway.Sales.Api.Application.Brokers;
+using Matterway.ServiceDefaults.Api;
 
 namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 

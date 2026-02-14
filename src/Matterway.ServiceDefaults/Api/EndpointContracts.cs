@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
-namespace Matterway.Catalog.Api.Application;
+namespace Matterway.ServiceDefaults.Api;
 
 public enum EndpointKind
 {
@@ -11,6 +12,11 @@ public enum EndpointKind
 }
 
 public readonly record struct EndpointKindMetadata(EndpointKind Kind);
+
+public interface IEndpoint
+{
+    void MapEndpoint(EndpointRouter endpoints);
+}
 
 public sealed class EndpointRouter(IReadOnlyDictionary<EndpointKind, RouteGroupBuilder> groups)
 {

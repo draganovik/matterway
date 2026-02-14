@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Net;
-using Matterway.Customers.Api.Application.Brokers;
+using Matterway.ServiceDefaults.Api;
 
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 

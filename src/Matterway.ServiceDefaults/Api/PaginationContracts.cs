@@ -1,7 +1,7 @@
-﻿namespace Matterway.Catalog.Api.Application;
-
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.WebUtilities;
+
+namespace Matterway.ServiceDefaults.Api;
 
 public record PaginationRequestParameters
 {
@@ -28,12 +28,10 @@ public sealed record PaginationResponse<T>(
         string? endpointUrl)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
-
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(currentPage);
 
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-        // Build metadata
         var meta = new PaginationResponseMeta(
             totalCount,
             totalPages,
@@ -41,8 +39,7 @@ public sealed record PaginationResponse<T>(
             pageSize
         );
 
-        // Build links
-        var links = endpointUrl == null
+        var links = endpointUrl is null
             ? null
             : new PaginationResponseLinks(
                 totalPages > 0 ? BuildUrl(1) : null,
@@ -53,12 +50,10 @@ public sealed record PaginationResponse<T>(
 
         return new PaginationResponse<T>(meta, data, links);
 
-        // Local helper
         string BuildUrl(int page)
         {
-            var s1 = QueryHelpers.AddQueryString(endpointUrl, "page", page.ToString());
-            var s2 = QueryHelpers.AddQueryString(s1, "pageSize", pageSize.ToString());
-            return s2;
+            var pageQuery = QueryHelpers.AddQueryString(endpointUrl, "page", page.ToString());
+            return QueryHelpers.AddQueryString(pageQuery, "pageSize", pageSize.ToString());
         }
     }
 }

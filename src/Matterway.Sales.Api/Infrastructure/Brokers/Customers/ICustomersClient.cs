@@ -1,5 +1,5 @@
 using System.Net;
-using Matterway.Sales.Api.Application.Brokers;
+using Matterway.ServiceDefaults.Api;
 
 namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
