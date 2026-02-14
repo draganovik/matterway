@@ -5,7 +5,7 @@ using Matterway.ServiceDefaults.Api;
 
 const string serviceName = "sales";
 const string scalarTitle = "Matterway Sales API";
-ApiVersion[] supportedApiVersions = [new(1, 0), new(2, 0)];
+ApiVersion[] supportedApiVersions = [new(1, 0)];
 
 var builder = ApiTemplateRegistration.CreateApiBuilder(args);
 

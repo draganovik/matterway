@@ -43,7 +43,7 @@ public static class PermissionClaims
         return true;
     }
 
-    public static bool HasPermission(ClaimsPrincipal user, string service, PermissionLevel minimumLevel)
+    public static bool HasPermission(ClaimsPrincipal? user, string service, PermissionLevel minimumLevel)
     {
         if (user is null) return false;
         if (!IsEmployee(user)) return false;
