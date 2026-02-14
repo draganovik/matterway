@@ -36,13 +36,12 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
     <template #header>
       <NuxtLink :to="`/articles/${article.id}`" class="block">
         <div class="bg-elevated aspect-[4/3] w-full overflow-hidden">
-          <img
-            v-if="article.thumbnailImage?.imageUrl"
-            :src="article.thumbnailImage.imageUrl"
-            :alt="article.thumbnailImage.imageAlt || article.title"
-            class="h-full w-full object-cover"
+          <ImageWithFallback
+            :src="article.thumbnailImage?.imageUrl || null"
+            :alt="article.thumbnailImage?.imageAlt || article.title"
+            img-class="h-full w-full object-cover"
+            placeholder-class="h-full w-full"
           />
-          <UIcon v-else name="i-lucide-image-off" class="text-muted h-8 w-8" />
         </div>
       </NuxtLink>
     </template>

@@ -4,6 +4,11 @@ import logoUrl from "~/assets/brand/matterway-logo-cyan.svg"
 
 <template>
   <NuxtLink to="/" class="flex items-center">
-    <img :src="logoUrl" alt="Matterway" class="h-9 w-9" />
+    <ImageWithFallback
+      :src="logoUrl"
+      alt="Matterway"
+      img-class="h-9 w-9"
+      placeholder-class="h-9 w-9 rounded-md"
+    />
   </NuxtLink>
 </template>

@@ -50,18 +50,12 @@ function showPrevious() {
     <div class="space-y-3">
       <div class="bg-elevated relative overflow-hidden rounded-xl">
         <div class="relative aspect-[4/3]">
-          <img
-            v-if="currentImage"
-            :src="currentImage.url"
-            :alt="currentImage.alt"
-            class="h-full w-full object-cover"
+          <ImageWithFallback
+            :src="currentImage?.url || null"
+            :alt="currentImage?.alt || 'Slika artikla'"
+            img-class="h-full w-full object-cover"
+            placeholder-class="h-full w-full"
           />
-          <div
-            v-else
-            class="text-muted flex h-full items-center justify-center"
-          >
-            <UIcon name="i-lucide-image-off" class="h-8 w-8" />
-          </div>
 
           <template v-if="hasMultipleImages">
             <UButton
@@ -98,10 +92,11 @@ function showPrevious() {
           :class="index === activeIndex ? 'border-primary' : 'border-default'"
           @click="selectImage(index)"
         >
-          <img
+          <ImageWithFallback
             :src="image.url"
             :alt="image.alt"
-            class="aspect-[4/3] h-full w-full object-cover"
+            img-class="aspect-[4/3] h-full w-full object-cover"
+            placeholder-class="aspect-[4/3] h-full w-full"
           />
         </button>
       </div>

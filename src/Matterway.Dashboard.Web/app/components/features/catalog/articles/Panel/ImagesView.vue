@@ -205,18 +205,12 @@ async function handleImageSubmit(payload: {
         >
           <div class="grid gap-3">
             <div class="bg-muted/60 aspect-4/3 overflow-hidden rounded-md">
-              <img
-                v-if="image.imageUrl"
+              <ImageWithFallback
                 :src="image.imageUrl"
                 :alt="image.imageAlt || ''"
-                class="h-full w-full object-cover"
+                img-class="h-full w-full object-cover"
+                placeholder-class="h-full w-full"
               />
-              <div
-                v-else
-                class="text-muted flex h-full w-full items-center justify-center text-xs"
-              >
-                No image
-              </div>
             </div>
             <div class="grid gap-3">
               <UButton
