@@ -8,9 +8,14 @@ hide circle
 
 package "Identity" {
   enum EIdentityRole {
-    Admin
-    Manager
     Customer
+    Employee
+  }
+
+  enum PermissionLevel {
+    Observer
+    Operator
+    Administrator
   }
 
   class SystemUser {
@@ -43,6 +48,13 @@ package "Identity" {
     +claimType: String
     +claimValue: String
   }
+
+  note right of IdentityUserClaim
+    Permission claims use:
+    claimType = "perm"
+    claimValue = "<service>:<level>"
+    where level in PermissionLevel
+  end note
 
   SystemUser "1" -- "0..*" IdentityUserClaim
   SystemUser "1" -- "0..*" IdentityUserRole
@@ -194,14 +206,12 @@ package "Sales" {
   }
 
   note right of Order
-    Flow (happy path)
-    Customer -> Sales: Place order
-    Sales -> Inventory: Request stock reservation
-    Inventory -> Sales: StockReserved
-    Sales: Initiate/Authorize payment
-    Sales: PaymentCaptured
-    Sales -> Inventory: Fulfillment request
-    Inventory -> Sales: OrderDeliveryInfoFulfilled
+    Current checkout flow
+    1) Storefront -> Sales: create order
+    2) Sales -> Customers: create CustomerOrder from cart
+    3) Sales persists Order + Processing status
+    4) Storefront charges via Stripe
+    5) Stripe webhook -> Sales system/payment registration
   end note
 
   enum EOrderType {
@@ -248,7 +258,7 @@ package "Sales" {
 
   OrderItem "0..*" -- "1" Order : orderId
   OrderStatus "0..*" -- "1" Order : orderId
-  OrderDeliveryInfo "1" -- "1" Order : OrderId
+  OrderDeliveryInfo "0..1" -- "1" Order : orderId
   Payment "0..*" -- "1" Order : orderId
 }
 
@@ -261,5 +271,5 @@ SystemUser "1" .up. "0..1" Customer
 
 ' Customers
 CustomerArticle "0..*" .. "1" Article
-CustomerOrder "0..1" .. "1" Order
+CustomerOrder "0..1" .. "1" Order : shared orderId
 @enduml
