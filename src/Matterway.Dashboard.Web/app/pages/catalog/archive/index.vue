@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: "Data I/O",
+  title: "Catalog Data",
   service: "catalog",
   level: "operator",
 })
@@ -12,7 +12,7 @@ definePageMeta({
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Catalog Data I/O">
+      <UDashboardNavbar title="Catalog Data">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

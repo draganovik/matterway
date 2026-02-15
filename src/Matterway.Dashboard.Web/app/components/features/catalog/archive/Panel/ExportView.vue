@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <UCard class="border-default border">
+  <UCard class="h-full !border-default !border !ring-0">
     <template #header>
       <div>
         <h3 class="text-foreground text-sm font-semibold">Export Archive</h3>

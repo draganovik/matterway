@@ -110,13 +110,13 @@ function formatImportSummary(summary: ImportCatalogArchiveResponse) {
 <template>
   <div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto">
     <div>
-      <h2 class="text-foreground text-base font-semibold">Catalog Data I/O</h2>
+      <h2 class="text-foreground text-base font-semibold">Catalog Data</h2>
       <p class="text-muted text-sm">
         Export or import catalog records and article images as a zip archive.
       </p>
     </div>
 
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid gap-4 lg:grid-cols-2 lg:items-stretch">
       <CatalogArchivePanelExportView
         :can-operate="canOperate"
         :loading="exportState.loading"
