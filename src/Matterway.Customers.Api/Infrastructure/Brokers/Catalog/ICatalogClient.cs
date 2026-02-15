@@ -1,5 +1,3 @@
-using Matterway.ServiceDefaults.Api;
-
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 
 public interface ICatalogClient

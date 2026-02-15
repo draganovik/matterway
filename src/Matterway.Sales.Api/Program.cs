@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 using Matterway.Sales.Api.Infrastructure.Persistence;
-using Matterway.ServiceDefaults.Api;
 
 const string serviceName = "sales";
 const string scalarTitle = "Matterway Sales API";

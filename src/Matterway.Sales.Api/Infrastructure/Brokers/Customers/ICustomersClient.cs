@@ -1,6 +1,3 @@
-using System.Net;
-using Matterway.ServiceDefaults.Api;
-
 namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
 public interface ICustomersClient

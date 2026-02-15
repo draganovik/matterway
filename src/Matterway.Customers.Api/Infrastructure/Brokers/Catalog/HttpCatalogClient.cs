@@ -1,6 +1,5 @@
-using System.Text.Json;
 using System.Net;
-using Matterway.ServiceDefaults.Api;
+using System.Text.Json;
 
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 

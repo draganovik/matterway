@@ -2,7 +2,6 @@
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
-using Matterway.ServiceDefaults.Api;
 
 const string serviceName = "catalog";
 const string scalarTitle = "Matterway Catalog API";

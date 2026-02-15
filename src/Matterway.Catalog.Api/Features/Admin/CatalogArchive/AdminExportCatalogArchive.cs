@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
 using Microsoft.AspNetCore.Http.HttpResults;
 

@@ -4,10 +4,8 @@ using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Configurations;
 using Matterway.Identity.Api.Infrastructure.Persistence;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
-using Matterway.ServiceDefaults.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 
 const string serviceName = "identity";
 const string scalarTitle = "Matterway Identity API";

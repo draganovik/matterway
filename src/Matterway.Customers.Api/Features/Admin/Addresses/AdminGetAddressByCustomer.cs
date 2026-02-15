@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Microsoft.AspNetCore.Http.HttpResults;

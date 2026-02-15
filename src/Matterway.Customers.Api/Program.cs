@@ -2,7 +2,6 @@
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 using Matterway.Customers.Api.Infrastructure.Persistence;
-using Matterway.ServiceDefaults.Api;
 
 const string serviceName = "customers";
 const string scalarTitle = "Matterway Customers API";

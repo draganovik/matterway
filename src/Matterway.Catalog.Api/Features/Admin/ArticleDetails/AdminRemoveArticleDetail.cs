@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;

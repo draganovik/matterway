@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

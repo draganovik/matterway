@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Identity.Api.Infrastructure.Persistence;
 

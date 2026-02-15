@@ -55,7 +55,7 @@ public static class ModelDataLoader
 
         #endregion
 
-        #region Adresses data
+        #region Addresses data
 
         modelBuilder.Entity<Address>().HasData(
             new Address
@@ -78,7 +78,7 @@ public static class ModelDataLoader
                 ZipCode = "11000",
                 AddressLine1 = "Kralja Milana",
                 AddressLine2 = "34/10",
-                ContactPhone = "++381676543210"
+                ContactPhone = "+381676543210"
             }
         );
 

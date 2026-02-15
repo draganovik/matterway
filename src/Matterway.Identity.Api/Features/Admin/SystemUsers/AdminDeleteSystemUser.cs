@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
-using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;

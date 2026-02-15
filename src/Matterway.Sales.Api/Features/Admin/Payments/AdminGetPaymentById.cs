@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Features.System.Payments;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;

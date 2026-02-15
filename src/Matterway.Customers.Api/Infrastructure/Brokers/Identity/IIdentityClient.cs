@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Matterway.ServiceDefaults.Api;
 
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 

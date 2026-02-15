@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Api;
-using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
