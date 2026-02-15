@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
@@ -11,10 +11,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Discounts;
 
 public class AdminUpdateDiscount : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPut("admin/discounts/{code}", Handle)
-            .WithName("AdminUpdateDiscount").WithSummary("Create or replace a discount across article ids (admin).")
+        endpoints.MapPut(EndpointKind.Admin, "discounts/{code}", Handle)
+            .WithName("AdminUpdateDiscount").WithSummary("[admin] Create or replace a discount across article ids")
             .WithTags(nameof(Discount))
             .Produces<UpdatedDiscountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

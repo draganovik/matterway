@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Self.Customers;
 
 public class SelfUpdateCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPatch("self/profile", Handler)
-            .WithName("SelfUpdateCustomer").WithSummary("Update own Customer profile.")
+        endpoints.MapPatch(EndpointKind.Self, "profile", Handler)
+            .WithName("SelfUpdateCustomer").WithSummary("[self] Update own Customer profile.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

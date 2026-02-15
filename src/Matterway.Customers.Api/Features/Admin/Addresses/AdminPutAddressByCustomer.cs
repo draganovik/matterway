@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -11,11 +11,11 @@ namespace Matterway.Customers.Api.Features.Admin.Addresses;
 
 public class AdminPutAddressByCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPut("admin/customers/{customerId:guid}/address", Handler)
+        endpoints.MapPut(EndpointKind.Admin, "customers/{customerId:guid}/address", Handler)
             .WithName("AdminPutAddressByCustomer")
-            .WithSummary("Create or replace Customer address by customer id (admin).")
+            .WithSummary("[admin] Create or replace Customer address by customer id")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)
             .Produces<AddressResponse>(StatusCodes.Status201Created)

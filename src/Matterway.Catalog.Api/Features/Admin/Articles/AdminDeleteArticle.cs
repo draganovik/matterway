@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
@@ -9,10 +9,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Articles;
 
 public class AdminDeleteArticle : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/articles/{id:guid}", Handle)
-            .WithName("AdminDeleteArticle").WithSummary("Delete an Article (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "articles/{id:guid}", Handle)
+            .WithName("AdminDeleteArticle").WithSummary("[admin] Delete an Article")
             .WithTags("Articles")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

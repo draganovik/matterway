@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
@@ -11,10 +11,10 @@ namespace Matterway.Catalog.Api.Features.Admin.ArticleImages;
 
 public class AdminUpdateArticleImage : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPatch("admin/articles/{articleId:guid}/images/{orderIndex:int}", Handle)
-            .WithName("AdminUpdateArticleImage").WithSummary("Update an ArticleImage (admin).")
+        endpoints.MapPatch(EndpointKind.Admin, "articles/{articleId:guid}/images/{orderIndex:int}", Handle)
+            .WithName("AdminUpdateArticleImage").WithSummary("[admin] Update an ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<UpdateArticleImageResponse>()
             .Produces(StatusCodes.Status404NotFound)

@@ -47,7 +47,7 @@ watch(
     <div
       class="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8"
     >
-      <HeaderBrandButton />
+      <HeaderAppLogo />
 
       <nav class="ml-2 hidden items-center gap-1 lg:flex">
         <UButton

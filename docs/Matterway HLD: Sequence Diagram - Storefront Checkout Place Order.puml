@@ -1,0 +1,70 @@
+@startuml HLD: Sequence Diagram - Storefront Checkout Place Order
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 120
+
+autonumber
+autoactivate on
+
+actor "Customer" as Customer
+participant "Checkout Workspace\n(app/components/features/checkout/Workspace.vue)" as Checkout
+participant "Storefront Server\n(Nuxt server/api)" as StorefrontServer
+participant "Sales API" as SalesApi
+participant "Customers API" as CustomersApi
+database "Sales DB" as SalesDb
+database "Customers DB" as CustomersDb
+participant "Stripe" as Stripe
+
+Customer -> Checkout : Click "Place order"
+note over Checkout
+Customer identity is resolved from JWT claims in all services.
+`customerId` is not taken from checkout payload.
+end note
+alt Client-side validation fails
+  Checkout --> Customer : Show validation errors\n(no API calls)
+else Validation passes
+  Checkout -> SalesApi : POST /api/self/v1.0/orders\n{type, deliveryInfo} + Bearer customer JWT
+  SalesApi -> CustomersApi : POST /api/self/v1.0/orders\n{orderId, deliveryInfo} + forwarded Bearer JWT
+  CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId)
+  CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
+  CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
+
+  SalesApi -> SalesDb : Save Order + Items + DeliveryInfo\nAdd initial status=Processing
+  SalesDb --> SalesApi : Order created
+  SalesApi --> Checkout : 201 Created {id, totalAmount, ...}
+
+  Checkout -> StorefrontServer : POST /api/payments\n{orderId, userId, amount, card, address}
+  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=true)\nmetadata:{order_id, reference_id, client_id}
+
+  note over Stripe, StorefrontServer
+  Order creation and payment registration are separate steps.
+  Payment registration in Sales happens asynchronously via Stripe webhook.
+  end note
+
+  alt Stripe payment intent creation fails
+    Stripe --> StorefrontServer : Error
+    StorefrontServer --> Checkout : 500 Payment failed
+    Checkout --> Customer : Show payment error\n(order already created, cart unchanged)
+  else Stripe payment intent created
+    Stripe --> StorefrontServer : 200 {client_secret}
+    StorefrontServer --> Checkout : 200 {clientSecret}
+    Checkout -> Checkout : cart.clear()
+    Checkout --> Customer : Redirect to /orders
+  end
+
+  ... asynchronous webhook handling ...
+
+  alt Stripe sends charge.succeeded
+    Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\ncharge.succeeded(order_id, amount, reference_id)
+    StorefrontServer -> SalesApi : POST /api/system/v1.0/payments\n{orderId, provider, referenceId, amount, status=Charged, createdAt}
+    SalesApi -> SalesDb : Verify order exists + insert Payment
+    SalesDb --> SalesApi : Payment stored
+    SalesApi --> StorefrontServer : 201 Created
+    StorefrontServer --> Stripe : 200 OK
+  else Stripe sends non-charge event
+    Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\n<other event type>
+    StorefrontServer --> Stripe : 304 Event ignored
+  end
+end
+
+@enduml

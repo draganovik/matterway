@@ -1,0 +1,37 @@
+using Matterway.Catalog.Api.Domain.Entities;
+
+namespace Matterway.Catalog.Api.Infrastructure.ImportExport.Rows;
+
+public sealed record ArticleImageRow(
+    Guid Id,
+    Guid ArticleId,
+    int OrderIndex,
+    string ImageAlt,
+    string? OriginalImageUrl,
+    string ImageFile,
+    string ContentType)
+{
+    public static ArticleImageRow FromEntity(ArticleImage entity, string imageFile, string contentType)
+    {
+        return new ArticleImageRow(
+            entity.Id,
+            entity.ArticleId,
+            entity.OrderIndex,
+            entity.ImageAlt ?? string.Empty,
+            entity.ImageUrl,
+            imageFile,
+            contentType);
+    }
+
+    public ArticleImage ToEntity(string imageUrl)
+    {
+        return new ArticleImage
+        {
+            Id = Id,
+            ArticleId = ArticleId,
+            OrderIndex = OrderIndex,
+            ImageAlt = ImageAlt ?? string.Empty,
+            ImageUrl = imageUrl
+        };
+    }
+}

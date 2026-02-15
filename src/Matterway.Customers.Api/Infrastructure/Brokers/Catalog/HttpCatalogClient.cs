@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Net;
-using Matterway.Customers.Api.Application.Brokers;
+using Matterway.ServiceDefaults.Api;
 
 namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 
@@ -9,7 +9,7 @@ public class HttpCatalogClient(HttpClient httpClient) : ICatalogClient
     public async Task<BrokerResponse<CatalogClientGetArticleByIdResponse>> GetArticleById(Guid id,
         CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1.0/public/articles/{id}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/public/v1.0/articles/{id}");
         var response = await httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {

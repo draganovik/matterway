@@ -6,6 +6,10 @@ const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
   ssr: false,
+  colorMode: {
+    preference: "system",
+    storageKey: "mw-dashboard-color-mode",
+  },
   components: [
     {
       path: "~/components/common",

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Sales.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
@@ -12,10 +12,10 @@ namespace Matterway.Sales.Api.Features.System.Payments;
 
 public class SystemRegisterPayment : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("system/payments", Handle)
-            .WithName("SystemRegisterPayment").WithSummary("Register a Payment (system).")
+        endpoints.MapPost(EndpointKind.System, "payments", Handle)
+            .WithName("SystemRegisterPayment").WithSummary("[system] Register a Payment")
             .WithTags(nameof(Payment))
             .Produces<PaymentResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)

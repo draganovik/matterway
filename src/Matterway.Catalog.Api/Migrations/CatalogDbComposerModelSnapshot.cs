@@ -17,7 +17,7 @@ namespace Matterway.Catalog.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -337,48 +337,6 @@ namespace Matterway.Catalog.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("ArticleImage", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"),
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            ImageAlt = "Amazon Echo Show 5",
-                            ImageUrl = "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg",
-                            OrderIndex = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"),
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            ImageAlt = "Spotlight Cam Plus",
-                            ImageUrl = "https://images.ctfassets.net/a3peezndovsu/article-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/article-24529407541337-media.jpg",
-                            OrderIndex = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"),
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            ImageAlt = "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View",
-                            ImageUrl = "https://images.homedepot-static.com/articleImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg",
-                            OrderIndex = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"),
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            ImageAlt = "Nest Learning Thermostat - Front View",
-                            ImageUrl = "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg",
-                            OrderIndex = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("88423aa2-93bb-462c-9934-7e783e680b98"),
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            ImageAlt = "August Wi-Fi Smart Lock Pro - Front View",
-                            ImageUrl = "https://images.homedepot-static.com/articleImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg",
-                            OrderIndex = 0
-                        });
                 });
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Detail", b =>

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.System.Customers;
 
 public class SystemVerifyCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("system/customers/{customerId:guid}/verify", Handler)
-            .WithName("SystemVerifyCustomer").WithSummary("Verify Customer by id (system).")
+        endpoints.MapGet(EndpointKind.System, "customers/{customerId:guid}/verify", Handler)
+            .WithName("SystemVerifyCustomer").WithSummary("[system] Verify Customer by id")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

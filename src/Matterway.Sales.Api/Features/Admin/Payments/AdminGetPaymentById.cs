@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Sales.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Features.System.Payments;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;
@@ -9,10 +9,10 @@ namespace Matterway.Sales.Api.Features.Admin.Payments;
 
 public class AdminGetPaymentById : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/payments/{paymentId:guid}", Handler)
-            .WithName("AdminGetPaymentById").WithSummary("Get Payment by id (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "payments/{paymentId:guid}", Handler)
+            .WithName("AdminGetPaymentById").WithSummary("[admin] Get Payment by id")
             .WithTags(nameof(Payment))
             .Produces<SystemRegisterPayment.PaymentResponse>()
             .Produces(StatusCodes.Status404NotFound)

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using Matterway.Identity.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.ServiceDefaults.Authorization;
@@ -14,11 +14,11 @@ namespace Matterway.Identity.Api.Features.Admin.UserPerms;
 
 public class AdminAddSystemUserPerm : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("admin/system-users/{id:guid}/perms", Handler)
+        endpoints.MapPost(EndpointKind.Admin, "system-users/{id:guid}/perms", Handler)
             .WithName("AdminAddSystemUserPerm")
-            .WithSummary("Add a permission to a system user (admin).")
+            .WithSummary("[admin] Add a permission to a system user")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<AddSystemUserPermResponse>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

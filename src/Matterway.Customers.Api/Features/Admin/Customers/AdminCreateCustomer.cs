@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -10,10 +10,10 @@ namespace Matterway.Customers.Api.Features.Admin.Customers;
 
 public class AdminCreateCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("admin/customers", Handler)
-            .WithName("AdminCreateCustomer").WithSummary("Create a Customer (admin).")
+        endpoints.MapPost(EndpointKind.Admin, "customers", Handler)
+            .WithName("AdminCreateCustomer").WithSummary("[admin] Create a Customer")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

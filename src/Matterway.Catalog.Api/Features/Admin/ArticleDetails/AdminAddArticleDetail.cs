@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
@@ -13,10 +13,10 @@ namespace Matterway.Catalog.Api.Features.Admin.ArticleDetails;
 
 public class AdminAddArticleDetail : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("admin/articles/{articleId:Guid}/details", Handle)
-            .WithName("AdminAddArticleDetail").WithSummary("Add a new ArticleDetail (admin).")
+        endpoints.MapPost(EndpointKind.Admin, "articles/{articleId:Guid}/details", Handle)
+            .WithName("AdminAddArticleDetail").WithSummary("[admin] Add a new ArticleDetail")
             .WithTags("ArticleDetail")
             .Produces<AddArticleDetailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

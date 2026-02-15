@@ -21,6 +21,7 @@ var postgres = builder.AddPostgres("postgres")
     .WithHostPort(15432)
     .WithPassword(postgresPassword)
     .WithVolume("matterway-postgres-data", "/var/lib/postgresql")
+    .WithBindMount("../../data", "/seed-data", true)
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";

@@ -52,15 +52,25 @@ const isOpen = computed({
   set: (value: boolean) => emit("update:open", value),
 })
 
+function toDisplayLabel(title: string, unit?: string | null) {
+  const normalizedUnit = unit?.trim()
+  return normalizedUnit ? `${title} (${normalizedUnit})` : title
+}
+
 const optionItems = computed(() =>
   detailOptions.value
     .filter((option) => option.slug)
-    .map((option) => ({
-      id: option.slug as string,
-      slug: option.slug as string,
-      label: (option.title ?? option.slug ?? "").toString(),
-      unit: option.unit || "",
-    })),
+    .map((option) => {
+      const title = (option.title ?? option.slug ?? "").toString()
+      const unit = option.unit?.trim() ?? ""
+      return {
+        id: option.slug as string,
+        slug: option.slug as string,
+        title,
+        displayLabel: toDisplayLabel(title, unit),
+        unit,
+      }
+    }),
 )
 
 const selectedOption = computed(() => {
@@ -69,18 +79,22 @@ const selectedOption = computed(() => {
   )
   if (match) return match
   if (props.detail?.detailSlug) {
+    const title = props.detail.title ?? props.detail.detailSlug
+    const unit = props.detail.unit?.trim() ?? ""
     return {
       id: props.detail.detailSlug,
       slug: props.detail.detailSlug,
-      label: props.detail.title ?? props.detail.detailSlug,
-      unit: props.detail.unit ?? "",
+      title,
+      displayLabel: toDisplayLabel(title, unit),
+      unit,
     }
   }
   if (!selectedKey.value) return null
   return {
     id: selectedKey.value,
     slug: selectedKey.value,
-    label: selectedKey.value,
+    title: selectedKey.value,
+    displayLabel: selectedKey.value,
     unit: "",
   }
 })
@@ -121,8 +135,7 @@ async function loadDefinitions() {
   definitionState.error = ""
   definitionState.success = ""
   definitionState.loading = true
-  const titleLike = searchTerm.value.trim() || undefined
-  const result = await api.queryDetails({ limit: 25, titleLike })
+  const result = await api.queryDetails({ limit: 200 })
   definitionState.loading = false
   if (!result.ok) {
     definitionState.error = result.error || "Unable to load definitions."
@@ -155,7 +168,7 @@ function submit() {
     }
     emit("submit", {
       detailSlug: slug,
-      title: selectedOption.value?.label ?? props.detail?.title ?? null,
+      title: selectedOption.value?.title ?? props.detail?.title ?? null,
       unit: selectedOption.value?.unit ?? props.detail?.unit ?? null,
       textValue: null,
       numericValue,
@@ -164,7 +177,7 @@ function submit() {
   }
   emit("submit", {
     detailSlug: slug,
-    title: selectedOption.value?.label ?? props.detail?.title ?? null,
+    title: selectedOption.value?.title ?? props.detail?.title ?? null,
     unit: selectedOption.value?.unit ?? props.detail?.unit ?? null,
     textValue: rawValue,
     numericValue: null,
@@ -191,39 +204,37 @@ function submit() {
 
     <template #body>
       <div class="grid gap-4">
-        <div class="grid gap-3 md:grid-cols-[1fr_auto]">
-          <UFormField label="Detail" required>
+        <div class="grid gap-3">
+          <UFormField label="Detail" required class="w-full">
             <USelectMenu
               v-model="selectedKey"
               v-model:search-term="searchTerm"
               :items="optionItems"
               value-key="id"
-              label-key="label"
+              label-key="displayLabel"
               :search-input="true"
               :disabled="!canEdit || mode === 'edit'"
               size="md"
               placeholder="Select detail"
+              class="w-full"
+              :ui="{ base: 'w-full' }"
             />
           </UFormField>
-          <div class="flex items-end">
-            <UButton
-              variant="outline"
-              :loading="definitionState.loading"
-              :disabled="!canEdit || mode === 'edit'"
-              @click="loadDefinitions"
-            >
-              Search
-            </UButton>
-          </div>
         </div>
 
-        <UFormField :label="isNumeric ? 'Numeric Value' : 'Value'" required>
+        <UFormField
+          :label="isNumeric ? 'Numeric Value' : 'Value'"
+          required
+          class="w-full"
+        >
           <UInput
             v-model="valueInput"
             :type="isNumeric ? 'number' : 'text'"
             :placeholder="isNumeric ? 'e.g. 42' : 'Enter value'"
             :disabled="!canEdit"
             size="md"
+            class="w-full"
+            :ui="{ root: 'w-full' }"
           />
         </UFormField>
 

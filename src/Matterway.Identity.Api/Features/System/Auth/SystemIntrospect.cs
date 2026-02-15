@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Asp.Versioning;
-using Matterway.Identity.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -8,11 +8,11 @@ namespace Matterway.Identity.Api.Features.System.Auth;
 
 public class SystemIntrospect : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("system/auth/introspect", Handler)
+        endpoints.MapGet(EndpointKind.System, "auth/introspect", Handler)
             .WithName("SystemIntrospect")
-            .WithSummary("Introspect access token and return claims (system).")
+            .WithSummary("[system] Introspect access token and return claims")
             .WithTags("Auth")
             .Produces<AuthIntrospectResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)

@@ -29,6 +29,7 @@ function formatValidationErrors(errors?: Record<string, string[]>) {
 
 export function useApiClient() {
   const auth = useAuthSession()
+  const validEndpointKinds = new Set(["self", "admin", "public", "system"])
 
   async function request<T>(
     service: ApiService,
@@ -49,8 +50,24 @@ export function useApiClient() {
       }
     }
 
-    const normalizedPath = path.replace(/^\//, "")
-    const url = `${baseUrl}/api/v1.0/${normalizedPath}`
+    const normalizedPath = path.replace(/^\/+/, "")
+    const [endpointKind, ...resourcePath] = normalizedPath.split("/")
+    if (!endpointKind || !validEndpointKinds.has(endpointKind)) {
+      return {
+        ok: false,
+        status: 0,
+        error:
+          "API putanja mora početi segmentom: self, admin, public ili system.",
+      }
+    }
+    if (resourcePath.length === 0) {
+      return {
+        ok: false,
+        status: 0,
+        error: "API putanja mora imati resurs nakon prvog segmenta.",
+      }
+    }
+    const url = `${baseUrl}/api/${endpointKind}/v1.0/${resourcePath.join("/")}`
     const headers = new Headers(options.headers || {})
     if (!headers.has("Accept")) headers.set("Accept", "application/json")
     if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {

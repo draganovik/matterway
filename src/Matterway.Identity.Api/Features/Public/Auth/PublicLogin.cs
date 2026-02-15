@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Identity.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -10,11 +10,11 @@ namespace Matterway.Identity.Api.Features.Public.Auth;
 
 public class PublicLogin : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("public/auth/login", Handler)
+        endpoints.MapPost(EndpointKind.Public, "auth/login", Handler)
             .WithName("PublicLogin")
-            .WithSummary("Authenticate user and issue tokens.")
+            .WithSummary("[public] Authenticate user and issue tokens.")
             .WithTags("Auth")
             .Produces<LoginResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)

@@ -36,3 +36,7 @@ export type {
   UpdateDiscountRequest,
   UpdatedDiscountResponse,
 } from "./discounts"
+export type {
+  ExportCatalogArchiveResponse,
+  ImportCatalogArchiveResponse,
+} from "./archive"

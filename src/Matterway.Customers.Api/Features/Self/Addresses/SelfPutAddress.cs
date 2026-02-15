@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -11,10 +11,10 @@ namespace Matterway.Customers.Api.Features.Self.Addresses;
 
 public class SelfPutAddress : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPut("self/address", Handler)
-            .WithName("SelfPutAddress").WithSummary("Create or update own Address.")
+        endpoints.MapPut(EndpointKind.Self, "address", Handler)
+            .WithName("SelfPutAddress").WithSummary("[self] Create or update own Address.")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

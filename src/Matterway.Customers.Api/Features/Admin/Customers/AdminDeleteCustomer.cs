@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,10 +8,10 @@ namespace Matterway.Customers.Api.Features.Admin.Customers;
 
 public class AdminDeleteCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("admin/customers/{systemUserId:guid}", Handler)
-            .WithName("AdminDeleteCustomer").WithSummary("Delete Customer by id (admin).")
+        endpoints.MapDelete(EndpointKind.Admin, "customers/{systemUserId:guid}", Handler)
+            .WithName("AdminDeleteCustomer").WithSummary("[admin] Delete Customer by id")
             .WithTags(nameof(Customer))
             .Produces<DeleteCustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

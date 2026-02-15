@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { useAuthSession } from "~/composables/useAuthSession"
 
-const colorMode = useColorMode()
-const color = computed(() =>
-  colorMode.value === "dark" ? "#0c0a09" : "#f5f5f4",
-)
 const auth = useAuthSession()
 const route = useRoute()
 const appTitle = "Matterway Dashboard"
@@ -23,7 +19,18 @@ useHead({
   meta: [
     { charset: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { key: "theme-color", name: "theme-color", content: color },
+    {
+      key: "theme-color-light",
+      name: "theme-color",
+      content: "#f5f5f4",
+      media: "(prefers-color-scheme: light)",
+    },
+    {
+      key: "theme-color-dark",
+      name: "theme-color",
+      content: "#0c0a09",
+      media: "(prefers-color-scheme: dark)",
+    },
   ],
   link: [{ rel: "icon", href: "/favicon.svg" }],
   htmlAttrs: {
@@ -33,8 +40,6 @@ useHead({
 
 onMounted(() => {
   if (!import.meta.client) return
-  // Dashboard follows system theme automatically (no manual override).
-  colorMode.preference = "system"
   void auth.initialize()
 })
 </script>
@@ -51,7 +56,7 @@ onMounted(() => {
       >
         <div class="flex flex-col items-center gap-4 text-center">
           <div
-            class="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent"
+            class="h-10 w-10 animate-spin rounded-full border border-orange-500 border-t-transparent"
           />
         </div>
       </div>

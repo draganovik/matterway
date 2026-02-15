@@ -1,5 +1,7 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/useApiClient"
+import { useAuthSession } from "~/composables/useAuthSession"
+import type { ApiResult } from "~/types/common/api"
 import type {
   AddArticleDetailRequest,
   AddArticleImageRequest,
@@ -10,7 +12,9 @@ import type {
   CreatedDiscountResponse,
   DeleteDetailResponse,
   DeleteDiscountResponse,
+  ExportCatalogArchiveResponse,
   GetArticleByIdResponse,
+  ImportCatalogArchiveResponse,
   PutDetailRequest,
   PutDetailResponse,
   QueryArticlesParams,
@@ -34,6 +38,7 @@ const ADMIN_DISCOUNTS_PATH = "admin/discounts"
 
 export function useCatalogApi() {
   const api = useApiClient()
+  const auth = useAuthSession()
 
   async function queryArticles(params: QueryArticlesParams) {
     const query = buildQuery({
@@ -232,6 +237,82 @@ export function useCatalogApi() {
     )
   }
 
+  async function importCatalogArchive(file: File) {
+    const formData = new FormData()
+    formData.append("file", file)
+
+    return api.request<ImportCatalogArchiveResponse>(
+      "catalog",
+      "admin/catalog/archive/import",
+      {
+        method: "POST",
+        body: formData,
+      },
+    )
+  }
+
+  async function exportCatalogArchive(): Promise<
+    ApiResult<ExportCatalogArchiveResponse>
+  > {
+    await auth.initialize()
+    const config = useRuntimeConfig()
+    const baseUrl = config.public.catalogApiBaseUrl
+    if (!baseUrl) {
+      return {
+        ok: false,
+        status: 0,
+        error: "Missing catalog API base URL.",
+      }
+    }
+
+    const endpoint = `${baseUrl.replace(/\/+$/, "")}/api/admin/v1/catalog/archive/export`
+    const token = auth.getAccessToken()
+    const headers = new Headers({ Accept: "application/zip" })
+    if (token) headers.set("Authorization", token)
+
+    const runFetch = () =>
+      fetch(endpoint, {
+        method: "GET",
+        headers,
+      })
+
+    let response = await runFetch()
+
+    if (response.status === 401) {
+      await auth.refreshTokens()
+      const refreshedToken = auth.getAccessToken()
+      if (refreshedToken) headers.set("Authorization", refreshedToken)
+      response = await runFetch()
+    }
+
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type") || ""
+      const payload = contentType.includes("application/json")
+        ? await response.json().catch(() => null)
+        : await response.text().catch(() => null)
+      const error =
+        payload?.title ||
+        payload?.detail ||
+        (typeof payload === "string" ? payload : null) ||
+        "Unable to export catalog archive."
+
+      return { ok: false, status: response.status, error }
+    }
+
+    const blob = await response.blob()
+    const contentDisposition = response.headers.get("content-disposition") || ""
+    const fileName = resolveDownloadFileName(contentDisposition)
+
+    return {
+      ok: true,
+      status: response.status,
+      data: {
+        fileName,
+        blob,
+      },
+    }
+  }
+
   return {
     queryArticles,
     getArticleById,
@@ -251,5 +332,57 @@ export function useCatalogApi() {
     createDiscounts,
     updateDiscount,
     deleteDiscount,
+    importCatalogArchive,
+    exportCatalogArchive,
   }
+}
+
+function resolveDownloadFileName(contentDisposition: string) {
+  const fallbackName = buildTimestampedArchiveName()
+
+  const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utf8Match && utf8Match[1]) {
+    try {
+      return ensureTimestampedArchiveName(decodeURIComponent(utf8Match[1]))
+    } catch {
+      return ensureTimestampedArchiveName(utf8Match[1])
+    }
+  }
+
+  const plainMatch = contentDisposition.match(/filename="?([^"]+)"?/i)
+  if (plainMatch && plainMatch[1]) {
+    return ensureTimestampedArchiveName(plainMatch[1])
+  }
+
+  return fallbackName
+}
+
+function ensureTimestampedArchiveName(fileName: string) {
+  const trimmed = (fileName || "").trim()
+  if (!trimmed) return buildTimestampedArchiveName()
+
+  const safe = trimmed.toLowerCase().endsWith(".zip")
+    ? trimmed
+    : `${trimmed}.zip`
+
+  if (/\d{8}-\d{6}/.test(safe)) return safe
+
+  const extension = ".zip"
+  const base = safe.slice(0, -extension.length)
+  const stamp = formatArchiveTimestamp(new Date())
+  return `${base}-${stamp}${extension}`
+}
+
+function buildTimestampedArchiveName(date = new Date()) {
+  return `catalog-archive-${formatArchiveTimestamp(date)}.zip`
+}
+
+function formatArchiveTimestamp(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  const hour = String(date.getHours()).padStart(2, "0")
+  const minute = String(date.getMinutes()).padStart(2, "0")
+  const second = String(date.getSeconds()).padStart(2, "0")
+  return `${year}${month}${day}-${hour}${minute}${second}`
 }

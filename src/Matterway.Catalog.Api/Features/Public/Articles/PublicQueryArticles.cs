@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,10 +8,10 @@ namespace Matterway.Catalog.Api.Features.Public.Articles;
 
 public class PublicQueryArticles : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("public/articles", Handle)
-            .WithName("PublicQueryArticles").WithSummary("Query Articles (public).")
+        endpoints.MapGet(EndpointKind.Public, "articles", Handle)
+            .WithName("PublicQueryArticles").WithSummary("[public] Query Articles")
             .WithTags("Articles")
             .Produces<PaginationResponse<QueryArticleResponse>>()
             .Produces(StatusCodes.Status204NoContent)

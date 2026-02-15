@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
@@ -11,10 +11,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Articles;
 
 public class AdminUpdateArticle : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPatch("admin/articles/{id:guid}", Handle)
-            .WithName("AdminUpdateArticle").WithSummary("Update an Article (admin).")
+        endpoints.MapPatch(EndpointKind.Admin, "articles/{id:guid}", Handle)
+            .WithName("AdminUpdateArticle").WithSummary("[admin] Update an Article")
             .WithTags("Articles")
             .Produces<UpdateArticleResponse>()
             .Produces(StatusCodes.Status404NotFound)

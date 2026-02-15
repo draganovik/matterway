@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Sales.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,10 +8,10 @@ namespace Matterway.Sales.Api.Features.Self.Orders;
 
 public class SelfGetOrderById : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("self/orders/{orderId:guid}", Handler)
-            .WithName("SelfGetOrderById").WithSummary("Get own Order by id.")
+        endpoints.MapGet(EndpointKind.Self, "orders/{orderId:guid}", Handler)
+            .WithName("SelfGetOrderById").WithSummary("[self] Get own Order by id.")
             .WithTags(nameof(Order))
             .Produces<SelfCreateOrder.OrderResponse>()
             .Produces(StatusCodes.Status404NotFound)

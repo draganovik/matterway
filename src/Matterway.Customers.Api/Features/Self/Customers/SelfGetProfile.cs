@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Self.Customers;
 
 public class SelfGetProfile : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("self/profile", Handler)
-            .WithName("SelfGetProfile").WithSummary("Get own Customer profile.")
+        endpoints.MapGet(EndpointKind.Self, "profile", Handler)
+            .WithName("SelfGetProfile").WithSummary("[self] Get own Customer profile.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
-using Matterway.Customers.Api.Application.Brokers;
+using Matterway.ServiceDefaults.Api;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -12,11 +12,11 @@ namespace Matterway.Customers.Api.Features.Public.Registration;
 
 public class PublicRegisterCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("public/register", Handler)
+        endpoints.MapPost(EndpointKind.Public, "register", Handler)
             .WithName("PublicRegisterCustomer")
-            .WithSummary("Register a new customer (creates identity user and customer profile).")
+            .WithSummary("[public] Register a new customer (creates identity user and customer profile).")
             .WithTags("Registration")
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

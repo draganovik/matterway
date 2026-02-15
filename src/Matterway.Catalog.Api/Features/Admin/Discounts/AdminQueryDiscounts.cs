@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
@@ -9,10 +9,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Discounts;
 
 public class AdminQueryDiscounts : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/discounts", Handle)
-            .WithName("AdminQueryDiscounts").WithSummary("Query discount rows (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "discounts", Handle)
+            .WithName("AdminQueryDiscounts").WithSummary("[admin] Query discount rows")
             .WithTags(nameof(Discount))
             .Produces<ICollection<QueryDiscountResponse>>()
             .RequireAuthorization(policy =>

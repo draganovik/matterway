@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -10,10 +10,10 @@ namespace Matterway.Customers.Api.Features.Self.Addresses;
 
 public class SelfDeleteAddress : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapDelete("self/address", Handler)
-            .WithName("SelfDeleteAddress").WithSummary("Delete own Address.")
+        endpoints.MapDelete(EndpointKind.Self, "address", Handler)
+            .WithName("SelfDeleteAddress").WithSummary("[self] Delete own Address.")
             .WithTags(nameof(Address))
             .Produces<DeleteAddressResponse>()
             .Produces(StatusCodes.Status404NotFound)

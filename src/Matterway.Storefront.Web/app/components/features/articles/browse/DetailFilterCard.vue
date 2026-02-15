@@ -17,11 +17,25 @@ const emit = defineEmits<{
   setMax: [value: number | undefined]
 }>()
 
+const searchTerm = ref("")
+
+function toDisplayLabel(label: string, unit?: string | null) {
+  const normalizedUnit = unit?.trim()
+  return normalizedUnit ? `${label} (${normalizedUnit})` : label
+}
+
 const definitionItems = computed(() =>
-  props.detailDefinitions.map((option) => ({
-    label: option.unit ? `${option.label} (${option.unit})` : option.label,
-    value: option.slug,
-  })),
+  props.detailDefinitions.map((option) => {
+    const title = option.label
+    const unit = option.unit?.trim() ?? ""
+    return {
+      id: option.slug,
+      slug: option.slug,
+      title,
+      displayLabel: toDisplayLabel(title, unit),
+      unit,
+    }
+  }),
 )
 
 const selectedDefinition = computed(() =>
@@ -30,11 +44,39 @@ const selectedDefinition = computed(() =>
   ),
 )
 
-const isNumeric = computed(() => Boolean(selectedDefinition.value?.unit))
+function normalizeSlug(value: unknown) {
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value)
+  }
 
-function onSlugChange(value: string | number | null | undefined) {
-  emit("setSlug", String(value ?? ""))
+  if (value && typeof value === "object") {
+    const candidate = value as { id?: unknown; value?: unknown; slug?: unknown }
+    if (typeof candidate.id === "string" || typeof candidate.id === "number") {
+      return String(candidate.id)
+    }
+    if (
+      typeof candidate.value === "string" ||
+      typeof candidate.value === "number"
+    ) {
+      return String(candidate.value)
+    }
+    if (
+      typeof candidate.slug === "string" ||
+      typeof candidate.slug === "number"
+    ) {
+      return String(candidate.slug)
+    }
+  }
+
+  return ""
 }
+
+const selectedSlug = computed({
+  get: () => props.detailFilter.slug,
+  set: (value: unknown) => emit("setSlug", normalizeSlug(value)),
+})
+
+const isNumeric = computed(() => Boolean(selectedDefinition.value?.unit))
 
 function toNumberOrUndefined(value: string | number | null | undefined) {
   const parsed = Number(value)
@@ -46,12 +88,16 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
   <UCard class="border-default bg-default border">
     <div class="space-y-3">
       <UFormField label="Detalj" required>
-        <USelect
-          :model-value="detailFilter.slug"
+        <USelectMenu
+          v-model="selectedSlug"
+          v-model:search-term="searchTerm"
           :items="definitionItems"
+          value-key="id"
+          label-key="displayLabel"
+          :search-input="true"
           placeholder="Izaberi detalj"
           class="w-full"
-          @update:model-value="onSlugChange"
+          :ui="{ content: 'border border-default bg-default shadow-sm' }"
         />
       </UFormField>
 
@@ -90,12 +136,13 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
         </UFormField>
       </template>
 
-      <div class="flex justify-end">
+      <div class="w-full">
         <UButton
           type="button"
           color="error"
           variant="ghost"
           icon="i-lucide-trash"
+          block
           @click="emit('remove')"
         >
           Ukloni

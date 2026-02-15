@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Catalog.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
@@ -11,10 +11,10 @@ namespace Matterway.Catalog.Api.Features.Admin.Details;
 
 public class AdminPutDetail : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPut("admin/details/{slug}", Handle)
-            .WithName("AdminPutDetail").WithSummary("Create or replace a Detail definition (admin).")
+        endpoints.MapPut(EndpointKind.Admin, "details/{slug}", Handle)
+            .WithName("AdminPutDetail").WithSummary("[admin] Create or replace a Detail definition")
             .WithTags(nameof(Detail))
             .Produces<PutDetailResponse>(StatusCodes.Status200OK)
             .Produces<PutDetailResponse>(StatusCodes.Status201Created)

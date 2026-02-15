@@ -57,16 +57,11 @@ function goToCheckout() {
             <div
               class="bg-elevated flex aspect-[4/3] w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg"
             >
-              <img
-                v-if="item.imageUrl"
-                :src="item.imageUrl"
+              <ImageWithFallback
+                :src="item.imageUrl || null"
                 :alt="item.imageAlt || item.articleName"
-                class="h-full w-full object-cover"
-              />
-              <UIcon
-                v-else
-                name="i-lucide-image-off"
-                class="text-muted h-5 w-5"
+                img-class="h-full w-full object-cover"
+                placeholder-class="h-full w-full"
               />
             </div>
 

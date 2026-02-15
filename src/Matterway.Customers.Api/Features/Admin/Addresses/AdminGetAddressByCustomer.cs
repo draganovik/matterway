@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,10 +9,10 @@ namespace Matterway.Customers.Api.Features.Admin.Addresses;
 
 public class AdminGetAddressByCustomer : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapGet("admin/customers/{customerId:guid}/address", Handler)
-            .WithName("AdminGetAddressByCustomer").WithSummary("Get Customer address by customer id (admin).")
+        endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/address", Handler)
+            .WithName("AdminGetAddressByCustomer").WithSummary("[admin] Get Customer address by customer id")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>()
             .Produces(StatusCodes.Status404NotFound)

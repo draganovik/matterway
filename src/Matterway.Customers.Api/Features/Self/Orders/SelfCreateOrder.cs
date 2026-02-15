@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Matterway.Customers.Api.Application;
+using Matterway.ServiceDefaults.Api;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
@@ -12,10 +12,10 @@ namespace Matterway.Customers.Api.Features.Self.Orders;
 
 public class SelfCreateOrder : IEndpoint
 {
-    public void MapEndpoint(IEndpointRouteBuilder app)
+    public void MapEndpoint(EndpointRouter endpoints)
     {
-        app.MapPost("self/orders", Handler)
-            .WithName("SelfCreateOrder").WithSummary("Create own order from cart items.")
+        endpoints.MapPost(EndpointKind.Self, "orders", Handler)
+            .WithName("SelfCreateOrder").WithSummary("[self] Create own order from cart items.")
             .WithTags(nameof(CustomerOrder))
             .Produces<CustomerOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -14,7 +14,7 @@ defineProps<{
     to="/"
   >
     <span class="flex w-full min-w-0 items-center gap-2">
-      <SidebarLogo class="h-6 w-6 shrink-0" />
+      <SidebarAppLogo />
       <span v-if="!collapsed" class="min-w-0 truncate text-sm font-semibold"
         >Matterway Dashboard</span
       >

@@ -49,7 +49,7 @@ const postPayment = async (event: StripeEventWebhookPayload) => {
       : new Date()
 
   const response = await fetch(
-    `${config.serverSalesApiBaseUrl}/api/v1.0/system/payments`,
+    `${config.serverSalesApiBaseUrl}/api/system/v1.0/payments`,
     {
       method: "POST",
       headers: {
