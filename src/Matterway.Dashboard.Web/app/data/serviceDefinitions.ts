@@ -31,6 +31,14 @@ export const serviceSections: ServiceSection[] = [
         minimum: "observer",
         actions: [],
       },
+      {
+        key: "archive",
+        label: "Data I/O",
+        route: "/catalog/archive",
+        service: "catalog",
+        minimum: "operator",
+        actions: [],
+      },
     ],
   },
   {

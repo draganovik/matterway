@@ -273,89 +273,23 @@ onMounted(() => {
       </template>
 
       <template #detail>
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <h3 class="text-foreground text-base font-semibold">
-              {{ selectedDetail ? "Edit Detail" : "Detail Editor" }}
-            </h3>
-            <p class="text-muted text-sm">
-              {{
-                canEdit
-                  ? "Operator permission is required for create, update, and delete."
-                  : "Read-only mode: operator permission required for changes."
-              }}
-            </p>
-          </div>
-
-          <EntitiesEmptyState
-            v-if="!selectedDetail"
-            title="Nothing selected"
-            description="Select an item from the list to start editing."
-          />
-
-          <div v-else class="grid gap-4">
-            <UFormField
-              label="Slug"
-              required
-              help="Lowercase key used in article details."
-            >
-              <UInput
-                v-model="form.slug"
-                placeholder="screen-size"
-                :disabled="!canEdit || canDelete"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField label="Title" required>
-              <UInput
-                v-model="form.title"
-                placeholder="Screen Size"
-                :disabled="!canEdit"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField
-              label="Unit"
-              help="Optional unit for numeric values (e.g. cm, kg)."
-            >
-              <UInput
-                v-model="form.unit"
-                placeholder="inch"
-                :disabled="!canEdit"
-                class="w-full"
-              />
-            </UFormField>
-
-            <div class="flex flex-wrap items-center gap-3">
-              <UButton
-                color="primary"
-                :loading="saveState.loading"
-                :disabled="!canEdit"
-                @click="saveDetail"
-              >
-                Update Detail
-              </UButton>
-
-              <UButton
-                v-if="canDelete"
-                color="error"
-                variant="ghost"
-                :loading="removeState.loading"
-                :disabled="!canEdit"
-                @click="removeDetail"
-              >
-                Delete Detail
-              </UButton>
-            </div>
-
-            <StatusMessages
-              :error="saveState.error || removeState.error"
-              :success="saveState.success || removeState.success"
-            />
-          </div>
-        </div>
+        <CatalogDetailsPanelInformationView
+          :detail="selectedDetail"
+          :can-edit="canEdit"
+          :can-delete="canDelete"
+          :slug="form.slug"
+          :title="form.title"
+          :unit="form.unit"
+          :save-loading="saveState.loading"
+          :remove-loading="removeState.loading"
+          :error="saveState.error || removeState.error"
+          :success="saveState.success || removeState.success"
+          @update:slug="(value) => (form.slug = value)"
+          @update:title="(value) => (form.title = value)"
+          @update:unit="(value) => (form.unit = value)"
+          @save="saveDetail"
+          @remove="removeDetail"
+        />
       </template>
     </EntitiesSplitView>
   </div>

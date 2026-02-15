@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Matterway.Catalog.Api.Infrastructure.ImportExport;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Matterway.ServiceDefaults.Api;
@@ -8,6 +9,8 @@ const string scalarTitle = "Matterway Catalog API";
 ApiVersion[] supportedApiVersions = [new(1, 0)];
 
 var builder = ApiTemplateRegistration.CreateApiBuilder(args);
+
+builder.Services.AddScoped<ICatalogArchiveService, CatalogArchiveService>();
 
 builder
     .ConfigureApiFoundation(serviceName, supportedApiVersions)

@@ -222,7 +222,11 @@ function submit() {
           </UFormField>
         </div>
 
-        <UFormField :label="isNumeric ? 'Numeric Value' : 'Value'" required class="w-full">
+        <UFormField
+          :label="isNumeric ? 'Numeric Value' : 'Value'"
+          required
+          class="w-full"
+        >
           <UInput
             v-model="valueInput"
             :type="isNumeric ? 'number' : 'text'"

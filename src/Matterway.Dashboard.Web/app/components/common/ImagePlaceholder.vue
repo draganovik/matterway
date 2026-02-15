@@ -12,7 +12,9 @@ const props = withDefaults(
 </script>
 
 <template>
-  <div class="bg-muted/60 text-muted/50 flex h-full w-full items-center justify-center">
+  <div
+    class="bg-muted/60 text-muted/50 flex h-full w-full items-center justify-center"
+  >
     <UIcon :name="props.icon" :class="props.iconClass" />
   </div>
 </template>

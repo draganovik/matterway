@@ -37,15 +37,23 @@ const isOpen = computed({
 })
 
 const file = ref<File | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const isDragOver = ref(false)
 const orderIndex = ref<number | string>(0)
 const imageAlt = ref("")
 const validationError = ref("")
+
+const controlsDisabled = computed(
+  () => !props.canEdit || props.loading || props.mode !== "add",
+)
 
 watch(
   () => props.open,
   (open) => {
     if (!open) {
       file.value = null
+      if (fileInputRef.value) fileInputRef.value.value = ""
+      isDragOver.value = false
       orderIndex.value = 0
       imageAlt.value = ""
       validationError.value = ""
@@ -55,13 +63,72 @@ watch(
       orderIndex.value = props.image.orderIndex ?? 0
       imageAlt.value = props.image.imageAlt || ""
       file.value = null
+      if (fileInputRef.value) fileInputRef.value.value = ""
+      isDragOver.value = false
     } else {
       orderIndex.value = 0
       imageAlt.value = ""
       file.value = null
+      if (fileInputRef.value) fileInputRef.value.value = ""
+      isDragOver.value = false
     }
   },
 )
+
+function setSelectedFile(next: File | null) {
+  validationError.value = ""
+  if (!next) {
+    file.value = null
+    return
+  }
+
+  const isImage = !next.type || next.type.startsWith("image/")
+  if (!isImage) {
+    file.value = null
+    validationError.value = "Only image files are supported."
+    return
+  }
+
+  file.value = next
+}
+
+function openPicker() {
+  if (controlsDisabled.value) return
+  fileInputRef.value?.click()
+}
+
+function onFileInputChange(event: Event) {
+  const target = event.target as HTMLInputElement | null
+  setSelectedFile(target?.files?.[0] ?? null)
+}
+
+function onDragEnter() {
+  if (controlsDisabled.value) return
+  isDragOver.value = true
+}
+
+function onDragOver() {
+  if (controlsDisabled.value) return
+  isDragOver.value = true
+}
+
+function onDragLeave() {
+  isDragOver.value = false
+}
+
+function onDrop(event: DragEvent) {
+  if (controlsDisabled.value) return
+  isDragOver.value = false
+  setSelectedFile(event.dataTransfer?.files?.[0] ?? null)
+}
+
+function clearSelection() {
+  if (controlsDisabled.value) return
+  validationError.value = ""
+  file.value = null
+  isDragOver.value = false
+  if (fileInputRef.value) fileInputRef.value.value = ""
+}
 
 function submit() {
   validationError.value = ""
@@ -102,15 +169,52 @@ function submit() {
     <template #body>
       <div class="grid gap-4">
         <UFormField v-if="mode === 'add'" label="File" required>
-          <UFileUpload
-            v-model="file"
+          <input
+            ref="fileInputRef"
+            class="hidden"
+            type="file"
             accept="image/*"
-            variant="button"
-            label="Choose image"
-            :preview="false"
-            :reset="true"
-            :disabled="!canEdit"
+            :disabled="controlsDisabled"
+            @change="onFileInputChange"
           />
+          <button
+            type="button"
+            class="border-default bg-elevated/40 w-full rounded-lg border border-dashed p-5 text-center transition"
+            :class="[
+              isDragOver
+                ? 'border-primary bg-primary/5'
+                : 'hover:border-primary/60',
+              controlsDisabled
+                ? 'cursor-not-allowed opacity-60'
+                : 'cursor-pointer',
+            ]"
+            :disabled="controlsDisabled"
+            @click="openPicker"
+            @dragenter.prevent="onDragEnter"
+            @dragover.prevent="onDragOver"
+            @dragleave.prevent="onDragLeave"
+            @drop.prevent="onDrop"
+          >
+            <div class="flex flex-col items-center gap-2">
+              <UIcon name="i-lucide-image-up" class="size-6" />
+              <p class="text-sm font-medium">Drag and drop an image</p>
+              <p class="text-muted text-xs">or click to browse</p>
+            </div>
+          </button>
+          <p class="text-muted mt-2 text-xs">
+            {{ file ? `Selected: ${file.name}` : "No image selected." }}
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-lucide-x"
+              :disabled="controlsDisabled || !file"
+              @click="clearSelection"
+            >
+              Clear
+            </UButton>
+          </div>
         </UFormField>
 
         <UFormField label="Order Index" required>
