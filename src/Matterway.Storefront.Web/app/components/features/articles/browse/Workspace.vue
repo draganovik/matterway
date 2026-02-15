@@ -82,16 +82,17 @@ const {
         >
       </EmptyState>
 
-      <div
-        v-else
-        class="grid gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-3"
-        :class="{ 'opacity-70': isRefreshing }"
-      >
-        <ArticlesBrowseListItem
-          v-for="article in items"
-          :key="article.id"
-          :article="article"
-        />
+      <div v-else class="@container">
+        <div
+          class="grid grid-cols-1 gap-4 transition-opacity @lg:grid-cols-2 @3xl:grid-cols-3"
+          :class="{ 'opacity-70': isRefreshing }"
+        >
+          <ArticlesBrowseListItem
+            v-for="article in items"
+            :key="article.id"
+            :article="article"
+          />
+        </div>
       </div>
 
       <div

@@ -2,9 +2,7 @@ import {
   buildArticlesRsqlFilter,
   createEmptyDetailFilter,
   normalizeDetailDefinitions,
-  parseDetailFilters,
   resolveDetailDefinition,
-  serializeDetailFilters,
   type DetailFilterDefinition,
   type DetailFilterState,
 } from "~/composables/useArticleFilters"
@@ -27,23 +25,117 @@ export function useArticleBrowser() {
   const catalogApi = useCatalogApi()
   const requestVersion = ref(0)
 
-  function parseRouteDetailFilters() {
-    const detailFiltersParam = route.query.detailFilters
-    const serialized =
-      typeof detailFiltersParam === "string"
-        ? detailFiltersParam
-        : Array.isArray(detailFiltersParam)
-          ? detailFiltersParam[0]
-          : undefined
-
-    return parseDetailFilters(serialized)
+  function getRouteQueryValue(value: unknown) {
+    if (typeof value === "string") return value
+    if (!Array.isArray(value)) return undefined
+    const firstString = value.find((item) => typeof item === "string")
+    return typeof firstString === "string" ? firstString : undefined
   }
 
+  function parseRouteFilterState(): FiltersState {
+    const filterExpression = getRouteQueryValue(route.query.filter)
+    if (!filterExpression) {
+      return {
+        search: "",
+        minPrice: undefined,
+        maxPrice: undefined,
+        detailFilters: [],
+      }
+    }
+
+    let decodedExpression = filterExpression
+    try {
+      decodedExpression = decodeURIComponent(filterExpression)
+    } catch {
+      decodedExpression = filterExpression
+    }
+
+    const nextState: FiltersState = {
+      search: "",
+      minPrice: undefined,
+      maxPrice: undefined,
+      detailFilters: [],
+    }
+    const detailMap = new Map<string, DetailFilterState>()
+
+    function ensureDetail(slug: string) {
+      const existing = detailMap.get(slug)
+      if (existing) return existing
+      const created: DetailFilterState = { slug }
+      detailMap.set(slug, created)
+      return created
+    }
+
+    for (const rawClause of decodedExpression.split(";")) {
+      const clause = rawClause.trim()
+      if (!clause) continue
+
+      if (clause.startsWith("title==")) {
+        nextState.search = clause.slice("title==".length)
+        continue
+      }
+
+      if (clause.startsWith("price=ge=")) {
+        const minPrice = Number(clause.slice("price=ge=".length))
+        if (Number.isFinite(minPrice)) {
+          nextState.minPrice = minPrice
+        }
+        continue
+      }
+
+      if (clause.startsWith("price=le=")) {
+        const maxPrice = Number(clause.slice("price=le=".length))
+        if (Number.isFinite(maxPrice)) {
+          nextState.maxPrice = maxPrice
+        }
+        continue
+      }
+
+      const greaterEqualIndex = clause.indexOf("=ge=")
+      if (greaterEqualIndex > 0) {
+        const slug = clause.slice(0, greaterEqualIndex).trim()
+        const minValue = Number(clause.slice(greaterEqualIndex + 4))
+        if (!slug || !Number.isFinite(minValue)) continue
+        const detail = ensureDetail(slug)
+        detail.min = minValue
+        detail.value = undefined
+        continue
+      }
+
+      const lowerEqualIndex = clause.indexOf("=le=")
+      if (lowerEqualIndex > 0) {
+        const slug = clause.slice(0, lowerEqualIndex).trim()
+        const maxValue = Number(clause.slice(lowerEqualIndex + 4))
+        if (!slug || !Number.isFinite(maxValue)) continue
+        const detail = ensureDetail(slug)
+        detail.max = maxValue
+        detail.value = undefined
+        continue
+      }
+
+      const equalsIndex = clause.indexOf("==")
+      if (equalsIndex > 0) {
+        const slug = clause.slice(0, equalsIndex).trim()
+        const value = clause.slice(equalsIndex + 2).trim()
+        if (!slug || !value || slug === "title" || slug === "price") continue
+        const detail = ensureDetail(slug)
+        detail.value = value
+        detail.min = undefined
+        detail.max = undefined
+      }
+    }
+
+    nextState.detailFilters = Array.from(detailMap.values())
+    return nextState
+  }
+
+  const initialFilters = parseRouteFilterState()
+
   const filters = reactive<FiltersState>({
-    search: (route.query.articleName as string) ?? "",
-    minPrice: route.query.minPrice ? Number(route.query.minPrice) : undefined,
-    maxPrice: route.query.maxPrice ? Number(route.query.maxPrice) : undefined,
-    detailFilters: parseRouteDetailFilters(),
+    search: initialFilters.search,
+    minPrice: initialFilters.minPrice,
+    maxPrice: initialFilters.maxPrice,
+    detailFilters: initialFilters.detailFilters,
   })
 
   const pagination = reactive({
@@ -89,13 +181,32 @@ export function useArticleBrowser() {
     )
   }
 
+  function mergeDetailDefinitions(
+    next: DetailFilterDefinition[],
+    current: DetailFilterDefinition[],
+  ) {
+    const map = new Map(
+      current.map((definition) => [definition.slug, definition]),
+    )
+
+    for (const definition of next) {
+      map.set(definition.slug, definition)
+    }
+
+    return Array.from(map.values()).sort((a, b) =>
+      a.label.localeCompare(b.label),
+    )
+  }
+
   async function loadDetailDefinitions(forVersion: number) {
     detailDefinitionsLoading.value = true
     try {
       const articleIds = items.value.map((item) => item.id).slice(0, 24)
       if (!articleIds.length) {
         if (forVersion === requestVersion.value) {
-          detailDefinitions.value = withActiveFilterDefinitions([])
+          detailDefinitions.value = withActiveFilterDefinitions(
+            detailDefinitions.value,
+          )
         }
         return
       }
@@ -121,8 +232,9 @@ export function useArticleBrowser() {
       }
 
       if (forVersion !== requestVersion.value) return
+      const normalizedDefinitions = normalizeDetailDefinitions(rawDefinitions)
       detailDefinitions.value = withActiveFilterDefinitions(
-        normalizeDetailDefinitions(rawDefinitions),
+        mergeDetailDefinitions(normalizedDefinitions, detailDefinitions.value),
       )
     } finally {
       if (forVersion === requestVersion.value) {
@@ -132,14 +244,11 @@ export function useArticleBrowser() {
   }
 
   function applyRouteState() {
-    filters.search = (route.query.articleName as string) ?? ""
-    filters.minPrice = route.query.minPrice
-      ? Number(route.query.minPrice)
-      : undefined
-    filters.maxPrice = route.query.maxPrice
-      ? Number(route.query.maxPrice)
-      : undefined
-    filters.detailFilters = parseRouteDetailFilters()
+    const parsedFilters = parseRouteFilterState()
+    filters.search = parsedFilters.search
+    filters.minPrice = parsedFilters.minPrice
+    filters.maxPrice = parsedFilters.maxPrice
+    filters.detailFilters = parsedFilters.detailFilters
     pagination.page = Number(route.query.page ?? 1) || 1
     pagination.pageSize =
       Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE
@@ -218,9 +327,7 @@ export function useArticleBrowser() {
 
   function updateRoute() {
     sanitizeNumericFilters()
-    const serializedDetailFilters = serializeDetailFilters(
-      filters.detailFilters,
-    )
+    const filter = buildFilterQuery()
     router.push({
       query: {
         page: pagination.page !== 1 ? pagination.page : undefined,
@@ -228,10 +335,7 @@ export function useArticleBrowser() {
           pagination.pageSize !== DEFAULT_PAGE_SIZE
             ? pagination.pageSize
             : undefined,
-        articleName: filters.search || undefined,
-        minPrice: filters.minPrice !== undefined ? filters.minPrice : undefined,
-        maxPrice: filters.maxPrice !== undefined ? filters.maxPrice : undefined,
-        detailFilters: serializedDetailFilters,
+        filter: filter || undefined,
       },
     })
   }

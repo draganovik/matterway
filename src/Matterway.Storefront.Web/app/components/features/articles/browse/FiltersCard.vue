@@ -112,9 +112,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             :detail-filter="detailFilter"
             :detail-definitions="props.detailDefinitions"
             @remove="emit('removeDetailFilter', index)"
-            @set-slug="
-              emit('setDetailFilterSlug', { index, slug: String($event) })
-            "
+            @set-slug="emit('setDetailFilterSlug', { index, slug: $event })"
             @set-value="
               emit('setDetailFilterValue', {
                 index,

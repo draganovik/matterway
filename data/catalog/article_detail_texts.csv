@@ -1,0 +1,469 @@
+article_id,detail_slug,value
+0711dadc-15d9-1132-1b70-465ceb21be74,category,smart-home-equipment
+0711dadc-15d9-1132-1b70-465ceb21be74,segment,prosumer
+0711dadc-15d9-1132-1b70-465ceb21be74,brand,Ubiquiti
+0711dadc-15d9-1132-1b70-465ceb21be74,model,UVC-G4 Doorbell Pro PoE
+0711dadc-15d9-1132-1b70-465ceb21be74,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+0711dadc-15d9-1132-1b70-465ceb21be74,operating-system,Embedded Linux
+0711dadc-15d9-1132-1b70-465ceb21be74,connectivity,"Wi-Fi, Bluetooth"
+0711dadc-15d9-1132-1b70-465ceb21be74,camera,5MP HDR sensor
+0711dadc-15d9-1132-1b70-465ceb21be74,video-quality,1600p
+0711dadc-15d9-1132-1b70-465ceb21be74,resolution,1600 x 1200
+0711dadc-15d9-1132-1b70-465ceb21be74,audio,Dual microphone and speaker
+0711dadc-15d9-1132-1b70-465ceb21be74,features,"Face detection, package alerts, smart chime integration"
+0711dadc-15d9-1132-1b70-465ceb21be74,ports,RJ45 PoE
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,category,smart-home-equipment
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,segment,prosumer
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,brand,Ubiquiti
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,model,UVC-G5-Bullet
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,operating-system,Embedded Linux
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,connectivity,"Wi-Fi, Bluetooth"
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,camera,1/2.4 inch 4MP
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,video-quality,2K
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,resolution,2688 x 1512
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,features,"IR night vision, motion zones, weatherproof housing"
+517f4396-1f2b-1e2d-76cc-6d1ea0769fb2,ports,RJ45 PoE
+d54fdb34-1ee9-c3fc-d742-1520342f0326,category,smart-home-equipment
+d54fdb34-1ee9-c3fc-d742-1520342f0326,segment,consumer
+d54fdb34-1ee9-c3fc-d742-1520342f0326,brand,D-Link
+d54fdb34-1ee9-c3fc-d742-1520342f0326,model,DCH-S162
+d54fdb34-1ee9-c3fc-d742-1520342f0326,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+d54fdb34-1ee9-c3fc-d742-1520342f0326,operating-system,Embedded Linux
+d54fdb34-1ee9-c3fc-d742-1520342f0326,connectivity,Wi-Fi 2.4GHz
+d54fdb34-1ee9-c3fc-d742-1520342f0326,features,"Leak detection cable, app push alerts, event history"
+d54fdb34-1ee9-c3fc-d742-1520342f0326,ports,Micro USB power
+d54fdb34-1ee9-c3fc-d742-1520342f0326,color,White
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,category,smart-home-equipment
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,segment,smart-home-core
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,brand,Aqara
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,model,HM-G01D
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,operating-system,Embedded Linux
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,connectivity,"Wi-Fi, Thread, Zigbee, Bluetooth"
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,features,"Matter bridge, Thread border router, local automations"
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,ports,USB-C
+0b33428f-fe6d-a65d-6908-d4ef3cf7fc03,audio,Built-in alert speaker
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,category,smart-home-equipment
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,segment,installer
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,brand,Shelly
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,model,Pro 4PM
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,operating-system,Embedded Linux
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,connectivity,"Wi-Fi, Ethernet, Bluetooth"
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,features,"4 relay outputs, metering per channel, scripting support"
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,ports,"Ethernet, 4 relay terminals"
+82ba3bb8-341c-c031-90d8-7a0f49c65ed1,material,DIN rail industrial polymer
+9c71227f-81a9-0b33-2a66-30ab9e5de172,category,smart-home-equipment
+9c71227f-81a9-0b33-2a66-30ab9e5de172,segment,consumer
+9c71227f-81a9-0b33-2a66-30ab9e5de172,brand,TP-Link
+9c71227f-81a9-0b33-2a66-30ab9e5de172,model,Tapo C425
+9c71227f-81a9-0b33-2a66-30ab9e5de172,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+9c71227f-81a9-0b33-2a66-30ab9e5de172,operating-system,Embedded Linux
+9c71227f-81a9-0b33-2a66-30ab9e5de172,connectivity,"Wi-Fi, Bluetooth"
+9c71227f-81a9-0b33-2a66-30ab9e5de172,camera,4MP sensor
+9c71227f-81a9-0b33-2a66-30ab9e5de172,video-quality,2K QHD
+9c71227f-81a9-0b33-2a66-30ab9e5de172,resolution,2560 x 1440
+9c71227f-81a9-0b33-2a66-30ab9e5de172,features,"Person detection, spotlight, two-way talk"
+9c71227f-81a9-0b33-2a66-30ab9e5de172,ports,USB-C
+a6f4ef82-fd41-7695-119b-52f176314931,category,smart-home-equipment
+a6f4ef82-fd41-7695-119b-52f176314931,segment,consumer
+a6f4ef82-fd41-7695-119b-52f176314931,brand,Philips Hue
+a6f4ef82-fd41-7695-119b-52f176314931,model,Bridge + GU10 x2
+a6f4ef82-fd41-7695-119b-52f176314931,compatibility,"Apple Home, Google Home, Alexa, SmartThings"
+a6f4ef82-fd41-7695-119b-52f176314931,operating-system,Embedded Linux
+a6f4ef82-fd41-7695-119b-52f176314931,connectivity,"Zigbee, Ethernet"
+a6f4ef82-fd41-7695-119b-52f176314931,features,"Scene automation, routines, adaptive lighting"
+a6f4ef82-fd41-7695-119b-52f176314931,ports,RJ45
+a6f4ef82-fd41-7695-119b-52f176314931,color,White
+924a9254-0c72-9ef1-ca13-076e78f0c588,category,smart-home-equipment
+924a9254-0c72-9ef1-ca13-076e78f0c588,segment,premium-consumer
+924a9254-0c72-9ef1-ca13-076e78f0c588,brand,Sonos
+924a9254-0c72-9ef1-ca13-076e78f0c588,model,Era 100
+924a9254-0c72-9ef1-ca13-076e78f0c588,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+924a9254-0c72-9ef1-ca13-076e78f0c588,operating-system,Embedded Linux
+924a9254-0c72-9ef1-ca13-076e78f0c588,connectivity,"Wi-Fi 6, Bluetooth 5.0"
+924a9254-0c72-9ef1-ca13-076e78f0c588,audio,Dual angled tweeters and mid-woofer
+924a9254-0c72-9ef1-ca13-076e78f0c588,audio-quality,Wide stereo sound with Trueplay tuning
+924a9254-0c72-9ef1-ca13-076e78f0c588,features,"AirPlay 2, voice assistant support, multi-room sync"
+924a9254-0c72-9ef1-ca13-076e78f0c588,ports,USB-C line-in adapter support
+924a9254-0c72-9ef1-ca13-076e78f0c588,color,Black
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,category,smart-home-equipment
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,segment,consumer
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,brand,Netatmo
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,model,NHC-EC
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,operating-system,Embedded Linux
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,connectivity,Wi-Fi
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,features,"CO2 insights, app history, threshold alerts"
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,display,LED status indicator
+f3a24842-77a5-2bb3-cca4-8333640c4b0a,color,Champagne
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,category,smart-home-equipment
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,segment,security
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,brand,Yale
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,model,Linus L2
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,compatibility,"Apple Home, Google Home, Alexa"
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,operating-system,Embedded Linux
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,connectivity,"Bluetooth, Wi-Fi bridge"
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,features,"Auto lock/unlock, digital keys, guest scheduling"
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,material,Aluminum alloy
+2966f0d7-d6a1-a805-5c19-a30b040bfe59,color,Matte black
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,category,smart-home-equipment
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,segment,consumer
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,brand,Google
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,model,GA01331
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,operating-system,Embedded Linux
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,connectivity,"Wi-Fi, Bluetooth"
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,display,7-inch touch display
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,audio,Full-range speaker
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,features,"Sleep sensing, routines, voice control"
+e709e4f6-6dcc-5e8d-ae55-5d7a64b4fe10,color,Chalk
+607c90c4-0d1d-e833-37e0-043a3a64d20b,category,smart-home-equipment
+607c90c4-0d1d-e833-37e0-043a3a64d20b,segment,consumer
+607c90c4-0d1d-e833-37e0-043a3a64d20b,brand,Amazon
+607c90c4-0d1d-e833-37e0-043a3a64d20b,model,Echo Show 8 Gen3
+607c90c4-0d1d-e833-37e0-043a3a64d20b,compatibility,"Matter, Apple Home, Google Home, Amazon Alexa"
+607c90c4-0d1d-e833-37e0-043a3a64d20b,operating-system,Embedded Linux
+607c90c4-0d1d-e833-37e0-043a3a64d20b,connectivity,"Wi-Fi, Bluetooth, Zigbee"
+607c90c4-0d1d-e833-37e0-043a3a64d20b,display,8-inch HD touch display
+607c90c4-0d1d-e833-37e0-043a3a64d20b,audio,Spatial audio stereo
+607c90c4-0d1d-e833-37e0-043a3a64d20b,audio-quality,Enhanced bass and room adaptation
+607c90c4-0d1d-e833-37e0-043a3a64d20b,features,"Alexa routines, video calls, smart-home widgets"
+d692c00f-4351-80d8-c279-bb2acf101d4e,category,pc-components-homelab
+d692c00f-4351-80d8-c279-bb2acf101d4e,segment,enthusiast
+d692c00f-4351-80d8-c279-bb2acf101d4e,brand,AMD
+d692c00f-4351-80d8-c279-bb2acf101d4e,model,Ryzen 9 7900
+d692c00f-4351-80d8-c279-bb2acf101d4e,connectivity,"PCIe, SATA, USB"
+d692c00f-4351-80d8-c279-bb2acf101d4e,compatibility,ATX and mATX ecosystems
+d692c00f-4351-80d8-c279-bb2acf101d4e,processor,"12 cores / 24 threads, Zen 4"
+d692c00f-4351-80d8-c279-bb2acf101d4e,features,"Hardware virtualization, AVX-512, PCIe 5.0"
+d692c00f-4351-80d8-c279-bb2acf101d4e,ports,AM5 socket
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,category,pc-components-homelab
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,segment,enthusiast
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,brand,Intel
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,model,Core i7-14700
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,connectivity,"PCIe, SATA, USB"
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,compatibility,ATX and mATX ecosystems
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,processor,20 cores (8P+12E) / 28 threads
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,features,"Intel VT-x/VT-d, Quick Sync, PCIe 5.0"
+e8aaadc9-77d3-950d-b30f-12ec362cbc47,ports,LGA1700 socket
+528ff775-1d52-256b-2bab-0446925133b3,category,pc-components-homelab
+528ff775-1d52-256b-2bab-0446925133b3,segment,homelab
+528ff775-1d52-256b-2bab-0446925133b3,brand,Gigabyte
+528ff775-1d52-256b-2bab-0446925133b3,model,B650 AORUS Elite AX
+528ff775-1d52-256b-2bab-0446925133b3,connectivity,"Wi-Fi 6E, Bluetooth, Ethernet"
+528ff775-1d52-256b-2bab-0446925133b3,compatibility,ATX and mATX ecosystems
+528ff775-1d52-256b-2bab-0446925133b3,features,"Dual M.2, Wi-Fi 6E, 2.5GbE LAN"
+528ff775-1d52-256b-2bab-0446925133b3,ports,"USB-C, HDMI, DisplayPort, 2.5GbE"
+92002af9-dcb9-4503-4de8-edf5b4d209fb,category,pc-components-homelab
+92002af9-dcb9-4503-4de8-edf5b4d209fb,segment,workstation
+92002af9-dcb9-4503-4de8-edf5b4d209fb,brand,ASUS
+92002af9-dcb9-4503-4de8-edf5b4d209fb,model,Pro WS W680-ACE IPMI
+92002af9-dcb9-4503-4de8-edf5b4d209fb,connectivity,"Ethernet, USB"
+92002af9-dcb9-4503-4de8-edf5b4d209fb,compatibility,ATX and mATX ecosystems
+92002af9-dcb9-4503-4de8-edf5b4d209fb,features,"IPMI remote KVM, ECC memory, TPM header"
+92002af9-dcb9-4503-4de8-edf5b4d209fb,ports,"Dual Ethernet, USB-C, PCIe x16"
+24df13c3-8190-f840-0c9c-89e30bd6be7f,category,pc-components-homelab
+24df13c3-8190-f840-0c9c-89e30bd6be7f,segment,enthusiast
+24df13c3-8190-f840-0c9c-89e30bd6be7f,brand,Kingston
+24df13c3-8190-f840-0c9c-89e30bd6be7f,model,FURY Beast DDR5 64GB
+24df13c3-8190-f840-0c9c-89e30bd6be7f,connectivity,"PCIe, SATA, USB"
+24df13c3-8190-f840-0c9c-89e30bd6be7f,compatibility,DDR5 desktop motherboards
+24df13c3-8190-f840-0c9c-89e30bd6be7f,features,"Low-latency profile, on-die ECC, XMP 3.0"
+24df13c3-8190-f840-0c9c-89e30bd6be7f,ports,Dual DIMM modules
+e6bdf15f-e274-7c1b-5395-3d980dad2079,category,pc-components-homelab
+e6bdf15f-e274-7c1b-5395-3d980dad2079,segment,storage
+e6bdf15f-e274-7c1b-5395-3d980dad2079,brand,Samsung
+e6bdf15f-e274-7c1b-5395-3d980dad2079,model,990 PRO 2TB
+e6bdf15f-e274-7c1b-5395-3d980dad2079,connectivity,"PCIe, SATA, USB"
+e6bdf15f-e274-7c1b-5395-3d980dad2079,compatibility,NVMe capable M.2 slots
+e6bdf15f-e274-7c1b-5395-3d980dad2079,features,"PCIe 4.0 x4, TLC NAND, thermal control"
+e6bdf15f-e274-7c1b-5395-3d980dad2079,ports,M.2 2280
+b8a236ce-862b-741b-b981-c8787ac24e45,category,pc-components-homelab
+b8a236ce-862b-741b-b981-c8787ac24e45,segment,storage
+b8a236ce-862b-741b-b981-c8787ac24e45,brand,Crucial
+b8a236ce-862b-741b-b981-c8787ac24e45,model,T500 1TB
+b8a236ce-862b-741b-b981-c8787ac24e45,connectivity,"PCIe, SATA, USB"
+b8a236ce-862b-741b-b981-c8787ac24e45,compatibility,Desktop and mini-PC M.2 slots
+b8a236ce-862b-741b-b981-c8787ac24e45,features,"PCIe 4.0, low idle power, firmware health telemetry"
+b8a236ce-862b-741b-b981-c8787ac24e45,ports,M.2 2280
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,category,pc-components-homelab
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,segment,homelab-storage
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,brand,Seagate
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,model,IronWolf Pro 12TB
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,connectivity,"PCIe, SATA, USB"
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,compatibility,"Synology, QNAP, TrueNAS"
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,features,"CMR recording, RV sensors, NAS firmware"
+789f50c6-3326-2d0f-26e7-c8286b6d9e39,ports,SATA 6Gb/s
+15777398-7f71-3ddf-07fc-4235a80b46c0,category,pc-components-homelab
+15777398-7f71-3ddf-07fc-4235a80b46c0,segment,homelab-storage
+15777398-7f71-3ddf-07fc-4235a80b46c0,brand,Western Digital
+15777398-7f71-3ddf-07fc-4235a80b46c0,model,WD80EFPX
+15777398-7f71-3ddf-07fc-4235a80b46c0,connectivity,"PCIe, SATA, USB"
+15777398-7f71-3ddf-07fc-4235a80b46c0,compatibility,SOHO NAS enclosures
+15777398-7f71-3ddf-07fc-4235a80b46c0,features,"CMR workload, NASware 3.0, low vibration profile"
+15777398-7f71-3ddf-07fc-4235a80b46c0,ports,SATA 6Gb/s
+376a4498-2cff-8607-ccf5-e2dba60490e2,category,pc-components-homelab
+376a4498-2cff-8607-ccf5-e2dba60490e2,segment,homelab-nas
+376a4498-2cff-8607-ccf5-e2dba60490e2,brand,Synology
+376a4498-2cff-8607-ccf5-e2dba60490e2,model,DS923+
+376a4498-2cff-8607-ccf5-e2dba60490e2,connectivity,"PCIe, SATA, USB"
+376a4498-2cff-8607-ccf5-e2dba60490e2,compatibility,ATX and mATX ecosystems
+376a4498-2cff-8607-ccf5-e2dba60490e2,processor,AMD Ryzen R1600
+376a4498-2cff-8607-ccf5-e2dba60490e2,operating-system,Synology DSM
+376a4498-2cff-8607-ccf5-e2dba60490e2,features,"Snapshot replication, Docker, cloud sync"
+376a4498-2cff-8607-ccf5-e2dba60490e2,ports,"2x1GbE, 2xUSB 3.2, eSATA"
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,category,pc-components-homelab
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,segment,homelab-nas
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,brand,QNAP
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,model,TS-464
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,connectivity,"PCIe, SATA, USB"
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,compatibility,ATX and mATX ecosystems
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,processor,Intel Celeron N5095
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,operating-system,QTS
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,features,"Container Station, snapshots, PCIe expansion"
+bc8b7592-7c09-1917-2ef8-46e45cc46c9d,ports,"2x2.5GbE, HDMI 2.0, USB 3.2"
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,category,pc-components-homelab
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,segment,cooling
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,brand,Noctua
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,model,NH-U12A chromax.black
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,connectivity,"PCIe, SATA, USB"
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,compatibility,"AM4, AM5, LGA1700"
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,features,"Dual NF-A12x25 fans, six heatpipes, low-noise adapters"
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,ports,PWM fan headers
+f93b138a-d953-8ab4-c048-f3495a1eb2ab,material,Nickel-plated copper and aluminum
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,category,pc-components-homelab
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,segment,power
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,brand,Corsair
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,model,RM850x
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,connectivity,"PCIe, SATA, USB"
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,compatibility,ATX and E-ATX chassis
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,features,"Fully modular, zero-RPM fan mode, high-efficiency rails"
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,ports,"24-pin ATX, EPS, PCIe, SATA"
+6f9e0940-a82d-abbb-3e1d-7c3b6fc82c2f,material,Steel enclosure
+7a44f54b-11b2-183b-effb-47e091846dd5,category,pc-components-homelab
+7a44f54b-11b2-183b-effb-47e091846dd5,segment,power-protection
+7a44f54b-11b2-183b-effb-47e091846dd5,brand,APC
+7a44f54b-11b2-183b-effb-47e091846dd5,model,SMT1500IC
+7a44f54b-11b2-183b-effb-47e091846dd5,connectivity,"PCIe, SATA, USB"
+7a44f54b-11b2-183b-effb-47e091846dd5,compatibility,"Servers, NAS, switches, workstations"
+7a44f54b-11b2-183b-effb-47e091846dd5,features,"Pure sinewave output, AVR, USB management"
+7a44f54b-11b2-183b-effb-47e091846dd5,ports,"USB, SmartSlot, 8 IEC outlets"
+7a44f54b-11b2-183b-effb-47e091846dd5,display,LCD status panel
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,category,network-equipment
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,segment,prosumer-core
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,brand,Ubiquiti
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,model,UDM-Pro
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,connectivity,1G/2.5G/10G Ethernet and SFP+
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,compatibility,"VLAN, LACP, SNMP, syslog"
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,operating-system,Embedded network OS
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,features,"IDS/IPS, multi-WAN, UniFi controller"
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,ports,"8x1GbE, 2xSFP+, 1xWAN"
+a9e87fba-296b-9dfe-6625-ddfb33e591d8,processor,Quad-core ARM
+4e964e08-f451-c799-e0c8-cc74b3f2d974,category,network-equipment
+4e964e08-f451-c799-e0c8-cc74b3f2d974,segment,prosumer-switching
+4e964e08-f451-c799-e0c8-cc74b3f2d974,brand,Ubiquiti
+4e964e08-f451-c799-e0c8-cc74b3f2d974,model,USW-Pro-24-PoE
+4e964e08-f451-c799-e0c8-cc74b3f2d974,connectivity,1G/2.5G/10G Ethernet and SFP+
+4e964e08-f451-c799-e0c8-cc74b3f2d974,compatibility,"VLAN, STP, LACP"
+4e964e08-f451-c799-e0c8-cc74b3f2d974,operating-system,Embedded network OS
+4e964e08-f451-c799-e0c8-cc74b3f2d974,features,"PoE+, Layer 3 routing, central cloud management"
+4e964e08-f451-c799-e0c8-cc74b3f2d974,ports,"24x1GbE PoE, 2x10G SFP+"
+404f0da9-0b19-5219-6c4f-315bb69987d3,category,network-equipment
+404f0da9-0b19-5219-6c4f-315bb69987d3,segment,enterprise-edge
+404f0da9-0b19-5219-6c4f-315bb69987d3,brand,MikroTik
+404f0da9-0b19-5219-6c4f-315bb69987d3,model,CCR2004-1G-12S+2XS
+404f0da9-0b19-5219-6c4f-315bb69987d3,connectivity,1G/2.5G/10G Ethernet and SFP+
+404f0da9-0b19-5219-6c4f-315bb69987d3,compatibility,"VLAN, LACP, SNMP, syslog"
+404f0da9-0b19-5219-6c4f-315bb69987d3,operating-system,RouterOS v7
+404f0da9-0b19-5219-6c4f-315bb69987d3,processor,AL32400 4-core
+404f0da9-0b19-5219-6c4f-315bb69987d3,features,"BGP, MPLS, VRF, hardware acceleration"
+404f0da9-0b19-5219-6c4f-315bb69987d3,ports,"12xSFP+, 2xSFP28, 1xGbE"
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,category,network-equipment
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,segment,business-switching
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,brand,Cisco
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,model,CBS350-24T-4G
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,connectivity,1G/2.5G/10G Ethernet and SFP+
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,compatibility,"802.1Q VLAN, RSTP, SNMP"
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,operating-system,Embedded network OS
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,features,"ACLs, QoS, static routing"
+b2c79bd9-a8cc-34e6-e0af-169e5893873e,ports,"24x1GbE, 4xSFP"
+84943d21-f7c6-0746-a330-8d30630595dc,category,network-equipment
+84943d21-f7c6-0746-a330-8d30630595dc,segment,business-edge
+84943d21-f7c6-0746-a330-8d30630595dc,brand,TP-Link
+84943d21-f7c6-0746-a330-8d30630595dc,model,ER7206
+84943d21-f7c6-0746-a330-8d30630595dc,connectivity,1G/2.5G/10G Ethernet and SFP+
+84943d21-f7c6-0746-a330-8d30630595dc,compatibility,"VLAN, LACP, SNMP, syslog"
+84943d21-f7c6-0746-a330-8d30630595dc,operating-system,Omada firmware
+84943d21-f7c6-0746-a330-8d30630595dc,features,"Omada SDN, site-to-site VPN, load balancing"
+84943d21-f7c6-0746-a330-8d30630595dc,ports,"1xGbE WAN, 4xGbE LAN/WAN"
+84943d21-f7c6-0746-a330-8d30630595dc,processor,Dual-core network processor
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,category,network-equipment
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,segment,wireless
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,brand,TP-Link
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,model,EAP670
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,connectivity,Wi-Fi 6 AX5400
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,compatibility,"VLAN, LACP, SNMP, syslog"
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,operating-system,Embedded network OS
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,features,"Wi-Fi 6, mesh, Omada cloud controller"
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,ports,1x2.5GbE PoE+
+7aebe095-3ae5-ff2a-1c86-7c5f469b7717,color,White
+7bb7f55d-f294-2911-2df8-39cf1499b38a,category,network-equipment
+7bb7f55d-f294-2911-2df8-39cf1499b38a,segment,wireless
+7bb7f55d-f294-2911-2df8-39cf1499b38a,brand,Ubiquiti
+7bb7f55d-f294-2911-2df8-39cf1499b38a,model,U7 Pro
+7bb7f55d-f294-2911-2df8-39cf1499b38a,connectivity,Wi-Fi 7 BE
+7bb7f55d-f294-2911-2df8-39cf1499b38a,compatibility,"VLAN, LACP, SNMP, syslog"
+7bb7f55d-f294-2911-2df8-39cf1499b38a,operating-system,Embedded network OS
+7bb7f55d-f294-2911-2df8-39cf1499b38a,features,"Wi-Fi 7, OFDMA, seamless roaming"
+7bb7f55d-f294-2911-2df8-39cf1499b38a,ports,1x2.5GbE PoE+
+7bb7f55d-f294-2911-2df8-39cf1499b38a,color,White
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,category,network-equipment
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,segment,business-wireless
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,brand,Aruba
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,model,AP25
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,connectivity,Wi-Fi 6
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,compatibility,"VLAN, LACP, SNMP, syslog"
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,operating-system,Embedded network OS
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,features,"WPA3, captive portal, cloud management"
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,ports,1x1GbE PoE
+efb25ef4-1c4d-fe27-73dd-ecb3d84a7956,color,White
+04a627d1-dede-22ef-cb00-7c678d385683,category,network-equipment
+04a627d1-dede-22ef-cb00-7c678d385683,segment,small-office
+04a627d1-dede-22ef-cb00-7c678d385683,brand,Netgear
+04a627d1-dede-22ef-cb00-7c678d385683,model,GS308EP
+04a627d1-dede-22ef-cb00-7c678d385683,connectivity,1G/2.5G/10G Ethernet and SFP+
+04a627d1-dede-22ef-cb00-7c678d385683,compatibility,"802.1Q VLAN, loop prevention"
+04a627d1-dede-22ef-cb00-7c678d385683,operating-system,Embedded network OS
+04a627d1-dede-22ef-cb00-7c678d385683,features,"PoE budget monitoring, VLAN, QoS"
+04a627d1-dede-22ef-cb00-7c678d385683,ports,8x1GbE PoE
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,category,network-equipment
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,segment,small-business
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,brand,D-Link
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,model,DGS-1210-28P
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,connectivity,1G/2.5G/10G Ethernet and SFP+
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,compatibility,"SNMP, RMON, LLDP"
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,operating-system,Embedded network OS
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,features,"PoE+, voice VLAN, surveillance mode"
+d419740c-a6dc-9cb2-e797-0a8d7cd3c075,ports,"24x1GbE PoE, 4xSFP"
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,category,network-equipment
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,segment,multi-gig
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,brand,Zyxel
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,model,XS1930-12HP
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,connectivity,1G/2.5G/10G Ethernet and SFP+
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,compatibility,"L3 lite, static routes, VLAN"
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,operating-system,Embedded network OS
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,features,"2.5G/10G ports, PoE++, cloud management"
+f0e56eb5-c9fe-b13b-d11b-d2f7a34315f0,ports,"8x2.5GbE PoE++, 2x10GbE, 2x10G SFP+"
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,category,network-equipment
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,segment,security-edge
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,brand,Fortinet
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,model,FG-70F
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,connectivity,1G/2.5G/10G Ethernet and SFP+
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,compatibility,"VLAN, LACP, SNMP, syslog"
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,operating-system,FortiOS
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,features,"NGFW, IPS, web filtering, SD-WAN"
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,ports,"2xWAN, 8xLAN, USB"
+69af10ee-b614-f0e5-6c83-f9a8a7b565b3,processor,Fortinet SoC4
+a2176cac-d662-a0d7-432d-048110a3e0d9,category,servers-workstations
+a2176cac-d662-a0d7-432d-048110a3e0d9,segment,entry-server
+a2176cac-d662-a0d7-432d-048110a3e0d9,brand,Dell
+a2176cac-d662-a0d7-432d-048110a3e0d9,model,PowerEdge T350
+a2176cac-d662-a0d7-432d-048110a3e0d9,connectivity,1G/10G Ethernet and USB
+a2176cac-d662-a0d7-432d-048110a3e0d9,compatibility,Virtualization and container workloads
+a2176cac-d662-a0d7-432d-048110a3e0d9,operating-system,"Windows Server, Ubuntu, VMware ESXi"
+a2176cac-d662-a0d7-432d-048110a3e0d9,processor,Intel Xeon E-2336
+a2176cac-d662-a0d7-432d-048110a3e0d9,features,"iDRAC9, ECC memory, RAID support"
+a2176cac-d662-a0d7-432d-048110a3e0d9,ports,"2x1GbE, USB 3.2, VGA"
+fd9bab5e-e215-424c-3f36-8aeea56f466b,category,servers-workstations
+fd9bab5e-e215-424c-3f36-8aeea56f466b,segment,entry-server
+fd9bab5e-e215-424c-3f36-8aeea56f466b,brand,HPE
+fd9bab5e-e215-424c-3f36-8aeea56f466b,model,ProLiant ML30 Gen11
+fd9bab5e-e215-424c-3f36-8aeea56f466b,connectivity,1G/10G Ethernet and USB
+fd9bab5e-e215-424c-3f36-8aeea56f466b,compatibility,Virtualization and container workloads
+fd9bab5e-e215-424c-3f36-8aeea56f466b,operating-system,"Windows Server, Linux"
+fd9bab5e-e215-424c-3f36-8aeea56f466b,processor,Intel Xeon E-2414
+fd9bab5e-e215-424c-3f36-8aeea56f466b,features,"HPE iLO, ECC support, hardware RAID"
+fd9bab5e-e215-424c-3f36-8aeea56f466b,ports,"2x1GbE, USB-C, DisplayPort"
+ade4f050-755b-065d-c33f-7cb8765094a3,category,servers-workstations
+ade4f050-755b-065d-c33f-7cb8765094a3,segment,workstation
+ade4f050-755b-065d-c33f-7cb8765094a3,brand,Lenovo
+ade4f050-755b-065d-c33f-7cb8765094a3,model,ThinkStation P3
+ade4f050-755b-065d-c33f-7cb8765094a3,connectivity,1G/10G Ethernet and USB
+ade4f050-755b-065d-c33f-7cb8765094a3,compatibility,Virtualization and container workloads
+ade4f050-755b-065d-c33f-7cb8765094a3,operating-system,"Windows 11 Pro, Ubuntu"
+ade4f050-755b-065d-c33f-7cb8765094a3,processor,Intel Core i9-14900
+ade4f050-755b-065d-c33f-7cb8765094a3,features,"ECC-ready options, ISV certifications, TPM 2.0"
+ade4f050-755b-065d-c33f-7cb8765094a3,ports,"2xUSB-C, 8xUSB, 2xDisplayPort"
+ade4f050-755b-065d-c33f-7cb8765094a3,material,Steel and aluminum
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,category,servers-workstations
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,segment,rack-server
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,brand,Supermicro
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,model,SYS-510T-MR
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,connectivity,1G/10G Ethernet and USB
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,compatibility,Virtualization and container workloads
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,operating-system,"Linux, VMware ESXi, Proxmox"
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,processor,Intel Xeon Silver
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,features,"IPMI remote management, redundant PSU options"
+70bb0354-ca1d-d8a3-7dc6-ef2ef3749263,ports,"2x10GbE, 2xUSB, VGA"
+e291d5ce-8ba6-8fe5-8182-394aa2919830,category,servers-workstations
+e291d5ce-8ba6-8fe5-8182-394aa2919830,segment,entry-server
+e291d5ce-8ba6-8fe5-8182-394aa2919830,brand,Fujitsu
+e291d5ce-8ba6-8fe5-8182-394aa2919830,model,TX1330 M5
+e291d5ce-8ba6-8fe5-8182-394aa2919830,connectivity,1G/10G Ethernet and USB
+e291d5ce-8ba6-8fe5-8182-394aa2919830,compatibility,Virtualization and container workloads
+e291d5ce-8ba6-8fe5-8182-394aa2919830,operating-system,"Windows Server, Linux"
+e291d5ce-8ba6-8fe5-8182-394aa2919830,processor,Intel Xeon E-2300
+e291d5ce-8ba6-8fe5-8182-394aa2919830,features,"iRMC S5, RAID, ECC memory"
+e291d5ce-8ba6-8fe5-8182-394aa2919830,ports,"2x1GbE, USB 3.0, serial"
+709cd2e4-68b4-dd35-6584-102748b3a7db,category,servers-workstations
+709cd2e4-68b4-dd35-6584-102748b3a7db,segment,workstation
+709cd2e4-68b4-dd35-6584-102748b3a7db,brand,HP
+709cd2e4-68b4-dd35-6584-102748b3a7db,model,Z4 G5
+709cd2e4-68b4-dd35-6584-102748b3a7db,connectivity,1G/10G Ethernet and USB
+709cd2e4-68b4-dd35-6584-102748b3a7db,compatibility,Virtualization and container workloads
+709cd2e4-68b4-dd35-6584-102748b3a7db,operating-system,"Windows 11 Pro, Red Hat Enterprise Linux"
+709cd2e4-68b4-dd35-6584-102748b3a7db,processor,Intel Xeon W5
+709cd2e4-68b4-dd35-6584-102748b3a7db,features,"ECC DDR5, PCIe expansion, tool-less chassis"
+709cd2e4-68b4-dd35-6584-102748b3a7db,ports,"USB-C, USB-A, dual LAN"
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,category,servers-workstations
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,segment,workstation
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,brand,Dell
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,model,Precision 5860
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,connectivity,1G/10G Ethernet and USB
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,compatibility,Virtualization and container workloads
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,operating-system,"Windows 11 Pro, Ubuntu"
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,processor,Intel Xeon W7
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,features,"High airflow chassis, ISV certifications"
+0ed82b68-70fd-5c79-2afd-a3126cf2ec1e,ports,"USB-C, Thunderbolt, 2.5GbE"
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,category,servers-workstations
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,segment,homelab-rack
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,brand,ASRock Rack
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,model,1U4LW-X570
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,connectivity,1G/10G Ethernet and USB
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,compatibility,Virtualization and container workloads
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,operating-system,"Proxmox, TrueNAS SCALE, Ubuntu"
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,processor,AMD Ryzen 9
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,features,"IPMI, ECC support, dual NIC"
+86b8ab7e-06f4-a0d3-d0e9-f88204f4aa3f,ports,"2x1GbE, 1xDedicated IPMI, USB"
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,category,servers-workstations
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,segment,datacenter
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,brand,Gigabyte
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,model,R283-Z96
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,connectivity,1G/10G Ethernet and USB
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,compatibility,Virtualization and container workloads
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,operating-system,"Linux, VMware, Kubernetes distributions"
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,processor,Dual AMD EPYC 9004
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,features,"Hot-swap bays, redundant PSU, OCP networking"
+b434d047-9ebb-de06-7e9c-dae5bb110cf9,ports,"2x10GbE, management LAN, USB"
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,category,servers-workstations
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,segment,mini-homelab
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,brand,Intel
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,model,NUC13ANHi7
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,connectivity,"Wi-Fi 6E, Bluetooth, 2.5GbE"
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,compatibility,Virtualization and container workloads
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,operating-system,"Linux, Windows 11 Pro"
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,processor,Intel Core i7-1360P
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,features,"Dual NVMe support, compact chassis, VPro options"
+0ffb8b80-7002-dc81-ca3b-6d8d6f9d0cf6,ports,"2xThunderbolt 4, 2xHDMI, 2.5GbE"

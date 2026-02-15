@@ -35,7 +35,7 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
   >
     <template #header>
       <NuxtLink :to="`/articles/${article.id}`" class="block">
-        <div class="bg-elevated aspect-[4/3] w-full overflow-hidden">
+        <div class="bg-elevated aspect-4/3 w-full overflow-hidden">
           <ImageWithFallback
             :src="article.thumbnailImage?.imageUrl || null"
             :alt="article.thumbnailImage?.imageAlt || article.title"

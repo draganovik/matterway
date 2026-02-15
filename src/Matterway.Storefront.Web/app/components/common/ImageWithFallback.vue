@@ -22,7 +22,9 @@ const resolvedSrc = computed(() => {
   return value.length ? value : null
 })
 
-const shouldRenderImage = computed(() => Boolean(resolvedSrc.value) && !loadFailed.value)
+const shouldRenderImage = computed(
+  () => Boolean(resolvedSrc.value) && !loadFailed.value,
+)
 
 watch(
   () => props.src,

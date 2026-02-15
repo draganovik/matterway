@@ -1,0 +1,29 @@
+slug,title,unit
+category,Category,
+segment,Segment,
+brand,Brand,
+model,Model,
+compatibility,Compatibility,
+connectivity,Connectivity,
+features,Features,
+ports,Ports,
+processor,Processor,
+resolution,Resolution,
+video-quality,Video Quality,
+audio,Audio,
+audio-quality,Audio Quality,
+display,Display,
+operating-system,Operating System,
+material,Material,
+color,Color,
+camera,Camera,
+power,Power,watts
+weight,Weight,grams
+width,Width,millimeters
+height,Height,millimeters
+depth,Depth,millimeters
+ram-size,RAM Size,GB
+storage,Storage,GB
+screen-size,Screen Size,inches
+refresh-rate,Refresh Rate,Hz
+battery-size,Battery Size,mAh

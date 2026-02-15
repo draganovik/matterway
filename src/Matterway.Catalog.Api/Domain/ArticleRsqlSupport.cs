@@ -76,6 +76,10 @@ public static class ArticleRsqlSupport
     private static readonly IReadOnlyDictionary<string, ArticleDetailRule> ArticleDetailRules =
         new Dictionary<string, ArticleDetailRule>(StringComparer.OrdinalIgnoreCase)
         {
+            ["category"] = ArticleDetailRule.Text("category", RsqlOperator.Equal, RsqlOperator.In,
+                RsqlOperator.NotIn),
+            ["segment"] = ArticleDetailRule.Text("segment", RsqlOperator.Equal, RsqlOperator.In,
+                RsqlOperator.NotIn),
             ["audio"] = ArticleDetailRule.Text("audio", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
             ["audio-quality"] = ArticleDetailRule.Text("audio-quality", RsqlOperator.Equal, RsqlOperator.In,
                 RsqlOperator.NotIn),
