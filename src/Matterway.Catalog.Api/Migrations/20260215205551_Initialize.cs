@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Matterway.Catalog.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -219,18 +219,6 @@ namespace Matterway.Catalog.Api.Migrations
                     { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
                     { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
                     { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "ArticleImage",
-                columns: new[] { "ArticleId", "Id", "ImageAlt", "ImageUrl", "OrderIndex" },
-                values: new object[,]
-                {
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), new Guid("05ffe3d2-d56d-4fd2-b816-7b1ef82b1e62"), "Spotlight Cam Plus", "https://images.ctfassets.net/a3peezndovsu/article-24529407541337-media/6eaa58ced96b0dc6959181f55dec6023/article-24529407541337-media.jpg", 0 },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), new Guid("55ab96f9-8b3b-42b0-a933-643522cd7397"), "Nest Learning Thermostat - Front View", "https://i.pinimg.com/originals/95/99/16/959916d70bd67c4a5a3d160078b7f266.jpg", 0 },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), new Guid("72cebb50-7f20-4c2a-9803-ccc9934274be"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb - Front View", "https://images.homedepot-static.com/articleImages/7d8edcf4-11b5-4cf1-8747-7ba637f618d1/svn/philips-led-bulbs-464487-64_1000.jpg", 0 },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), new Guid("88423aa2-93bb-462c-9934-7e783e680b98"), "August Wi-Fi Smart Lock Pro - Front View", "https://images.homedepot-static.com/articleImages/e2f3a648-f053-4e00-92fb-4349a0f344a2/svn/august-electronic-deadbolts-augsl05-m01-s01-64_1000.jpg", 0 },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), new Guid("9dc0c1db-a949-4cb8-8a8c-2f55de2f1f90"), "Amazon Echo Show 5", "https://m.media-amazon.com/images/I/51iobpaEM5S._AC_SL1000_.jpg", 0 }
                 });
 
             migrationBuilder.InsertData(
