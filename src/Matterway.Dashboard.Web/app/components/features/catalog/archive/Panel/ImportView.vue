@@ -71,7 +71,7 @@ function clearSelection() {
 </script>
 
 <template>
-  <UCard class="h-full !border-default !border !ring-0">
+  <UCard class="!border-default h-full !border !ring-0">
     <template #header>
       <div>
         <h3 class="text-foreground text-sm font-semibold">Import Archive</h3>
