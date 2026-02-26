@@ -1,5 +1,6 @@
 using Matterway.AppHost.Composition;
 using Matterway.ServiceDefaults;
+using Microsoft.Extensions.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -89,7 +90,9 @@ var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>
 var web = WebComposition.AddWebApps(builder, identityApi, catalogApi, customersApi, salesApi);
 
 // Apply cross-cutting API wiring (docs + auth/cors environment) in one place.
-ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
+if (builder.Environment.IsDevelopment())
+    ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
+
 ApiEnvironmentComposition.ConfigureApiEnvironment(
     apisByServiceName.Values,
     identityApi.GetEndpoint("http"),

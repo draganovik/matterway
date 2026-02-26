@@ -15,6 +15,7 @@ internal static class WebComposition
     {
         var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.Web")
             .WaitFor(catalogApi)
+            .WaitFor(salesApi)
             .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
             .WithEnvironment("PORT", "3001")
             .WithEndpoint("http", endpoint =>

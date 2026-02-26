@@ -14,7 +14,10 @@ internal static class ScalarComposition
 
         foreach (var apiContract in ApiDirectory.All)
         {
-            var resource = apisByServiceName[apiContract.ServiceName];
+            if (!apisByServiceName.TryGetValue(apiContract.ServiceName, out var resource))
+                throw new KeyNotFoundException(
+                    $"No API resource registered for service '{apiContract.ServiceName}'. " +
+                    "Ensure it is registered in the AppHost configuration.");
 
             scalarApiReference.WithApiReference(resource, options =>
             {
