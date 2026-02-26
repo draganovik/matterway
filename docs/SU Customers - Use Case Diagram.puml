@@ -1,0 +1,59 @@
+@startuml SUCustomersUseCaseDiagram
+title SU: Customers - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+actor :Anonymous: as anon
+actor :Customer: as csmr
+anon <-- csmr
+
+rectangle #line:transparent {
+  actor :Employee: as empl
+  actor :Manager: as mngr
+  actor :Operator: as oprt
+}
+oprt --> empl
+mngr --> empl
+
+rectangle #line:transparent {
+  actor "Identity API" as idApi
+  actor "Sales API" as salesApi
+}
+
+package "Customers API" {
+  usecase "Register Customer" as registerCustomer
+
+  usecase "Manage Own Profile" as manageOwnProfile
+  usecase "Manage Own Address" as manageOwnAddress
+  usecase "Manage Own Cart Items" as manageOwnCartItems
+  usecase "Manage Own Orders" as manageOwnOrders
+
+  usecase "Review Customers" as reviewCustomers
+  usecase "Review Customer Address" as reviewCustomerAddress
+  usecase "Review Customer Cart Items" as reviewCustomerCartItems
+  usecase "Manage Customers" as manageCustomers
+  usecase "Manage Customer Address" as manageCustomerAddress
+
+  usecase "Provision Customer User" as provisionCustomerUser
+  usecase "Verify Customer" as verifyCustomer
+
+  registerCustomer ..> provisionCustomerUser : <<include>>
+  manageOwnOrders ..> manageOwnCartItems : <<include>>
+  manageOwnOrders ..> manageOwnAddress : <<include>>
+  reviewCustomerAddress ..> reviewCustomers : <<extend>>
+  reviewCustomerCartItems ..> reviewCustomers : <<extend>>
+  manageCustomerAddress ..> manageCustomers : <<extend>>
+}
+
+anon --- registerCustomer
+
+csmr --- manageOwnProfile
+csmr --- manageOwnOrders
+
+reviewCustomers --- oprt
+manageCustomers --- oprt
+
+provisionCustomerUser --- idApi
+verifyCustomer --- salesApi
+@enduml

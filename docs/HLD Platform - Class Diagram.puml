@@ -1,10 +1,6 @@
-@startuml HLD: Class Diagram - Platform Overview
+@startuml HLD: Platform - Class Diagram
 skinparam classAttributeIconSize 10
 hide circle
-
-' =======================
-' MODULES
-' =======================
 
 package "Identity" {
   enum EIdentityRole {
@@ -262,14 +258,8 @@ package "Sales" {
   Payment "0..*" -- "1" Order : orderId
 }
 
-' =======================
-' RELATIONSHIPS
-' =======================
-
-' Identity
 SystemUser "1" .left. "0..1" Customer
 
-' Customers
 CustomerArticle "0..*" .up. "1" Article
 CustomerOrder "0..1" .right. "1" Order : shared orderId
 @enduml

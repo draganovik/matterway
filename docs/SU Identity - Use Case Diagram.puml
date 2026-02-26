@@ -1,0 +1,60 @@
+@startuml SUIdentityUseCaseDiagram
+title SU: Identity - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+actor :Anonymous: as anon
+actor :System User: as sysUser
+anon <-- sysUser
+
+rectangle #line:transparent {
+  actor :Employee: as empl
+  actor :Manager: as mngr
+  actor :Operator: as oprt
+}
+oprt --> empl
+mngr --> empl
+
+rectangle #line:transparent {
+  actor "Customers API" as customersApi
+  actor "Internal APIs" as internalApis
+}
+
+package "Identity API" {
+  usecase "Sign Up" as signUp
+  usecase "Sign In" as signIn
+  usecase "Refresh Session" as refreshSession
+  usecase "Sign Out" as signOut
+
+  usecase "Review System Users" as reviewSystemUsers
+  usecase "Manage System Users" as manageSystemUsers
+  usecase "Delete System User" as deleteSystemUser
+  usecase "Review User Permissions" as reviewUserPermissions
+  usecase "Manage User Permissions" as manageUserPermissions
+
+  usecase "Create Customer User" as createCustomerUser
+  usecase "Introspect Access Token" as introspectAccessToken
+
+  note top of manageSystemUsers
+    Elevating a user to employee privileges
+    requires administrator rights.
+  end note
+
+  manageSystemUsers ..> reviewSystemUsers : <<include>>
+  deleteSystemUser ..> manageSystemUsers : <<extend>>
+  manageUserPermissions ..> reviewUserPermissions : <<include>>
+}
+
+anon --- signUp
+anon --- signIn
+anon --- refreshSession
+sysUser --- signOut
+
+manageSystemUsers --- oprt
+reviewUserPermissions --- oprt
+manageUserPermissions --- mngr
+
+createCustomerUser --- customersApi
+introspectAccessToken --- internalApis
+@enduml

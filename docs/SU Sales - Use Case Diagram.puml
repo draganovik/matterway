@@ -1,0 +1,39 @@
+@startuml SUSalesUseCaseDiagram
+title SU: Sales - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+actor :Customer: as csmr
+
+rectangle #line:transparent {
+  actor :Employee: as empl
+  actor :Manager: as mngr
+  actor :Operator: as oprt
+}
+oprt --> empl
+mngr --> empl
+
+actor "Storefront.Web" <<Payment Process>> as paymentProcess
+
+package "Sales API" {
+  usecase "Place Own Order" as placeOwnOrder
+  usecase "View Own Orders" as viewOwnOrders
+
+  usecase "View Orders" as viewOrders
+  usecase "View Payments" as viewPayments
+  usecase "Update Order Status" as updateOrderStatus
+
+  usecase "Register Payment" as registerPayment
+
+  viewPayments ..> viewOrders : <<extend>>
+  updateOrderStatus ..> viewOrders : <<include>>
+}
+
+csmr --- placeOwnOrder
+csmr --- viewOwnOrders
+
+updateOrderStatus --- oprt
+
+registerPayment --- paymentProcess
+@enduml

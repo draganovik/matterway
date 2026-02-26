@@ -1,4 +1,4 @@
-@startuml HLD: Sequence Diagram - Storefront Checkout Place Order
+@startuml LLD: Place Order - Sequence Diagram
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
 skinparam maxMessageSize 120
