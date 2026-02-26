@@ -41,6 +41,10 @@ public static class FeatureDiscoveryExtensions
         {
             return assembly.DefinedTypes;
         }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.OfType<TypeInfo>();
+        }
         catch
         {
             return [];
