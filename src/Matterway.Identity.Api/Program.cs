@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Asp.Versioning;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Configurations;
 using Matterway.Identity.Api.Infrastructure.Persistence;
@@ -7,11 +6,9 @@ using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 
-const string serviceName = "identity";
-const string scalarTitle = "Matterway Identity API";
-ApiVersion[] supportedApiVersions = [new(1, 0)];
+var apiContract = ApiContracts.Identity;
 
-var builder = ApiTemplateRegistration.CreateApiBuilder(
+var builder = ApiTemplate.CreateApiBuilder(
     args,
     new ApiBootstrapFeatureOptions
     {
@@ -23,8 +20,7 @@ var jwtOptions = jwtConfigurationSection.Get<JwtTokenOptions>() ?? new JwtTokenO
 
 builder
     .ConfigureApiFoundation(
-        serviceName,
-        supportedApiVersions,
+        apiContract,
         new ApiProblemDetailsFeatureOptions
         {
             EnableBadHttpRequestCustomization = false
@@ -37,8 +33,7 @@ builder
 var app = builder.Build();
 
 app.UseApiFoundation();
-app.ApplyDevelopmentApiDocs(scalarTitle, supportedApiVersions);
-app.ApplyEndpoints(supportedApiVersions);
+app.ApplyApiContract(apiContract);
 
 app.Run();
 

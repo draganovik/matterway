@@ -14,6 +14,7 @@
         <PackageReference Include="Aspire.Hosting.Docker" Version="13.0.0-preview.1.25560.3"/>
         <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.1.1"/>
         <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.1"/>
+        <PackageReference Include="Scalar.Aspire" Version="0.8.50"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -21,6 +22,7 @@
         <ProjectReference Include="..\Matterway.Customers.Api\Matterway.Customers.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Identity.Api\Matterway.Identity.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Sales.Api\Matterway.Sales.Api.csproj"/>
+        <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj" IsAspireProjectResource="false"/>
     </ItemGroup>
 
 </Project>

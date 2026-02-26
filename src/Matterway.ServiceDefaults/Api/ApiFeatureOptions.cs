@@ -85,13 +85,11 @@ public sealed record ApiEndpointRoutingFeatureOptions
 
 public sealed record ApiOpenApiRouteOptions
 {
-    public string OpenApiRoutePattern { get; init; } = "/openapi/{documentName}.yaml";
+    public string OpenApiRoutePattern { get; init; } = ApiDocumentationDefaults.OpenApiRoutePattern;
 }
 
-public sealed record ApiScalarFeatureOptions
+public static class ApiDocumentationDefaults
 {
-    public required IReadOnlyCollection<ApiVersion> SupportedApiVersions { get; init; }
-    public required string Title { get; init; }
-    public string RoutePrefix { get; init; } = "/";
-    public string OpenApiRoutePattern { get; init; } = "/openapi/{documentName}.yaml";
+    public const string DefaultDocumentName = "v1";
+    public const string OpenApiRoutePattern = "/openapi/{documentName}.yaml";
 }

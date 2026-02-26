@@ -1,15 +1,12 @@
-﻿using Asp.Versioning;
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 using Matterway.Sales.Api.Infrastructure.Persistence;
 
-const string serviceName = "sales";
-const string scalarTitle = "Matterway Sales API";
-ApiVersion[] supportedApiVersions = [new(1, 0)];
+var apiContract = ApiContracts.Sales;
 
-var builder = ApiTemplateRegistration.CreateApiBuilder(args);
+var builder = ApiTemplate.CreateApiBuilder(args);
 
 builder
-    .ConfigureApiFoundation(serviceName, supportedApiVersions)
+    .ConfigureApiFoundation(apiContract)
     .ConfigureAuthentication(new ApiAuthenticationFeatureOptions())
     .ConfigureCustomersIntegration()
     .ConfigurePersistence()
@@ -18,7 +15,6 @@ builder
 var app = builder.Build();
 
 app.UseApiFoundation();
-app.ApplyDevelopmentApiDocs(scalarTitle, supportedApiVersions);
-app.ApplyEndpoints(supportedApiVersions);
+app.ApplyApiContract(apiContract);
 
 app.Run();

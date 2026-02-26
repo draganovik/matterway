@@ -1,69 +1,33 @@
-using System.Diagnostics;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Matterway.ServiceDefaults.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Scalar.AspNetCore;
 
 namespace Matterway.ServiceDefaults.Api;
 
-public static class ApiTemplateRegistration
+public static partial class ApiTemplate
 {
-    public static WebApplicationBuilder CreateApiBuilder(
-        string[] args,
-        ApiBootstrapFeatureOptions? options = null)
-    {
-        options ??= new ApiBootstrapFeatureOptions();
-        var contentRootPath = options.ContentRootPath ?? Directory.GetCurrentDirectory();
-
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-        {
-            Args = args,
-            ContentRootPath = contentRootPath
-        });
-
-        builder.Configuration
-            .SetBasePath(contentRootPath)
-            .AddJsonFile(
-                string.Format(options.EnvironmentSettingsFilePattern, builder.Environment.EnvironmentName),
-                options.EnvironmentSettingsOptional,
-                options.EnvironmentSettingsReloadOnChange);
-
-        if (options.AddEnvironmentVariables)
-            builder.Configuration.AddEnvironmentVariables();
-
-        if (options.ThrowOnBadRequest is bool throwOnBadRequest)
-            builder.Services.Configure<RouteHandlerOptions>(routeHandlerOptions =>
-                routeHandlerOptions.ThrowOnBadRequest = throwOnBadRequest);
-
-        if (options.AddJsonStringEnumConverter)
-            builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
-            {
-                jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
-
-        if (options.AddValidation)
-            builder.Services.AddValidation();
-
-        if (options.AddServiceDefaults)
-            builder.AddServiceDefaults();
-
-        return builder;
-    }
-
     extension(IHostApplicationBuilder builder)
     {
+        public IHostApplicationBuilder ConfigureApiFoundation(
+            ApiContract apiContract,
+            ApiProblemDetailsFeatureOptions? problemDetailsOptions = null,
+            ApiCorsFeatureOptions? corsOptions = null)
+        {
+            ArgumentNullException.ThrowIfNull(apiContract);
+
+            return builder.ConfigureApiFoundation(
+                apiContract.ServiceName,
+                apiContract.SupportedApiVersions,
+                problemDetailsOptions,
+                corsOptions);
+        }
+
         public IHostApplicationBuilder ConfigureApiFoundation(
             string serviceName,
             IReadOnlyCollection<ApiVersion> supportedApiVersions,
@@ -262,156 +226,5 @@ public static class ApiTemplateRegistration
 
             return builder;
         }
-    }
-
-    extension(WebApplication app)
-    {
-        public WebApplication UseApiFoundation()
-        {
-            app.UseExceptionHandler();
-            app.MapDefaultEndpoints();
-            app.UseStatusCodePages();
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            return app;
-        }
-
-        public WebApplication ApplyDevelopmentApiDocs(
-            string title,
-            IReadOnlyCollection<ApiVersion> supportedApiVersions,
-            ApiOpenApiRouteOptions? openApiRouteOptions = null)
-        {
-            if (!app.Environment.IsDevelopment())
-                return app;
-
-            app.ApplyOpenApi(openApiRouteOptions ?? new ApiOpenApiRouteOptions());
-            app.ApplyScalar(new ApiScalarFeatureOptions
-            {
-                SupportedApiVersions = supportedApiVersions,
-                Title = title
-            });
-
-            return app;
-        }
-
-        public WebApplication ApplyOpenApi(ApiOpenApiRouteOptions? options = null)
-        {
-            var routeOptions = options ?? new ApiOpenApiRouteOptions();
-            app.MapOpenApi(routeOptions.OpenApiRoutePattern);
-            return app;
-        }
-
-        public WebApplication ApplyScalar(ApiScalarFeatureOptions options)
-        {
-            var documentNames = ApiVersioningConventions.ToDocumentNames(options.SupportedApiVersions);
-
-            app.MapScalarApiReference(options.RoutePrefix, (scalarOptions, _) =>
-            {
-                scalarOptions.WithOpenApiRoutePattern(options.OpenApiRoutePattern);
-                scalarOptions.WithTitle(options.Title);
-                scalarOptions.AddDocuments(documentNames);
-            });
-
-            return app;
-        }
-
-        public WebApplication ApplyEndpoints(ApiEndpointRoutingFeatureOptions options)
-        {
-            var versions = ApiVersioningConventions.NormalizeSupportedVersions(options.SupportedApiVersions);
-            var versionSetBuilder = app.NewApiVersionSet()
-                .ReportApiVersions();
-
-            foreach (var version in versions)
-                versionSetBuilder.HasApiVersion(version);
-
-            options.ConfigureVersionSet?.Invoke(versionSetBuilder);
-
-            var versionSet = versionSetBuilder.Build();
-
-            var apiGroup = app.MapGroup(options.ApiRoutePrefix);
-            if (options.DisableAntiforgery)
-                apiGroup = apiGroup.DisableAntiforgery();
-
-            RouteGroupBuilder MapKindGroup(EndpointKind endpointKind)
-            {
-                var endpointSegment = endpointKind.ToString().ToLowerInvariant();
-
-                return apiGroup.MapGroup($"/{endpointSegment}")
-                    .MapGroup("/v{version:apiVersion}")
-                    .WithApiVersionSet(versionSet);
-            }
-
-            var endpointGroups = options.EndpointKinds
-                .Distinct()
-                .ToDictionary(endpointKind => endpointKind, MapKindGroup);
-
-            var endpointRouter = new EndpointRouter(endpointGroups);
-
-            var endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
-            foreach (var endpoint in endpoints) endpoint.MapEndpoint(endpointRouter);
-
-            return app;
-        }
-
-        public WebApplication ApplyEndpoints(IReadOnlyCollection<ApiVersion> supportedApiVersions)
-        {
-            return app.ApplyEndpoints(new ApiEndpointRoutingFeatureOptions
-            {
-                SupportedApiVersions = supportedApiVersions
-            });
-        }
-    }
-
-    private static void ApplyBadRequestProblemDetails(ProblemDetailsContext context)
-    {
-        if (context.Exception is not BadHttpRequestException
-            {
-                InnerException: JsonException jsonException
-            })
-        {
-            if (context.Exception is BadHttpRequestException badHttpException)
-            {
-                context.HttpContext.Response.StatusCode = badHttpException.StatusCode;
-                context.ProblemDetails = new ProblemDetails
-                {
-                    Status = badHttpException.StatusCode,
-                    Title = "Bad Request",
-                    Detail = badHttpException.Message,
-                    Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
-                };
-                context.ProblemDetails.Extensions["traceId"] =
-                    Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
-            }
-
-            return;
-        }
-
-        context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        var member = jsonException.Path?.TrimStart('$').TrimStart('.');
-        if (!string.IsNullOrWhiteSpace(member))
-            context.ProblemDetails = new ValidationProblemDetails(new Dictionary<string, string[]>
-            {
-                [member] =
-                [
-                    $"Value provided for '{member}' has an invalid format. Please check the value and try again."
-                ]
-            })
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Invalid request payload format.",
-                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
-            };
-        else
-            context.ProblemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Invalid JSON payload.",
-                Detail = "The request body contains malformed JSON. Please fix the payload and try again.",
-                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
-            };
-
-        context.ProblemDetails.Extensions["traceId"] =
-            Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
     }
 }

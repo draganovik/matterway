@@ -1,18 +1,15 @@
-﻿using Asp.Versioning;
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 
-const string serviceName = "catalog";
-const string scalarTitle = "Matterway Catalog API";
-ApiVersion[] supportedApiVersions = [new(1, 0)];
+var apiContract = ApiContracts.Catalog;
 
-var builder = ApiTemplateRegistration.CreateApiBuilder(args);
+var builder = ApiTemplate.CreateApiBuilder(args);
 
 builder.Services.AddScoped<ICatalogArchiveService, CatalogArchiveService>();
 
 builder
-    .ConfigureApiFoundation(serviceName, supportedApiVersions)
+    .ConfigureApiFoundation(apiContract)
     .ConfigureAuthentication(new ApiAuthenticationFeatureOptions())
     .ConfigureImageStorage()
     .ConfigurePersistence()
@@ -21,7 +18,6 @@ builder
 var app = builder.Build();
 
 app.UseApiFoundation();
-app.ApplyDevelopmentApiDocs(scalarTitle, supportedApiVersions);
-app.ApplyEndpoints(supportedApiVersions);
+app.ApplyApiContract(apiContract);
 
 app.Run();

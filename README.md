@@ -84,7 +84,7 @@ docs/                         # PlantUML high-level design artifacts
   - `/api/admin/v1.0/...`
   - `/api/system/v1.0/...`
 - OpenAPI document (development): `/openapi/v1.yaml`
-- Scalar API UI (development): `/`
+- Unified Scalar API Reference (development): Aspire `scalar-api-reference` resource in `Matterway.AppHost`
 - Health endpoints (development): `/health`, `/alive`
 
 Scope semantics:
