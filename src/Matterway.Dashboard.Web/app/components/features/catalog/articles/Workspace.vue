@@ -167,6 +167,7 @@ onMounted(() => {
       class="min-h-0 flex-1"
       list-class="overflow-y-auto"
       detail-class="overflow-y-auto"
+      :detail-loading="articleState.loading"
     >
       <template #list>
         <EntitiesListPanel
@@ -200,7 +201,6 @@ onMounted(() => {
       <template #detail>
         <CatalogArticlesPanelInformationView
           :article="selectedArticle"
-          :loading="articleState.loading"
           :error="articleState.error"
           :can-edit="canEdit"
           @update:article="updateSelectedArticle"

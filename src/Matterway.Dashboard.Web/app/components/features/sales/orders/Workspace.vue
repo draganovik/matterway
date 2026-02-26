@@ -172,6 +172,7 @@ onMounted(() => {
       class="min-h-0 flex-1"
       list-class="overflow-y-auto"
       detail-class="overflow-y-auto"
+      :detail-loading="detailState.loading"
     >
       <template #list>
         <EntitiesListPanel
@@ -207,7 +208,6 @@ onMounted(() => {
       <template #detail>
         <SalesOrdersPanelInformationView
           :order="selectedOrder"
-          :loading="detailState.loading"
           :error="detailState.error"
           :can-manage-statuses="canManageStatuses"
           @reveal-details="revealDetails"

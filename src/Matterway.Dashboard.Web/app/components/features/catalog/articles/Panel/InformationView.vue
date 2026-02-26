@@ -6,13 +6,11 @@ import { useRequestState } from "~/composables/useRequestState"
 const props = withDefaults(
   defineProps<{
     article?: GetArticleByIdResponse | null
-    loading?: boolean
     error?: string
     canEdit?: boolean
   }>(),
   {
     article: null,
-    loading: false,
     error: "",
     canEdit: false,
   },
@@ -108,8 +106,6 @@ function updateImages(images: GetArticleByIdResponse["images"]) {
 <template>
   <div class="flex flex-col gap-5">
     <StatusMessages v-if="error" :error="error" />
-
-    <StatusMessages v-else-if="loading" loading="Loading article." />
 
     <div v-else-if="!article" class="space-y-4">
       <div class="space-y-1">
