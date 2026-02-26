@@ -85,7 +85,7 @@ async function submit() {
           <UInput
             v-model="model.password"
             type="password"
-            placeholder="Unesite lozinku"
+            placeholder="••••••••"
             autocomplete="current-password"
             class="w-full"
             required

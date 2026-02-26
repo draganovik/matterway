@@ -9,28 +9,10 @@ definePageMeta({
 })
 
 const auth = useAuthSession()
-const fields = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "name@matterway.local",
-    required: true,
-    autocomplete: "email",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "••••••••",
-    required: true,
-    autocomplete: "current-password",
-  },
-]
-const submitConfig = {
-  label: "Sign in",
-  color: "primary",
-} as const
+const model = reactive({
+  email: "",
+  password: "",
+})
 const error = ref("")
 const loading = ref(false)
 
@@ -52,13 +34,20 @@ function getFirstRoute() {
   return "/"
 }
 
-async function handleSubmit(event: {
-  data: Record<"email" | "password", string>
-}) {
+async function handleSubmit() {
+  const email = model.email.trim()
+  const password = model.password
+
   error.value = ""
+
+  if (!email || !password.trim()) {
+    error.value = "Email and password are required."
+    return
+  }
+
   loading.value = true
   try {
-    await auth.login(event.data.email, event.data.password)
+    await auth.login(email, password)
     await navigateTo(getFirstRoute())
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Login failed."
@@ -89,27 +78,45 @@ async function handleSubmit(event: {
           </p>
         </div>
         <UCard class="!border-default !bg-elevated/75 !border !shadow-sm">
-          <UAuthForm
-            title="Sign in"
-            description="Use your employee credentials."
-            :fields="fields"
-            :submit="submitConfig"
-            :loading="loading"
-            @submit="handleSubmit"
-          >
-            <template #header>
-              <div class="space-y-1">
-                <p class="text-sm tracking-[0.3em] text-orange-600 uppercase">
-                  Operator Access
-                </p>
-                <h2 class="text-foreground text-2xl font-semibold">Sign in</h2>
-                <p class="text-muted text-sm">Use your employee credentials.</p>
-              </div>
-            </template>
-            <template #validation>
-              <StatusMessages v-if="error" :error="error" />
-            </template>
-          </UAuthForm>
+          <template #header>
+            <div class="space-y-1">
+              <p class="text-sm tracking-[0.3em] text-orange-600 uppercase">
+                Operator Access
+              </p>
+              <h2 class="text-foreground text-2xl font-semibold">Sign in</h2>
+              <p class="text-muted text-sm">Use your employee credentials.</p>
+            </div>
+          </template>
+
+          <form class="space-y-4" @submit.prevent="handleSubmit">
+            <UFormField label="Email" required>
+              <UInput
+                v-model="model.email"
+                type="email"
+                placeholder="name@matterway.local"
+                autocomplete="email"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <UFormField label="Password" required>
+              <UInput
+                v-model="model.password"
+                type="password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+                class="w-full"
+                required
+              />
+            </UFormField>
+
+            <StatusMessages v-if="error" :error="error" />
+
+            <UButton type="submit" color="primary" :loading="loading">
+              Sign in
+            </UButton>
+          </form>
         </UCard>
       </div>
     </div>
