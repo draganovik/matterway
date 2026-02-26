@@ -11,7 +11,7 @@ import type {
 } from "~/types/auth/session"
 
 const refreshCookieName = "mw_storefront_refresh"
-const authPath = "/api/public/v1.0/auth"
+const authPath = "/api/public/v1/auth"
 const authJsonHeaders = {
   "Content-Type": "application/json",
   accept: "application/json",

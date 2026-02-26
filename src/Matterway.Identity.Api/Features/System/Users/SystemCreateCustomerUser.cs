@@ -1,10 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Identity.Api.Features.System.Users;
 

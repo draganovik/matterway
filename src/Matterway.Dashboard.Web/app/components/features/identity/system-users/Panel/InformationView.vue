@@ -12,7 +12,6 @@ const form = defineModel<SystemUserForm>({ required: true })
 const props = withDefaults(
   defineProps<{
     systemUser?: SystemUserResponse | null
-    loading?: boolean
     error?: string
     canOperate?: boolean
     canManage?: boolean
@@ -25,7 +24,6 @@ const props = withDefaults(
   }>(),
   {
     systemUser: null,
-    loading: false,
     error: "",
     canOperate: false,
     canManage: false,
@@ -60,11 +58,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
       </p>
     </div>
 
-    <StatusMessages
-      v-if="loading || error"
-      :loading="loading ? 'Loading system user.' : false"
-      :error="error"
-    />
+    <StatusMessages v-if="error" :error="error" />
 
     <EntitiesEmptyState
       v-else-if="!systemUser"

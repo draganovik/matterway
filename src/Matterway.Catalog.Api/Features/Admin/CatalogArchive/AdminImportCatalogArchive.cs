@@ -1,8 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Features.Admin.CatalogArchive;
 

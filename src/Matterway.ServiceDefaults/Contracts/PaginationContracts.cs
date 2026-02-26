@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Contracts;
 
 public record PaginationRequestParameters
 {

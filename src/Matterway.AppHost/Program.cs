@@ -1,21 +1,18 @@
+using Matterway.AppHost.Composition;
+using Matterway.ServiceDefaults;
+using Microsoft.Extensions.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-const string articleImagesBucket = "article-images";
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
 var minioPassword = builder.AddParameter("MinioRootPassword", true);
 
-// Setup Docker Compose environment for dashboard
-builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options =>
-{
-    options.WithHostPort(18888);
-    options.WithContainerName("aspire-dashboard");
-}).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
+// Configure shared local infrastructure first (dashboard, data stores, object storage).
+ConfigureDashboard(builder);
 
-// Setup PostgreSQL container with databases
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("18")
     .WithHostPort(15432)
@@ -33,7 +30,6 @@ var customersDb = postgres.AddDatabase("CustomersDb");
 var identityDb = postgres.AddDatabase("IdentityDb");
 var salesDb = postgres.AddDatabase("SalesDb");
 
-// Setup MinIO for article image storage
 var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
@@ -48,132 +44,86 @@ var minio = builder.AddContainer("minio", "minio/minio:latest")
         service.Ports = ["19000:9000", "19001:9001"];
     });
 
-// Setup Identity API
-var identityApi = builder.AddProject<Matterway_Identity_Api>("identity-api")
-    .WithReference(identityDb)
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2003:8080"];
-    });
+// Register APIs in dependency order so references are explicit and startup waits are correct.
+var identityApi = ConfigureApiResource(
+    builder.AddProject<Matterway_Identity_Api>(ToApiResourceName(ApiDirectory.Identity))
+        .WithReference(identityDb),
+    2003);
 
-// Setup Catalog API
-var catalogApi = builder.AddProject<Matterway_Catalog_Api>("catalog-api")
-    .WithReference(catalogDb)
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2001:8080"];
-    });
+var catalogApi = ConfigureApiResource(
+    builder.AddProject<Matterway_Catalog_Api>(ToApiResourceName(ApiDirectory.Catalog))
+        .WithReference(catalogDb),
+    2001);
 
 catalogApi
     .WaitFor(minio)
     .WithReference(minio.GetEndpoint("http"))
-    .WithEnvironment("ImageStorage__Bucket", articleImagesBucket)
+    .WithEnvironment("ImageStorage__Bucket", "article-images")
     .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
     .WithEnvironment("ImageStorage__SecretKey", minioPassword)
     .WithEnvironment("ImageStorage__AllowPublicRead", "true");
 
-// Setup Customers API
-var customersApi = builder.AddProject<Matterway_Customers_Api>("customers-api")
-    .WithReference(customersDb)
-    .WithReference(identityApi.GetEndpoint("http"))
-    .WithReference(catalogApi.GetEndpoint("http"))
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2002:8080"];
-    });
+var customersApi = ConfigureApiResource(
+    builder.AddProject<Matterway_Customers_Api>(ToApiResourceName(ApiDirectory.Customers))
+        .WithReference(customersDb)
+        .WithReference(identityApi.GetEndpoint("http"))
+        .WithReference(catalogApi.GetEndpoint("http")),
+    2002);
 
-// Setup Sales API
-var salesApi = builder.AddProject<Matterway_Sales_Api>("sales-api")
-    .WithReference(salesDb)
-    .WithReference(customersApi.GetEndpoint("http"))
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["2005:8080"];
-    });
+var salesApi = ConfigureApiResource(
+    builder.AddProject<Matterway_Sales_Api>(ToApiResourceName(ApiDirectory.Sales))
+        .WithReference(salesDb)
+        .WithReference(customersApi.GetEndpoint("http")),
+    2005);
 
-// Setup Storefront Web Application
-var storefront = builder.AddViteApp("storefront-web", "../Matterway.Storefront.Web")
-    .WaitFor(catalogApi)
-    .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
-    .WithEnvironment("PORT", "3001")
-    .WithEndpoint("http", e =>
-    {
-        e.Port = 3001;
-        e.IsProxied = false;
-    })
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerFile()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["3001:3001"];
-    });
+var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
+{
+    [ApiDirectory.Identity.ServiceName] = identityApi,
+    [ApiDirectory.Catalog.ServiceName] = catalogApi,
+    [ApiDirectory.Customers.ServiceName] = customersApi,
+    [ApiDirectory.Sales.ServiceName] = salesApi
+};
 
-// Setup Dashboard Web Application
-var dashboard = builder.AddViteApp("dashboard-web", "../Matterway.Dashboard.Web")
-    .WaitFor(identityApi)
-    .WaitFor(catalogApi)
-    .WaitFor(customersApi)
-    .WaitFor(salesApi)
-    .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApi.GetEndpoint("http"))
-    .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
-    .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
-    .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
-    // expose public runtime config values so the client bundle has base URLs
-    .WithEnvironment("IDENTITY_API_BASE_URL", identityApi.GetEndpoint("http"))
-    .WithEnvironment("CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
-    .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
-    .WithEnvironment("SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
-    .WithEnvironment("PORT", "3002")
-    .WithEndpoint("http", e =>
-    {
-        e.Port = 3002;
-        e.IsProxied = false;
-    })
-    .WithExternalHttpEndpoints()
-    .PublishAsDockerFile()
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = ["3002:3002"];
-    });
+// Compose frontend apps once all API endpoints are known.
+var web = WebComposition.AddWebApps(builder, identityApi, catalogApi, customersApi, salesApi);
 
-ConfigureApiJwtSettings(catalogApi);
-ConfigureApiJwtSettings(customersApi);
-ConfigureApiJwtSettings(identityApi);
-ConfigureApiJwtSettings(salesApi);
+// Apply cross-cutting API wiring (docs + auth/cors environment) in one place.
+if (builder.Environment.IsDevelopment())
+    ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
 
-ConfigureApiCorsOrigins(catalogApi);
-ConfigureApiCorsOrigins(customersApi);
-ConfigureApiCorsOrigins(identityApi);
-ConfigureApiCorsOrigins(salesApi);
+ApiEnvironmentComposition.ConfigureApiEnvironment(
+    apisByServiceName.Values,
+    identityApi.GetEndpoint("http"),
+    web,
+    jwtSigningKey);
 
-// Run the application
 builder.Build().Run();
 
-return;
-
-void ConfigureApiCorsOrigins(IResourceBuilder<ProjectResource> resource)
+static void ConfigureDashboard(IDistributedApplicationBuilder builder)
 {
-    resource
-        .WithEnvironment("Cors__AllowedOrigins__0", storefront.GetEndpoint("http"))
-        .WithEnvironment("Cors__AllowedOrigins__1", dashboard.GetEndpoint("http"));
+    builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options =>
+    {
+        options.WithHostPort(18888);
+        options.WithContainerName("aspire-dashboard");
+    }).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
 }
 
-void ConfigureApiJwtSettings(IResourceBuilder<ProjectResource> resource)
+static string ToApiResourceName(ApiDefinition apiDefinition)
 {
-    resource
-        .WithEnvironment("Jwt__Key", jwtSigningKey)
-        .WithEnvironment("Jwt__Issuer", identityApi.GetEndpoint("http"))
-        .WithEnvironment("Jwt__Audience", identityApi.GetEndpoint("http"));
+    return $"{apiDefinition.ServiceName}-api";
+}
+
+static IResourceBuilder<ProjectResource> ConfigureApiResource(
+    IResourceBuilder<ProjectResource> resourceBuilder,
+    int hostPort)
+{
+    return resourceBuilder
+        .WithExternalHttpEndpoints()
+        .PublishAsDockerComposeService((_, service) =>
+        {
+            service.Restart = "unless-stopped";
+            service.Ports = [$"{hostPort}:8080"];
+        });
 }

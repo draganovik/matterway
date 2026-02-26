@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Bootstraps;
 
 public enum EndpointKind
 {

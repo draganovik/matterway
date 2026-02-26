@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace Matterway.ServiceDefaults.Versioning;
+namespace Matterway.ServiceDefaults;
 
 public static class ApiVersioningConventions
 {

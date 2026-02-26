@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Bootstraps;
 
-public sealed record ApiBootstrapFeatureOptions
+public sealed record BuilderBootstrapOptions
 {
     public string? ContentRootPath { get; init; }
     public string EnvironmentSettingsFilePattern { get; init; } = "Properties/appsettings.{0}.json";
@@ -71,7 +71,8 @@ public sealed record ApiAuthenticationFeatureOptions
 
 public sealed record ApiFeatureDiscoveryOptions
 {
-    public IReadOnlyCollection<Assembly>? Assemblies { get; init; }
+    public bool IncludeEntryAssembly { get; init; } = true;
+    public IReadOnlyCollection<Assembly>? AdditionalAssemblies { get; init; }
 }
 
 public sealed record ApiEndpointRoutingFeatureOptions
@@ -85,13 +86,11 @@ public sealed record ApiEndpointRoutingFeatureOptions
 
 public sealed record ApiOpenApiRouteOptions
 {
-    public string OpenApiRoutePattern { get; init; } = "/openapi/{documentName}.yaml";
+    public string OpenApiRoutePattern { get; init; } = ApiDocumentationDefaults.OpenApiRoutePattern;
 }
 
-public sealed record ApiScalarFeatureOptions
+public static class ApiDocumentationDefaults
 {
-    public required IReadOnlyCollection<ApiVersion> SupportedApiVersions { get; init; }
-    public required string Title { get; init; }
-    public string RoutePrefix { get; init; } = "/";
-    public string OpenApiRoutePattern { get; init; } = "/openapi/{documentName}.yaml";
+    public const string DefaultDocumentName = "v1";
+    public const string OpenApiRoutePattern = "/openapi/{documentName}.yaml";
 }

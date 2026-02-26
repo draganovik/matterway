@@ -13,7 +13,6 @@ const form = defineModel<CustomerForm>({ required: true })
 withDefaults(
   defineProps<{
     customer?: CustomerResponse | null
-    loading?: boolean
     error?: string
     canEdit?: boolean
     saveLoading?: boolean
@@ -25,7 +24,6 @@ withDefaults(
   }>(),
   {
     customer: null,
-    loading: false,
     error: "",
     canEdit: false,
     saveLoading: false,
@@ -57,11 +55,7 @@ const emit = defineEmits<{
       </p>
     </div>
 
-    <StatusMessages
-      v-if="loading || error"
-      :loading="loading ? 'Loading customer.' : false"
-      :error="error"
-    />
+    <StatusMessages v-if="error" :error="error" />
 
     <EntitiesEmptyState
       v-else-if="!customer"

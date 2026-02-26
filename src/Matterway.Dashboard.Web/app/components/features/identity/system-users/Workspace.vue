@@ -325,6 +325,7 @@ onMounted(() => {
       class="min-h-0 flex-1"
       list-class="overflow-y-auto"
       detail-class="overflow-y-auto"
+      :detail-loading="detailState.loading"
     >
       <template #list>
         <EntitiesListPanel
@@ -361,7 +362,6 @@ onMounted(() => {
         <IdentitySystemUsersPanelInformationView
           v-model="form"
           :system-user="selectedSystemUser"
-          :loading="detailState.loading"
           :error="detailState.error"
           :can-operate="canOperate"
           :can-manage="canManage"

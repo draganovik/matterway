@@ -1,6 +1,4 @@
-using Asp.Versioning;
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Admin.CatalogArchive;
 

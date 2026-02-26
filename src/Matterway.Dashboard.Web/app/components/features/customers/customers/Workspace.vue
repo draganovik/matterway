@@ -365,6 +365,7 @@ onMounted(() => {
       class="min-h-0 flex-1"
       list-class="overflow-y-auto"
       detail-class="overflow-y-auto"
+      :detail-loading="detailState.loading"
     >
       <template #list>
         <EntitiesListPanel
@@ -401,7 +402,6 @@ onMounted(() => {
         <CustomersCustomersPanelInformationView
           v-model="form"
           :customer="selectedCustomer"
-          :loading="detailState.loading"
           :error="detailState.error"
           :can-edit="canEdit"
           :save-loading="saveState.loading"

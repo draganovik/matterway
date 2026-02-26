@@ -67,7 +67,7 @@ export function useApiClient() {
         error: "API putanja mora imati resurs nakon prvog segmenta.",
       }
     }
-    const url = `${baseUrl}/api/${endpointKind}/v1.0/${resourcePath.join("/")}`
+    const url = `${baseUrl}/api/${endpointKind}/v1/${resourcePath.join("/")}`
     const headers = new Headers(options.headers || {})
     if (!headers.has("Accept")) headers.set("Accept", "application/json")
     if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {

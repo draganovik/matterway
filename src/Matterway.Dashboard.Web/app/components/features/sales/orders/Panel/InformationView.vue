@@ -10,13 +10,11 @@ import {
 const props = withDefaults(
   defineProps<{
     order?: OrderResponse | null
-    loading?: boolean
     error?: string
     canManageStatuses?: boolean
   }>(),
   {
     order: null,
-    loading: false,
     error: "",
     canManageStatuses: false,
   },
@@ -60,11 +58,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
       </p>
     </div>
 
-    <StatusMessages
-      v-if="loading || error"
-      :loading="loading ? 'Loading order.' : false"
-      :error="error"
-    />
+    <StatusMessages v-if="error" :error="error" />
 
     <EntitiesEmptyState
       v-else-if="!order"

@@ -1,10 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Catalog.Api.Features.Admin.ArticleImages;
 
