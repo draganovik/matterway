@@ -1,29 +1,30 @@
 using System.Text;
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Versioning;
+using Matterway.ServiceDefaults.Authorization;
+using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Extensions;
 
-public static partial class ApiTemplate
+public static class BuilderExtensions
 {
     extension(IHostApplicationBuilder builder)
     {
         public IHostApplicationBuilder ConfigureApiFoundation(
-            ApiContract apiContract,
+            ApiDefinition apiDefinition,
             ApiProblemDetailsFeatureOptions? problemDetailsOptions = null,
             ApiCorsFeatureOptions? corsOptions = null)
         {
-            ArgumentNullException.ThrowIfNull(apiContract);
+            ArgumentNullException.ThrowIfNull(apiDefinition);
 
             return builder.ConfigureApiFoundation(
-                apiContract.ServiceName,
-                apiContract.SupportedApiVersions,
+                apiDefinition.ServiceName,
+                apiDefinition.SupportedApiVersions,
                 problemDetailsOptions,
                 corsOptions);
         }
@@ -54,9 +55,15 @@ public static partial class ApiTemplate
                 .ConfigureCors(corsOptions ?? new ApiCorsFeatureOptions());
         }
 
-        public IHostApplicationBuilder ConfigureAuthentication(ApiAuthenticationFeatureOptions? options = null)
+        public IHostApplicationBuilder ConfigureAuthentication()
         {
-            options ??= new ApiAuthenticationFeatureOptions();
+            return builder.ConfigureAuthentication(new ApiAuthenticationFeatureOptions());
+        }
+
+        public IHostApplicationBuilder ConfigureAuthentication(ApiAuthenticationFeatureOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(options);
+
             options.ConfigureServices?.Invoke(builder);
 
             builder.Services.AddAuthentication(authenticationOptions =>
@@ -96,7 +103,10 @@ public static partial class ApiTemplate
 
         public IHostApplicationBuilder ConfigureRequestIdentity(RequestIdentityOptions options)
         {
-            RequestIdentity.Configure(options);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentException.ThrowIfNullOrWhiteSpace(options.ServiceName);
+
+            builder.Services.AddSingleton<IOptions<RequestIdentityOptions>>(_ => Options.Create(options));
             return builder;
         }
 
@@ -147,7 +157,7 @@ public static partial class ApiTemplate
                 problemDetailsOptions.CustomizeProblemDetails = context =>
                 {
                     if (options.EnableBadHttpRequestCustomization)
-                        ApplyBadRequestProblemDetails(context);
+                        context.ApplyBadRequestProblemDetails();
 
                     options.CustomizeProblemDetails?.Invoke(context);
                 };
@@ -193,36 +203,6 @@ public static partial class ApiTemplate
                         ApiVersioningConventions.AddBearerSecurity(openApiOptions);
                 });
             }
-
-            return builder;
-        }
-
-        public IHostApplicationBuilder ConfigureFeatures(ApiFeatureDiscoveryOptions? options = null)
-        {
-            var featureOptions = options ?? new ApiFeatureDiscoveryOptions();
-            var uniqueTypes = new HashSet<Type>();
-            var assemblies = featureOptions.Assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
-
-            var serviceDescriptors = assemblies
-                .SelectMany(assembly =>
-                {
-                    try
-                    {
-                        return assembly.DefinedTypes;
-                    }
-                    catch
-                    {
-                        return [];
-                    }
-                })
-                .Where(type =>
-                    type is { IsAbstract: false, IsInterface: false } &&
-                    type.IsAssignableTo(typeof(IEndpoint)) &&
-                    uniqueTypes.Add(type.AsType()))
-                .Select(type => ServiceDescriptor.Transient(typeof(IEndpoint), type.AsType()))
-                .ToArray();
-
-            builder.Services.TryAddEnumerable(serviceDescriptors);
 
             return builder;
         }

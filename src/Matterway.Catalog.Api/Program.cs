@@ -1,19 +1,21 @@
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
+using Matterway.ServiceDefaults;
+using Matterway.ServiceDefaults.Extensions;
 
-var apiContract = ApiContracts.Catalog;
+var apiContract = ApiDirectory.Catalog;
 
-var builder = ApiTemplate.CreateApiBuilder(args);
+var builder = BuilderBootstrap.CreateBuilder(args);
 
 builder.Services.AddScoped<ICatalogArchiveService, CatalogArchiveService>();
 
 builder
     .ConfigureApiFoundation(apiContract)
-    .ConfigureAuthentication(new ApiAuthenticationFeatureOptions())
+    .ConfigureAuthentication()
     .ConfigureImageStorage()
     .ConfigurePersistence()
-    .ConfigureFeatures(new ApiFeatureDiscoveryOptions());
+    .ConfigureFeatures();
 
 var app = builder.Build();
 

@@ -1,7 +1,5 @@
-using Asp.Versioning;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Admin.Articles;
 

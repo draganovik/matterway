@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Identity.Api.Features.Public.Auth;
 

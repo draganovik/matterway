@@ -1,10 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Asp.Versioning;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace Matterway.Identity.Api.Features.Admin.SystemUsers;

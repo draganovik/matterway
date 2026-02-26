@@ -1,7 +1,5 @@
-using Asp.Versioning;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Sales.Api.Features.Self.Orders;
 

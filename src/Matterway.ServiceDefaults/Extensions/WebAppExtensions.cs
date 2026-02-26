@@ -1,13 +1,15 @@
 using Asp.Versioning;
-using Matterway.ServiceDefaults.Versioning;
+using Matterway.ServiceDefaults.Authorization;
+using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Extensions;
 
-public static partial class ApiTemplate
+public static class WebAppExtensions
 {
     extension(WebApplication app)
     {
@@ -16,6 +18,12 @@ public static partial class ApiTemplate
             app.UseExceptionHandler();
             app.MapDefaultEndpoints();
             app.UseStatusCodePages();
+            app.Use(async (httpContext, next) =>
+            {
+                var options = httpContext.RequestServices.GetRequiredService<IOptions<RequestIdentityOptions>>().Value;
+                using var _ = RequestIdentity.PushOptions(options);
+                await next();
+            });
             app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -41,13 +49,13 @@ public static partial class ApiTemplate
         }
 
         public WebApplication ApplyApiContract(
-            ApiContract apiContract,
+            ApiDefinition apiDefinition,
             ApiOpenApiRouteOptions? openApiRouteOptions = null)
         {
-            ArgumentNullException.ThrowIfNull(apiContract);
+            ArgumentNullException.ThrowIfNull(apiDefinition);
 
             app.ApplyDevelopmentApiDocs(openApiRouteOptions);
-            app.ApplyEndpoints(apiContract);
+            app.ApplyEndpoints(apiDefinition);
 
             return app;
         }
@@ -99,10 +107,10 @@ public static partial class ApiTemplate
             });
         }
 
-        public WebApplication ApplyEndpoints(ApiContract apiContract)
+        public WebApplication ApplyEndpoints(ApiDefinition apiDefinition)
         {
-            ArgumentNullException.ThrowIfNull(apiContract);
-            return app.ApplyEndpoints(apiContract.SupportedApiVersions);
+            ArgumentNullException.ThrowIfNull(apiDefinition);
+            return app.ApplyEndpoints(apiDefinition.SupportedApiVersions);
         }
     }
 }

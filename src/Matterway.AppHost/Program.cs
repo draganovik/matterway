@@ -1,5 +1,5 @@
 using Matterway.AppHost.Composition;
-using Matterway.ServiceDefaults.Api;
+using Matterway.ServiceDefaults;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -45,14 +45,14 @@ var minio = builder.AddContainer("minio", "minio/minio:latest")
 
 // Register APIs in dependency order so references are explicit and startup waits are correct.
 var identityApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Identity_Api>(ToApiResourceName(ApiContracts.Identity))
+    builder.AddProject<Matterway_Identity_Api>(ToApiResourceName(ApiDirectory.Identity))
         .WithReference(identityDb),
-    hostPort: 2003);
+    2003);
 
 var catalogApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Catalog_Api>(ToApiResourceName(ApiContracts.Catalog))
+    builder.AddProject<Matterway_Catalog_Api>(ToApiResourceName(ApiDirectory.Catalog))
         .WithReference(catalogDb),
-    hostPort: 2001);
+    2001);
 
 catalogApi
     .WaitFor(minio)
@@ -65,24 +65,24 @@ catalogApi
     .WithEnvironment("ImageStorage__AllowPublicRead", "true");
 
 var customersApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Customers_Api>(ToApiResourceName(ApiContracts.Customers))
+    builder.AddProject<Matterway_Customers_Api>(ToApiResourceName(ApiDirectory.Customers))
         .WithReference(customersDb)
         .WithReference(identityApi.GetEndpoint("http"))
         .WithReference(catalogApi.GetEndpoint("http")),
-    hostPort: 2002);
+    2002);
 
 var salesApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Sales_Api>(ToApiResourceName(ApiContracts.Sales))
+    builder.AddProject<Matterway_Sales_Api>(ToApiResourceName(ApiDirectory.Sales))
         .WithReference(salesDb)
         .WithReference(customersApi.GetEndpoint("http")),
-    hostPort: 2005);
+    2005);
 
 var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
 {
-    [ApiContracts.Identity.ServiceName] = identityApi,
-    [ApiContracts.Catalog.ServiceName] = catalogApi,
-    [ApiContracts.Customers.ServiceName] = customersApi,
-    [ApiContracts.Sales.ServiceName] = salesApi
+    [ApiDirectory.Identity.ServiceName] = identityApi,
+    [ApiDirectory.Catalog.ServiceName] = catalogApi,
+    [ApiDirectory.Customers.ServiceName] = customersApi,
+    [ApiDirectory.Sales.ServiceName] = salesApi
 };
 
 // Compose frontend apps once all API endpoints are known.
@@ -107,9 +107,9 @@ static void ConfigureDashboard(IDistributedApplicationBuilder builder)
     }).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
 }
 
-static string ToApiResourceName(ApiContract apiContract)
+static string ToApiResourceName(ApiDefinition apiDefinition)
 {
-    return $"{apiContract.ServiceName}-api";
+    return $"{apiDefinition.ServiceName}-api";
 }
 
 static IResourceBuilder<ProjectResource> ConfigureApiResource(

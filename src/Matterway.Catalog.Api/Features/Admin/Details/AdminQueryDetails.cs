@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Asp.Versioning;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Catalog.Api.Features.Admin.Details;
 

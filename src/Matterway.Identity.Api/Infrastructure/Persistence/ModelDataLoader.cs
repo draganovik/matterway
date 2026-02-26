@@ -1,6 +1,5 @@
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
-using Matterway.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

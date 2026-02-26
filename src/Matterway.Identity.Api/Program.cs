@@ -3,14 +3,16 @@ using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Configurations;
 using Matterway.Identity.Api.Infrastructure.Persistence;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
+using Matterway.ServiceDefaults;
+using Matterway.ServiceDefaults.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 
-var apiContract = ApiContracts.Identity;
+var apiContract = ApiDirectory.Identity;
 
-var builder = ApiTemplate.CreateApiBuilder(
+var builder = BuilderBootstrap.CreateBuilder(
     args,
-    new ApiBootstrapFeatureOptions
+    new BuilderBootstrapOptions
     {
         ThrowOnBadRequest = false
     });
@@ -28,7 +30,7 @@ builder
     .ConfigureAuthentication(CreateAuthenticationOptions(jwtConfigurationSection, jwtOptions))
     .ConfigureIdentity()
     .ConfigurePersistence()
-    .ConfigureFeatures(new ApiFeatureDiscoveryOptions());
+    .ConfigureFeatures();
 
 var app = builder.Build();
 

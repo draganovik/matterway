@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using Asp.Versioning;
 using Matterway.Customers.Api.Domain.Entities;
 using Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerArticleEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Matterway.Customers.Api.Features.Self.CartItems;
 

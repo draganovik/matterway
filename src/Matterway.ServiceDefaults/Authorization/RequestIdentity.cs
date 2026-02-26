@@ -1,8 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Matterway.ServiceDefaults.Authorization;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Authorization;
 
 public sealed record RequestIdentityOptions
 {
@@ -13,14 +12,14 @@ public sealed record RequestIdentityOptions
 
 public static class RequestIdentity
 {
-    private static RequestIdentityOptions? _configuredOptions;
+    private static readonly AsyncLocal<RequestIdentityOptions?> CurrentOptions = new();
 
-    public static void Configure(RequestIdentityOptions options)
+    internal static IDisposable PushOptions(RequestIdentityOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ServiceName);
 
-        _configuredOptions = options;
+        return new RequestIdentityOptionsScope(options);
     }
 
     public static Guid? GetIdentifier(ClaimsPrincipal? principal)
@@ -73,9 +72,9 @@ public static class RequestIdentity
 
     private static RequestIdentityOptions GetOptions()
     {
-        return _configuredOptions
+        return CurrentOptions.Value
                ?? throw new InvalidOperationException(
-                   "RequestIdentity is not configured. Call RequestIdentity.Configure(...) during startup.");
+                   "RequestIdentity options are unavailable for this request. Ensure UseApiFoundation() is configured.");
     }
 
     private static string? GetSubjectValue(ClaimsPrincipal principal)
@@ -84,5 +83,21 @@ public static class RequestIdentity
         if (!string.IsNullOrWhiteSpace(subject)) return subject;
 
         return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
+    }
+
+    private sealed class RequestIdentityOptionsScope : IDisposable
+    {
+        private readonly RequestIdentityOptions? _previous;
+
+        public RequestIdentityOptionsScope(RequestIdentityOptions current)
+        {
+            _previous = CurrentOptions.Value;
+            CurrentOptions.Value = current;
+        }
+
+        public void Dispose()
+        {
+            CurrentOptions.Value = _previous;
+        }
     }
 }

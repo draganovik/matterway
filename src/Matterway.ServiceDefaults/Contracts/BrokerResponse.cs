@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Contracts;
 
 public sealed record BrokerResponse<T>(
     bool IsSuccess,

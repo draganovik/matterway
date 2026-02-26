@@ -1,8 +1,6 @@
-using Asp.Versioning;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Features.System.Payments;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Matterway.Sales.Api.Features.Admin.Payments;
 

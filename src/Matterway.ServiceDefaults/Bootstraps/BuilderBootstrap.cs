@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Bootstraps;
 
-public static partial class ApiTemplate
+public static class BuilderBootstrap
 {
-    public static WebApplicationBuilder CreateApiBuilder(
+    public static WebApplicationBuilder CreateBuilder(
         string[] args,
-        ApiBootstrapFeatureOptions? options = null)
+        BuilderBootstrapOptions? options = null)
     {
-        options ??= new ApiBootstrapFeatureOptions();
+        options ??= new BuilderBootstrapOptions();
         var contentRootPath = options.ContentRootPath ?? Directory.GetCurrentDirectory();
 
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions

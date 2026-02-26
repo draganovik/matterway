@@ -1,16 +1,18 @@
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 using Matterway.Sales.Api.Infrastructure.Persistence;
+using Matterway.ServiceDefaults;
+using Matterway.ServiceDefaults.Extensions;
 
-var apiContract = ApiContracts.Sales;
+var apiContract = ApiDirectory.Sales;
 
-var builder = ApiTemplate.CreateApiBuilder(args);
+var builder = BuilderBootstrap.CreateBuilder(args);
 
 builder
     .ConfigureApiFoundation(apiContract)
-    .ConfigureAuthentication(new ApiAuthenticationFeatureOptions())
+    .ConfigureAuthentication()
     .ConfigureCustomersIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures(new ApiFeatureDiscoveryOptions());
+    .ConfigureFeatures();
 
 var app = builder.Build();
 

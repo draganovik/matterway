@@ -1,5 +1,5 @@
-using Matterway.ServiceDefaults.Api;
-using Matterway.ServiceDefaults.Versioning;
+using Matterway.ServiceDefaults;
+using Matterway.ServiceDefaults.Bootstraps;
 using Scalar.Aspire;
 
 namespace Matterway.AppHost.Composition;
@@ -12,7 +12,7 @@ internal static class ScalarComposition
     {
         var scalarApiReference = builder.AddScalarApiReference();
 
-        foreach (var apiContract in ApiContracts.All)
+        foreach (var apiContract in ApiDirectory.All)
         {
             var resource = apisByServiceName[apiContract.ServiceName];
 
@@ -26,9 +26,9 @@ internal static class ScalarComposition
         }
     }
 
-    private static IEnumerable<string> GetDocumentNames(ApiContract apiContract)
+    private static IEnumerable<string> GetDocumentNames(ApiDefinition apiDefinition)
     {
-        return ApiVersioningConventions.NormalizeSupportedVersions(apiContract.SupportedApiVersions)
+        return ApiVersioningConventions.NormalizeSupportedVersions(apiDefinition.SupportedApiVersions)
             .Select(ApiVersioningConventions.ToDocumentName);
     }
 }

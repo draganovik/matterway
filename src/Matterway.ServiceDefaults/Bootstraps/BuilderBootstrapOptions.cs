@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Matterway.ServiceDefaults.Api;
+namespace Matterway.ServiceDefaults.Bootstraps;
 
-public sealed record ApiBootstrapFeatureOptions
+public sealed record BuilderBootstrapOptions
 {
     public string? ContentRootPath { get; init; }
     public string EnvironmentSettingsFilePattern { get; init; } = "Properties/appsettings.{0}.json";
@@ -71,7 +71,8 @@ public sealed record ApiAuthenticationFeatureOptions
 
 public sealed record ApiFeatureDiscoveryOptions
 {
-    public IReadOnlyCollection<Assembly>? Assemblies { get; init; }
+    public bool IncludeEntryAssembly { get; init; } = true;
+    public IReadOnlyCollection<Assembly>? AdditionalAssemblies { get; init; }
 }
 
 public sealed record ApiEndpointRoutingFeatureOptions
