@@ -57,6 +57,9 @@ public class SelfQueryCartItems : IEndpoint
         public string? ArticleName { get; init; }
 
         [Required]
+        public string? ArticleCode { get; init; }
+
+        [Required]
         public Guid ArticleId { get; init; }
 
         [Required]
@@ -75,6 +78,7 @@ public class SelfQueryCartItems : IEndpoint
             CustomerId = entity.CustomerId,
             ArticleId = entity.ArticleId,
             ArticleName = entity.ArticleName,
+            ArticleCode = entity.ArticleCode ?? string.Empty,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

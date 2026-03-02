@@ -9,6 +9,7 @@ public interface ICatalogClient
 public record CatalogClientGetArticleByIdResponse
 {
     public Guid Id { get; init; }
+    public string? Code { get; init; }
     public string? Title { get; init; }
     public decimal? BasePrice { get; init; }
     public decimal? Price { get; init; }

@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Customers.Api.Migrations
 {
     [DbContext(typeof(CustomersDbComposer))]
-    [Migration("20260124135849_Initialize")]
-    partial class Initialize
+    [Migration("20260302202459_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -89,7 +89,7 @@ namespace Matterway.Customers.Api.Migrations
                             AddressLine1 = "Kralja Milana",
                             AddressLine2 = "34/10",
                             City = "Beograd",
-                            ContactPhone = "++381676543210",
+                            ContactPhone = "+381676543210",
                             Country = "Serbia",
                             CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                             ZipCode = "11000"
@@ -146,6 +146,10 @@ namespace Matterway.Customers.Api.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ArticleCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uuid");

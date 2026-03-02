@@ -6,6 +6,7 @@ public class CustomerArticle
     public int Quantity { get; set; }
     public decimal? UnitPrice { get; set; }
     public string? ArticleName { get; set; }
+    public string? ArticleCode { get; set; }
 
     public Guid ArticleId { get; set; }
     public Guid CustomerId { get; set; }
