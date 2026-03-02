@@ -39,6 +39,15 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
+      label: "Moj profil",
+      icon: "i-lucide-user-cog",
+      onSelect: async () => {
+        await navigateTo("/profile")
+      },
+    },
+  ],
+  [
+    {
       label: "Odjavi se",
       icon: "i-lucide-log-out",
       onSelect: async () => {

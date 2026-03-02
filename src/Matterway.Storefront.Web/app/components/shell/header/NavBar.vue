@@ -220,6 +220,17 @@ watch(
 
         <template v-else-if="auth.isCustomer.value">
           <UButton
+            to="/profile"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-user-cog"
+            block
+            @click="mobileMenuOpen = false"
+          >
+            Moj profil
+          </UButton>
+
+          <UButton
             to="/orders"
             color="neutral"
             variant="ghost"

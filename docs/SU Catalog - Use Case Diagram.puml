@@ -9,7 +9,7 @@ actor empl as "Employee"
 
 user --|> empl
 
-package "Catalog API" {
+package "Catalog" {
   usecase viewDetailedArticles as "View Detailed Articles"
   usecase viewDiscounts as "View Discounts"
   usecase queryArticles as "Query Articles
