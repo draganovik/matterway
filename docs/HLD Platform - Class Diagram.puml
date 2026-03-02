@@ -1,0 +1,267 @@
+@startuml HLD: Platform - Class Diagram
+skinparam classAttributeIconSize 10
+hide circle
+
+package "Identity" {
+  enum EIdentityRole {
+    Customer
+    Employee
+  }
+
+  enum PermissionLevel {
+    Observer
+    Operator
+    Manager
+  }
+
+  class SystemUser {
+    +id: UUID
+    --
+    +userName: String
+    +email: String
+    +passwordHash: String
+    +securityStamp: String
+    +created: DateTime
+  }
+
+  class IdentityRole {
+    +id: UUID
+    --
+    +name: String
+    +normalizedName: String
+  }
+
+  class IdentityUserRole {
+    +userId: UUID
+    +roleId: UUID
+  }
+
+  class IdentityUserClaim {
+    +id: Numeric
+    --
+    +userId: UUID
+    ..
+    +claimType: String
+    +claimValue: String
+  }
+
+  note left of IdentityUserClaim
+    Permission claims use:
+    claimType = "perm"
+    claimValue = "<service>:<level>"
+    where level in PermissionLevel
+    one claim per service for employees
+    missing service claim resolves to Observer
+  end note
+
+  SystemUser "1" -- "0..*" IdentityUserClaim
+  SystemUser "1" -- "0..*" IdentityUserRole
+  IdentityUserRole "0..*" -- "1" IdentityRole
+}
+
+package "Catalog" {
+  class Discount {
+    +code: String
+    --
+    +articleId: UUID
+    ..
+    +percentage: Numeric
+    +validFrom: DateTime
+    +validTo: DateTime?
+  }
+
+  class Article {
+    +id: UUID
+    --
+    +articleCode: String
+    +title: String
+    +description: String
+    +basePrice: Money
+    +isAvailable: Boolean
+    +createdAt: DateTime
+    +updatedAt: DateTime
+  }
+
+  class ArticleDetailText {
+    +articleId: UUID
+    +detailSlug: String
+    --
+    +value: String
+  }
+
+  class ArticleDetailNumeric {
+    +articleId: UUID
+    +detailSlug: String
+    --
+    +value: Numeric
+  }
+
+  class Detail {
+    +slug: String
+    --
+    +title: String
+    +unit: String?
+  }
+
+  class ArticleImage {
+    +id: UUID
+    --
+    +articleId: UUID
+    ..
+    +orderIndex: Numeric
+    +imageUrl: String
+    +imageAlt: String?
+  }
+
+  Discount "0..*" -- "1" Article : articleId
+  ArticleDetailText "0..*" -- "1" Article : articleId
+  ArticleDetailText "0..*" -- "1" Detail : detailSlug
+  ArticleDetailNumeric "0..*" -- "1" Article : articleId
+  ArticleDetailNumeric "0..*" -- "1" Detail : detailSlug
+  ArticleImage "0..*" -- "1" Article : articleId
+}
+
+package "Customers" {
+  class Address {
+    +id: UUID
+    --
+    +customerId: UUID
+    ..
+    +country: String
+    +city: String
+    +zipCode: String
+    +addressLine1: String
+    +addressLine2: String
+    +contactPhone: String
+  }
+
+  class Customer {
+    +id: UUID
+    --
+    +firstName: String
+    +lastName: String
+    +birthDate: DateOnly
+    +defaultAddressId: UUID?
+  }
+
+  class CustomerArticle {
+    +id: UUID
+    +articleId: UUID
+    --
+    +customerId: UUID
+    +orderId: UUID?
+    +articleName: String?
+    +unitPrice: Money?
+    +quantity: Numeric
+  }
+
+  class CustomerOrder {
+    +orderId: UUID
+    --
+    +customerId: UUID
+    ..
+    +placedAt: DateTime
+  }
+
+  CustomerOrder "0..*" -- "1" Customer : customerId
+  Customer "1" -- "0..1" Address : customerId
+  CustomerArticle "0..*" -- "1" Customer : customerId
+  CustomerArticle "0..*" -- "0..1" CustomerOrder : orderId
+}
+
+package "Sales" {
+
+  class OrderDeliveryInfo {
+    +id: UUID
+    --
+    +orderId: UUID
+    ..
+    +country: String
+    +city: String
+    +zipCode: String
+    +addressLine1: String
+    +addressLine2: String
+    +contactPhone: String
+  }
+  class Order {
+    +id: UUID
+    --
+    +customerId: UUID?
+    ..
+    +placedAt: DateTime
+    +type: EOrderType
+  }
+
+  class OrderItem {
+    +id: UUID
+    --
+    +orderId: UUID
+    ..
+    +articleId: UUID
+    +articleTitle: String
+    +unitPrice: Money
+    +quantity: Numeric
+  }
+
+  note left of Order
+    Current checkout flow
+    1) Storefront -> Sales: create order
+    2) Sales -> Customers: create CustomerOrder from cart
+    3) Sales persists Order + Processing status
+    4) Storefront charges via Stripe
+    5) Stripe webhook -> Sales system/payment registration
+  end note
+
+  enum EOrderType {
+    Retail
+    Ecommerce
+  }
+
+  enum EOrderStatusType {
+    Processing
+    Reserved
+    Delivery
+    Completed
+    Cancelled
+  }
+
+  class OrderStatus {
+    +id: Numeric
+    --
+    +orderId: UUID
+    ..
+    +changedAt: DateTime
+    +status: EOrderStatusType
+    +note: String?
+  }
+
+  class Payment {
+    +id: UUID
+    --
+    +orderId: UUID
+    ..
+    +provider: String
+    +referenceId: String
+    +amount: Money
+    +status: EPaymentStatus
+    +createdAt: DateTime
+  }
+
+  enum EPaymentStatus {
+    Reserved
+    Charged
+    Failed
+    Refunded
+  }
+
+  OrderItem "0..*" -- "1" Order : orderId
+  OrderStatus "0..*" -- "1" Order : orderId
+  OrderDeliveryInfo "0..1" -- "1" Order : orderId
+  Payment "0..*" -- "1" Order : orderId
+}
+
+SystemUser "1" .left. "0..1" Customer
+
+CustomerArticle "0..*" .up. "1" Article
+CustomerOrder "0..1" .right. "1" Order : shared orderId
+@enduml

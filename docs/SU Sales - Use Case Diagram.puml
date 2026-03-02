@@ -1,0 +1,38 @@
+@startuml SUSalesUseCaseDiagram
+title SU: Sales - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+actor user as "User"
+actor csmr as "Customer"
+actor empl as "Employee"
+
+user --|> csmr
+user --|> empl
+
+actor systm as "System"
+
+package "Sales" {
+  usecase placeOwnOrder as "Place Own Order"
+  usecase viewOwnOrders as "View Own Orders"
+
+  usecase viewOrders as "View Orders
+                         ..<i>extention points</i>..
+                         View Payments"
+  usecase viewPayments as "View Payments"
+  usecase updateOrderStatus as "Update Order Status"
+
+  usecase registerPayment as "Register Payment"
+
+  viewPayments .up.> viewOrders : <<extend>>
+}
+
+csmr --- placeOwnOrder
+csmr --- viewOwnOrders
+
+updateOrderStatus --- empl : perm:[operator,manager]
+viewOrders --- empl
+
+registerPayment --- systm
+@enduml

@@ -1,0 +1,44 @@
+@startuml SUCatalogUseCaseDiagram
+title SU: Catalog - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+actor user as "User"
+actor empl as "Employee"
+
+user --|> empl
+
+package "Catalog" {
+  usecase viewDetailedArticles as "View Detailed Articles"
+  usecase viewDiscounts as "View Discounts"
+  usecase queryArticles as "Query Articles
+                           ..<i>extention points</i>..
+                           Get Detailed Article"
+  queryArticles <.. viewDetailedArticles: <<extend>>
+  queryArticles ..> viewDiscounts: <<include>>
+
+  usecase manageArticles as "Manage Articles"
+  usecase manageArticleDetails as "Manage Article Details"
+  usecase manageArticleImages as "Manage Article Images"
+  usecase manageDiscounts as "Manage Discounts"
+  manageArticleDetails <.. manageArticles : <<include>>
+  manageArticleImages <.. manageArticles : <<include>>
+
+  usecase viewDetails as "View Details"
+  usecase manageDetails as "Manage Details"
+  viewDetails <.. manageDetails : <<include>>
+
+  usecase importCatalogArchive as "Import Catalog Archive"
+  usecase exportCatalogArchive as "Export Catalog Archive"
+}
+
+user --- queryArticles
+user --- viewDetails
+
+manageArticles -- empl : perm:[operator,manager]
+manageDiscounts -- empl : perm:[operator,manager]
+manageDetails -- empl : perm:[operator,manager]
+importCatalogArchive -- empl : perm:[manager]
+exportCatalogArchive -- empl : perm:[manager]
+@enduml

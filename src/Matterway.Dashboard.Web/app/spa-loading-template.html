@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matterway Dashboard</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #f5f5f4 0%,
+          #fafaf9 55%,
+          #e7e5e4 100%
+        );
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      .spinner {
+        width: 44px;
+        height: 44px;
+        display: block;
+      }
+      .spinner circle {
+        stroke: #f55d3e;
+        stroke-width: 3;
+        stroke-linecap: round;
+        fill: none;
+        stroke-dasharray: 140;
+        stroke-dashoffset: 110;
+        transform-origin: 50% 50%;
+        animation: spin 1s linear infinite;
+        will-change: transform;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(
+            135deg,
+            #0c0a09 0%,
+            #1c1917 55%,
+            #0c0a09 100%
+          );
+        }
+        .spinner circle {
+          stroke: #fb7a5a;
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="spinner" viewBox="0 0 44 44" aria-label="Loading" role="img">
+      <circle cx="22" cy="22" r="19" />
+    </svg>
+  </body>
+</html>

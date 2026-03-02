@@ -1,0 +1,45 @@
+@startuml SUCustomersUseCaseDiagram
+title SU: Customers - Use Case Diagram
+left to right direction
+skinparam shadowing false
+skinparam actorStyle hollow
+
+rectangle #line:transparent {
+  actor user as "User"
+  actor csmr as "Customer"
+}
+rectangle #line:transparent {
+  actor empl as "Employee"
+  actor sysm as "System"
+  empl -[hidden]- sysm
+}
+
+user --|> csmr
+user --|> empl
+
+package "Customers" {
+  usecase createCustomer as "Create Customer"
+  usecase manageOwnProfile as "Manage Own Profile"
+  usecase manageOwnAddress as "Manage Own Address"
+  usecase manageOwnCartItems as "Manage Own Cart Items"
+
+  usecase syncOnOrder as "Sync On Order"
+  usecase verifyCustomer as "Verify Customer"
+
+  usecase manageCustomers as "Manage Customers
+                              ..<i>extention points</i>..
+                              Upsert Customer Address"
+  usecase manageCustomerAddress as "Manage Customer Address"
+  manageCustomerAddress .left.> manageCustomers : <<extend>>
+}
+
+user -- createCustomer
+csmr -- manageOwnProfile
+csmr -- manageOwnAddress
+csmr -- manageOwnCartItems
+
+syncOnOrder -- sysm
+verifyCustomer -- sysm
+
+manageCustomers -- empl : perm:[operator,manager]
+@enduml
