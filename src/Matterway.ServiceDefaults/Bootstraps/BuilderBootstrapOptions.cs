@@ -69,13 +69,13 @@ public sealed record ApiAuthenticationFeatureOptions
     public Action<JwtBearerOptions, IHostApplicationBuilder>? ConfigureJwtBearer { get; init; }
 }
 
-public sealed record ApiFeatureDiscoveryOptions
+public sealed record ApiEndpointDiscoveryOptions
 {
     public bool IncludeEntryAssembly { get; init; } = true;
     public IReadOnlyCollection<Assembly>? AdditionalAssemblies { get; init; }
 }
 
-public sealed record ApiEndpointRoutingFeatureOptions
+public sealed record ApiEndpointRoutingOptions
 {
     public required IReadOnlyCollection<ApiVersion> SupportedApiVersions { get; init; }
     public EndpointKind[] EndpointKinds { get; init; } = Enum.GetValues<EndpointKind>();

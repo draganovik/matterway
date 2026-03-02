@@ -14,7 +14,7 @@ builder
     .ConfigureCatalogIntegration()
     .ConfigureIdentityIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

@@ -12,7 +12,7 @@ builder
     .ConfigureAuthentication()
     .ConfigureCustomersIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

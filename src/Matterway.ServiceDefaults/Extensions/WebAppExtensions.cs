@@ -60,7 +60,7 @@ public static class WebAppExtensions
             return app;
         }
 
-        public WebApplication ApplyEndpoints(ApiEndpointRoutingFeatureOptions options)
+        public WebApplication ApplyEndpoints(ApiEndpointRoutingOptions options)
         {
             var versions = ApiVersioningConventions.NormalizeSupportedVersions(options.SupportedApiVersions);
             var versionSetBuilder = app.NewApiVersionSet()
@@ -101,7 +101,7 @@ public static class WebAppExtensions
 
         public WebApplication ApplyEndpoints(IReadOnlyCollection<ApiVersion> supportedApiVersions)
         {
-            return app.ApplyEndpoints(new ApiEndpointRoutingFeatureOptions
+            return app.ApplyEndpoints(new ApiEndpointRoutingOptions
             {
                 SupportedApiVersions = supportedApiVersions
             });

@@ -15,7 +15,7 @@ builder
     .ConfigureAuthentication()
     .ConfigureImageStorage()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

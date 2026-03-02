@@ -30,7 +30,7 @@ builder
     .ConfigureAuthentication(CreateAuthenticationOptions(jwtConfigurationSection, jwtOptions))
     .ConfigureIdentity()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 
