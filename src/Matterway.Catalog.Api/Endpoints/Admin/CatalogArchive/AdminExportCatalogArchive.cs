@@ -13,7 +13,7 @@ public class AdminExportCatalogArchive : IEndpoint
             .Produces(StatusCodes.Status200OK)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
-                    RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
+                    RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

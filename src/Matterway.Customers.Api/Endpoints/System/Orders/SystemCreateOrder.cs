@@ -4,36 +4,37 @@ using Matterway.Customers.Api.Infrastructure.Persistence.AddressEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerEntity;
 using Matterway.Customers.Api.Infrastructure.Persistence.CustomerOrderEntity;
 
-namespace Matterway.Customers.Api.Endpoints.Self.Orders;
+namespace Matterway.Customers.Api.Endpoints.System.Orders;
 
-public class SelfCreateOrder : IEndpoint
+public class SystemCreateOrder : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.Self, "orders", Handler)
-            .WithName("SelfCreateOrder").WithSummary("[self] Create own order from cart items.")
+        endpoints.MapPost(EndpointKind.System, "orders", Handler)
+            .WithName("SystemCreateOrder")
+            .WithSummary("[system] Create customer order from open cart items.")
             .WithTags(nameof(CustomerOrder))
             .Produces<CustomerOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<
-            Results<Created<CustomerOrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult>>
-        Handler(CreateCustomerOrderRequest request,
-            HttpContext httpContext,
-            LinkGenerator linkGenerator,
-            ICustomerRepository customerRepository,
-            IAddressRepository addressRepository,
-            ICustomerOrderRepository customerOrderRepository,
-            CancellationToken cancellationToken)
+    private static async Task<Results<Created<CustomerOrderResponse>, BadRequest<ProblemDetails>, NotFound>> Handler(
+        CreateCustomerOrderRequest request,
+        HttpContext httpContext,
+        ICustomerRepository customerRepository,
+        IAddressRepository addressRepository,
+        ICustomerOrderRepository customerOrderRepository,
+        CancellationToken cancellationToken)
     {
-        var customerId = RequestIdentity.GetIdentifier(httpContext.User);
-        if (customerId is null) return TypedResults.Forbid();
+        if (request.CustomerId == Guid.Empty)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Bad Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "CustomerId is required."
+            });
 
         if (request.OrderId == Guid.Empty)
             return TypedResults.BadRequest(new ProblemDetails
@@ -43,7 +44,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "OrderId is required."
             });
 
-        var customer = await customerRepository.GetBy(customerId.Value, cancellationToken);
+        var customer = await customerRepository.GetBy(request.CustomerId, cancellationToken);
         if (customer is null) return TypedResults.NotFound();
 
         var deliveryInfo = request.DeliveryInfo is null
@@ -66,7 +67,7 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Customer address is unavailable."
             });
 
-        var createdOrder = await customerOrderRepository.CreateFromCart(customerId.Value, request.OrderId,
+        var createdOrder = await customerOrderRepository.CreateFromCart(request.CustomerId, request.OrderId,
             cancellationToken);
         if (createdOrder is null)
             return TypedResults.BadRequest(new ProblemDetails
@@ -76,16 +77,15 @@ public class SelfCreateOrder : IEndpoint
                 Detail = "Unable to create order from cart items."
             });
 
-        var location = linkGenerator.GetUriByName(
-            httpContext,
-            "SelfQueryOrders",
-            null);
-
+        var location = $"{httpContext.Request.Path}/{createdOrder.OrderId}";
         return TypedResults.Created(location, MapToResponse(createdOrder, deliveryInfo));
     }
 
     public record CreateCustomerOrderRequest
     {
+        [Required]
+        public Guid CustomerId { get; init; }
+
         [Required]
         public Guid OrderId { get; init; }
 
@@ -140,7 +140,8 @@ public class SelfCreateOrder : IEndpoint
         public int Quantity { get; init; }
     }
 
-    private static async Task<DeliveryInfoResponse?> ResolveDeliveryInfo(Customer customer,
+    private static async Task<DeliveryInfoResponse?> ResolveDeliveryInfo(
+        Customer customer,
         IAddressRepository addressRepository,
         CancellationToken cancellationToken)
     {

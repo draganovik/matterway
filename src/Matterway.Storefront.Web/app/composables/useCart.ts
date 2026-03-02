@@ -22,6 +22,28 @@ function createCartItem(article: CatalogArticle): CartItem {
   }
 }
 
+function mapRemoteCartItem(item: {
+  articleId?: string
+  articleCode?: string
+  articleName?: string
+  unitPrice?: number
+  quantity?: number
+  imageUrl?: string
+  imageAlt?: string
+}): CartItem | null {
+  if (!item.articleId) return null
+
+  return {
+    articleId: String(item.articleId),
+    articleCode: item.articleCode ? String(item.articleCode) : "",
+    articleName: item.articleName ? String(item.articleName) : "",
+    unitPrice: normalizeNumber(item.unitPrice),
+    quantity: Math.max(1, normalizeNumber(item.quantity, 1)),
+    imageUrl: item.imageUrl ? String(item.imageUrl) : undefined,
+    imageAlt: item.imageAlt ? String(item.imageAlt) : undefined,
+  }
+}
+
 export function useCart() {
   const auth = useAuthSession()
   const customers = useCustomersApi()
@@ -155,6 +177,27 @@ export function useCart() {
     items.value = []
   }
 
+  async function refreshFromRemote() {
+    hydrate()
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
+      return { ok: true as const }
+    }
+
+    const remote = await customers.listSelfCartItems(1, 100)
+    if (remote.error) {
+      return {
+        ok: false as const,
+        error: remote.error,
+      }
+    }
+
+    items.value = remote.items
+      .map(mapRemoteCartItem)
+      .filter((item): item is CartItem => item !== null)
+
+    return { ok: true as const }
+  }
+
   const totalItems = computed(() =>
     items.value.reduce((sum, item) => sum + item.quantity, 0),
   )
@@ -182,6 +225,7 @@ export function useCart() {
     decrease,
     remove,
     clear,
+    refreshFromRemote,
     hasArticle,
     quantityFor,
   }

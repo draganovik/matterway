@@ -97,23 +97,29 @@ async function submitCheckout() {
   if (loading.value) return
   error.value = ""
 
-  if (isCartEmpty.value) {
-    error.value = "Korpa je prazna."
-    return
-  }
-
   if (!auth.customerId.value) {
     error.value = "Korisnička sesija nije dostupna."
     return
   }
 
-  if (!isAddressValid()) {
-    error.value = "Popunite sva obavezna polja za dostavu."
-    return
-  }
-
   loading.value = true
   try {
+    const refreshedCart = await cart.refreshFromRemote()
+    if (!refreshedCart.ok) {
+      error.value = refreshedCart.error || "Osvežavanje korpe nije uspelo."
+      return
+    }
+
+    if (isCartEmpty.value) {
+      error.value = "Korpa je prazna."
+      return
+    }
+
+    if (!isAddressValid()) {
+      error.value = "Popunite sva obavezna polja za dostavu."
+      return
+    }
+
     const orderResponse = await salesApi.placeSelfOrder({
       customerId: auth.customerId.value,
       type: "Ecommerce",

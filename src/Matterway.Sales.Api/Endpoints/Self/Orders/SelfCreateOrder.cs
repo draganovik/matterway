@@ -38,12 +38,9 @@ public class SelfCreateOrder : IEndpoint
         var effectiveCustomerId = customerId.Value;
 
         var orderId = Guid.CreateVersion7();
-        var customersRequest = MapToCustomersRequest(orderId, request);
-        var authorization = httpContext.Request.Headers.Authorization.ToString();
+        var customersRequest = MapToCustomersRequest(effectiveCustomerId, orderId, request);
         var customersResult = await customersClient.CreateOrderAsync(
-            effectiveCustomerId,
             customersRequest,
-            authorization,
             cancellationToken);
 
         if (!customersResult.IsSuccess || customersResult.Data is null)
@@ -191,10 +188,14 @@ public class SelfCreateOrder : IEndpoint
         public DateTime CreatedAt { get; init; }
     }
 
-    private static CustomersCreateOrderRequest MapToCustomersRequest(Guid orderId, CreateOrderRequest request)
+    private static CustomersCreateOrderRequest MapToCustomersRequest(
+        Guid customerId,
+        Guid orderId,
+        CreateOrderRequest request)
     {
         return new CustomersCreateOrderRequest
         {
+            CustomerId = customerId,
             OrderId = orderId,
             DeliveryInfo = request.DeliveryInfo is null
                 ? null

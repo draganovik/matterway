@@ -5,6 +5,7 @@ import type {
 
 const readAllowed: PermissionLevel[] = ["observer", "operator", "manager"]
 const operateAllowed: PermissionLevel[] = ["operator", "manager"]
+const managerAllowed: PermissionLevel[] = ["manager"]
 
 export const serviceSections: ServiceSection[] = [
   {
@@ -42,7 +43,7 @@ export const serviceSections: ServiceSection[] = [
         label: "Catalog Data",
         route: "/catalog/archive",
         service: "catalog",
-        allowed: [...operateAllowed],
+        allowed: [...managerAllowed],
         actions: [],
       },
     ],

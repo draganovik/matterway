@@ -1,32 +1,27 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
 public class HttpCustomersClient(HttpClient httpClient) : ICustomersClient
 {
-    public async Task<BrokerResponse<CustomersOrderResponse>> CreateOrderAsync(Guid customerId,
+    public async Task<BrokerResponse<CustomersOrderResponse>> CreateOrderAsync(
         CustomersCreateOrderRequest request,
-        string? authorizationHeader,
         CancellationToken cancellationToken)
     {
         var httpRequest =
-            new HttpRequestMessage(HttpMethod.Post, "/api/self/v1.0/orders")
+            new HttpRequestMessage(HttpMethod.Post, "/api/system/v1/orders")
             {
                 Content = JsonContent.Create(request)
             };
 
-        if (!string.IsNullOrWhiteSpace(authorizationHeader) &&
-            AuthenticationHeaderValue.TryParse(authorizationHeader, out var authHeader))
-            httpRequest.Headers.Authorization = authHeader;
-
         var response = await httpClient.SendAsync(httpRequest, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+            var rawError = await response.Content.ReadAsStringAsync(cancellationToken);
+            var error = ExtractErrorMessage(rawError) ?? response.ReasonPhrase;
             return BrokerResponse<CustomersOrderResponse>.Failure(
-                string.IsNullOrWhiteSpace(error) ? response.ReasonPhrase : error,
+                error,
                 response.StatusCode);
         }
 
@@ -39,5 +34,35 @@ public class HttpCustomersClient(HttpClient httpClient) : ICustomersClient
             ? BrokerResponse<CustomersOrderResponse>.Failure("Empty response from customers service.",
                 HttpStatusCode.NoContent)
             : BrokerResponse<CustomersOrderResponse>.Success(order, response.StatusCode);
+    }
+
+    private static string? ExtractErrorMessage(string? rawError)
+    {
+        if (string.IsNullOrWhiteSpace(rawError)) return null;
+
+        var trimmed = rawError.Trim();
+
+        try
+        {
+            using var document = JsonDocument.Parse(trimmed);
+            if (document.RootElement.ValueKind != JsonValueKind.Object)
+                return trimmed;
+
+            foreach (var propertyName in new[] { "detail", "title", "message" })
+            {
+                if (!document.RootElement.TryGetProperty(propertyName, out var property)) continue;
+                if (property.ValueKind != JsonValueKind.String) continue;
+
+                var value = property.GetString();
+                if (!string.IsNullOrWhiteSpace(value))
+                    return value.Trim();
+            }
+        }
+        catch (JsonException)
+        {
+            // Payload is plain text; return as-is.
+        }
+
+        return trimmed;
     }
 }
