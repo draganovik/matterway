@@ -6,8 +6,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  increase: [articleId: string]
-  decrease: [articleId: string]
   remove: [articleId: string]
 }>()
 </script>
@@ -26,7 +24,6 @@ const emit = defineEmits<{
             <th class="px-3 py-2 text-right font-medium">Cena</th>
             <th class="px-3 py-2 text-center font-medium">Kolicina</th>
             <th class="px-3 py-2 text-right font-medium">Ukupno</th>
-            <th class="px-3 py-2 text-right font-medium">Akcije</th>
           </tr>
         </thead>
         <tbody>
@@ -34,8 +31,6 @@ const emit = defineEmits<{
             v-for="item in props.items"
             :key="item.articleId"
             :item="item"
-            @increase="emit('increase', $event)"
-            @decrease="emit('decrease', $event)"
             @remove="emit('remove', $event)"
           />
         </tbody>

@@ -147,6 +147,18 @@ export function useCart() {
     await syncItem(existing.articleId, existing.quantity)
   }
 
+  async function setQuantity(articleId: string, quantity: number) {
+    hydrate()
+    const existing = items.value.find((item) => item.articleId === articleId)
+    if (!existing) return
+
+    const normalized = Math.max(1, Math.trunc(normalizeNumber(quantity, 1)))
+    if (existing.quantity === normalized) return
+
+    existing.quantity = normalized
+    await syncItem(existing.articleId, existing.quantity)
+  }
+
   async function remove(articleId: string) {
     hydrate()
     items.value = items.value.filter((item) => item.articleId !== articleId)
@@ -215,6 +227,7 @@ export function useCart() {
     add,
     increase,
     decrease,
+    setQuantity,
     remove,
     clear,
     refreshFromRemote,

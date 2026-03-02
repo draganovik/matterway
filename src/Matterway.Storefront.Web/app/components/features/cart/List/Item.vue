@@ -7,8 +7,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  increase: [articleId: string]
-  decrease: [articleId: string]
   remove: [articleId: string]
 }>()
 </script>
@@ -33,39 +31,18 @@ const emit = defineEmits<{
     </td>
 
     <td class="px-3 py-3">
-      <div class="flex items-center justify-center gap-2">
-        <UButton
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-minus"
-          square
-          @click="emit('decrease', props.item.articleId)"
-        />
-        <UBadge color="primary" variant="subtle">
-          {{ props.item.quantity }}
-        </UBadge>
-        <UButton
-          color="primary"
-          variant="soft"
-          icon="i-lucide-plus"
-          square
-          @click="emit('increase', props.item.articleId)"
+      <div class="flex items-center justify-center">
+        <ModalQuantityEditor
+          :article-id="props.item.articleId"
+          :quantity="props.item.quantity"
+          :show-remove="true"
+          @remove="emit('remove', props.item.articleId)"
         />
       </div>
     </td>
 
     <td class="px-3 py-3 text-right font-semibold whitespace-nowrap">
       {{ formatMoney(props.item.unitPrice * props.item.quantity) }}
-    </td>
-
-    <td class="px-3 py-3 text-right">
-      <UButton
-        color="error"
-        variant="ghost"
-        icon="i-lucide-trash"
-        square
-        @click="emit('remove', props.item.articleId)"
-      />
     </td>
   </tr>
 </template>

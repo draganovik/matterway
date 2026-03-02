@@ -80,18 +80,16 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
         </UBadge>
 
         <div class="flex items-center gap-2">
-          <UButton
+          <ModalQuantityEditor
             v-if="currentQty > 0"
-            color="neutral"
-            variant="soft"
-            icon="i-lucide-minus"
-            square
-            @click="cart.decrease(article.id)"
+            :article-id="article.id"
+            :quantity="currentQty"
+            :disabled="!article.isAvailable"
+            :show-remove="true"
+            @remove="cart.remove(article.id)"
           />
-          <UBadge v-if="currentQty > 0" color="primary" variant="subtle">
-            {{ currentQty }}
-          </UBadge>
           <UButton
+            v-else
             :disabled="!article.isAvailable"
             color="primary"
             variant="soft"

@@ -51,12 +51,7 @@ async function clearCart() {
     </EmptyState>
 
     <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
-      <CartListPanel
-        :items="cart.items.value"
-        @increase="cart.increase"
-        @decrease="cart.decrease"
-        @remove="cart.remove"
-      />
+      <CartListPanel :items="cart.items.value" @remove="cart.remove" />
 
       <CartActionPanel
         :total-items="cart.totalItems.value"

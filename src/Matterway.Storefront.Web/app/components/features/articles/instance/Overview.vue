@@ -44,29 +44,29 @@ const hasDiscount = computed(
         >
           {{ props.article.isAvailable ? "Na stanju" : "Nije na stanju" }}
         </UBadge>
-        <UBadge v-if="quantity > 0" color="primary" variant="subtle">
-          U korpi: {{ quantity }}
-        </UBadge>
       </div>
 
       <div class="flex items-center gap-2">
         <UButton
+          v-if="quantity === 0"
           :disabled="!props.article.isAvailable"
+          size="lg"
           color="primary"
           icon="i-lucide-plus"
           @click="cart.add(props.article)"
         >
           Dodaj u korpu
         </UButton>
-        <UButton
-          v-if="quantity > 0"
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-minus"
-          @click="cart.decrease(props.article.id)"
-        >
-          Ukloni jedan
-        </UButton>
+        <template v-else>
+          <span class="text-muted text-sm font-medium">U korpi:</span>
+          <ModalQuantityEditor
+            :article-id="props.article.id"
+            :quantity="quantity"
+            size="lg"
+            :show-remove="true"
+            @remove="cart.remove(props.article.id)"
+          />
+        </template>
       </div>
 
       <p class="text-muted text-xs">

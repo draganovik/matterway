@@ -34,12 +34,17 @@ useHead({
 })
 
 let cartRefreshInFlight: Promise<void> | null = null
+let lastCartRefreshAt = 0
+const cartRefreshThrottleMs = 5000
 
 async function refreshCartFromRemote() {
   if (!import.meta.client) return
+  const now = Date.now()
+  if (now - lastCartRefreshAt < cartRefreshThrottleMs) return
   if (cartRefreshInFlight) return cartRefreshInFlight
 
   cartRefreshInFlight = (async () => {
+    lastCartRefreshAt = Date.now()
     await auth.initialize()
     await cart.refreshFromRemote()
   })()
