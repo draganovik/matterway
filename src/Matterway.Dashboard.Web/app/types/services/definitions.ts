@@ -1,4 +1,4 @@
-export type PermissionLevel = "observer" | "operator" | "administrator"
+export type PermissionLevel = "observer" | "operator" | "manager"
 
 export type ActionKey = "create" | "query" | "update" | "delete"
 
@@ -16,7 +16,7 @@ export type FeatureDefinition = {
   label: string
   route: string
   service: "catalog" | "customers" | "identity" | "sales"
-  minimum: PermissionLevel
+  allowed: PermissionLevel[]
   actions: FeatureAction[]
 }
 
@@ -24,6 +24,6 @@ export type ServiceSection = {
   key: string
   label: string
   service: FeatureDefinition["service"]
-  minimum: PermissionLevel
+  allowed: PermissionLevel[]
   features: FeatureDefinition[]
 }

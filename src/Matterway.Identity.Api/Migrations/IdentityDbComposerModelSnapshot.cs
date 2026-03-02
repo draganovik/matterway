@@ -17,7 +17,7 @@ namespace Matterway.Identity.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -255,28 +255,28 @@ namespace Matterway.Identity.Api.Migrations
                         {
                             Id = 1,
                             ClaimType = "perm",
-                            ClaimValue = "identity:administrator",
+                            ClaimValue = "identity:manager",
                             UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
                         },
                         new
                         {
                             Id = 2,
                             ClaimType = "perm",
-                            ClaimValue = "catalog:administrator",
+                            ClaimValue = "catalog:manager",
                             UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
                         },
                         new
                         {
                             Id = 3,
                             ClaimType = "perm",
-                            ClaimValue = "customers:administrator",
+                            ClaimValue = "customers:manager",
                             UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
                         },
                         new
                         {
                             Id = 4,
                             ClaimType = "perm",
-                            ClaimValue = "sales:administrator",
+                            ClaimValue = "sales:manager",
                             UserId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1")
                         },
                         new

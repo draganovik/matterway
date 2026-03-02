@@ -8,7 +8,7 @@ declare module "#app" {
   interface PageMeta {
     public?: boolean
     service?: ServiceSection["service"]
-    level?: PermissionLevel
+    permissions?: PermissionLevel[]
     action?: ActionKey
   }
 }

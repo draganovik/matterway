@@ -15,7 +15,8 @@ public class AdminImportCatalogArchive : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Accepts<ImportCatalogArchiveRequest>("multipart/form-data")
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

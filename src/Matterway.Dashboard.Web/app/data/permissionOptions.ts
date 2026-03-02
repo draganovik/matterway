@@ -3,7 +3,7 @@ import { serviceSections } from "~/data/serviceDefinitions"
 export const permissionLevels = [
   { label: "Observer", value: "observer" },
   { label: "Operator", value: "operator" },
-  { label: "Administrator", value: "administrator" },
+  { label: "Manager", value: "manager" },
 ] as const
 
 export const permissionServices = serviceSections.map((service) => ({

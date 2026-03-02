@@ -2,7 +2,7 @@
 definePageMeta({
   title: "Catalog Data",
   service: "catalog",
-  level: "operator",
+  permissions: ["operator", "manager"],
 })
 </script>
 

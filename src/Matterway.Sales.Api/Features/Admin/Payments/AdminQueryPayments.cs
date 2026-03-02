@@ -15,7 +15,9 @@ public class AdminQueryPayments : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
+                    RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

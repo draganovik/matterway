@@ -25,9 +25,9 @@ onMounted(async () => {
 
 function getFirstRoute() {
   for (const service of serviceSections) {
-    if (!auth.hasPermission(service.service, service.minimum)) continue
+    if (!auth.hasPermission(service.service, service.allowed)) continue
     const feature = service.features.find((item) =>
-      auth.hasPermission(item.service, item.minimum),
+      auth.hasPermission(item.service, item.allowed),
     )
     if (feature) return feature.route
   }

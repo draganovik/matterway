@@ -17,16 +17,16 @@ export { permissionLevels, permissionServices } from "~/data/permissionOptions"
 
 type HasPermission = (
   service: ServiceSection["service"],
-  minimum: PermissionLevel,
+  allowed: PermissionLevel[],
 ) => boolean
 
 export function getAuthorizedSections(hasPermission: HasPermission) {
   return serviceSections
-    .filter((section) => hasPermission(section.service, section.minimum))
+    .filter((section) => hasPermission(section.service, section.allowed))
     .map((section) => ({
       ...section,
       features: section.features.filter((feature) =>
-        hasPermission(feature.service, feature.minimum),
+        hasPermission(feature.service, feature.allowed),
       ),
     }))
     .filter((section) => section.features.length > 0)

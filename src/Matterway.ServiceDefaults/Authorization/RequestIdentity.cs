@@ -41,6 +41,11 @@ public static class RequestIdentity
         return string.Equals(roleValue, options.CustomerRoleName, StringComparison.OrdinalIgnoreCase);
     }
 
+    public static bool IsEmployee(ClaimsPrincipal? principal)
+    {
+        return principal is not null && PermissionClaims.IsEmployee(principal);
+    }
+
     public static bool AsObserver(ClaimsPrincipal? principal)
     {
         return HasPermission(principal, PermissionLevel.Observer);
@@ -51,9 +56,9 @@ public static class RequestIdentity
         return HasPermission(principal, PermissionLevel.Operator);
     }
 
-    public static bool AsAdministrator(ClaimsPrincipal? principal)
+    public static bool AsManager(ClaimsPrincipal? principal)
     {
-        return HasPermission(principal, PermissionLevel.Administrator);
+        return HasPermission(principal, PermissionLevel.Manager);
     }
 
     public static bool CanManageOwnedResource(ClaimsPrincipal? principal, Guid ownerId)

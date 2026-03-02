@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { serviceSections } from "~/data/serviceRegistry"
 
-definePageMeta({ title: "Catalog", service: "catalog", level: "observer" })
+definePageMeta({
+  title: "Catalog",
+  service: "catalog",
+  permissions: ["observer", "operator", "manager"],
+})
 
 const catalogSection = serviceSections.find(
   (section) => section.key === "catalog",

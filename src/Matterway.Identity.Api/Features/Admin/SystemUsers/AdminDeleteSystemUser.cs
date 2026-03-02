@@ -13,7 +13,7 @@ public class AdminDeleteSystemUser : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsAdministrator(context.User)))
+                policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

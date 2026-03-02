@@ -18,7 +18,8 @@ public class AdminUpdateSystemUser : IEndpoint
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -33,9 +34,9 @@ public class AdminUpdateSystemUser : IEndpoint
         if (user is null) return TypedResults.NotFound();
 
         var userRole = await IdentityRoleAdapter.GetPrimaryRoleAsync(userManager, user);
-        var isAdmin = RequestIdentity.AsAdministrator(httpContext.User);
+        var isManager = RequestIdentity.AsManager(httpContext.User);
 
-        if (!isAdmin && userRole != EIdentityRole.Customer)
+        if (!isManager && userRole != EIdentityRole.Customer)
             return TypedResults.BadRequest(CreateProblemDetails("Operators can only update Customer users"));
 
         if (!string.IsNullOrWhiteSpace(request.Email))

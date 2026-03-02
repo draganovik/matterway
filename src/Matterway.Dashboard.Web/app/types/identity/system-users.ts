@@ -24,20 +24,16 @@ export type UpdateSystemUserRequest = {
 
 export type UpdateSystemUserResponse = SystemUserResponse
 
-export type SystemUserPermLevel = "Observer" | "Operator" | "Administrator"
+export type SystemUserPermLevel = "Observer" | "Operator" | "Manager"
 
 export type SystemUserPermResponse = {
   service: string
   level: SystemUserPermLevel
 }
 
-export type AddSystemUserPermRequest = {
+export type PatchSystemUserPermRequest = {
   service: string
   level: SystemUserPermLevel
 }
 
-export type DeleteSystemUserPermRequest = AddSystemUserPermRequest
-
-export type AddSystemUserPermResponse = SystemUserPermResponse
-
-export type DeleteSystemUserPermResponse = SystemUserPermResponse
+export type PatchSystemUserPermResponse = SystemUserPermResponse

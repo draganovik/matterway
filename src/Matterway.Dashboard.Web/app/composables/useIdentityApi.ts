@@ -1,10 +1,8 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/useApiClient"
 import type {
-  AddSystemUserPermRequest,
-  AddSystemUserPermResponse,
-  DeleteSystemUserPermRequest,
-  DeleteSystemUserPermResponse,
+  PatchSystemUserPermRequest,
+  PatchSystemUserPermResponse,
   QuerySystemUsersParams,
   QuerySystemUsersResponse,
   SystemUserPermResponse,
@@ -65,29 +63,15 @@ export function useIdentityApi() {
     )
   }
 
-  async function addSystemUserPerm(
+  async function patchSystemUserPerm(
     id: string,
-    payload: AddSystemUserPermRequest,
+    payload: PatchSystemUserPermRequest,
   ) {
-    return api.request<AddSystemUserPermResponse[]>(
+    return api.request<PatchSystemUserPermResponse[]>(
       "identity",
       `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
       {
-        method: "POST",
-        body: JSON.stringify(payload),
-      },
-    )
-  }
-
-  async function deleteSystemUserPerm(
-    id: string,
-    payload: DeleteSystemUserPermRequest,
-  ) {
-    return api.request<DeleteSystemUserPermResponse[]>(
-      "identity",
-      `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
-      {
-        method: "DELETE",
+        method: "PATCH",
         body: JSON.stringify(payload),
       },
     )
@@ -99,7 +83,6 @@ export function useIdentityApi() {
     updateSystemUser,
     deleteSystemUser,
     getSystemUserPerms,
-    addSystemUserPerm,
-    deleteSystemUserPerm,
+    patchSystemUserPerm,
   }
 }

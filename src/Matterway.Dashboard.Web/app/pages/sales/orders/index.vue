@@ -2,7 +2,7 @@
 definePageMeta({
   title: "Orders",
   service: "sales",
-  level: "observer",
+  permissions: ["observer", "operator", "manager"],
 })
 </script>
 

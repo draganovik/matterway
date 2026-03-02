@@ -4,11 +4,13 @@ import type {
   SystemUserPermLevel,
   SystemUserPermResponse,
 } from "~/types/identity"
+import type { ServiceSection } from "~/types/services/definitions"
 import { useModalCloseReset } from "~/composables/useModalCloseReset"
 import { useRequestState } from "~/composables/useRequestState"
+import { permissionServices } from "~/data/serviceRegistry"
 
-type RoleForm = {
-  service: string
+type PermissionForm = {
+  service: ServiceSection["service"]
   level: SystemUserPermLevel
 }
 
@@ -30,39 +32,40 @@ const isOpen = defineModel<boolean>("open", { required: true })
 const api = useIdentityApi()
 const loadState = useRequestState()
 const saveState = useRequestState()
-const removeState = useRequestState()
+const resetState = useRequestState()
 
-const roles = ref<SystemUserPermResponse[]>([])
+const permissions = ref<SystemUserPermResponse[]>([])
 const notFound = ref(false)
-const removingKey = ref<string | null>(null)
+const resettingService = ref<string | null>(null)
 
-const serviceOptions = [
-  { label: "Identity", value: "identity" },
-  { label: "Catalog", value: "catalog" },
-  { label: "Customers", value: "customers" },
-  { label: "Sales", value: "sales" },
-]
+const serviceOptions = permissionServices
 
-const levelOptions: Array<{ label: string; value: SystemUserPermLevel }> = [
-  { label: "Observer", value: "Observer" },
+const setLevelOptions: Array<{ label: string; value: SystemUserPermLevel }> = [
   { label: "Operator", value: "Operator" },
-  { label: "Administrator", value: "Administrator" },
+  { label: "Manager", value: "Manager" },
 ]
 
-const form = ref<RoleForm>({
-  service: serviceOptions[0]?.value || "identity",
-  level: "Observer",
+const form = ref<PermissionForm>({
+  service: (serviceOptions[0]?.value ||
+    "identity") as ServiceSection["service"],
+  level: "Operator",
 })
 
 const displayLabel = computed(
   () => props.userLabel.trim() || "Selected system user",
 )
 
-function roleKey(role: SystemUserPermResponse) {
-  return `${role.service.toLowerCase()}:${role.level.toLowerCase()}`
+function permissionKey(permission: SystemUserPermResponse) {
+  return permission.service.toLowerCase()
 }
 
-function normalizeRoles(items: SystemUserPermResponse[]) {
+function permissionRank(level: SystemUserPermLevel) {
+  if (level === "Manager") return 3
+  if (level === "Operator") return 2
+  return 1
+}
+
+function normalizePermissions(items: SystemUserPermResponse[]) {
   const map = new Map<string, SystemUserPermResponse>()
 
   for (const item of items) {
@@ -70,24 +73,25 @@ function normalizeRoles(items: SystemUserPermResponse[]) {
     const level = item.level
     if (!service || !level) continue
 
-    map.set(`${service}:${level.toLowerCase()}`, {
-      service,
-      level,
-    })
+    const existing = map.get(service)
+    if (!existing || permissionRank(level) > permissionRank(existing.level)) {
+      map.set(service, {
+        service,
+        level,
+      })
+    }
   }
 
   return [...map.values()].sort((left, right) => {
-    const byService = left.service.localeCompare(right.service)
-    if (byService !== 0) return byService
-    return left.level.localeCompare(right.level)
+    return left.service.localeCompare(right.service)
   })
 }
 
 function clearMessages() {
   saveState.error = ""
   saveState.success = ""
-  removeState.error = ""
-  removeState.success = ""
+  resetState.error = ""
+  resetState.success = ""
 }
 
 function resetModalState() {
@@ -96,23 +100,24 @@ function resetModalState() {
   saveState.loading = false
   saveState.error = ""
   saveState.success = ""
-  removeState.loading = false
-  removeState.error = ""
-  removeState.success = ""
-  removingKey.value = null
-  roles.value = []
+  resetState.loading = false
+  resetState.error = ""
+  resetState.success = ""
+  resettingService.value = null
+  permissions.value = []
   notFound.value = false
   form.value = {
-    service: serviceOptions[0]?.value || "identity",
-    level: "Observer",
+    service: (serviceOptions[0]?.value ||
+      "identity") as ServiceSection["service"],
+    level: "Operator",
   }
 }
 
-async function loadRoles() {
+async function loadPermissions() {
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
     loadState.error = "Select a system user first."
-    roles.value = []
+    permissions.value = []
     notFound.value = false
     return
   }
@@ -120,7 +125,7 @@ async function loadRoles() {
   loadState.loading = true
   loadState.error = ""
   clearMessages()
-  roles.value = []
+  permissions.value = []
   notFound.value = false
 
   const result = await api.getSystemUserPerms(systemUserId)
@@ -132,14 +137,25 @@ async function loadRoles() {
       return
     }
 
-    loadState.error = result.error || "Unable to reveal roles."
+    loadState.error = result.error || "Unable to reveal permissions."
     return
   }
 
-  roles.value = normalizeRoles(result.data || [])
+  permissions.value = normalizePermissions(result.data || [])
 }
 
-async function addRole() {
+function applyLocalPermission(service: string, level: SystemUserPermLevel) {
+  const normalizedService = service.trim().toLowerCase()
+  permissions.value = normalizePermissions([
+    ...permissions.value.filter((item) => item.service !== normalizedService),
+    {
+      service: normalizedService,
+      level,
+    },
+  ])
+}
+
+async function setPermission() {
   clearMessages()
   if (!props.canManage) return
 
@@ -150,7 +166,7 @@ async function addRole() {
   }
 
   const payload = {
-    service: form.value.service.trim().toLowerCase(),
+    service: form.value.service,
     level: form.value.level,
   }
 
@@ -160,59 +176,55 @@ async function addRole() {
   }
 
   saveState.loading = true
-  const result = await api.addSystemUserPerm(systemUserId, payload)
+  const result = await api.patchSystemUserPerm(systemUserId, payload)
   saveState.loading = false
 
   if (!result.ok) {
-    saveState.error = result.error || "Unable to add role."
+    saveState.error = result.error || "Unable to set permission."
     return
   }
 
-  roles.value = normalizeRoles(
-    result.data || [
-      ...roles.value,
-      {
-        service: payload.service,
-        level: payload.level,
-      },
-    ],
-  )
+  permissions.value = result.data
+    ? normalizePermissions(result.data)
+    : permissions.value
+  if (!result.data) applyLocalPermission(payload.service, payload.level)
 
-  saveState.success = "Role added."
+  saveState.success = "Permission updated."
 }
 
-async function removeRole(role: SystemUserPermResponse) {
+async function resetPermission(permission: SystemUserPermResponse) {
   clearMessages()
   if (!props.canManage) return
+  if (permission.level === "Observer") return
 
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    removeState.error = "Select a system user first."
+    resetState.error = "Select a system user first."
     return
   }
 
-  const key = roleKey(role)
-  removingKey.value = key
-  removeState.loading = true
+  resettingService.value = permission.service.toLowerCase()
+  resetState.loading = true
 
-  const result = await api.deleteSystemUserPerm(systemUserId, {
-    service: role.service,
-    level: role.level,
+  const result = await api.patchSystemUserPerm(systemUserId, {
+    service: permission.service,
+    level: "Observer",
   })
 
-  removeState.loading = false
-  removingKey.value = null
+  resetState.loading = false
+  resettingService.value = null
 
   if (!result.ok) {
-    removeState.error = result.error || "Unable to remove role."
+    resetState.error = result.error || "Unable to reset permission."
     return
   }
 
-  roles.value = normalizeRoles(
-    result.data || roles.value.filter((item) => roleKey(item) !== key),
-  )
+  permissions.value = result.data
+    ? normalizePermissions(result.data)
+    : permissions.value
+  if (!result.data) applyLocalPermission(permission.service, "Observer")
 
-  removeState.success = "Role removed."
+  resetState.success = "Permission reset to Observer."
 }
 
 useModalCloseReset({
@@ -220,7 +232,7 @@ useModalCloseReset({
   watchSources: [toRef(props, "systemUserId")],
   onCloseReset: resetModalState,
   onOpen: async () => {
-    await loadRoles()
+    await loadPermissions()
   },
 })
 </script>
@@ -230,9 +242,11 @@ useModalCloseReset({
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          System User Roles
+          System User Permissions
         </h3>
-        <p class="text-muted text-sm">Revealed roles for {{ displayLabel }}.</p>
+        <p class="text-muted text-sm">
+          Revealed permissions for {{ displayLabel }}.
+        </p>
       </div>
     </template>
 
@@ -240,7 +254,7 @@ useModalCloseReset({
       <div class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Revealing roles.' : false"
+          :loading="loadState.loading ? 'Revealing permissions.' : false"
           :error="loadState.error"
         />
 
@@ -252,35 +266,38 @@ useModalCloseReset({
 
         <template v-else>
           <EntitiesEmptyState
-            v-if="!roles.length"
-            title="No roles assigned"
-            description="This user has no service permissions assigned yet."
+            v-if="!permissions.length"
+            title="No permissions found"
+            description="This user has no employee service permissions."
           />
 
           <div v-else class="space-y-2">
             <div
-              v-for="role in roles"
-              :key="roleKey(role)"
+              v-for="permission in permissions"
+              :key="permissionKey(permission)"
               class="border-default/70 flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
             >
               <div>
                 <p class="text-foreground text-sm font-medium">
-                  {{ role.service }}
+                  {{ permission.service }}
                 </p>
                 <p class="text-muted text-xs">
-                  {{ role.level }}
+                  {{ permission.level }}
                 </p>
               </div>
 
               <UButton
-                v-if="canManage"
+                v-if="canManage && permission.level !== 'Observer'"
                 color="error"
                 variant="ghost"
                 size="xs"
-                :loading="removeState.loading && removingKey === roleKey(role)"
-                @click="removeRole(role)"
+                :loading="
+                  resetState.loading &&
+                  resettingService === permission.service.toLowerCase()
+                "
+                @click="resetPermission(permission)"
               >
-                Remove
+                Reset to Observer
               </UButton>
             </div>
           </div>
@@ -289,7 +306,9 @@ useModalCloseReset({
             v-if="canManage"
             class="border-default/70 space-y-3 rounded-lg border p-3"
           >
-            <h4 class="text-foreground text-sm font-semibold">Add Role</h4>
+            <h4 class="text-foreground text-sm font-semibold">
+              Set Permission
+            </h4>
 
             <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
               <UFormField label="Service" required>
@@ -304,13 +323,13 @@ useModalCloseReset({
                 />
               </UFormField>
 
-              <UFormField label="Level" required>
+              <UFormField label="Permission" required>
                 <USelectMenu
                   v-model="form.level"
-                  :items="levelOptions"
+                  :items="setLevelOptions"
                   value-key="value"
                   label-key="label"
-                  placeholder="Select level"
+                  placeholder="Select permission"
                   class="w-full"
                   :disabled="saveState.loading"
                 />
@@ -320,20 +339,20 @@ useModalCloseReset({
                 color="primary"
                 :loading="saveState.loading"
                 class="md:mb-0.5"
-                @click="addRole"
+                @click="setPermission"
               >
-                Add
+                Save
               </UButton>
             </div>
 
             <StatusMessages
-              :error="saveState.error || removeState.error"
-              :success="saveState.success || removeState.success"
+              :error="saveState.error || resetState.error"
+              :success="saveState.success || resetState.success"
             />
           </div>
 
           <p v-else class="text-muted text-sm">
-            Administrator permission is required to change roles.
+            Manager permission is required to change permissions.
           </p>
         </template>
       </div>

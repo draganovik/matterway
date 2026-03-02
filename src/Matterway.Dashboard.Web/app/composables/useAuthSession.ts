@@ -5,6 +5,7 @@ import {
   type JwtPayload,
 } from "~/utils/jwt"
 import type { AuthSession, LoginResponse } from "~/types/auth/session"
+import type { PermissionLevel } from "~/types/services/definitions"
 
 const refreshCookieName = "mw_refresh"
 const authPath = "/api/public/v1.0/auth"
@@ -13,11 +14,7 @@ const authJsonHeaders = {
   accept: "application/json",
 } as const
 
-const permissionLevels = {
-  observer: 0,
-  operator: 1,
-  administrator: 2,
-} as const
+const allPermissions: PermissionLevel[] = ["observer", "operator", "manager"]
 
 let refreshPromise: Promise<void> | null = null
 let initPromise: Promise<void> | null = null
@@ -47,6 +44,14 @@ function getCookieOptions() {
     secure,
     path: "/",
   }
+}
+
+function normalizePermissionLevel(raw: string): PermissionLevel | null {
+  const normalized = raw.trim().toLowerCase()
+  if (normalized === "observer") return "observer"
+  if (normalized === "operator") return "operator"
+  if (normalized === "manager") return "manager"
+  return null
 }
 
 export function useAuthSession() {
@@ -236,19 +241,17 @@ export function useAuthSession() {
 
   function hasPermission(
     service: string,
-    minimumLevel: "observer" | "operator" | "administrator" = "observer",
+    allowedLevels: PermissionLevel[] = allPermissions,
   ) {
     if (!isEmployee.value) return false
-    const required = permissionLevels[minimumLevel]
+    const allowed = new Set(allowedLevels)
     const normalizedService = service.toLowerCase()
     return permissions.value.some((perm) => {
       const [permService, permLevel] = perm.split(":", 2)
       if (!permService || !permLevel) return false
       if (permService.toLowerCase() !== normalizedService) return false
-      const normalizedLevel =
-        permLevel.toLowerCase() as keyof typeof permissionLevels
-      if (permissionLevels[normalizedLevel] === undefined) return false
-      return permissionLevels[normalizedLevel] >= required
+      const normalizedLevel = normalizePermissionLevel(permLevel)
+      return normalizedLevel !== null && allowed.has(normalizedLevel)
     })
   }
 

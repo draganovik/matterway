@@ -17,10 +17,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const feature = getFeatureByRoute(to.path)
   const requiredService = to.meta.service ?? feature?.service
-  const requiredLevel = to.meta.level ?? feature?.minimum
+  const requiredPermissions = to.meta.permissions ?? feature?.allowed
 
-  if (requiredService && requiredLevel) {
-    if (!auth.hasPermission(requiredService, requiredLevel)) {
+  if (requiredService && requiredPermissions?.length) {
+    if (!auth.hasPermission(requiredService, requiredPermissions)) {
       return navigateTo(feature?.route || "/")
     }
   }

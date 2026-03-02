@@ -15,10 +15,10 @@ type RoleFilter = "all" | "customers" | "employees"
 const auth = useAuthSession()
 const api = useIdentityApi()
 
-const canOperate = computed(() => auth.hasPermission("identity", "operator"))
-const canManage = computed(() =>
-  auth.hasPermission("identity", "administrator"),
+const canOperate = computed(() =>
+  auth.hasPermission("identity", ["operator", "manager"]),
 )
+const canManage = computed(() => auth.hasPermission("identity", ["manager"]))
 const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
 const listState = useRequestState({ empty: "No system users found." })
@@ -302,7 +302,7 @@ onMounted(() => {
           Manage System Users
         </h2>
         <p class="text-muted text-sm">
-          Browse users, update credentials, and manage service roles.
+          Browse users, update credentials, and manage service permissions.
         </p>
       </div>
 

@@ -8,7 +8,7 @@ import { useWorkspacePagination } from "~/composables/useWorkspacePagination"
 const auth = useAuthSession()
 const api = useSalesApi()
 const canManageStatuses = computed(() =>
-  auth.hasPermission("sales", "operator"),
+  auth.hasPermission("sales", ["operator", "manager"]),
 )
 
 const listState = useRequestState({ empty: "No orders found." })

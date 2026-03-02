@@ -11,7 +11,7 @@ package "Identity" {
   enum PermissionLevel {
     Observer
     Operator
-    Administrator
+    Manager
   }
 
   class SystemUser {
@@ -50,6 +50,8 @@ package "Identity" {
     claimType = "perm"
     claimValue = "<service>:<level>"
     where level in PermissionLevel
+    one claim per service for employees
+    missing service claim resolves to Observer
   end note
 
   SystemUser "1" -- "0..*" IdentityUserClaim

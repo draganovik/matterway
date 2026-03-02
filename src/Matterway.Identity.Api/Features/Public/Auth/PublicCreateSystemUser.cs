@@ -39,11 +39,11 @@ public class PublicCreateSystemUser : IEndpoint
         if (requestIdentityExists)
         {
             if (requestedRole == EIdentityRole.Employee &&
-                !RequestIdentity.AsAdministrator(httpContext.User))
+                !RequestIdentity.AsManager(httpContext.User))
                 return TypedResults.Forbid();
 
             if (requestedRole == EIdentityRole.Customer &&
-                !RequestIdentity.AsOperator(httpContext.User))
+                !(RequestIdentity.AsOperator(httpContext.User) || RequestIdentity.AsManager(httpContext.User)))
                 return TypedResults.Forbid();
         }
 
@@ -63,6 +63,17 @@ public class PublicCreateSystemUser : IEndpoint
         if (!roleResult.Succeeded)
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 roleResult.Errors.Select(error => error.Description))));
+
+        if (role == EIdentityRole.Employee)
+        {
+            var permissionResult = await IdentityPermissionAdapter.EnsureEmployeeObserverDefaultsAsync(
+                userManager,
+                systemUser);
+
+            if (!permissionResult.Succeeded)
+                return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                    permissionResult.Errors.Select(error => error.Description))));
+        }
 
         var location = linkGenerator.GetPathByName(httpContext, "AdminGetSystemUserById",
             new { id = systemUser.Id });

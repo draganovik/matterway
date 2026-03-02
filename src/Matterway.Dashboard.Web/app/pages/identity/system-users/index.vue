@@ -2,7 +2,7 @@
 definePageMeta({
   title: "System Users",
   service: "identity",
-  level: "operator",
+  permissions: ["operator", "manager"],
 })
 </script>
 

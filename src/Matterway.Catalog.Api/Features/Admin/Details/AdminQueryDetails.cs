@@ -13,7 +13,9 @@ public class AdminQueryDetails : IEndpoint
             .WithTags(nameof(Detail))
             .Produces<ICollection<QueryDetailResponse>>()
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
+                    RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
