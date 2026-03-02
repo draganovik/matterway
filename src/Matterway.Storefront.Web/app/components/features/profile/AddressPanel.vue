@@ -96,7 +96,12 @@ const emit = defineEmits<{
 
       <StatusMessages :error="error" :info="info" :success="success" />
 
-      <UButton type="submit" color="primary" :loading="loading" :disabled="disabled">
+      <UButton
+        type="submit"
+        color="primary"
+        :loading="loading"
+        :disabled="disabled"
+      >
         Sačuvaj adresu
       </UButton>
     </form>

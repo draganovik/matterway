@@ -12,16 +12,9 @@ public static class EndpointDiscoveryExtensions
     {
         public IHostApplicationBuilder ConfigureEndpoints()
         {
-            return builder.ConfigureEndpoints(new ApiEndpointDiscoveryOptions());
-        }
-
-        public IHostApplicationBuilder ConfigureEndpoints(ApiEndpointDiscoveryOptions options)
-        {
-            ArgumentNullException.ThrowIfNull(options);
-
+            var endpointAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
             var uniqueTypes = new HashSet<Type>();
-            var serviceDescriptors = ResolveAssemblies(options)
-                .SelectMany(GetDefinedTypesSafe)
+            var serviceDescriptors = GetDefinedTypesSafe(endpointAssembly)
                 .Where(type =>
                     type is { IsAbstract: false, IsInterface: false } &&
                     type.IsAssignableTo(typeof(IEndpoint)) &&
@@ -49,21 +42,5 @@ public static class EndpointDiscoveryExtensions
         {
             return [];
         }
-    }
-
-    private static IReadOnlyCollection<Assembly> ResolveAssemblies(ApiEndpointDiscoveryOptions options)
-    {
-        var assemblies = new List<Assembly>();
-
-        if (options.IncludeEntryAssembly && Assembly.GetEntryAssembly() is { } entryAssembly)
-            assemblies.Add(entryAssembly);
-
-        if (options.AdditionalAssemblies is { Count: > 0 })
-            assemblies.AddRange(options.AdditionalAssemblies);
-
-        if (assemblies.Count == 0)
-            assemblies.Add(Assembly.GetExecutingAssembly());
-
-        return assemblies.Distinct().ToArray();
     }
 }

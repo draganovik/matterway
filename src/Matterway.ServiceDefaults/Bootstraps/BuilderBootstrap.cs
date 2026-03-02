@@ -8,12 +8,9 @@ namespace Matterway.ServiceDefaults.Bootstraps;
 
 public static class BuilderBootstrap
 {
-    public static WebApplicationBuilder CreateBuilder(
-        string[] args,
-        BuilderBootstrapOptions? options = null)
+    public static WebApplicationBuilder CreateBuilder(string[] args, bool? throwOnBadRequest = null)
     {
-        options ??= new BuilderBootstrapOptions();
-        var contentRootPath = options.ContentRootPath ?? Directory.GetCurrentDirectory();
+        var contentRootPath = Directory.GetCurrentDirectory();
 
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
@@ -24,28 +21,22 @@ public static class BuilderBootstrap
         builder.Configuration
             .SetBasePath(contentRootPath)
             .AddJsonFile(
-                string.Format(options.EnvironmentSettingsFilePattern, builder.Environment.EnvironmentName),
-                options.EnvironmentSettingsOptional,
-                options.EnvironmentSettingsReloadOnChange);
+                $"Properties/appsettings.{builder.Environment.EnvironmentName}.json",
+                true,
+                true)
+            .AddEnvironmentVariables();
 
-        if (options.AddEnvironmentVariables)
-            builder.Configuration.AddEnvironmentVariables();
-
-        if (options.ThrowOnBadRequest is { } throwOnBadRequest)
+        if (throwOnBadRequest is { } throwOnBadRequestValue)
             builder.Services.Configure<RouteHandlerOptions>(routeHandlerOptions =>
-                routeHandlerOptions.ThrowOnBadRequest = throwOnBadRequest);
+                routeHandlerOptions.ThrowOnBadRequest = throwOnBadRequestValue);
 
-        if (options.AddJsonStringEnumConverter)
-            builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
-            {
-                jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+        builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
+        {
+            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
-        if (options.AddValidation)
-            builder.Services.AddValidation();
-
-        if (options.AddServiceDefaults)
-            builder.AddServiceDefaults();
+        builder.Services.AddValidation();
+        builder.AddServiceDefaults();
 
         return builder;
     }

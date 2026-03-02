@@ -71,7 +71,12 @@ const emit = defineEmits<{
 
       <StatusMessages :error="error" :success="success" />
 
-      <UButton type="submit" color="primary" :loading="loading" :disabled="disabled">
+      <UButton
+        type="submit"
+        color="primary"
+        :loading="loading"
+        :disabled="disabled"
+      >
         Sačuvaj korisničke podatke
       </UButton>
     </form>

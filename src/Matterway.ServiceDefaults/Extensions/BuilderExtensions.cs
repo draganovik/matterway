@@ -3,6 +3,8 @@ using Asp.Versioning;
 using Matterway.ServiceDefaults.Authorization;
 using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,55 +15,31 @@ namespace Matterway.ServiceDefaults.Extensions;
 
 public static class BuilderExtensions
 {
+    private const string CorsAllowedOriginsConfigurationPath = "Cors:AllowedOrigins";
+    private const string CorsDiscoveryServiceNamesConfigurationPath = "Cors:DiscoveryServiceNames";
+
     extension(IHostApplicationBuilder builder)
     {
-        public IHostApplicationBuilder ConfigureApiFoundation(
+        public IHostApplicationBuilder ConfigureApi(
             ApiDefinition apiDefinition,
-            ApiProblemDetailsFeatureOptions? problemDetailsOptions = null,
-            ApiCorsFeatureOptions? corsOptions = null)
+            bool customizeBadHttpRequestProblemDetails = true,
+            Action<ProblemDetailsContext>? customizeProblemDetails = null,
+            Action<CorsPolicyBuilder>? configureCorsPolicy = null)
         {
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
-            return builder.ConfigureApiFoundation(
-                apiDefinition.ServiceName,
-                apiDefinition.SupportedApiVersions,
-                problemDetailsOptions,
-                corsOptions);
+            ConfigureRequestIdentity(builder, apiDefinition.ServiceName);
+            ConfigureProblemDetails(builder, customizeBadHttpRequestProblemDetails, customizeProblemDetails);
+            ConfigureApiVersioning(builder, apiDefinition.SupportedApiVersions);
+            ConfigureOpenApi(builder, apiDefinition.SupportedApiVersions);
+            ConfigureCors(builder, configureCorsPolicy);
+
+            return builder;
         }
 
-        public IHostApplicationBuilder ConfigureApiFoundation(
-            string serviceName,
-            IReadOnlyCollection<ApiVersion> supportedApiVersions,
-            ApiProblemDetailsFeatureOptions? problemDetailsOptions = null,
-            ApiCorsFeatureOptions? corsOptions = null)
+        public IHostApplicationBuilder ConfigureAuthentication(ApiAuthenticationOptions? options = null)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
-            ArgumentNullException.ThrowIfNull(supportedApiVersions);
-
-            return builder
-                .ConfigureRequestIdentity(new RequestIdentityOptions
-                {
-                    ServiceName = serviceName
-                })
-                .ConfigureProblemDetails(problemDetailsOptions ?? new ApiProblemDetailsFeatureOptions())
-                .ConfigureApiVersioning(new ApiVersioningFeatureOptions
-                {
-                    SupportedApiVersions = supportedApiVersions
-                })
-                .ConfigureOpenApi(new ApiOpenApiFeatureOptions
-                {
-                    SupportedApiVersions = supportedApiVersions
-                })
-                .ConfigureCors(corsOptions ?? new ApiCorsFeatureOptions());
-        }
-
-        public IHostApplicationBuilder ConfigureAuthentication()
-        {
-            return builder.ConfigureAuthentication(new ApiAuthenticationFeatureOptions());
-        }
-
-        public IHostApplicationBuilder ConfigureAuthentication(ApiAuthenticationFeatureOptions options)
-        {
+            options ??= new ApiAuthenticationOptions();
             ArgumentNullException.ThrowIfNull(options);
 
             options.ConfigureServices?.Invoke(builder);
@@ -74,25 +52,24 @@ public static class BuilderExtensions
                 })
                 .AddJwtBearer(jwtOptions =>
                 {
-                    jwtOptions.RequireHttpsMetadata = options.RequireHttpsMetadata;
-                    jwtOptions.SaveToken = options.SaveToken;
-
                     var signingKey = builder.Configuration[options.SigningKeyConfigurationPath]
                                      ?? throw new InvalidOperationException("JWT signing key not configured.");
 
                     var tokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = options.ValidateIssuer,
-                        ValidateAudience = options.ValidateAudience,
+                        ValidateIssuer = !string.IsNullOrWhiteSpace(options.ValidIssuer),
+                        ValidateAudience = !string.IsNullOrWhiteSpace(options.ValidAudience),
                         ValidIssuer = options.ValidIssuer,
                         ValidAudience = options.ValidAudience,
-                        ValidateLifetime = options.ValidateLifetime,
-                        ValidateIssuerSigningKey = options.ValidateIssuerSigningKey,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
                     };
 
                     options.ConfigureTokenValidation?.Invoke(tokenValidationParameters, builder);
 
+                    jwtOptions.RequireHttpsMetadata = false;
+                    jwtOptions.SaveToken = true;
                     jwtOptions.TokenValidationParameters = tokenValidationParameters;
                     options.ConfigureJwtBearer?.Invoke(jwtOptions, builder);
                 });
@@ -100,111 +77,114 @@ public static class BuilderExtensions
             builder.Services.AddAuthorization();
             return builder;
         }
+    }
 
-        public IHostApplicationBuilder ConfigureRequestIdentity(RequestIdentityOptions options)
+    private static void ConfigureRequestIdentity(IHostApplicationBuilder builder, string serviceName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
+
+        builder.Services.AddSingleton<IOptions<RequestIdentityOptions>>(_ => Options.Create(new RequestIdentityOptions
         {
-            ArgumentNullException.ThrowIfNull(options);
-            ArgumentException.ThrowIfNullOrWhiteSpace(options.ServiceName);
+            ServiceName = serviceName
+        }));
+    }
 
-            builder.Services.AddSingleton<IOptions<RequestIdentityOptions>>(_ => Options.Create(options));
-            return builder;
-        }
+    private static void ConfigureCors(
+        IHostApplicationBuilder builder,
+        Action<CorsPolicyBuilder>? configureCorsPolicy)
+    {
+        var configuredOrigins = builder.Configuration
+                                    .GetSection(CorsAllowedOriginsConfigurationPath)
+                                    .Get<string[]>()
+                                ?? [];
 
-        public IHostApplicationBuilder ConfigureCors(ApiCorsFeatureOptions? options = null)
-        {
-            options ??= new ApiCorsFeatureOptions();
-
-            var configuredOrigins = builder.Configuration
-                                        .GetSection(options.AllowedOriginsConfigurationPath)
+        var discoveryServiceNames = builder.Configuration
+                                        .GetSection(CorsDiscoveryServiceNamesConfigurationPath)
                                         .Get<string[]>()
-                                    ?? options.FallbackAllowedOrigins;
+                                    ?? [];
 
-            var discoveredOrigins = options.DiscoveryServiceNames
-                .Select(serviceName => builder.Configuration.ResolveServiceUri(serviceName)
-                    .GetLeftPart(UriPartial.Authority));
+        var discoveredOrigins = discoveryServiceNames
+            .Select(serviceName => builder.Configuration.ResolveServiceUri(serviceName)
+                .GetLeftPart(UriPartial.Authority));
 
-            var allowedOrigins = configuredOrigins
-                .Concat(discoveredOrigins)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
+        var allowedOrigins = configuredOrigins
+            .Concat(discoveredOrigins)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
-            builder.Services.AddCors(corsOptions =>
+        builder.Services.AddCors(corsOptions =>
+        {
+            corsOptions.AddDefaultPolicy(policy =>
             {
-                corsOptions.AddDefaultPolicy(policy =>
+                if (configureCorsPolicy is not null)
                 {
-                    if (options.ConfigurePolicy is not null)
-                    {
-                        options.ConfigurePolicy(policy);
-                        return;
-                    }
+                    configureCorsPolicy(policy);
+                    return;
+                }
 
-                    policy.WithOrigins(allowedOrigins)
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
-                });
+                if (allowedOrigins.Length == 0)
+                    return;
+
+                policy.WithOrigins(allowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
             });
+        });
+    }
 
-            return builder;
-        }
-
-        public IHostApplicationBuilder ConfigureProblemDetails(ApiProblemDetailsFeatureOptions? options = null)
+    private static void ConfigureProblemDetails(
+        IHostApplicationBuilder builder,
+        bool customizeBadHttpRequestProblemDetails,
+        Action<ProblemDetailsContext>? customizeProblemDetails)
+    {
+        builder.Services.AddProblemDetails(problemDetailsOptions =>
         {
-            options ??= new ApiProblemDetailsFeatureOptions();
-
-            builder.Services.AddProblemDetails(problemDetailsOptions =>
+            problemDetailsOptions.CustomizeProblemDetails = context =>
             {
-                problemDetailsOptions.CustomizeProblemDetails = context =>
-                {
-                    if (options.EnableBadHttpRequestCustomization)
-                        context.ApplyBadRequestProblemDetails();
+                if (customizeBadHttpRequestProblemDetails)
+                    context.ApplyBadRequestProblemDetails();
 
-                    options.CustomizeProblemDetails?.Invoke(context);
-                };
+                customizeProblemDetails?.Invoke(context);
+            };
+        });
+    }
+
+    private static void ConfigureApiVersioning(
+        IHostApplicationBuilder builder,
+        IReadOnlyCollection<ApiVersion> supportedApiVersions)
+    {
+        var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
+
+        builder.Services.AddApiVersioning(versioningOptions =>
+            {
+                versioningOptions.DefaultApiVersion = versions[0];
+                versioningOptions.AssumeDefaultVersionWhenUnspecified = true;
+                versioningOptions.ReportApiVersions = true;
+                versioningOptions.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddApiExplorer(explorerOptions =>
+            {
+                explorerOptions.GroupNameFormat = "'v'VVV";
+                explorerOptions.SubstituteApiVersionInUrl = true;
             });
+    }
 
-            return builder;
-        }
+    private static void ConfigureOpenApi(
+        IHostApplicationBuilder builder,
+        IReadOnlyCollection<ApiVersion> supportedApiVersions)
+    {
+        var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
 
-        public IHostApplicationBuilder ConfigureApiVersioning(ApiVersioningFeatureOptions options)
+        foreach (var version in versions)
         {
-            var versions = ApiVersioningConventions.NormalizeSupportedVersions(options.SupportedApiVersions);
-
-            builder.Services.AddApiVersioning(versioningOptions =>
-                {
-                    versioningOptions.DefaultApiVersion = versions[0];
-                    versioningOptions.AssumeDefaultVersionWhenUnspecified =
-                        options.AssumeDefaultVersionWhenUnspecified;
-                    versioningOptions.ReportApiVersions = options.ReportApiVersions;
-                    versioningOptions.ApiVersionReader = options.ApiVersionReader;
-                })
-                .AddApiExplorer(explorerOptions =>
-                {
-                    explorerOptions.GroupNameFormat = options.GroupNameFormat;
-                    explorerOptions.SubstituteApiVersionInUrl = options.SubstituteApiVersionInUrl;
-                });
-
-            return builder;
-        }
-
-        public IHostApplicationBuilder ConfigureOpenApi(ApiOpenApiFeatureOptions options)
-        {
-            var versions = ApiVersioningConventions.NormalizeSupportedVersions(options.SupportedApiVersions);
-
-            foreach (var version in versions)
+            var documentName = ApiVersioningConventions.ToDocumentName(version);
+            builder.Services.AddOpenApi(documentName, openApiOptions =>
             {
-                var documentName = ApiVersioningConventions.ToDocumentName(version);
-                builder.Services.AddOpenApi(documentName, openApiOptions =>
-                {
-                    openApiOptions.ShouldInclude =
-                        description => ApiVersioningConventions.ShouldIncludeInDocument(description, version);
-
-                    if (options.EnableBearerSecurity)
-                        ApiVersioningConventions.AddBearerSecurity(openApiOptions);
-                });
-            }
-
-            return builder;
+                openApiOptions.ShouldInclude =
+                    description => ApiVersioningConventions.ShouldIncludeInDocument(description, version);
+                ApiVersioningConventions.AddBearerSecurity(openApiOptions);
+            });
         }
     }
 }

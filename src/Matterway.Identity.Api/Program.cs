@@ -12,21 +12,15 @@ var apiContract = ApiDirectory.Identity;
 
 var builder = BuilderBootstrap.CreateBuilder(
     args,
-    new BuilderBootstrapOptions
-    {
-        ThrowOnBadRequest = false
-    });
+    false);
 
 var jwtConfigurationSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtConfigurationSection.Get<JwtTokenOptions>() ?? new JwtTokenOptions();
 
 builder
-    .ConfigureApiFoundation(
+    .ConfigureApi(
         apiContract,
-        new ApiProblemDetailsFeatureOptions
-        {
-            EnableBadHttpRequestCustomization = false
-        })
+        false)
     .ConfigureAuthentication(CreateAuthenticationOptions(jwtConfigurationSection, jwtOptions))
     .ConfigureIdentity()
     .ConfigurePersistence()
@@ -39,13 +33,12 @@ app.ApplyApiContract(apiContract);
 
 app.Run();
 
-static ApiAuthenticationFeatureOptions CreateAuthenticationOptions(
+static ApiAuthenticationOptions CreateAuthenticationOptions(
     IConfigurationSection jwtConfigurationSection,
     JwtTokenOptions jwtOptions)
 {
-    return new ApiAuthenticationFeatureOptions
+    return new ApiAuthenticationOptions
     {
-        ValidateIssuer = !string.IsNullOrWhiteSpace(jwtOptions.Issuer),
         ValidIssuer = jwtOptions.Issuer,
         ConfigureServices = hostBuilder =>
         {
