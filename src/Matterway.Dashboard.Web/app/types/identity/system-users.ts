@@ -24,6 +24,13 @@ export type UpdateSystemUserRequest = {
 
 export type UpdateSystemUserResponse = SystemUserResponse
 
+export type CreateEmployeeUserRequest = {
+  email: string
+  password: string
+}
+
+export type CreateEmployeeUserResponse = SystemUserResponse
+
 export type SystemUserPermLevel = "Observer" | "Operator" | "Manager"
 
 export type SystemUserPermResponse = {

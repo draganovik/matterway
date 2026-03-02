@@ -25,14 +25,14 @@ package "Sales" {
 
   usecase registerPayment as "Register Payment"
 
-  viewPayments ..> viewOrders : <<extend>>
-  updateOrderStatus ..> viewOrders : <<include>>
+  viewPayments .up.> viewOrders : <<extend>>
 }
 
 csmr --- placeOwnOrder
 csmr --- viewOwnOrders
 
 updateOrderStatus --- empl : perm:[operator,manager]
+viewOrders --- empl
 
 registerPayment --- systm
 @enduml

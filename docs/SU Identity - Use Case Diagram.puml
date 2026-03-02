@@ -14,24 +14,26 @@ rectangle #line:transparent {
 user --|> empl
 
 package "Identity" {
-  left to right direction
   usecase signIn as "Sign In"
   usecase refreshSession as "Refresh Session"
   usecase signOut as "Sign Out"
 
-  usecase viewSystemUsers as "View System Users"
   usecase manageSystemUsers as "Manage System Users
                                 ..<i>extention points</i>..
-                                Delete System User"
+                                Delete System User [manager only]"
   usecase deleteSystemUser as "Delete System User"
+  usecase viewSystemUsers as "View System Users"
+
   usecase viewUserPermissions as "View User Permissions"
   usecase manageUserPermissions as "Manage User Permissions"
 
-  usecase register as "Register"
+  usecase createEmployeeAccount as "Create Employee User Account"
+  usecase createCustomerAccount as "Create Customer User Account"
   usecase introspectAccessToken as "Introspect Access Token"
 
-  manageSystemUsers .left.> viewSystemUsers : <<include>>
-  deleteSystemUser .left.> manageSystemUsers : <<extend>>
+  manageSystemUsers .up.> viewSystemUsers : <<include>>
+  manageUserPermissions .up.> viewSystemUsers : <<include>>
+  deleteSystemUser .up.> manageSystemUsers : <<extend>>
 }
 
 user --- signIn
@@ -41,8 +43,8 @@ user --- signOut
 manageSystemUsers --- empl : perm:[operator,manager]
 viewUserPermissions --- empl : perm:[operator,manager]
 manageUserPermissions --- empl : perm:[manager]
-deleteSystemUser --- empl : perm:[manager]
+createEmployeeAccount --- empl : perm:[manager]
 
 introspectAccessToken --- sysm
-register --- sysm
+createCustomerAccount --- sysm
 @enduml

@@ -1,6 +1,8 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/useApiClient"
 import type {
+  CreateEmployeeUserRequest,
+  CreateEmployeeUserResponse,
   PatchSystemUserPermRequest,
   PatchSystemUserPermResponse,
   QuerySystemUsersParams,
@@ -15,6 +17,17 @@ const ADMIN_SYSTEM_USERS_PATH = "admin/system-users"
 
 export function useIdentityApi() {
   const api = useApiClient()
+
+  async function createEmployee(payload: CreateEmployeeUserRequest) {
+    return api.request<CreateEmployeeUserResponse>(
+      "identity",
+      "admin/users/employee",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    )
+  }
 
   async function querySystemUsers(params: QuerySystemUsersParams) {
     const query = buildQuery({
@@ -78,6 +91,7 @@ export function useIdentityApi() {
   }
 
   return {
+    createEmployee,
     querySystemUsers,
     getSystemUserById,
     updateSystemUser,

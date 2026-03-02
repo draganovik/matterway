@@ -1,4 +1,6 @@
 export type {
+  CreateEmployeeUserRequest,
+  CreateEmployeeUserResponse,
   IdentityRole,
   PatchSystemUserPermRequest,
   PatchSystemUserPermResponse,
