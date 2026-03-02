@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuthSession } from "~/composables/useAuthSession"
 import { useCart } from "~/composables/useCart"
+import { getJwtStringClaim } from "~/utils/jwt"
 
 const auth = useAuthSession()
 const cart = useCart()
@@ -17,6 +18,21 @@ const navItems = [
 
 const cartCount = computed(() => cart.totalItems.value)
 
+const userLabel = computed(() => {
+  if (auth.customerId.value?.trim()) return auth.customerId.value.trim()
+
+  const payload = auth.payload.value
+  const candidates = [
+    getJwtStringClaim(payload, "email"),
+    getJwtStringClaim(payload, "preferred_username"),
+    getJwtStringClaim(payload, "name"),
+    getJwtStringClaim(payload, "sub"),
+  ].filter(Boolean) as string[]
+
+  const raw = candidates[0] || "Kupac"
+  return raw.includes("@") ? raw.split("@")[0] : raw
+})
+
 function isActive(to: string) {
   return route.path === to || (to !== "/" && route.path.startsWith(`${to}/`))
 }
@@ -30,6 +46,13 @@ function submitSearch() {
     },
   })
   mobileMenuOpen.value = false
+}
+
+async function logoutFromCompactMenu() {
+  await cart.clear()
+  await auth.logout()
+  mobileMenuOpen.value = false
+  await navigateTo("/")
 }
 
 watch(
@@ -120,17 +143,6 @@ watch(
 
       <div class="ml-auto flex items-center gap-2 lg:hidden">
         <UButton
-          v-if="auth.isLoggedIn.value && auth.isCustomer.value"
-          to="/orders"
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-package-check"
-          square
-          :ui="{ leadingIcon: 'text-lg' }"
-          class="hover:bg-muted hover:text-highlighted hover:ring-default focus-visible:bg-muted focus-visible:text-highlighted focus-visible:ring-default hover:ring-1 hover:ring-inset focus-visible:ring-1 focus-visible:ring-inset"
-        />
-
-        <UButton
           to="/cart"
           color="neutral"
           variant="ghost"
@@ -170,6 +182,14 @@ watch(
         />
       </form>
       <div class="flex flex-col gap-1">
+        <div
+          v-if="auth.isLoggedIn.value && auth.isCustomer.value"
+          class="border-default bg-elevated/60 mb-2 rounded-md border px-3 py-2"
+        >
+          <p class="text-muted text-xs">Prijavljeni korisnik</p>
+          <p class="text-sm font-semibold">{{ userLabel }}</p>
+        </div>
+
         <UButton
           v-for="item in navItems"
           :key="`mobile-${item.to}`"
@@ -197,6 +217,29 @@ watch(
         >
           Prijava
         </UButton>
+
+        <template v-else-if="auth.isCustomer.value">
+          <UButton
+            to="/orders"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-package-check"
+            block
+            @click="mobileMenuOpen = false"
+          >
+            Moje porudžbine
+          </UButton>
+
+          <UButton
+            color="error"
+            variant="soft"
+            icon="i-lucide-log-out"
+            block
+            @click="logoutFromCompactMenu"
+          >
+            Odjavi se
+          </UButton>
+        </template>
       </div>
     </div>
   </header>

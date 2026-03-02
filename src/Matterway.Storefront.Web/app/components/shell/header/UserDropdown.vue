@@ -13,10 +13,6 @@ const userLabel = computed(() => {
   const payload = auth.payload.value
   const candidates = [
     getJwtStringClaim(payload, "email"),
-    getJwtStringClaim(
-      payload,
-      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
-    ),
     getJwtStringClaim(payload, "preferred_username"),
     getJwtStringClaim(payload, "name"),
     getJwtStringClaim(payload, "sub"),
