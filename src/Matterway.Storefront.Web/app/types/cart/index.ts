@@ -4,6 +4,4 @@ export type CartItem = {
   articleName: string
   unitPrice: number
   quantity: number
-  imageUrl?: string
-  imageAlt?: string
 }

@@ -13,8 +13,6 @@ type RemoteCartItem = {
   articleName?: string
   quantity?: number
   unitPrice?: number
-  imageUrl?: string
-  imageAlt?: string
   articleCode?: string
 }
 

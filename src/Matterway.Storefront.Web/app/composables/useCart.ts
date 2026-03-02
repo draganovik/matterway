@@ -17,8 +17,6 @@ function createCartItem(article: CatalogArticle): CartItem {
     articleName: article.title,
     unitPrice: normalizeNumber(article.price ?? article.basePrice, 0),
     quantity: 1,
-    imageUrl: article.thumbnailImage?.imageUrl,
-    imageAlt: article.thumbnailImage?.imageAlt,
   }
 }
 
@@ -28,8 +26,6 @@ function mapRemoteCartItem(item: {
   articleName?: string
   unitPrice?: number
   quantity?: number
-  imageUrl?: string
-  imageAlt?: string
 }): CartItem | null {
   if (!item.articleId) return null
 
@@ -39,8 +35,6 @@ function mapRemoteCartItem(item: {
     articleName: item.articleName ? String(item.articleName) : "",
     unitPrice: normalizeNumber(item.unitPrice),
     quantity: Math.max(1, normalizeNumber(item.quantity, 1)),
-    imageUrl: item.imageUrl ? String(item.imageUrl) : undefined,
-    imageAlt: item.imageAlt ? String(item.imageAlt) : undefined,
   }
 }
 
@@ -76,8 +70,6 @@ export function useCart() {
             articleName: String(source.articleName ?? ""),
             unitPrice: normalizeNumber(source.unitPrice),
             quantity: Math.max(1, normalizeNumber(source.quantity, 1)),
-            imageUrl: source.imageUrl ? String(source.imageUrl) : undefined,
-            imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
           }
         })
         .filter((item: CartItem) => item.articleId)

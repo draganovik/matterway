@@ -3,7 +3,6 @@ import { useAuthSession } from "~/composables/useAuthSession"
 import { useCart } from "~/composables/useCart"
 import { useCustomersApi } from "~/composables/useCustomersApi"
 import { useSalesApi } from "~/composables/useSalesApi"
-import { formatMoney } from "~/utils/formatters"
 import type { CheckoutAddress } from "~/types/customers/address"
 
 const auth = useAuthSession()
@@ -24,15 +23,89 @@ const address = reactive<CheckoutAddress>({
 
 const payment = reactive({
   cardNumber: "",
-  expMonth: new Date().getMonth() + 1,
-  expYear: new Date().getFullYear(),
+  expMonth: "",
+  expYear: "",
   cvc: "",
 })
 
 const error = ref("")
 const loading = ref(false)
+const currentYear = new Date().getFullYear()
 
 const isCartEmpty = computed(() => cart.totalItems.value === 0)
+
+function getCardDigits() {
+  return payment.cardNumber.replace(/\D/g, "")
+}
+
+function isLuhnValid(cardDigits: string) {
+  let sum = 0
+  let shouldDouble = false
+
+  for (let i = cardDigits.length - 1; i >= 0; i -= 1) {
+    let digit = Number(cardDigits[i])
+    if (!Number.isFinite(digit)) return false
+
+    if (shouldDouble) {
+      digit *= 2
+      if (digit > 9) digit -= 9
+    }
+
+    sum += digit
+    shouldDouble = !shouldDouble
+  }
+
+  return sum % 10 === 0
+}
+
+function isCardNumberValid() {
+  const cardDigits = getCardDigits()
+  if (!/^\d{13,19}$/.test(cardDigits)) return false
+  return isLuhnValid(cardDigits)
+}
+
+function getParsedExpiry() {
+  const monthRaw = payment.expMonth.trim()
+  const yearRaw = payment.expYear.trim()
+
+  if (!/^\d{1,2}$/.test(monthRaw)) return null
+  if (!/^\d{4}$/.test(yearRaw)) return null
+
+  const month = Number(monthRaw)
+  const year = Number(yearRaw)
+  if (!Number.isInteger(month) || !Number.isInteger(year)) return null
+  if (month < 1 || month > 12) return null
+  if (year < 2000) return null
+
+  const now = new Date()
+  const nowMonth = now.getMonth() + 1
+  const nowYear = now.getFullYear()
+  if (year < nowYear) return null
+  if (year === nowYear && month < nowMonth) return null
+
+  return { month, year }
+}
+
+function isExpiryValid() {
+  return getParsedExpiry() !== null
+}
+
+function isCvcValid() {
+  return /^\d{3,4}$/.test(payment.cvc)
+}
+
+function getPaymentValidationError() {
+  if (!isCardNumberValid()) {
+    return "Unesite ispravan broj kartice."
+  }
+  if (!isExpiryValid()) {
+    return "Unesite ispravan datum isteka kartice."
+  }
+  if (!isCvcValid()) {
+    return "Unesite ispravan CVC kod."
+  }
+  return null
+}
 
 function formatCardNumber(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 19)
@@ -55,6 +128,26 @@ watch(
     const normalized = value.replace(/\D/g, "").slice(0, 4)
     if (normalized !== value) {
       payment.cvc = normalized
+    }
+  },
+)
+
+watch(
+  () => payment.expMonth,
+  (value) => {
+    const normalized = value.replace(/\D/g, "").slice(0, 2)
+    if (normalized !== value) {
+      payment.expMonth = normalized
+    }
+  },
+)
+
+watch(
+  () => payment.expYear,
+  (value) => {
+    const normalized = value.replace(/\D/g, "").slice(0, 4)
+    if (normalized !== value) {
+      payment.expYear = normalized
     }
   },
 )
@@ -104,12 +197,6 @@ async function submitCheckout() {
 
   loading.value = true
   try {
-    const refreshedCart = await cart.refreshFromRemote()
-    if (!refreshedCart.ok) {
-      error.value = refreshedCart.error || "Osvežavanje korpe nije uspelo."
-      return
-    }
-
     if (isCartEmpty.value) {
       error.value = "Korpa je prazna."
       return
@@ -117,6 +204,18 @@ async function submitCheckout() {
 
     if (!isAddressValid()) {
       error.value = "Popunite sva obavezna polja za dostavu."
+      return
+    }
+
+    const paymentValidationError = getPaymentValidationError()
+    if (paymentValidationError) {
+      error.value = paymentValidationError
+      return
+    }
+
+    const expiry = getParsedExpiry()
+    if (!expiry) {
+      error.value = "Unesite ispravan datum isteka kartice."
       return
     }
 
@@ -145,8 +244,8 @@ async function submitCheckout() {
       },
       body: JSON.stringify({
         cardNumber: payment.cardNumber.replace(/\D/g, ""),
-        expMonth: payment.expMonth,
-        expYear: payment.expYear,
+        expMonth: expiry.month,
+        expYear: expiry.year,
         cvc: payment.cvc.replace(/\D/g, ""),
         amount: orderResponse.data.totalAmount ?? cart.totalPrice.value,
         ...address,
@@ -196,176 +295,17 @@ onMounted(async () => {
     <StatusMessages v-if="error" :error="error" />
 
     <div class="grid gap-6 lg:grid-cols-[1fr_22rem]">
-      <UCard class="border-default bg-default border">
-        <template #header>
-          <h2 class="text-lg font-semibold">Dostava</h2>
-        </template>
+      <div class="space-y-6">
+        <CheckoutDeliveryPanel v-model="address" />
+        <CheckoutPaymentPanel v-model="payment" :current-year="currentYear" />
+      </div>
 
-        <div class="grid gap-4 sm:grid-cols-2">
-          <UFormField label="Ime primaoca" required>
-            <UInput
-              v-model="address.receiverName"
-              placeholder="npr. Petar Petrović"
-              class="w-full"
-              required
-            />
-          </UFormField>
-
-          <UFormField label="Telefon">
-            <UInput
-              v-model="address.contactPhone"
-              placeholder="npr. +381 64 123 4567"
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField label="Ulica" required>
-            <UInput
-              v-model="address.street"
-              placeholder="npr. Bulevar oslobođenja 15"
-              class="w-full"
-              required
-            />
-          </UFormField>
-
-          <UFormField label="Dodatak adrese" required>
-            <UInput
-              v-model="address.residence"
-              placeholder="npr. Stan 12, 3. sprat"
-              class="w-full"
-              required
-            />
-          </UFormField>
-
-          <UFormField label="Grad" required>
-            <UInput
-              v-model="address.city"
-              placeholder="npr. Novi Sad"
-              class="w-full"
-              required
-            />
-          </UFormField>
-
-          <UFormField label="Poštanski broj" required>
-            <UInput
-              v-model="address.zipCode"
-              placeholder="npr. 21000"
-              class="w-full"
-              required
-            />
-          </UFormField>
-
-          <UFormField label="Država" class="sm:col-span-2">
-            <UInput
-              v-model="address.country"
-              placeholder="npr. Srbija"
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField label="Napomena" class="sm:col-span-2">
-            <UTextarea
-              v-model="address.note"
-              placeholder="Napomena za dostavu (opciono)"
-              class="w-full"
-            />
-          </UFormField>
-        </div>
-
-        <template #footer>
-          <h3 class="mb-3 text-base font-semibold">Plaćanje karticom</h3>
-          <div
-            class="border-default bg-elevated mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-xs"
-          >
-            <UIcon name="i-lucide-shield-check" class="text-primary h-4 w-4" />
-            <span class="text-muted">
-              Bezbedna SSL naplata. Podaci o kartici se ne čuvaju.
-            </span>
-          </div>
-          <div class="grid gap-4 sm:grid-cols-3">
-            <UFormField label="Broj kartice" required class="sm:col-span-3">
-              <UInput
-                v-model="payment.cardNumber"
-                icon="i-lucide-credit-card"
-                placeholder="1234 5678 9012 3456"
-                autocomplete="cc-number"
-                inputmode="numeric"
-                maxlength="23"
-                :ui="{ base: 'font-mono tracking-[0.08em]' }"
-                class="w-full"
-                required
-              />
-            </UFormField>
-
-            <UFormField label="Mesec" required>
-              <UInput
-                v-model.number="payment.expMonth"
-                type="number"
-                min="1"
-                max="12"
-                placeholder="MM"
-                autocomplete="cc-exp-month"
-                inputmode="numeric"
-                class="w-full"
-                required
-              />
-            </UFormField>
-
-            <UFormField label="Godina" required>
-              <UInput
-                v-model.number="payment.expYear"
-                type="number"
-                min="2024"
-                placeholder="GGGG"
-                autocomplete="cc-exp-year"
-                inputmode="numeric"
-                class="w-full"
-                required
-              />
-            </UFormField>
-
-            <UFormField label="CVC" required>
-              <UInput
-                v-model="payment.cvc"
-                placeholder="123"
-                autocomplete="cc-csc"
-                inputmode="numeric"
-                maxlength="4"
-                class="w-full"
-                required
-              />
-            </UFormField>
-          </div>
-        </template>
-      </UCard>
-
-      <UCard class="border-default bg-default h-fit border">
-        <template #header>
-          <h2 class="text-base font-semibold">Pregled porudžbine</h2>
-        </template>
-
-        <div class="space-y-3 text-sm">
-          <div class="flex items-center justify-between">
-            <span class="text-muted">Stavke</span>
-            <span>{{ cart.totalItems.value }}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-muted">Iznos</span>
-            <span>{{ formatMoney(cart.totalPrice.value) }}</span>
-          </div>
-        </div>
-
-        <template #footer>
-          <UButton
-            color="primary"
-            block
-            :loading="loading"
-            @click="submitCheckout"
-          >
-            {{ loading ? "Obrada..." : "Plati odmah" }}
-          </UButton>
-        </template>
-      </UCard>
+      <CheckoutOrderActionPanel
+        :total-items="cart.totalItems.value"
+        :total-price="cart.totalPrice.value"
+        :loading="loading"
+        @submit="submitCheckout"
+      />
     </div>
   </div>
 </template>

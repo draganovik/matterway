@@ -16,6 +16,10 @@ function goToCheckout() {
   }
   void navigateTo("/checkout")
 }
+
+async function clearCart() {
+  await cart.clear()
+}
 </script>
 
 <template>
@@ -47,107 +51,19 @@ function goToCheckout() {
     </EmptyState>
 
     <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
-      <UCard class="border-default bg-default border">
-        <ul class="divide-default divide-y">
-          <li
-            v-for="item in cart.items.value"
-            :key="item.articleId"
-            class="flex items-center gap-4 py-4"
-          >
-            <div
-              class="bg-elevated flex aspect-[4/3] w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg"
-            >
-              <ImageWithFallback
-                :src="item.imageUrl || null"
-                :alt="item.imageAlt || item.articleName"
-                img-class="h-full w-full object-cover"
-                placeholder-class="h-full w-full"
-              />
-            </div>
+      <CartListPanel
+        :items="cart.items.value"
+        @increase="cart.increase"
+        @decrease="cart.decrease"
+        @remove="cart.remove"
+      />
 
-            <div class="min-w-0 flex-1">
-              <NuxtLink
-                :to="`/articles/${item.articleId}`"
-                class="truncate text-sm font-semibold hover:text-cyan-700"
-              >
-                {{ item.articleName }}
-              </NuxtLink>
-              <p class="text-muted text-xs">#{{ item.articleCode }}</p>
-              <p class="text-sm">{{ formatMoney(item.unitPrice) }}</p>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <UButton
-                color="neutral"
-                variant="soft"
-                icon="i-lucide-minus"
-                square
-                @click="cart.decrease(item.articleId)"
-              />
-              <UBadge color="primary" variant="subtle">
-                {{ item.quantity }}
-              </UBadge>
-              <UButton
-                color="primary"
-                variant="soft"
-                icon="i-lucide-plus"
-                square
-                @click="cart.increase(item.articleId)"
-              />
-              <UButton
-                color="error"
-                variant="ghost"
-                icon="i-lucide-trash"
-                square
-                @click="cart.remove(item.articleId)"
-              />
-            </div>
-          </li>
-        </ul>
-      </UCard>
-
-      <UCard class="border-default bg-default h-fit border">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-muted">Stavke</span>
-            <span>{{ cart.totalItems.value }}</span>
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-muted">Međuzbir</span>
-            <span>{{ formatMoney(cart.totalPrice.value) }}</span>
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-muted">Dostava</span>
-            <span>Besplatna</span>
-          </div>
-          <div class="border-default border-t pt-2">
-            <div class="flex items-center justify-between font-semibold">
-              <span>Ukupno</span>
-              <span>{{ formatMoney(cart.totalPrice.value) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <template #footer>
-          <div class="space-y-2">
-            <UButton color="primary" block @click="goToCheckout"
-              >Nastavi na plaćanje</UButton
-            >
-            <UButton
-              color="neutral"
-              variant="soft"
-              block
-              @click="
-                () => {
-                  void cart.clear()
-                }
-              "
-            >
-              Isprazni korpu
-            </UButton>
-          </div>
-        </template>
-      </UCard>
+      <CartActionPanel
+        :total-items="cart.totalItems.value"
+        :total-price="cart.totalPrice.value"
+        @checkout="goToCheckout"
+        @clear="clearCart"
+      />
     </div>
   </div>
 </template>
