@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Matterway.Customers.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,6 +79,7 @@ namespace Matterway.Customers.Api.Migrations
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
                     ArticleName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: true)
@@ -116,16 +117,16 @@ namespace Matterway.Customers.Api.Migrations
                 values: new object[,]
                 {
                     { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b5"), "Futog", "23b", "Novi Sad", "+381601234567", "Serbia", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b3"), "21000" },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), "Kralja Milana", "34/10", "Beograd", "++381676543210", "Serbia", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), "11000" }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b6"), "Kralja Milana", "34/10", "Beograd", "+381676543210", "Serbia", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), "11000" }
                 });
 
             migrationBuilder.InsertData(
                 table: "CustomerArticle",
-                columns: new[] { "Id", "ArticleId", "ArticleName", "CustomerId", "OrderId", "Quantity", "UnitPrice" },
+                columns: new[] { "Id", "ArticleCode", "ArticleId", "ArticleName", "CustomerId", "OrderId", "Quantity", "UnitPrice" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 3, 4999m },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 1, 19999m }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), null, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 3, 4999m },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), null, new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 1, 19999m }
                 });
 
             migrationBuilder.CreateIndex(

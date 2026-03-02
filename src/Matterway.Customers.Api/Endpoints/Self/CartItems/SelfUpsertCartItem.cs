@@ -64,6 +64,7 @@ public class SelfUpsertCartItem : IEndpoint
             ArticleId = articleId,
             Quantity = request.Quantity,
             ArticleName = article.Title,
+            ArticleCode = article.Code,
             UnitPrice = resolvedPrice
         };
 
@@ -94,6 +95,9 @@ public class SelfUpsertCartItem : IEndpoint
         public string? ArticleName { get; init; }
 
         [Required]
+        public string? ArticleCode { get; init; }
+
+        [Required]
         public Guid ArticleId { get; init; }
 
         [Required]
@@ -119,6 +123,7 @@ public class SelfUpsertCartItem : IEndpoint
             CustomerId = entity.CustomerId,
             ArticleId = entity.ArticleId,
             ArticleName = entity.ArticleName,
+            ArticleCode = entity.ArticleCode ?? string.Empty,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

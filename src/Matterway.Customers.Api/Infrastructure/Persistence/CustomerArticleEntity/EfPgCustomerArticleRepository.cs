@@ -32,6 +32,7 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
             existing.Quantity = requestModel.Quantity;
             existing.UnitPrice = requestModel.UnitPrice;
             existing.ArticleName = requestModel.ArticleName;
+            existing.ArticleCode = requestModel.ArticleCode;
             context.CustomerArticle.Update(existing);
         }
         else

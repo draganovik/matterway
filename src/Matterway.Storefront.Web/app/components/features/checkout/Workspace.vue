@@ -65,8 +65,8 @@ function isCardNumberValid() {
 }
 
 function getParsedExpiry() {
-  const monthRaw = payment.expMonth.trim()
-  const yearRaw = payment.expYear.trim()
+  const monthRaw = String(payment.expMonth ?? "").trim()
+  const yearRaw = String(payment.expYear ?? "").trim()
 
   if (!/^\d{1,2}$/.test(monthRaw)) return null
   if (!/^\d{4}$/.test(yearRaw)) return null
@@ -135,7 +135,9 @@ watch(
 watch(
   () => payment.expMonth,
   (value) => {
-    const normalized = value.replace(/\D/g, "").slice(0, 2)
+    const normalized = String(value ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 2)
     if (normalized !== value) {
       payment.expMonth = normalized
     }
@@ -145,7 +147,9 @@ watch(
 watch(
   () => payment.expYear,
   (value) => {
-    const normalized = value.replace(/\D/g, "").slice(0, 4)
+    const normalized = String(value ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 4)
     if (normalized !== value) {
       payment.expYear = normalized
     }

@@ -32,6 +32,10 @@ internal sealed class CustomerArticleEntityTypeConfiguration : IEntityTypeConfig
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(article => article.ArticleCode)
+            .IsRequired(false)
+            .HasMaxLength(10);
+
         builder.HasOne(article => article.Customer)
             .WithMany()
             .HasForeignKey(article => article.CustomerId)

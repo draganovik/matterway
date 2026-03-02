@@ -46,12 +46,11 @@ const payment = defineModel<PaymentForm>({ required: true })
       <UFormField label="Mesec" required>
         <UInput
           v-model="payment.expMonth"
-          type="number"
-          min="1"
-          max="12"
+          type="text"
           placeholder="MM"
           autocomplete="cc-exp-month"
           inputmode="numeric"
+          maxlength="2"
           class="w-full"
           required
         />
