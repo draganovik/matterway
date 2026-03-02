@@ -18,7 +18,9 @@ type CustomerForm = {
 const auth = useAuthSession()
 const api = useCustomersApi()
 
-const canEdit = computed(() => auth.hasPermission("customers", "operator"))
+const canEdit = computed(() =>
+  auth.hasPermission("customers", ["operator", "manager"]),
+)
 const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
 const listState = useRequestState({ empty: "No customers found." })

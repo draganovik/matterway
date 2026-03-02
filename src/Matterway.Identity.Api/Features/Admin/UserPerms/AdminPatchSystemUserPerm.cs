@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
@@ -7,29 +6,28 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Matterway.Identity.Api.Features.Admin.UserPerms;
 
-public class AdminDeleteSystemUserPerm : IEndpoint
+public class AdminPatchSystemUserPerm : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapDelete(EndpointKind.Admin, "system-users/{id:guid}/perms", Handler)
-            .WithName("AdminDeleteSystemUserPerm")
-            .WithSummary("[admin] Remove a permission from a system user")
+        endpoints.MapPatch(EndpointKind.Admin, "system-users/{id:guid}/perms", Handler)
+            .WithName("AdminPatchSystemUserPerm")
+            .WithSummary("[admin] Set a permission for a system user")
             .WithTags("SystemUsers")
-            .Produces<IEnumerable<DeleteSystemUserPermResponse>>(StatusCodes.Status200OK)
+            .Produces<IEnumerable<PatchSystemUserPermResponse>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsAdministrator(context.User)))
+                policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
     private static async
-        Task<Results<Ok<IEnumerable<DeleteSystemUserPermResponse>>, BadRequest<ProblemDetails>, NotFound>>
+        Task<Results<Ok<IEnumerable<PatchSystemUserPermResponse>>, BadRequest<ProblemDetails>, NotFound>>
         Handler(
             Guid id,
-            [FromBody]
-            DeleteSystemUserPermRequest request,
+            PatchSystemUserPermRequest request,
             UserManager<SystemUser> userManager)
     {
         var user = await userManager.FindByIdAsync(id.ToString());
@@ -42,25 +40,22 @@ public class AdminDeleteSystemUserPerm : IEndpoint
         if (string.IsNullOrWhiteSpace(request.Service) || request.Level is null)
             return TypedResults.BadRequest(CreateProblemDetails("Service and level are required."));
 
-        var permissionValue = PermissionClaims.Format(request.Service, request.Level.Value);
-        var claim = new Claim(PermissionClaims.ClaimType, permissionValue);
-        var removeResult = await userManager.RemoveClaimAsync(user, claim);
-        if (!removeResult.Succeeded)
-            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
-                removeResult.Errors.Select(error => error.Description))));
+        var setResult = await IdentityPermissionAdapter.SetServicePermissionAsync(
+            userManager,
+            user,
+            request.Service,
+            request.Level.Value);
 
-        var claims = await userManager.GetClaimsAsync(user);
-        var response = claims
-            .Where(existing => string.Equals(existing.Type, PermissionClaims.ClaimType, StringComparison.Ordinal))
-            .Select(existing => PermissionClaims.TryParse(existing.Value, out var service, out var level)
-                ? new DeleteSystemUserPermResponse
-                {
-                    Service = service,
-                    Level = level
-                }
-                : null)
-            .Where(responseItem => responseItem is not null)
-            .Select(responseItem => responseItem!);
+        if (!setResult.Succeeded)
+            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                setResult.Errors.Select(error => error.Description))));
+
+        var response = (await IdentityPermissionAdapter.GetServicePermissionsAsync(userManager, user))
+            .Select(permission => new PatchSystemUserPermResponse
+            {
+                Service = permission.Service,
+                Level = permission.Level
+            });
 
         return TypedResults.Ok(response);
     }
@@ -75,7 +70,7 @@ public class AdminDeleteSystemUserPerm : IEndpoint
         };
     }
 
-    public class DeleteSystemUserPermRequest
+    public class PatchSystemUserPermRequest
     {
         [Required(ErrorMessage = "Service is required.")]
         public string? Service { get; set; }
@@ -85,7 +80,7 @@ public class AdminDeleteSystemUserPerm : IEndpoint
         public PermissionLevel? Level { get; set; }
     }
 
-    public class DeleteSystemUserPermResponse
+    public class PatchSystemUserPermResponse
     {
         public string Service { get; set; } = string.Empty;
 

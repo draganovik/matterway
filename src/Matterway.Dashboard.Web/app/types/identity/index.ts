@@ -1,9 +1,9 @@
 export type {
-  AddSystemUserPermRequest,
-  AddSystemUserPermResponse,
-  DeleteSystemUserPermRequest,
-  DeleteSystemUserPermResponse,
+  CreateEmployeeUserRequest,
+  CreateEmployeeUserResponse,
   IdentityRole,
+  PatchSystemUserPermRequest,
+  PatchSystemUserPermResponse,
   QuerySystemUsersParams,
   QuerySystemUsersResponse,
   SystemUserPermLevel,

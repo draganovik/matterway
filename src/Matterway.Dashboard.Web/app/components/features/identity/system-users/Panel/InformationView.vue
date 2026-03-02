@@ -52,7 +52,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
       <p class="text-muted text-sm">
         {{
           canOperate
-            ? "Operator permission is required for updates. Administrator permission is required for role changes and delete."
+            ? "Operator permission is required for updates. Manager permission is required for permission changes and delete."
             : "Read-only mode: operator permission required for updates."
         }}
       </p>
@@ -103,14 +103,14 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
         class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Roles</h4>
+          <h4 class="text-foreground text-sm font-semibold">Permissions</h4>
           <p class="text-muted text-sm">
-            Reveal assigned service roles and manage them as admin.
+            Reveal assigned service permissions and manage them as manager.
           </p>
         </div>
 
         <UButton variant="outline" @click="emit('revealRoles')">
-          Reveal Roles
+          Reveal Permissions
         </UButton>
       </div>
 

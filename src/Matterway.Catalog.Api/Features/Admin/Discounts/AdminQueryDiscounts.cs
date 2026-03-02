@@ -12,7 +12,9 @@ public class AdminQueryDiscounts : IEndpoint
             .WithTags(nameof(Discount))
             .Produces<ICollection<QueryDiscountResponse>>()
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsObserver(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
+                    RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

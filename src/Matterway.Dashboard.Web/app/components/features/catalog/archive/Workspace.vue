@@ -7,7 +7,9 @@ import type { ImportCatalogArchiveResponse } from "~/types/catalog"
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canOperate = computed(() => auth.hasPermission("catalog", "operator"))
+const canOperate = computed(() =>
+  auth.hasPermission("catalog", ["operator", "manager"]),
+)
 
 const exportState = useRequestState()
 const importState = useRequestState()

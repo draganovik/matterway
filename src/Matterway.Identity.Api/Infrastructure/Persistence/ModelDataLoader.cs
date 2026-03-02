@@ -125,28 +125,28 @@ public static class ModelDataLoader
                 Id = 1,
                 UserId = adminUserId,
                 ClaimType = PermissionClaims.ClaimType,
-                ClaimValue = PermissionClaims.Format("identity", PermissionLevel.Administrator)
+                ClaimValue = PermissionClaims.Format("identity", PermissionLevel.Manager)
             },
             new IdentityUserClaim<Guid>
             {
                 Id = 2,
                 UserId = adminUserId,
                 ClaimType = PermissionClaims.ClaimType,
-                ClaimValue = PermissionClaims.Format("catalog", PermissionLevel.Administrator)
+                ClaimValue = PermissionClaims.Format("catalog", PermissionLevel.Manager)
             },
             new IdentityUserClaim<Guid>
             {
                 Id = 3,
                 UserId = adminUserId,
                 ClaimType = PermissionClaims.ClaimType,
-                ClaimValue = PermissionClaims.Format("customers", PermissionLevel.Administrator)
+                ClaimValue = PermissionClaims.Format("customers", PermissionLevel.Manager)
             },
             new IdentityUserClaim<Guid>
             {
                 Id = 4,
                 UserId = adminUserId,
                 ClaimType = PermissionClaims.ClaimType,
-                ClaimValue = PermissionClaims.Format("sales", PermissionLevel.Administrator)
+                ClaimValue = PermissionClaims.Format("sales", PermissionLevel.Manager)
             },
             new IdentityUserClaim<Guid>
             {

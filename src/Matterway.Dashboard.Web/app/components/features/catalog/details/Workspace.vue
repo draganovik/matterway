@@ -14,7 +14,9 @@ type DetailForm = {
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
+const canEdit = computed(() =>
+  auth.hasPermission("catalog", ["operator", "manager"]),
+)
 
 const listState = useRequestState({ empty: "No detail definitions found." })
 const saveState = useRequestState()

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useSalesApi } from "~/composables/useSalesApi"
-import { formatDate, formatMoney } from "~/utils/formatters"
 import type { SalesOrder } from "~/types/sales/orders"
 
 const salesApi = useSalesApi()
@@ -8,9 +7,22 @@ const salesApi = useSalesApi()
 const loading = ref(true)
 const error = ref("")
 const orders = ref<SalesOrder[]>([])
+const statusHistoryOpen = ref(false)
+const itemsOpen = ref(false)
+const selectedOrder = ref<SalesOrder | null>(null)
 
-function resolveOrderDate(order: SalesOrder) {
-  return formatDate(order.placedAt || order.createdAt || null)
+watch([statusHistoryOpen, itemsOpen], ([isStatusHistoryOpen, isItemsOpen]) => {
+  if (!isStatusHistoryOpen && !isItemsOpen) selectedOrder.value = null
+})
+
+function openStatusHistory(order: SalesOrder) {
+  selectedOrder.value = order
+  statusHistoryOpen.value = true
+}
+
+function openItems(order: SalesOrder) {
+  selectedOrder.value = order
+  itemsOpen.value = true
 }
 
 async function loadOrders() {
@@ -73,39 +85,27 @@ onMounted(() => {
               <th class="px-3 py-2 font-medium">Datum</th>
               <th class="px-3 py-2 font-medium">Stavke</th>
               <th class="px-3 py-2 font-medium">Adresa</th>
+              <th class="px-3 py-2 font-medium">Status</th>
               <th class="px-3 py-2 text-right font-medium">Iznos</th>
             </tr>
           </thead>
           <tbody>
-            <tr
+            <OrdersListItem
               v-for="order in orders"
               :key="order.id"
-              class="border-default border-t"
-            >
-              <td class="px-3 py-3 font-medium">{{ order.id }}</td>
-              <td class="text-muted px-3 py-3 whitespace-nowrap">
-                {{ resolveOrderDate(order) }}
-              </td>
-              <td class="px-3 py-3">
-                <ul class="list-disc pl-5">
-                  <li
-                    v-for="item in order.items"
-                    :key="`${order.id}-${item.articleTitle}`"
-                  >
-                    {{ item.quantity }} x {{ item.articleTitle }}
-                  </li>
-                </ul>
-              </td>
-              <td class="px-3 py-3">
-                {{ order.deliveryInfo?.addressLine1 || "-" }}
-              </td>
-              <td class="px-3 py-3 text-right font-semibold">
-                {{ formatMoney(order.totalAmount || 0) }}
-              </td>
-            </tr>
+              :order="order"
+              @reveal-status-history="openStatusHistory"
+              @reveal-items="openItems"
+            />
           </tbody>
         </table>
       </div>
     </UCard>
   </div>
+
+  <OrdersModalStatusHistoryView
+    v-model:open="statusHistoryOpen"
+    :order="selectedOrder"
+  />
+  <OrdersModalItemsView v-model:open="itemsOpen" :order="selectedOrder" />
 </template>

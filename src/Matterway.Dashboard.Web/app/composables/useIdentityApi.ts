@@ -1,10 +1,10 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/useApiClient"
 import type {
-  AddSystemUserPermRequest,
-  AddSystemUserPermResponse,
-  DeleteSystemUserPermRequest,
-  DeleteSystemUserPermResponse,
+  CreateEmployeeUserRequest,
+  CreateEmployeeUserResponse,
+  PatchSystemUserPermRequest,
+  PatchSystemUserPermResponse,
   QuerySystemUsersParams,
   QuerySystemUsersResponse,
   SystemUserPermResponse,
@@ -17,6 +17,17 @@ const ADMIN_SYSTEM_USERS_PATH = "admin/system-users"
 
 export function useIdentityApi() {
   const api = useApiClient()
+
+  async function createEmployee(payload: CreateEmployeeUserRequest) {
+    return api.request<CreateEmployeeUserResponse>(
+      "identity",
+      "admin/users/employee",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    )
+  }
 
   async function querySystemUsers(params: QuerySystemUsersParams) {
     const query = buildQuery({
@@ -65,41 +76,27 @@ export function useIdentityApi() {
     )
   }
 
-  async function addSystemUserPerm(
+  async function patchSystemUserPerm(
     id: string,
-    payload: AddSystemUserPermRequest,
+    payload: PatchSystemUserPermRequest,
   ) {
-    return api.request<AddSystemUserPermResponse[]>(
+    return api.request<PatchSystemUserPermResponse[]>(
       "identity",
       `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
       {
-        method: "POST",
-        body: JSON.stringify(payload),
-      },
-    )
-  }
-
-  async function deleteSystemUserPerm(
-    id: string,
-    payload: DeleteSystemUserPermRequest,
-  ) {
-    return api.request<DeleteSystemUserPermResponse[]>(
-      "identity",
-      `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
-      {
-        method: "DELETE",
+        method: "PATCH",
         body: JSON.stringify(payload),
       },
     )
   }
 
   return {
+    createEmployee,
     querySystemUsers,
     getSystemUserById,
     updateSystemUser,
     deleteSystemUser,
     getSystemUserPerms,
-    addSystemUserPerm,
-    deleteSystemUserPerm,
+    patchSystemUserPerm,
   }
 }

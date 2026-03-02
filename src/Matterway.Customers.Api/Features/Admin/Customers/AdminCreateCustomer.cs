@@ -14,7 +14,7 @@ public class AdminCreateCustomer : IEndpoint
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.AsOperator(context.User)))
+                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

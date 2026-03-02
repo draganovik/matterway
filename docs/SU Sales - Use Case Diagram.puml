@@ -4,36 +4,35 @@ left to right direction
 skinparam shadowing false
 skinparam actorStyle hollow
 
-actor :Customer: as csmr
+actor user as "User"
+actor csmr as "Customer"
+actor empl as "Employee"
 
-rectangle #line:transparent {
-  actor :Employee: as empl
-  actor :Manager: as mngr
-  actor :Operator: as oprt
-}
-oprt --> empl
-mngr --> empl
+user --|> csmr
+user --|> empl
 
-actor "Storefront.Web" <<Payment Process>> as paymentProcess
+actor systm as "System"
 
-package "Sales API" {
-  usecase "Place Own Order" as placeOwnOrder
-  usecase "View Own Orders" as viewOwnOrders
+package "Sales" {
+  usecase placeOwnOrder as "Place Own Order"
+  usecase viewOwnOrders as "View Own Orders"
 
-  usecase "View Orders" as viewOrders
-  usecase "View Payments" as viewPayments
-  usecase "Update Order Status" as updateOrderStatus
+  usecase viewOrders as "View Orders
+                         ..<i>extention points</i>..
+                         View Payments"
+  usecase viewPayments as "View Payments"
+  usecase updateOrderStatus as "Update Order Status"
 
-  usecase "Register Payment" as registerPayment
+  usecase registerPayment as "Register Payment"
 
-  viewPayments ..> viewOrders : <<extend>>
-  updateOrderStatus ..> viewOrders : <<include>>
+  viewPayments .up.> viewOrders : <<extend>>
 }
 
 csmr --- placeOwnOrder
 csmr --- viewOwnOrders
 
-updateOrderStatus --- oprt
+updateOrderStatus --- empl : perm:[operator,manager]
+viewOrders --- empl
 
-registerPayment --- paymentProcess
+registerPayment --- systm
 @enduml

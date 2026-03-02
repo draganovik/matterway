@@ -12,7 +12,9 @@ import { useAuthSession } from "~/composables/useAuthSession"
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
+const canEdit = computed(() =>
+  auth.hasPermission("catalog", ["operator", "manager"]),
+)
 
 const listState = useRequestState({ empty: "No articles found." })
 const articles = ref<QueryArticleResponse[]>([])

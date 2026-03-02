@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,7 +16,8 @@ public class AdminGetSystemUserPerms : IEndpoint
             .Produces<IEnumerable<GetSystemUserPermResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
-                policy.RequireAssertion(context => RequestIdentity.AsOperator(context.User)))
+                policy.RequireAssertion(context =>
+                    RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
@@ -26,18 +28,15 @@ public class AdminGetSystemUserPerms : IEndpoint
         var user = await userManager.FindByIdAsync(id.ToString());
         if (user is null) return TypedResults.NotFound();
 
-        var claims = await userManager.GetClaimsAsync(user);
-        var response = claims
-            .Where(claim => string.Equals(claim.Type, PermissionClaims.ClaimType, StringComparison.Ordinal))
-            .Select(claim => PermissionClaims.TryParse(claim.Value, out var service, out var level)
-                ? new GetSystemUserPermResponse
-                {
-                    Service = service,
-                    Level = level
-                }
-                : null)
-            .Where(responseItem => responseItem is not null)
-            .Select(responseItem => responseItem!);
+        var role = await IdentityRoleAdapter.GetPrimaryRoleAsync(userManager, user);
+        var response = role == EIdentityRole.Employee
+            ? (await IdentityPermissionAdapter.GetServicePermissionsAsync(userManager, user))
+            .Select(permission => new GetSystemUserPermResponse
+            {
+                Service = permission.Service,
+                Level = permission.Level
+            })
+            : Enumerable.Empty<GetSystemUserPermResponse>();
 
         return TypedResults.Ok(response);
     }

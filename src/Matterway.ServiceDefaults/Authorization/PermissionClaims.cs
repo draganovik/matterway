@@ -6,7 +6,7 @@ public enum PermissionLevel
 {
     Observer = 0,
     Operator = 1,
-    Administrator = 2
+    Manager = 2
 }
 
 public static class PermissionClaims
@@ -36,14 +36,14 @@ public static class PermissionClaims
         var levelPart = parts[1].Trim();
         if (string.IsNullOrWhiteSpace(parsedService) || string.IsNullOrWhiteSpace(levelPart)) return false;
 
-        if (!Enum.TryParse(levelPart, true, out PermissionLevel parsedLevel)) return false;
+        if (!TryParsePermissionLevel(levelPart, out var parsedLevel)) return false;
 
         service = NormalizeService(parsedService);
         level = parsedLevel;
         return true;
     }
 
-    public static bool HasPermission(ClaimsPrincipal? user, string service, PermissionLevel minimumLevel)
+    public static bool HasPermission(ClaimsPrincipal? user, string service, PermissionLevel level)
     {
         if (user is null) return false;
         if (!IsEmployee(user)) return false;
@@ -53,7 +53,7 @@ public static class PermissionClaims
         {
             if (!TryParse(claim.Value, out var claimService, out var claimLevel)) continue;
             if (!string.Equals(claimService, normalizedService, StringComparison.OrdinalIgnoreCase)) continue;
-            if (claimLevel >= minimumLevel) return true;
+            if (claimLevel == level) return true;
         }
 
         return false;
@@ -73,5 +73,10 @@ public static class PermissionClaims
     private static string NormalizeLevel(PermissionLevel level)
     {
         return level.ToString().ToLowerInvariant();
+    }
+
+    private static bool TryParsePermissionLevel(string rawLevel, out PermissionLevel level)
+    {
+        return Enum.TryParse(rawLevel, true, out level);
     }
 }

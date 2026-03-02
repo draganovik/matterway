@@ -1,52 +1,34 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace Matterway.Identity.Api.Features.Public.Auth;
+namespace Matterway.Identity.Api.Features.Admin.SystemUsers;
 
-public class PublicCreateSystemUser : IEndpoint
+public class AdminCreateEmployeeUser : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.Public, "auth/signup", Handler)
-            .WithName("PublicCreateSystemUser").WithSummary("[public] Create a new system user (customer default).")
-            .WithTags("Auth")
-            .Produces<CreateSystemUserResponse>(StatusCodes.Status201Created)
+        endpoints.MapPost(EndpointKind.Admin, "users/employee", Handler)
+            .WithName("AdminCreateEmployeeUser")
+            .WithSummary("[admin] Create an Employee user")
+            .WithTags("SystemUsers")
+            .Produces<CreateUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
-            .Produces(StatusCodes.Status403Forbidden)
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 
-    private static async Task<Results<Created<CreateSystemUserResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>
-        Handler(
-            CreateSystemUserRequest request,
-            HttpContext httpContext,
-            LinkGenerator linkGenerator,
-            UserManager<SystemUser> userManager,
-            RoleManager<IdentityRole<Guid>> roleManager)
+    private static async Task<Results<Created<CreateUserResponse>, BadRequest<ProblemDetails>>> Handler(
+        CreateUserRequest request,
+        HttpContext httpContext,
+        LinkGenerator linkGenerator,
+        UserManager<SystemUser> userManager,
+        RoleManager<IdentityRole<Guid>> roleManager)
     {
-        var requestIdentityExists = RequestIdentity.GetIdentifier(httpContext.User) is not null;
-
-        var requestedRole = request.Role ?? EIdentityRole.Customer;
-
-        if (!requestIdentityExists && requestedRole != EIdentityRole.Customer)
-            return TypedResults.Forbid();
-
-        if (requestIdentityExists)
-        {
-            if (requestedRole == EIdentityRole.Employee &&
-                !RequestIdentity.AsAdministrator(httpContext.User))
-                return TypedResults.Forbid();
-
-            if (requestedRole == EIdentityRole.Customer &&
-                !RequestIdentity.AsOperator(httpContext.User))
-                return TypedResults.Forbid();
-        }
-
         var systemUser = new SystemUser
         {
             Email = request.Email,
@@ -58,24 +40,30 @@ public class PublicCreateSystemUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 createResult.Errors.Select(error => error.Description))));
 
-        var role = requestedRole;
-        var roleResult = await IdentityRoleAdapter.SetPrimaryRoleAsync(userManager, roleManager, systemUser, role);
+        var roleResult = await IdentityRoleAdapter.SetPrimaryRoleAsync(userManager, roleManager, systemUser,
+            EIdentityRole.Employee);
         if (!roleResult.Succeeded)
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 roleResult.Errors.Select(error => error.Description))));
 
+        var permissionResult = await IdentityPermissionAdapter.EnsureEmployeeObserverDefaultsAsync(
+            userManager,
+            systemUser);
+
+        if (!permissionResult.Succeeded)
+            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                permissionResult.Errors.Select(error => error.Description))));
+
         var location = linkGenerator.GetPathByName(httpContext, "AdminGetSystemUserById",
             new { id = systemUser.Id });
 
-        var response = new CreateSystemUserResponse
+        return TypedResults.Created(location, new CreateUserResponse
         {
             Id = systemUser.Id,
             Email = systemUser.Email,
             Created = systemUser.Created,
-            Role = role
-        };
-
-        return TypedResults.Created(location, response);
+            Role = EIdentityRole.Employee
+        });
     }
 
     private static ProblemDetails CreateProblemDetails(string detail)
@@ -88,22 +76,18 @@ public class PublicCreateSystemUser : IEndpoint
         };
     }
 
-    public class CreateSystemUserRequest
+    public class CreateUserRequest
     {
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public required string Email { get; init; }
 
-        [PasswordPropertyText]
         [Required(ErrorMessage = "Password is required.")]
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters long.")]
         public required string Password { get; init; }
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public EIdentityRole? Role { get; set; }
     }
 
-    public class CreateSystemUserResponse
+    public class CreateUserResponse
     {
         public Guid Id { get; set; }
 

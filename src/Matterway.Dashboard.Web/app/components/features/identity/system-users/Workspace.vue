@@ -15,10 +15,10 @@ type RoleFilter = "all" | "customers" | "employees"
 const auth = useAuthSession()
 const api = useIdentityApi()
 
-const canOperate = computed(() => auth.hasPermission("identity", "operator"))
-const canManage = computed(() =>
-  auth.hasPermission("identity", "administrator"),
+const canOperate = computed(() =>
+  auth.hasPermission("identity", ["operator", "manager"]),
 )
+const canManage = computed(() => auth.hasPermission("identity", ["manager"]))
 const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
 const listState = useRequestState({ empty: "No system users found." })
@@ -49,6 +49,7 @@ const roleFilterOptions = [
 const selectedId = ref<string | null>(null)
 const selectedSystemUser = ref<SystemUserResponse | null>(null)
 const rolesModalOpen = ref(false)
+const createModalOpen = ref(false)
 
 const form = ref<SystemUserForm>({
   email: "",
@@ -201,6 +202,28 @@ function changeRoleFilter(value: RoleFilter) {
   searchWithPageReset(loadSystemUsers)
 }
 
+function handleEmployeeCreated(systemUser: SystemUserResponse) {
+  resetMessages()
+
+  if (isLookupMode.value || roleFilter.value === "customers") {
+    filter.value = systemUser.id
+    systemUsers.value = [systemUser]
+    setSinglePageTotal(1)
+  } else {
+    const exists = systemUsers.value.some((item) => item.id === systemUser.id)
+    if (!exists) {
+      systemUsers.value = [systemUser, ...systemUsers.value]
+      pagination.totalCount += 1
+    }
+  }
+
+  selectedId.value = systemUser.id
+  selectedSystemUser.value = systemUser
+  applySystemUserToForm(systemUser)
+  detailState.error = ""
+  rolesModalOpen.value = false
+}
+
 async function saveSystemUser() {
   resetMessages()
 
@@ -302,11 +325,19 @@ onMounted(() => {
           Manage System Users
         </h2>
         <p class="text-muted text-sm">
-          Browse users, update credentials, and manage service roles.
+          Browse users, update credentials, and manage service permissions.
         </p>
       </div>
 
-      <div class="w-full sm:w-auto">
+      <div class="flex w-full flex-wrap items-end justify-end gap-3 sm:w-auto">
+        <UButton
+          color="primary"
+          :disabled="!canManage"
+          @click="createModalOpen = true"
+        >
+          Create new Employee Account
+        </UButton>
+
         <UFormField label="Role">
           <USelectMenu
             :items="roleFilterOptions"
@@ -378,6 +409,12 @@ onMounted(() => {
       </template>
     </EntitiesSplitView>
   </div>
+
+  <IdentitySystemUsersModalInformationManager
+    v-model:open="createModalOpen"
+    :can-manage="canManage"
+    @created="handleEmployeeCreated"
+  />
 
   <IdentitySystemUsersModalRolesManager
     v-model:open="rolesModalOpen"

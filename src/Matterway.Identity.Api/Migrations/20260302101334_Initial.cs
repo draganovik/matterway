@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Identity.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -185,10 +185,10 @@ namespace Matterway.Identity.Api.Migrations
                 columns: new[] { "Id", "ClaimType", "ClaimValue", "UserId" },
                 values: new object[,]
                 {
-                    { 1, "perm", "identity:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
-                    { 2, "perm", "catalog:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
-                    { 3, "perm", "customers:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
-                    { 4, "perm", "sales:administrator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 1, "perm", "identity:manager", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 2, "perm", "catalog:manager", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 3, "perm", "customers:manager", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
+                    { 4, "perm", "sales:manager", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b1") },
                     { 5, "perm", "identity:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
                     { 6, "perm", "catalog:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },
                     { 7, "perm", "customers:operator", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b2") },

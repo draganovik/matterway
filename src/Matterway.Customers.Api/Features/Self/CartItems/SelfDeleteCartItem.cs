@@ -15,7 +15,7 @@ public class SelfDeleteCartItem : IEndpoint
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
                 RequestIdentity.IsCustomer(context.User) ||
-                RequestIdentity.AsOperator(context.User)))
+                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

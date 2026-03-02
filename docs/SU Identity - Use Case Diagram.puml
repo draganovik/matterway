@@ -4,57 +4,47 @@ left to right direction
 skinparam shadowing false
 skinparam actorStyle hollow
 
-actor :Anonymous: as anon
-actor :System User: as sysUser
-anon <-- sysUser
+actor user as "User"
 
 rectangle #line:transparent {
-  actor :Employee: as empl
-  actor :Manager: as mngr
-  actor :Operator: as oprt
-}
-oprt --> empl
-mngr --> empl
-
-rectangle #line:transparent {
-  actor "Customers API" as customersApi
-  actor "Internal APIs" as internalApis
+  actor empl as "Employee"
+  actor sysm as "System"
 }
 
-package "Identity API" {
-  usecase "Sign Up" as signUp
-  usecase "Sign In" as signIn
-  usecase "Refresh Session" as refreshSession
-  usecase "Sign Out" as signOut
+user --|> empl
 
-  usecase "Review System Users" as reviewSystemUsers
-  usecase "Manage System Users" as manageSystemUsers
-  usecase "Delete System User" as deleteSystemUser
-  usecase "Review User Permissions" as reviewUserPermissions
-  usecase "Manage User Permissions" as manageUserPermissions
+package "Identity" {
+  usecase signIn as "Sign In"
+  usecase refreshSession as "Refresh Session"
+  usecase signOut as "Sign Out"
 
-  usecase "Create Customer User" as createCustomerUser
-  usecase "Introspect Access Token" as introspectAccessToken
+  usecase manageSystemUsers as "Manage System Users
+                                ..<i>extention points</i>..
+                                Delete System User [manager only]"
+  usecase deleteSystemUser as "Delete System User"
+  usecase viewSystemUsers as "View System Users"
 
-  note top of manageSystemUsers
-    Elevating a user to employee privileges
-    requires administrator rights.
-  end note
+  usecase viewUserPermissions as "View User Permissions"
+  usecase manageUserPermissions as "Manage User Permissions"
 
-  manageSystemUsers ..> reviewSystemUsers : <<include>>
-  deleteSystemUser ..> manageSystemUsers : <<extend>>
-  manageUserPermissions ..> reviewUserPermissions : <<include>>
+  usecase createEmployeeAccount as "Create Employee User Account"
+  usecase createCustomerAccount as "Create Customer User Account"
+  usecase introspectAccessToken as "Introspect Access Token"
+
+  manageSystemUsers .down.> viewSystemUsers : <<include>>
+  manageUserPermissions .up.> viewSystemUsers : <<include>>
+  deleteSystemUser .up.> manageSystemUsers : <<extend>>
 }
 
-anon --- signUp
-anon --- signIn
-anon --- refreshSession
-sysUser --- signOut
+user --- signIn
+user --- refreshSession
+user --- signOut
 
-manageSystemUsers --- oprt
-reviewUserPermissions --- oprt
-manageUserPermissions --- mngr
+manageSystemUsers --- empl : perm:[operator,manager]
+viewUserPermissions --- empl : perm:[operator,manager]
+manageUserPermissions --- empl : perm:[manager]
+createEmployeeAccount --- empl : perm:[manager]
 
-createCustomerUser --- customersApi
-introspectAccessToken --- internalApis
+introspectAccessToken --- sysm
+createCustomerAccount --- sysm
 @enduml

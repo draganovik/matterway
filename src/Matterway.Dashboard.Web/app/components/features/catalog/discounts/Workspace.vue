@@ -28,7 +28,9 @@ type DiscountForm = {
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canEdit = computed(() => auth.hasPermission("catalog", "operator"))
+const canEdit = computed(() =>
+  auth.hasPermission("catalog", ["operator", "manager"]),
+)
 
 const listState = useRequestState({ empty: "No discounts found." })
 const submitState = useRequestState()

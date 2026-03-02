@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { serviceSections } from "~/data/serviceRegistry"
 
-definePageMeta({ title: "Sales", service: "sales", level: "observer" })
+definePageMeta({
+  title: "Sales",
+  service: "sales",
+  permissions: ["observer", "operator", "manager"],
+})
 
 const salesSection = serviceSections.find((section) => section.key === "sales")
 const firstFeatureRoute = salesSection?.features[0]?.route || "/"
