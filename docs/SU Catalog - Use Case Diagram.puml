@@ -4,46 +4,41 @@ left to right direction
 skinparam shadowing false
 skinparam actorStyle hollow
 
-actor :Anonymous: as anon
-actor :Customer: as csmr
-anon <-- csmr
+actor user as "User"
+actor empl as "Employee"
 
-rectangle #line:transparent {
-  actor :Employee: as empl
-  actor :Manager: as mngr
-  actor :Operator: as oprt
-}
-oprt --> empl
-mngr --> empl
+user --|> empl
 
 package "Catalog API" {
-  usecase "View Article Data" as viewArticleData
-  usecase "View Discounts" as viewDiscounts
-  usecase "Browse Articles" as browseArticles
-  browseArticles <.. viewArticleData: <<extend>>
-  browseArticles <.. viewDiscounts: <<include>>
+  usecase viewDetailedArticles as "View Detailed Articles"
+  usecase viewDiscounts as "View Discounts"
+  usecase queryArticles as "Query Articles
+                           ..<i>extention points</i>..
+                           Get Detailed Article"
+  queryArticles <.. viewDetailedArticles: <<extend>>
+  queryArticles ..> viewDiscounts: <<include>>
 
-  usecase "Administer Articles" as administerArticles
-  usecase "Administer Article Details" as administerArticleDetails
-  usecase "Administer Article Images" as administerArticleImages
-  usecase "Administer Discounts" as administerDiscounts
-  administerArticleDetails ..> administerArticles : <<include>>
-  administerArticleImages ..> administerArticles : <<include>>
+  usecase manageArticles as "Manage Articles"
+  usecase manageArticleDetails as "Manage Article Details"
+  usecase manageArticleImages as "Manage Article Images"
+  usecase manageDiscounts as "Manage Discounts"
+  manageArticleDetails <.. manageArticles : <<include>>
+  manageArticleImages <.. manageArticles : <<include>>
 
-  usecase "View Details" as viewDetails
-  usecase "Administer Details" as administerDetails
-  viewDetails <.. administerDetails : <<include>>
+  usecase viewDetails as "View Details"
+  usecase manageDetails as "Manage Details"
+  viewDetails <.. manageDetails : <<include>>
 
-  usecase "Import Catalog Archive" as importCatalogArchive
-  usecase "Export Catalog Archive" as exportCatalogArchive
+  usecase importCatalogArchive as "Import Catalog Archive"
+  usecase exportCatalogArchive as "Export Catalog Archive"
 }
 
-anon --- browseArticles
-anon --- viewDetails
+user --- queryArticles
+user --- viewDetails
 
-administerArticles -- oprt
-administerDiscounts -- oprt
-administerDetails -- oprt
-importCatalogArchive -- mngr
-exportCatalogArchive -- mngr
+manageArticles -- empl : perm:[operator,manager]
+manageDiscounts -- empl : perm:[operator,manager]
+manageDetails -- empl : perm:[operator,manager]
+importCatalogArchive -- empl : perm:[manager]
+exportCatalogArchive -- empl : perm:[manager]
 @enduml
