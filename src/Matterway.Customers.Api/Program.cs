@@ -9,12 +9,12 @@ var apiContract = ApiDirectory.Customers;
 var builder = BuilderBootstrap.CreateBuilder(args);
 
 builder
-    .ConfigureApiFoundation(apiContract)
+    .ConfigureApi(apiContract)
     .ConfigureAuthentication()
     .ConfigureCatalogIntegration()
     .ConfigureIdentityIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

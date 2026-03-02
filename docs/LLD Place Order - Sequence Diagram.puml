@@ -1,40 +1,51 @@
 @startuml LLD: Place Order - Sequence Diagram
+skinparam actorStyle hollow
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
 skinparam maxMessageSize 120
 
 autonumber
-autoactivate on
 
 actor "Customer" as Customer
-participant "Checkout Workspace\n(app/components/features/checkout/Workspace.vue)" as Checkout
-participant "Storefront Server\n(Nuxt server/api)" as StorefrontServer
+participant "Storefront Client" as Checkout
+participant "Storefront Server" as StorefrontServer
 participant "Sales API" as SalesApi
 participant "Customers API" as CustomersApi
 database "Sales DB" as SalesDb
 database "Customers DB" as CustomersDb
 participant "Stripe" as Stripe
 
-Customer -> Checkout : Click "Place order"
-note over Checkout
-Customer identity is resolved from JWT claims in all services.
-`customerId` is not taken from checkout payload.
+Customer -> Checkout : Place order
+activate Checkout
+note over SalesApi
+Sales resolves `customerId` from customer JWT.
 end note
 alt Client-side validation fails
   Checkout --> Customer : Show validation errors\n(no API calls)
+
 else Validation passes
-  Checkout -> SalesApi : POST /api/self/v1.0/orders\n{type, deliveryInfo} + Bearer customer JWT
-  SalesApi -> CustomersApi : POST /api/self/v1.0/orders\n{orderId, deliveryInfo} + forwarded Bearer JWT
+  Checkout -> SalesApi : POST /api/self/v1/orders\n{type, deliveryInfo} + Bearer customer JWT
+  activate SalesApi
+  SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
+  activate CustomersApi
   CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId)
+  activate CustomersDb
   CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
+  deactivate CustomersDb
   CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
+  deactivate CustomersApi
 
   SalesApi -> SalesDb : Save Order + Items + DeliveryInfo\nAdd initial status=Processing
+  activate SalesDb
   SalesDb --> SalesApi : Order created
+  deactivate SalesDb
   SalesApi --> Checkout : 201 Created {id, totalAmount, ...}
+  deactivate SalesApi
 
   Checkout -> StorefrontServer : POST /api/payments\n{orderId, userId, amount, card, address}
+  activate StorefrontServer
   StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=true)\nmetadata:{order_id, reference_id, client_id}
+  activate Stripe
 
   note over Stripe, StorefrontServer
   Order creation and payment registration are separate steps.
@@ -44,26 +55,40 @@ else Validation passes
   alt Stripe payment intent creation fails
     Stripe --> StorefrontServer : Error
     StorefrontServer --> Checkout : 500 Payment failed
-    Checkout --> Customer : Show payment error\n(order already created, cart unchanged)
+    deactivate StorefrontServer
+    Checkout -> Checkout : cart.clear()
+    Checkout --> Customer : Show payment error\n(order not payed)
   else Stripe payment intent created
     Stripe --> StorefrontServer : 200 {client_secret}
+    activate StorefrontServer
     StorefrontServer --> Checkout : 200 {clientSecret}
+    deactivate StorefrontServer
     Checkout -> Checkout : cart.clear()
     Checkout --> Customer : Redirect to /orders
   end
+  deactivate Checkout
 
   ... asynchronous webhook handling ...
 
   alt Stripe sends charge.succeeded
     Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\ncharge.succeeded(order_id, amount, reference_id)
-    StorefrontServer -> SalesApi : POST /api/system/v1.0/payments\n{orderId, provider, referenceId, amount, status=Charged, createdAt}
+    activate StorefrontServer
+    StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, referenceId, amount, status=Charged, createdAt}
+    activate SalesApi
     SalesApi -> SalesDb : Verify order exists + insert Payment
+    activate SalesDb
     SalesDb --> SalesApi : Payment stored
+    deactivate SalesDb
     SalesApi --> StorefrontServer : 201 Created
+    deactivate SalesApi
     StorefrontServer --> Stripe : 200 OK
+    deactivate StorefrontServer
   else Stripe sends non-charge event
     Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\n<other event type>
+    activate StorefrontServer
     StorefrontServer --> Stripe : 304 Event ignored
+    deactivate StorefrontServer
+    deactivate Stripe
   end
 end
 

@@ -27,6 +27,35 @@ function formatValidationErrors(errors?: Record<string, string[]>) {
     .join(" | ")
 }
 
+function getErrorMessage(payload: unknown) {
+  if (typeof payload === "string") {
+    const message = payload.trim()
+    return message || null
+  }
+
+  if (!payload || typeof payload !== "object") return null
+
+  const candidate = payload as {
+    title?: unknown
+    detail?: unknown
+    message?: unknown
+  }
+
+  if (typeof candidate.detail === "string" && candidate.detail.trim()) {
+    return candidate.detail.trim()
+  }
+
+  if (typeof candidate.title === "string" && candidate.title.trim()) {
+    return candidate.title.trim()
+  }
+
+  if (typeof candidate.message === "string" && candidate.message.trim()) {
+    return candidate.message.trim()
+  }
+
+  return null
+}
+
 export function useApiClient() {
   const auth = useAuthSession()
   const validEndpointKinds = new Set(["self", "admin", "public", "system"])
@@ -97,7 +126,7 @@ export function useApiClient() {
     }
 
     const contentType = response.headers.get("content-type") || ""
-    const isJson = contentType.includes("application/json")
+    const isJson = contentType.includes("json")
     const payload = isJson
       ? await response.json().catch(() => null)
       : await response.text().catch(() => null)
@@ -107,12 +136,7 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const payloadError =
-      typeof payload === "object" && payload
-        ? ((payload as { title?: string; detail?: string }).title ??
-          (payload as { title?: string; detail?: string }).detail)
-        : null
-    const baseError = payloadError || "Zahtev nije uspeo."
+    const baseError = getErrorMessage(payload) || "Zahtev nije uspeo."
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,

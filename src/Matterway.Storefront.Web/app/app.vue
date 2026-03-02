@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useAuthSession } from "~/composables/useAuthSession"
+import { useCart } from "~/composables/useCart"
 
 const colorMode = useColorMode()
 const color = computed(() =>
   colorMode.value === "dark" ? "#020617" : "#f1f5f9",
 )
 const auth = useAuthSession()
+const cart = useCart()
 const route = useRoute()
 const appTitle = "Matterway prodavnica"
 const isBooting = computed(
@@ -31,9 +33,50 @@ useHead({
   },
 })
 
+let cartRefreshInFlight: Promise<void> | null = null
+let lastCartRefreshAt = 0
+const cartRefreshThrottleMs = 5000
+
+async function refreshCartFromRemote() {
+  if (!import.meta.client) return
+  const now = Date.now()
+  if (now - lastCartRefreshAt < cartRefreshThrottleMs) return
+  if (cartRefreshInFlight) return cartRefreshInFlight
+
+  cartRefreshInFlight = (async () => {
+    lastCartRefreshAt = Date.now()
+    await auth.initialize()
+    await cart.refreshFromRemote()
+  })()
+
+  try {
+    await cartRefreshInFlight
+  } finally {
+    cartRefreshInFlight = null
+  }
+}
+
+function handleWindowFocus() {
+  void refreshCartFromRemote()
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState !== "visible") return
+  void refreshCartFromRemote()
+}
+
 onMounted(() => {
   if (!import.meta.client) return
   void auth.initialize()
+  window.addEventListener("focus", handleWindowFocus)
+  document.addEventListener("visibilitychange", handleVisibilityChange)
+  void refreshCartFromRemote()
+})
+
+onBeforeUnmount(() => {
+  if (!import.meta.client) return
+  window.removeEventListener("focus", handleWindowFocus)
+  document.removeEventListener("visibilitychange", handleVisibilityChange)
 })
 </script>
 

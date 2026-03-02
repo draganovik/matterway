@@ -8,11 +8,11 @@ var apiContract = ApiDirectory.Sales;
 var builder = BuilderBootstrap.CreateBuilder(args);
 
 builder
-    .ConfigureApiFoundation(apiContract)
+    .ConfigureApi(apiContract)
     .ConfigureAuthentication()
     .ConfigureCustomersIntegration()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

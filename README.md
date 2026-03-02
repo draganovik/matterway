@@ -34,7 +34,7 @@ flowchart LR
 
 ## Core Design Decisions
 
-- Backend style: Minimal APIs with a feature-first layout (`Features/<Scope>/<Feature>`).
+- Backend style: Minimal APIs with a feature-first layout (`Endpoints/<Scope>/<Endpoint>`).
 - Routing convention: `/api/{public|self|admin|system}/v{version}/...`.
 - API versioning: URL segment versioning (currently `v1.0`).
 - Authn/Authz: JWT bearer authentication with role + permission-claim checks.

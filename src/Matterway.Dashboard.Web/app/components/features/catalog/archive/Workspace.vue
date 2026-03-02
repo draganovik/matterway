@@ -7,9 +7,7 @@ import type { ImportCatalogArchiveResponse } from "~/types/catalog"
 const auth = useAuthSession()
 const api = useCatalogApi()
 
-const canOperate = computed(() =>
-  auth.hasPermission("catalog", ["operator", "manager"]),
-)
+const canOperate = computed(() => auth.hasPermission("catalog", ["manager"]))
 
 const exportState = useRequestState()
 const importState = useRequestState()
@@ -54,7 +52,7 @@ async function exportArchive() {
   resetExportMessages()
 
   if (!canOperate.value) {
-    exportState.error = "Operator permission is required."
+    exportState.error = "Manager permission is required."
     return
   }
 
@@ -83,7 +81,7 @@ async function importArchive() {
   resetImportMessages()
 
   if (!canOperate.value) {
-    importState.error = "Operator permission is required."
+    importState.error = "Manager permission is required."
     return
   }
 

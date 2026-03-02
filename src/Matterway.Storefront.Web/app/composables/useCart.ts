@@ -17,8 +17,24 @@ function createCartItem(article: CatalogArticle): CartItem {
     articleName: article.title,
     unitPrice: normalizeNumber(article.price ?? article.basePrice, 0),
     quantity: 1,
-    imageUrl: article.thumbnailImage?.imageUrl,
-    imageAlt: article.thumbnailImage?.imageAlt,
+  }
+}
+
+function mapRemoteCartItem(item: {
+  articleId?: string
+  articleCode?: string
+  articleName?: string
+  unitPrice?: number
+  quantity?: number
+}): CartItem | null {
+  if (!item.articleId) return null
+
+  return {
+    articleId: String(item.articleId),
+    articleCode: item.articleCode ? String(item.articleCode) : "",
+    articleName: item.articleName ? String(item.articleName) : "",
+    unitPrice: normalizeNumber(item.unitPrice),
+    quantity: Math.max(1, normalizeNumber(item.quantity, 1)),
   }
 }
 
@@ -54,8 +70,6 @@ export function useCart() {
             articleName: String(source.articleName ?? ""),
             unitPrice: normalizeNumber(source.unitPrice),
             quantity: Math.max(1, normalizeNumber(source.quantity, 1)),
-            imageUrl: source.imageUrl ? String(source.imageUrl) : undefined,
-            imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
           }
         })
         .filter((item: CartItem) => item.articleId)
@@ -133,6 +147,18 @@ export function useCart() {
     await syncItem(existing.articleId, existing.quantity)
   }
 
+  async function setQuantity(articleId: string, quantity: number) {
+    hydrate()
+    const existing = items.value.find((item) => item.articleId === articleId)
+    if (!existing) return
+
+    const normalized = Math.max(1, Math.trunc(normalizeNumber(quantity, 1)))
+    if (existing.quantity === normalized) return
+
+    existing.quantity = normalized
+    await syncItem(existing.articleId, existing.quantity)
+  }
+
   async function remove(articleId: string) {
     hydrate()
     items.value = items.value.filter((item) => item.articleId !== articleId)
@@ -153,6 +179,27 @@ export function useCart() {
     hydrate()
     await clearRemote().catch(() => null)
     items.value = []
+  }
+
+  async function refreshFromRemote() {
+    hydrate()
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
+      return { ok: true as const }
+    }
+
+    const remote = await customers.listSelfCartItems(1, 100)
+    if (remote.error) {
+      return {
+        ok: false as const,
+        error: remote.error,
+      }
+    }
+
+    items.value = remote.items
+      .map(mapRemoteCartItem)
+      .filter((item): item is CartItem => item !== null)
+
+    return { ok: true as const }
   }
 
   const totalItems = computed(() =>
@@ -180,8 +227,10 @@ export function useCart() {
     add,
     increase,
     decrease,
+    setQuantity,
     remove,
     clear,
+    refreshFromRemote,
     hasArticle,
     quantityFor,
   }

@@ -11,11 +11,11 @@ var builder = BuilderBootstrap.CreateBuilder(args);
 builder.Services.AddScoped<ICatalogArchiveService, CatalogArchiveService>();
 
 builder
-    .ConfigureApiFoundation(apiContract)
+    .ConfigureApi(apiContract)
     .ConfigureAuthentication()
     .ConfigureImageStorage()
     .ConfigurePersistence()
-    .ConfigureFeatures();
+    .ConfigureEndpoints();
 
 var app = builder.Build();
 

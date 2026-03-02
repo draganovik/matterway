@@ -92,7 +92,8 @@ async function loadAddress() {
   const response = await customersApi.getSelfAddress()
   if (!response.ok) {
     if (response.status === 404) {
-      addressInfo.value = "Nemate sačuvanu adresu. Popunite formu i sačuvajte je."
+      addressInfo.value =
+        "Nemate sačuvanu adresu. Popunite formu i sačuvajte je."
       applyAddress(null)
       return
     }

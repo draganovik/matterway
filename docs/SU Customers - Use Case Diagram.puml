@@ -26,8 +26,6 @@ package "Customers" {
   usecase syncOnOrder as "Sync On Order"
   usecase verifyCustomer as "Verify Customer"
 
-
-  usecase viewCartItems as "View Cart Items"
   usecase manageCustomers as "Manage Customers
                               ..<i>extention points</i>..
                               Upsert Customer Address"
@@ -44,5 +42,4 @@ syncOnOrder -- sysm
 verifyCustomer -- sysm
 
 manageCustomers -- empl : perm:[operator,manager]
-viewCartItems -- empl : perm:[operator,manager]
 @enduml

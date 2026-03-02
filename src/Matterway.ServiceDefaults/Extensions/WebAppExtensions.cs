@@ -11,6 +11,8 @@ namespace Matterway.ServiceDefaults.Extensions;
 
 public static class WebAppExtensions
 {
+    private const string ApiRoutePrefix = "/api";
+
     extension(WebApplication app)
     {
         public WebApplication UseApiFoundation()
@@ -30,87 +32,49 @@ public static class WebAppExtensions
             return app;
         }
 
-        public WebApplication ApplyDevelopmentApiDocs(
-            ApiOpenApiRouteOptions? openApiRouteOptions = null)
-        {
-            if (!app.Environment.IsDevelopment())
-                return app;
-
-            app.ApplyOpenApi(openApiRouteOptions ?? new ApiOpenApiRouteOptions());
-
-            return app;
-        }
-
-        public WebApplication ApplyOpenApi(ApiOpenApiRouteOptions? options = null)
-        {
-            var routeOptions = options ?? new ApiOpenApiRouteOptions();
-            app.MapOpenApi(routeOptions.OpenApiRoutePattern);
-            return app;
-        }
-
-        public WebApplication ApplyApiContract(
-            ApiDefinition apiDefinition,
-            ApiOpenApiRouteOptions? openApiRouteOptions = null)
+        public WebApplication ApplyApiContract(ApiDefinition apiDefinition)
         {
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
-            app.ApplyDevelopmentApiDocs(openApiRouteOptions);
-            app.ApplyEndpoints(apiDefinition);
+            if (app.Environment.IsDevelopment())
+                app.MapOpenApi(ApiDocumentationDefaults.OpenApiRoutePattern);
+
+            ApplyEndpoints(app, apiDefinition.SupportedApiVersions);
 
             return app;
         }
+    }
 
-        public WebApplication ApplyEndpoints(ApiEndpointRoutingFeatureOptions options)
+    private static void ApplyEndpoints(WebApplication app, IReadOnlyCollection<ApiVersion> supportedApiVersions)
+    {
+        var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
+        var versionSetBuilder = app.NewApiVersionSet()
+            .ReportApiVersions();
+
+        foreach (var version in versions)
+            versionSetBuilder.HasApiVersion(version);
+
+        var versionSet = versionSetBuilder.Build();
+
+        var apiGroup = app.MapGroup(ApiRoutePrefix)
+            .DisableAntiforgery();
+
+        RouteGroupBuilder MapKindGroup(EndpointKind endpointKind)
         {
-            var versions = ApiVersioningConventions.NormalizeSupportedVersions(options.SupportedApiVersions);
-            var versionSetBuilder = app.NewApiVersionSet()
-                .ReportApiVersions();
+            var endpointSegment = endpointKind.ToString().ToLowerInvariant();
 
-            foreach (var version in versions)
-                versionSetBuilder.HasApiVersion(version);
-
-            options.ConfigureVersionSet?.Invoke(versionSetBuilder);
-
-            var versionSet = versionSetBuilder.Build();
-
-            var apiGroup = app.MapGroup(options.ApiRoutePrefix);
-            if (options.DisableAntiforgery)
-                apiGroup = apiGroup.DisableAntiforgery();
-
-            RouteGroupBuilder MapKindGroup(EndpointKind endpointKind)
-            {
-                var endpointSegment = endpointKind.ToString().ToLowerInvariant();
-
-                return apiGroup.MapGroup($"/{endpointSegment}")
-                    .MapGroup("/v{version:apiVersion}")
-                    .WithApiVersionSet(versionSet);
-            }
-
-            var endpointGroups = options.EndpointKinds
-                .Distinct()
-                .ToDictionary(endpointKind => endpointKind, MapKindGroup);
-
-            var endpointRouter = new EndpointRouter(endpointGroups);
-
-            var endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
-            foreach (var endpoint in endpoints)
-                endpoint.MapEndpoint(endpointRouter);
-
-            return app;
+            return apiGroup.MapGroup($"/{endpointSegment}")
+                .MapGroup("/v{version:apiVersion}")
+                .WithApiVersionSet(versionSet);
         }
 
-        public WebApplication ApplyEndpoints(IReadOnlyCollection<ApiVersion> supportedApiVersions)
-        {
-            return app.ApplyEndpoints(new ApiEndpointRoutingFeatureOptions
-            {
-                SupportedApiVersions = supportedApiVersions
-            });
-        }
+        var endpointGroups = Enum.GetValues<EndpointKind>()
+            .ToDictionary(endpointKind => endpointKind, MapKindGroup);
 
-        public WebApplication ApplyEndpoints(ApiDefinition apiDefinition)
-        {
-            ArgumentNullException.ThrowIfNull(apiDefinition);
-            return app.ApplyEndpoints(apiDefinition.SupportedApiVersions);
-        }
+        var endpointRouter = new EndpointRouter(endpointGroups);
+
+        var endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
+        foreach (var endpoint in endpoints)
+            endpoint.MapEndpoint(endpointRouter);
     }
 }
