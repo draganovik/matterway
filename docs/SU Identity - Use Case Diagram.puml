@@ -31,7 +31,7 @@ package "Identity" {
   usecase createCustomerAccount as "Create Customer User Account"
   usecase introspectAccessToken as "Introspect Access Token"
 
-  manageSystemUsers .up.> viewSystemUsers : <<include>>
+  manageSystemUsers .down.> viewSystemUsers : <<include>>
   manageUserPermissions .up.> viewSystemUsers : <<include>>
   deleteSystemUser .up.> manageSystemUsers : <<extend>>
 }
