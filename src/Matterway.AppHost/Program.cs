@@ -9,8 +9,6 @@ var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
 var minioPassword = builder.AddParameter("MinioRootPassword", true);
-
-// Configure shared local infrastructure first (dashboard, data stores, object storage).
 ConfigureDashboard(builder);
 
 var postgres = builder.AddPostgres("postgres")
@@ -25,11 +23,11 @@ var postgres = builder.AddPostgres("postgres")
         service.Ports = ["15432:5432"];
     });
 
-var catalogDb = postgres.AddDatabase("CatalogDb");
-var customersDb = postgres.AddDatabase("CustomersDb");
-var identityDb = postgres.AddDatabase("IdentityDb");
-var salesDb = postgres.AddDatabase("SalesDb");
-
+var databases = (
+    Catalog: postgres.AddDatabase("CatalogDb"),
+    Customers: postgres.AddDatabase("CustomersDb"),
+    Identity: postgres.AddDatabase("IdentityDb"),
+    Sales: postgres.AddDatabase("SalesDb"));
 var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
@@ -44,39 +42,28 @@ var minio = builder.AddContainer("minio", "minio/minio:latest")
         service.Ports = ["19000:9000", "19001:9001"];
     });
 
-// Register APIs in dependency order so references are explicit and startup waits are correct.
-var identityApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Identity_Api>(ToApiResourceName(ApiDirectory.Identity))
-        .WithReference(identityDb),
-    2003);
+var identityApi = AddApi<Matterway_Identity_Api>(builder, ApiDirectory.Identity, 2003,
+    resource => resource.WithReference(databases.Identity));
+var catalogApi = AddApi<Matterway_Catalog_Api>(builder, ApiDirectory.Catalog, 2001,
+    resource => resource.WithReference(databases.Catalog));
+var customersApi = AddApi<Matterway_Customers_Api>(builder, ApiDirectory.Customers, 2002, resource => resource
+    .WithReference(databases.Customers)
+    .WithReference(identityApi.GetEndpoint("http"))
+    .WithReference(catalogApi.GetEndpoint("http")));
+var salesApi = AddApi<Matterway_Sales_Api>(builder, ApiDirectory.Sales, 2005, resource => resource
+    .WithReference(databases.Sales)
+    .WithReference(customersApi.GetEndpoint("http")));
 
-var catalogApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Catalog_Api>(ToApiResourceName(ApiDirectory.Catalog))
-        .WithReference(catalogDb),
-    2001);
-
+var minioHttpEndpoint = minio.GetEndpoint("http");
 catalogApi
     .WaitFor(minio)
-    .WithReference(minio.GetEndpoint("http"))
+    .WithReference(minioHttpEndpoint)
     .WithEnvironment("ImageStorage__Bucket", "article-images")
-    .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
-    .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
+    .WithEnvironment("ImageStorage__Endpoint", minioHttpEndpoint)
+    .WithEnvironment("ImageStorage__PublicBaseUrl", minioHttpEndpoint)
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
     .WithEnvironment("ImageStorage__SecretKey", minioPassword)
     .WithEnvironment("ImageStorage__AllowPublicRead", "true");
-
-var customersApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Customers_Api>(ToApiResourceName(ApiDirectory.Customers))
-        .WithReference(customersDb)
-        .WithReference(identityApi.GetEndpoint("http"))
-        .WithReference(catalogApi.GetEndpoint("http")),
-    2002);
-
-var salesApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Sales_Api>(ToApiResourceName(ApiDirectory.Sales))
-        .WithReference(salesDb)
-        .WithReference(customersApi.GetEndpoint("http")),
-    2005);
 
 var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
 {
@@ -85,21 +72,22 @@ var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>
     [ApiDirectory.Customers.ServiceName] = customersApi,
     [ApiDirectory.Sales.ServiceName] = salesApi
 };
-
-// Compose frontend apps once all API endpoints are known.
 var web = WebComposition.AddWebApps(builder, identityApi, catalogApi, customersApi, salesApi);
-
-// Apply cross-cutting API wiring (docs + auth/cors environment) in one place.
 if (builder.Environment.IsDevelopment())
     ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
-
-ApiEnvironmentComposition.ConfigureApiEnvironment(
-    apisByServiceName.Values,
-    identityApi.GetEndpoint("http"),
-    web,
+ApiEnvironmentComposition.ConfigureApiEnvironment(apisByServiceName.Values, identityApi.GetEndpoint("http"), web,
     jwtSigningKey);
-
 builder.Build().Run();
+
+static IResourceBuilder<ProjectResource> AddApi<TProject>(
+    IDistributedApplicationBuilder builder,
+    ApiDefinition apiDefinition,
+    int hostPort,
+    Func<IResourceBuilder<ProjectResource>, IResourceBuilder<ProjectResource>> configure)
+    where TProject : IProjectMetadata, new()
+{
+    return ConfigureApiResource(configure(builder.AddProject<TProject>($"{apiDefinition.ServiceName}-api")), hostPort);
+}
 
 static void ConfigureDashboard(IDistributedApplicationBuilder builder)
 {
@@ -108,11 +96,6 @@ static void ConfigureDashboard(IDistributedApplicationBuilder builder)
         options.WithHostPort(18888);
         options.WithContainerName("aspire-dashboard");
     }).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
-}
-
-static string ToApiResourceName(ApiDefinition apiDefinition)
-{
-    return $"{apiDefinition.ServiceName}-api";
 }
 
 static IResourceBuilder<ProjectResource> ConfigureApiResource(
