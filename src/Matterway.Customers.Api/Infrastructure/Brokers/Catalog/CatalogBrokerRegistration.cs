@@ -11,7 +11,7 @@ public static class CatalogBrokerRegistration
             builder.Services.AddHttpClient<ICatalogClient, HttpCatalogClient>((sp, client) =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();
-                client.BaseAddress = configuration.ResolveServiceUri("catalog-api", "Services:Catalog:Url");
+                client.BaseAddress = configuration.ResolveServiceUri("catalog-api", "Apis:AccessOrigins:Catalog");
             });
 
             return builder;

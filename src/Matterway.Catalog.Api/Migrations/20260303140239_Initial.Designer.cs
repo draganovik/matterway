@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Catalog.Api.Migrations
 {
     [DbContext(typeof(CatalogDbComposer))]
-    [Migration("20260215205551_Initialize")]
-    partial class Initialize
+    [Migration("20260303140239_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

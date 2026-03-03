@@ -9,74 +9,98 @@ var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
 var minioPassword = builder.AddParameter("MinioRootPassword", true);
+var stripeSecretKey = builder.AddParameter("StripeSecretKey", true);
 
-// Configure shared local infrastructure first (dashboard, data stores, object storage).
-ConfigureDashboard(builder);
+builder.AddDockerComposeEnvironment("matterway-platform")
+    .WithDashboard(dashboard =>
+    {
+        dashboard.WithHostPort(PlatformPorts.AspireDashboard);
+        dashboard.WithContainerName("aspire-dashboard");
+    })
+    .ConfigureComposeFile(compose => compose.Name = "matterway-platform");
 
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("18")
-    .WithHostPort(15432)
+    .WithHostPort(PlatformPorts.Postgres)
     .WithPassword(postgresPassword)
     .WithVolume("matterway-postgres-data", "/var/lib/postgresql")
     .WithBindMount("../../data", "/seed-data", true)
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = ["15432:5432"];
+        service.Ports = [$"{PlatformPorts.Postgres}:5432"];
     });
 
-var catalogDb = postgres.AddDatabase("CatalogDb");
-var customersDb = postgres.AddDatabase("CustomersDb");
-var identityDb = postgres.AddDatabase("IdentityDb");
-var salesDb = postgres.AddDatabase("SalesDb");
+var databases = (
+    Catalog: postgres.AddDatabase("CatalogDb"),
+    Customers: postgres.AddDatabase("CustomersDb"),
+    Identity: postgres.AddDatabase("IdentityDb"),
+    Sales: postgres.AddDatabase("SalesDb"));
 
 var minio = builder.AddContainer("minio", "minio/minio:latest")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
     .WithArgs("server", "/data", "--console-address", ":9001")
-    .WithHttpEndpoint(19000, 9000, "http")
-    .WithHttpEndpoint(19001, 9001, "console")
+    .WithHttpEndpoint(PlatformPorts.MinioApi, 9000, "http")
+    .WithHttpEndpoint(PlatformPorts.MinioConsole, 9001, "console")
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Command = ["server", "/data", "--console-address", ":9001"];
-        service.Ports = ["19000:9000", "19001:9001"];
+        service.Ports = [$"{PlatformPorts.MinioApi}:9000", $"{PlatformPorts.MinioConsole}:9001"];
     });
 
-// Register APIs in dependency order so references are explicit and startup waits are correct.
-var identityApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Identity_Api>(ToApiResourceName(ApiDirectory.Identity))
-        .WithReference(identityDb),
-    2003);
+builder.AddProject<Matterway_Migrations>("db-migrator")
+    .WithReference(databases.Catalog)
+    .WithReference(databases.Customers)
+    .WithReference(databases.Identity)
+    .WithReference(databases.Sales)
+    .WaitFor(postgres)
+    .WithExplicitStart()
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "no"; });
 
-var catalogApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Catalog_Api>(ToApiResourceName(ApiDirectory.Catalog))
-        .WithReference(catalogDb),
-    2001);
+var identityApi = AddApi<Matterway_Identity_Api>(
+    ApiDirectory.Identity,
+    PlatformPorts.IdentityApi,
+    api => api.WithReference(databases.Identity));
+
+var catalogApi = AddApi<Matterway_Catalog_Api>(
+    ApiDirectory.Catalog,
+    PlatformPorts.CatalogApi,
+    api => api.WithReference(databases.Catalog));
+
+var customersApi = AddApi<Matterway_Customers_Api>(
+    ApiDirectory.Customers,
+    PlatformPorts.CustomersApi,
+    api => api
+        .WithReference(databases.Customers)
+        .WithReference(identityApi.GetEndpoint("http"))
+        .WithReference(catalogApi.GetEndpoint("http")));
+
+var salesApi = AddApi<Matterway_Sales_Api>(
+    ApiDirectory.Sales,
+    PlatformPorts.SalesApi,
+    api => api.WithReference(databases.Sales)
+        .WithReference(customersApi.GetEndpoint("http")));
+
+var identityApiHttp = identityApi.GetEndpoint("http");
+var catalogApiHttp = catalogApi.GetEndpoint("http");
+var customersApiHttp = customersApi.GetEndpoint("http");
+var salesApiHttp = salesApi.GetEndpoint("http");
+var minioHttpEndpoint = minio.GetEndpoint("http");
+var minioPublicBaseUrl = builder.Configuration["Apis:AccessOrigins:Minio"];
+if (string.IsNullOrWhiteSpace(minioPublicBaseUrl))
+    minioPublicBaseUrl = $"http://localhost:{PlatformPorts.MinioApi}";
 
 catalogApi
     .WaitFor(minio)
-    .WithReference(minio.GetEndpoint("http"))
+    .WithReference(minioHttpEndpoint)
     .WithEnvironment("ImageStorage__Bucket", "article-images")
-    .WithEnvironment("ImageStorage__Endpoint", minio.GetEndpoint("http"))
-    .WithEnvironment("ImageStorage__PublicBaseUrl", minio.GetEndpoint("http"))
+    .WithEnvironment("ImageStorage__Endpoint", minioHttpEndpoint)
+    .WithEnvironment("ImageStorage__PublicBaseUrl", minioPublicBaseUrl.TrimEnd('/'))
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
     .WithEnvironment("ImageStorage__SecretKey", minioPassword)
     .WithEnvironment("ImageStorage__AllowPublicRead", "true");
-
-var customersApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Customers_Api>(ToApiResourceName(ApiDirectory.Customers))
-        .WithReference(customersDb)
-        .WithReference(identityApi.GetEndpoint("http"))
-        .WithReference(catalogApi.GetEndpoint("http")),
-    2002);
-
-var salesApi = ConfigureApiResource(
-    builder.AddProject<Matterway_Sales_Api>(ToApiResourceName(ApiDirectory.Sales))
-        .WithReference(salesDb)
-        .WithReference(customersApi.GetEndpoint("http")),
-    2005);
 
 var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
 {
@@ -86,44 +110,75 @@ var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>
     [ApiDirectory.Sales.ServiceName] = salesApi
 };
 
-// Compose frontend apps once all API endpoints are known.
-var web = WebComposition.AddWebApps(builder, identityApi, catalogApi, customersApi, salesApi);
+WebAppComposition.AddWebApp(
+    builder,
+    new WebAppCompositionOptions
+    {
+        ServiceName = "storefront-web",
+        RelativePath = "../Matterway.Storefront.Web",
+        HostPort = PlatformPorts.StorefrontWeb,
+        Dependencies = [catalogApi, salesApi],
+        ConfigureEnvironment = environment =>
+        {
+            ConfigureCommonWebEnvironment(environment);
+            environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
+        }
+    });
 
-// Apply cross-cutting API wiring (docs + auth/cors environment) in one place.
+WebAppComposition.AddWebApp(
+    builder,
+    new WebAppCompositionOptions
+    {
+        ServiceName = "dashboard-web",
+        RelativePath = "../Matterway.Dashboard.Web",
+        HostPort = PlatformPorts.DashboardWeb,
+        Dependencies = [identityApi, catalogApi, customersApi, salesApi],
+        ConfigureEnvironment = ConfigureCommonWebEnvironment
+    });
+
 if (builder.Environment.IsDevelopment())
     ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
 
 ApiEnvironmentComposition.ConfigureApiEnvironment(
     apisByServiceName.Values,
-    identityApi.GetEndpoint("http"),
-    web,
-    jwtSigningKey);
+    identityApiHttp,
+    jwtSigningKey,
+    builder.Configuration);
 
 builder.Build().Run();
 
-static void ConfigureDashboard(IDistributedApplicationBuilder builder)
+IResourceBuilder<ProjectResource> AddApi<TProject>(
+    ApiDefinition apiDefinition,
+    int hostPort,
+    Func<IResourceBuilder<ProjectResource>, IResourceBuilder<ProjectResource>> configure)
+    where TProject : IProjectMetadata, new()
 {
-    builder.AddDockerComposeEnvironment("matterway-platform").WithDashboard(options =>
-    {
-        options.WithHostPort(18888);
-        options.WithContainerName("aspire-dashboard");
-    }).ConfigureComposeFile(compose => { compose.Name = "matterway-erp-stack"; });
-}
-
-static string ToApiResourceName(ApiDefinition apiDefinition)
-{
-    return $"{apiDefinition.ServiceName}-api";
-}
-
-static IResourceBuilder<ProjectResource> ConfigureApiResource(
-    IResourceBuilder<ProjectResource> resourceBuilder,
-    int hostPort)
-{
-    return resourceBuilder
+    var api = builder.AddProject<TProject>($"{apiDefinition.ServiceName}-api")
         .WithExternalHttpEndpoints()
         .PublishAsDockerComposeService((_, service) =>
         {
             service.Restart = "unless-stopped";
             service.Ports = [$"{hostPort}:8080"];
         });
+
+    return configure(api);
+}
+
+void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
+{
+    environment
+        .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
+        .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
+        .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
+        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
+        .WithEnvironment("IDENTITY_API_BASE_URL", identityApiHttp)
+        .WithEnvironment("CATALOG_API_BASE_URL", catalogApiHttp)
+        .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
+        .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
+        .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL",
+            builder.Configuration["Apis:AccessOrigins:Identity"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Catalog"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL",
+            builder.Configuration["Apis:AccessOrigins:Customers"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Sales"]);
 }

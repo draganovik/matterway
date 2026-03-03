@@ -369,7 +369,7 @@ FodyWeavers.xsd
 
 # Aspire generated files
 /.aspire
-/aspire-output
+**/aspire-output/
 /docker-compose-artifacts
 
 # Local project based solution files
