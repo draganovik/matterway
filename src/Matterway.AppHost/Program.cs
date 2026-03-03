@@ -110,9 +110,31 @@ var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>
     [ApiDirectory.Sales.ServiceName] = salesApi
 };
 
-AddWebApp("storefront-web", "../Matterway.Storefront.Web", PlatformPorts.StorefrontWeb, [catalogApi, salesApi]);
-AddWebApp("dashboard-web", "../Matterway.Dashboard.Web", PlatformPorts.DashboardWeb,
-    [identityApi, catalogApi, customersApi, salesApi]);
+WebAppComposition.AddWebApp(
+    builder,
+    new WebAppCompositionOptions
+    {
+        ServiceName = "storefront-web",
+        RelativePath = "../Matterway.Storefront.Web",
+        HostPort = PlatformPorts.StorefrontWeb,
+        Dependencies = [catalogApi, salesApi],
+        ConfigureEnvironment = environment =>
+        {
+            ConfigureCommonWebEnvironment(environment);
+            environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
+        }
+    });
+
+WebAppComposition.AddWebApp(
+    builder,
+    new WebAppCompositionOptions
+    {
+        ServiceName = "dashboard-web",
+        RelativePath = "../Matterway.Dashboard.Web",
+        HostPort = PlatformPorts.DashboardWeb,
+        Dependencies = [identityApi, catalogApi, customersApi, salesApi],
+        ConfigureEnvironment = ConfigureCommonWebEnvironment
+    });
 
 if (builder.Environment.IsDevelopment())
     ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
@@ -142,92 +164,21 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     return configure(api);
 }
 
-void AddWebApp(
-    string serviceName,
-    string relativePath,
-    int hostPort,
-    IReadOnlyList<IResourceBuilder<ProjectResource>> dependencies)
+void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
 {
-    const string httpEndpoint = "http";
-
-    if (builder.ExecutionContext.IsPublishMode)
-    {
-        var published = builder.AddDockerfile(serviceName, relativePath)
-            .WithEnvironment("PORT", hostPort.ToString())
-            .WithHttpEndpoint(hostPort, hostPort, httpEndpoint);
-
-        foreach (var dependency in dependencies)
-            published = published.WaitFor(dependency);
-
-        var configured = ConfigureWebEnvironment(published);
-        if (string.Equals(serviceName, "storefront-web", StringComparison.Ordinal))
-            configured = configured.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
-
-        configured.PublishAsDockerComposeService((_, service) =>
-        {
-            service.Restart = "unless-stopped";
-            service.Ports = [$"{hostPort}:{hostPort}"];
-        });
-
-        return;
-    }
-
-    var development = builder.AddViteApp(serviceName, relativePath)
-        .WithEnvironment("PORT", hostPort.ToString())
-        .WithEndpoint(httpEndpoint, endpoint =>
-        {
-            endpoint.Port = hostPort;
-            endpoint.IsProxied = false;
-        })
-        .WithExternalHttpEndpoints()
-        .PublishAsDockerFile();
-
-    foreach (var dependency in dependencies)
-        development = development.WaitFor(dependency);
-
-    var configuredDevelopment = ConfigureWebEnvironment(development);
-    if (string.Equals(serviceName, "storefront-web", StringComparison.Ordinal))
-        configuredDevelopment = configuredDevelopment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
-
-    configuredDevelopment.PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = [$"{hostPort}:{hostPort}"];
-    });
-}
-
-IResourceBuilder<T> ConfigureWebEnvironment<T>(IResourceBuilder<T> resource)
-    where T : IResource, IResourceWithEnvironment
-{
-    var endpointVariables = new (string Name, EndpointReference Value)[]
-    {
-        ("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp),
-        ("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp),
-        ("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp),
-        ("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp),
-        ("IDENTITY_API_BASE_URL", identityApiHttp),
-        ("CATALOG_API_BASE_URL", catalogApiHttp),
-        ("CUSTOMERS_API_BASE_URL", customersApiHttp),
-        ("SALES_API_BASE_URL", salesApiHttp)
-    };
-
-    foreach (var (name, value) in endpointVariables)
-        resource = resource.WithEnvironment(name, value);
-
-    var apiAccessOriginVariables = new (string Name, string ConfigKey)[]
-    {
-        ("NUXT_PUBLIC_IDENTITY_API_BASE_URL", "Apis:AccessOrigins:Identity"),
-        ("NUXT_PUBLIC_CATALOG_API_BASE_URL", "Apis:AccessOrigins:Catalog"),
-        ("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL", "Apis:AccessOrigins:Customers"),
-        ("NUXT_PUBLIC_SALES_API_BASE_URL", "Apis:AccessOrigins:Sales")
-    };
-
-    foreach (var (name, configKey) in apiAccessOriginVariables)
-    {
-        var value = builder.Configuration[configKey];
-        if (!string.IsNullOrWhiteSpace(value))
-            resource = resource.WithEnvironment(name, value.TrimEnd('/'));
-    }
-
-    return resource;
+    environment
+        .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
+        .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
+        .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
+        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
+        .WithEnvironment("IDENTITY_API_BASE_URL", identityApiHttp)
+        .WithEnvironment("CATALOG_API_BASE_URL", catalogApiHttp)
+        .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
+        .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
+        .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL",
+            builder.Configuration["Apis:AccessOrigins:Identity"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Catalog"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL",
+            builder.Configuration["Apis:AccessOrigins:Customers"])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Sales"]);
 }
