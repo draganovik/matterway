@@ -111,10 +111,16 @@ Scope semantics:
 - Docker Desktop (or Docker Engine) for PostgreSQL and MinIO.
 - .NET SDK `10.0.100` (see `global.json`).
 - Node.js compatible with Nuxt 4 (Node 20+ recommended).
-- `dotnet-ef` tool (required for migration/database scripts):
+- `dotnet-ef` tool (required for migration/database scripts).
+- Aspire CLI (required for non-debug e2e deployment with `aspire deploy`).
+- Stripe CLI (required for local webhook forwarding).
+
+Install tools:
 
 ```bash
 dotnet tool install --global dotnet-ef
+curl -sSL https://aspire.dev/install.sh | bash
+stripe login
 ```
 
 ### 1) Restore Dependencies
@@ -133,6 +139,7 @@ npm install --prefix src/Matterway.Dashboard.Web
 - `Parameters:PostgresPassword`
 - `Parameters:MinioRootUser`
 - `Parameters:MinioRootPassword`
+- `Parameters:StripeSecretKey`
 
 Set them with user-secrets:
 
@@ -141,19 +148,34 @@ dotnet user-secrets set "Parameters:JwtSigningKey" "<jwt-signing-key>" --project
 dotnet user-secrets set "Parameters:PostgresPassword" "<postgres-password>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootUser" "<minio-user>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootPassword" "<minio-password>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:StripeSecretKey" "<stripe-secret-key>" --project src/Matterway.AppHost
 ```
 
-### 3) Start Full Stack (Recommended)
+Optional (override browser-facing API URLs for Nuxt apps):
+
+- `Apis:AccessOrigins:Catalog`
+- `Apis:AccessOrigins:Customers`
+- `Apis:AccessOrigins:Identity`
+- `Apis:AccessOrigins:Sales`
+- `Apis:AccessOrigins:Minio` (public object URL origin used for image links)
+
+`appsettings.Development.json` already provides local defaults. For production, set explicit values in `appsettings.Production.json` or via environment variables.
+
+Optional (override API CORS origins):
+
+- `Cors:AllowedOrigins` (array)
+
+`appsettings.Development.json` and `appsettings.Production.json` include baseline values you can customize.
+
+### 3) Debug Mode (AppHost)
 
 ```bash
 dotnet run --project src/Matterway.AppHost
 ```
 
-This starts APIs, both Nuxt apps, PostgreSQL, MinIO, and Aspire dashboard. API containers are reachable only inside the Compose network (no host port publishing by default).
+This is the recommended developer workflow for debugging. It starts APIs, both Nuxt apps, PostgreSQL, MinIO, and the Aspire dashboard.
 
-### 4) Apply Migrations
-
-APIs do not auto-run EF migrations on startup. Run this once after PostgreSQL is up:
+Apply migrations after PostgreSQL is up:
 
 ```bash
 ./scripts/databases_update.sh
@@ -165,7 +187,29 @@ Windows equivalent:
 scripts\databases_update.cmd
 ```
 
-## Manual Run Mode (Without AppHost)
+If testing Stripe webhook flow locally, run Stripe CLI in a separate terminal:
+
+```bash
+stripe listen --forward-to http://localhost:3001/api/webhooks/stripe-intent
+```
+
+### 4) E2E System Deployment (Non-Debug)
+
+Use this when validating full deployment behavior (container images + compose orchestration), not day-to-day debugging:
+
+```bash
+aspire deploy --environment production
+```
+
+Notes:
+
+- This uses AppHost production configuration (`src/Matterway.AppHost/appsettings.Production.json`) and AppHost parameters/secrets.
+- Set real values for `Apis:AccessOrigins:*` (including `Minio`) and `Cors:AllowedOrigins` before running.
+- For local Stripe webhook testing during e2e runs, keep Stripe CLI forwarding active:
+  - `stripe listen --forward-to http://localhost:3001/api/webhooks/stripe-intent`
+- For real production environments, configure Stripe webhooks against your deployed public URL.
+
+### 5) Manual Run Mode (Without AppHost, Optional)
 
 Use this when debugging one service at a time.
 
@@ -188,17 +232,17 @@ PORT=3002 npm run dev --prefix src/Matterway.Dashboard.Web
 When running web apps outside AppHost, provide API base URLs via env vars:
 
 - Storefront:
-  - `CATALOG_API_BASE_URL`
-  - `CUSTOMERS_API_BASE_URL`
-  - `AUTH_API_BASE_URL` or `IDENTITY_API_BASE_URL`
-  - `SALES_API_BASE_URL`
-  - `SERVER_SALES_API_BASE_URL` (for Stripe webhook-to-sales flow)
-  - `STRIPE_SECRET_KEY` (if using payment endpoints)
+  - `NUXT_PUBLIC_CATALOG_API_BASE_URL`
+  - `NUXT_PUBLIC_CUSTOMERS_API_BASE_URL`
+  - `NUXT_PUBLIC_IDENTITY_API_BASE_URL`
+  - `NUXT_PUBLIC_SALES_API_BASE_URL`
+  - `NUXT_SERVER_SALES_API_BASE_URL` (for Stripe webhook-to-sales flow)
+  - `NUXT_STRIPE_SECRET_KEY` (if using payment endpoints)
 - Dashboard:
-  - `IDENTITY_API_BASE_URL`
-  - `CATALOG_API_BASE_URL`
-  - `CUSTOMERS_API_BASE_URL`
-  - `SALES_API_BASE_URL`
+  - `NUXT_PUBLIC_IDENTITY_API_BASE_URL`
+  - `NUXT_PUBLIC_CATALOG_API_BASE_URL`
+  - `NUXT_PUBLIC_CUSTOMERS_API_BASE_URL`
+  - `NUXT_PUBLIC_SALES_API_BASE_URL`
 
 ## Database and Migration Workflow
 

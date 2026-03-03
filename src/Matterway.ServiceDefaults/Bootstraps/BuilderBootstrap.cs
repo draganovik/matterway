@@ -20,10 +20,7 @@ public static class BuilderBootstrap
 
         builder.Configuration
             .SetBasePath(contentRootPath)
-            .AddJsonFile(
-                $"Properties/appsettings.{builder.Environment.EnvironmentName}.json",
-                true,
-                true)
+            .AddJsonFile("Properties/appsettings.json", true, true)
             .AddEnvironmentVariables();
 
         if (throwOnBadRequest is { } throwOnBadRequestValue)

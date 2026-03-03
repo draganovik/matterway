@@ -8,11 +8,10 @@ public sealed class IdentityDbFactory : IDesignTimeDbContextFactory<IdentityDbCo
     public IdentityDbComposer CreateDbContext(string[] args)
     {
         var basePath = Directory.GetCurrentDirectory();
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)
-            .AddJsonFile($"Properties/appsettings.{environment}.json", true)
+            .AddJsonFile("Properties/appsettings.json", true)
             .AddEnvironmentVariables()
             .Build();
 

@@ -1,7 +1,3 @@
-const env = import.meta.env as Record<string, string | undefined>
-
-const publicEnv = (key: string) => env[`NUXT_PUBLIC_${key}`] ?? env[key]
-
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
   ssr: false,
@@ -28,14 +24,14 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   runtimeConfig: {
-    stripeSecretKey: env.STRIPE_SECRET_KEY,
-    serverSalesApiBaseUrl: env.SERVER_SALES_API_BASE_URL,
+    // Runtime values are injected from container env at startup.
+    stripeSecretKey: "",
+    serverSalesApiBaseUrl: "",
     public: {
-      identityApiBaseUrl:
-        publicEnv("IDENTITY_API_BASE_URL") ?? publicEnv("AUTH_API_BASE_URL"),
-      catalogApiBaseUrl: publicEnv("CATALOG_API_BASE_URL"),
-      customersApiBaseUrl: publicEnv("CUSTOMERS_API_BASE_URL"),
-      salesApiBaseUrl: publicEnv("SALES_API_BASE_URL"),
+      identityApiBaseUrl: "",
+      catalogApiBaseUrl: "",
+      customersApiBaseUrl: "",
+      salesApiBaseUrl: "",
     },
   },
 

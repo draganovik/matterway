@@ -20,9 +20,22 @@ public static class ServiceDiscovery
                 if (!string.IsNullOrWhiteSpace(explicitValue)) return CreateUri(explicitValue, configurationKey);
             }
 
-            var inferredKey = configurationKey ?? $"Services:{ToPascalCase(aspireServiceName)}:Url";
+            var inferredKey = configurationKey ?? $"Apis:AccessOrigins:{ToPascalCase(aspireServiceName)}";
             var configuredValue = configuration[inferredKey];
             if (!string.IsNullOrWhiteSpace(configuredValue)) return CreateUri(configuredValue, inferredKey);
+
+            if (configurationKey is null)
+            {
+                var legacyApiKey = $"Api:AccessOrigins:{ToPascalCase(aspireServiceName)}";
+                var legacyApiConfiguredValue = configuration[legacyApiKey];
+                if (!string.IsNullOrWhiteSpace(legacyApiConfiguredValue))
+                    return CreateUri(legacyApiConfiguredValue, legacyApiKey);
+
+                var legacyKey = $"Services:{ToPascalCase(aspireServiceName)}:Url";
+                var legacyConfiguredValue = configuration[legacyKey];
+                if (!string.IsNullOrWhiteSpace(legacyConfiguredValue))
+                    return CreateUri(legacyConfiguredValue, legacyKey);
+            }
 
             return new Uri($"http://{aspireServiceName}", UriKind.Absolute);
         }
