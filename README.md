@@ -149,7 +149,7 @@ dotnet user-secrets set "Parameters:MinioRootPassword" "<minio-password>" --proj
 dotnet run --project src/Matterway.AppHost
 ```
 
-This starts APIs, both Nuxt apps, PostgreSQL, MinIO, and Aspire dashboard using the ports listed above.
+This starts APIs, both Nuxt apps, PostgreSQL, MinIO, and Aspire dashboard. API containers are reachable only inside the Compose network (no host port publishing by default).
 
 ### 4) Apply Migrations
 
