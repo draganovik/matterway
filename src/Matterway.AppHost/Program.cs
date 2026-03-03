@@ -17,7 +17,7 @@ builder.AddDockerComposeEnvironment("matterway-platform")
         dashboard.WithHostPort(PlatformPorts.AspireDashboard);
         dashboard.WithContainerName("aspire-dashboard");
     })
-    .ConfigureComposeFile(compose => compose.Name = "matterway-erp-stack");
+    .ConfigureComposeFile(compose => compose.Name = "matterway-platform");
 
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("18")
