@@ -155,9 +155,16 @@ npm install --prefix src/Matterway.Dashboard.Web
 
 ------------------------------------------------------------------------
 
-### 2️⃣ Configure AppHost Secrets
+### 2️⃣ Configure AppHost Settings (Development)
 
-Set required parameters via user-secrets:
+This section is for local development.
+
+AppHost currently includes shared defaults in `src/Matterway.AppHost/appsettings.json`.
+You can add optional environment-specific overrides in the same folder (for example
+`appsettings.Development.json`, `appsettings.Production.json`, or other
+`appsettings.{Environment}.json` files) for non-secret values.
+
+Set required secret parameters via user-secrets:
 
 ``` bash
 dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
@@ -167,7 +174,12 @@ dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/M
 dotnet user-secrets set "Parameters:StripeSecretKey" "<value>" --project src/Matterway.AppHost
 ```
 
-Optional configuration: - `Apis:AccessOrigins:*` - `Cors:AllowedOrigins`
+For deployed environments, prefer environment variables or your platform's secret
+store for sensitive values.
+
+Optional non-secret configuration:
+- `Apis:AccessOrigins:*`
+- `Cors:AllowedOrigins`
 
 ------------------------------------------------------------------------
 

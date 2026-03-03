@@ -12,13 +12,13 @@ RUN --mount=type=cache,target=/root/.npm \
     && case "$arch" in \
       aarch64|arm64) npm install --no-save --no-audit --no-fund @oxc-parser/binding-linux-arm64-gnu ;; \
       x86_64|amd64) npm install --no-save --no-audit --no-fund @oxc-parser/binding-linux-x64-gnu ;; \
-      *) echo "Unsupported architecture for oxc-parser native binding: $arch" ;; \
-    esac \
-    && npm run postinstall
+      *) echo "Unsupported architecture for oxc-parser native binding: $arch" >&2; exit 1 ;; \
+    esac
 
 FROM deps AS build
 COPY . .
-RUN npm run build
+RUN npm run postinstall \
+    && npm run build
 
 FROM ${NODE_VERSION}-slim AS runtime
 WORKDIR /app
