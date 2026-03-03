@@ -11,7 +11,7 @@ public static class IdentityBrokerRegistration
             builder.Services.AddHttpClient<IIdentityClient, HttpIdentityClient>((sp, client) =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();
-                client.BaseAddress = configuration.ResolveServiceUri("identity-api", "Services:Identity:Url");
+                client.BaseAddress = configuration.ResolveServiceUri("identity-api", "Apis:AccessOrigins:Identity");
             });
 
             return builder;

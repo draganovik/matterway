@@ -21,6 +21,7 @@
         <ProjectReference Include="..\Matterway.Catalog.Api\Matterway.Catalog.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Customers.Api\Matterway.Customers.Api.csproj"/>
         <ProjectReference Include="..\Matterway.Identity.Api\Matterway.Identity.Api.csproj"/>
+        <ProjectReference Include="..\Matterway.Migrations\Matterway.Migrations.csproj"/>
         <ProjectReference Include="..\Matterway.Sales.Api\Matterway.Sales.Api.csproj"/>
         <ProjectReference Include="..\Matterway.ServiceDefaults\Matterway.ServiceDefaults.csproj" IsAspireProjectResource="false"/>
     </ItemGroup>

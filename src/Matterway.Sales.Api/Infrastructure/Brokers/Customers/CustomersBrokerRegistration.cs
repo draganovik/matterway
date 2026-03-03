@@ -11,7 +11,7 @@ public static class CustomersBrokerRegistration
             builder.Services.AddHttpClient<ICustomersClient, HttpCustomersClient>((sp, client) =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();
-                client.BaseAddress = configuration.ResolveServiceUri("customers-api", "Services:Customers:Url");
+                client.BaseAddress = configuration.ResolveServiceUri("customers-api", "Apis:AccessOrigins:Customers");
             });
 
             return builder;

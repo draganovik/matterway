@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace Matterway.AppHost.Composition;
 
 internal static class ApiEnvironmentComposition
@@ -5,15 +7,25 @@ internal static class ApiEnvironmentComposition
     public static void ConfigureApiEnvironment(
         IEnumerable<IResourceBuilder<ProjectResource>> apis,
         EndpointReference identityApiHttpEndpoint,
-        WebEndpoints web,
-        IResourceBuilder<ParameterResource> jwtSigningKey)
+        IResourceBuilder<ParameterResource> jwtSigningKey,
+        IConfiguration configuration)
     {
+        var corsAllowedOrigins = configuration
+                                     .GetSection("Cors:AllowedOrigins")
+                                     .Get<string[]>()?
+                                     .Where(origin => !string.IsNullOrWhiteSpace(origin))
+                                     .ToArray()
+                                 ?? [];
+
         foreach (var api in apis)
+        {
             api
                 .WithEnvironment("Jwt__Key", jwtSigningKey)
                 .WithEnvironment("Jwt__Issuer", identityApiHttpEndpoint)
-                .WithEnvironment("Jwt__Audience", identityApiHttpEndpoint)
-                .WithEnvironment("Cors__AllowedOrigins__0", web.StorefrontHttpEndpoint)
-                .WithEnvironment("Cors__AllowedOrigins__1", web.DashboardHttpEndpoint);
+                .WithEnvironment("Jwt__Audience", identityApiHttpEndpoint);
+
+            for (var i = 0; i < corsAllowedOrigins.Length; i++)
+                api.WithEnvironment($"Cors__AllowedOrigins__{i}", corsAllowedOrigins[i]);
+        }
     }
 }
