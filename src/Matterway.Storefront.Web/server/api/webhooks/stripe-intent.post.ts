@@ -1,6 +1,7 @@
 import type { StripeEventWebhookPayload } from "../../types/payments"
 
 const config = useRuntimeConfig()
+const systemAccessKeyHeaderName = "X-System-Access-Key"
 
 export default defineEventHandler(async (event) => {
   const stripeEvent = (await readBody(event)) as StripeEventWebhookPayload
@@ -25,6 +26,11 @@ export default defineEventHandler(async (event) => {
 const postPayment = async (event: StripeEventWebhookPayload) => {
   if (!config.serverSalesApiBaseUrl) {
     console.error("[stripe] missing serverSalesApiBaseUrl runtime config")
+    return null
+  }
+
+  if (!config.systemAccessKey) {
+    console.error("[stripe] missing systemAccessKey runtime config")
     return null
   }
 
@@ -55,6 +61,7 @@ const postPayment = async (event: StripeEventWebhookPayload) => {
       headers: {
         "Content-Type": "application/json",
         accept: "application/json",
+        [systemAccessKeyHeaderName]: config.systemAccessKey,
       },
       body: JSON.stringify({
         orderId,

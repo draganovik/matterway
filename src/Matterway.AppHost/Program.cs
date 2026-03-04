@@ -6,6 +6,7 @@ using Projects;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
+var systemAccessKey = builder.AddParameter("SystemAccessKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
 var minioUser = builder.AddParameter("MinioRootUser");
 var minioPassword = builder.AddParameter("MinioRootPassword", true);
@@ -121,6 +122,7 @@ WebAppComposition.AddWebApp(
         ConfigureEnvironment = environment =>
         {
             ConfigureCommonWebEnvironment(environment);
+            environment.WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey);
             environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
         }
     });
@@ -143,6 +145,7 @@ ApiEnvironmentComposition.ConfigureApiEnvironment(
     apisByServiceName.Values,
     identityApiHttp,
     jwtSigningKey,
+    systemAccessKey,
     builder.Configuration);
 
 builder.Build().Run();

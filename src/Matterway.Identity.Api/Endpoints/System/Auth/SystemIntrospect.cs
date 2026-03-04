@@ -13,6 +13,7 @@ public class SystemIntrospect : IEndpoint
             .WithTags("Auth")
             .Produces<AuthIntrospectResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
+            .RequireSystemAccessKey()
             .RequireAuthorization()
             .MapToApiVersion(new ApiVersion(1, 0));
     }

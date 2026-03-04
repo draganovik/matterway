@@ -8,6 +8,7 @@ internal static class ApiEnvironmentComposition
         IEnumerable<IResourceBuilder<ProjectResource>> apis,
         EndpointReference identityApiHttpEndpoint,
         IResourceBuilder<ParameterResource> jwtSigningKey,
+        IResourceBuilder<ParameterResource> systemAccessKey,
         IConfiguration configuration)
     {
         var corsAllowedOrigins = configuration
@@ -22,7 +23,8 @@ internal static class ApiEnvironmentComposition
             api
                 .WithEnvironment("Jwt__Key", jwtSigningKey)
                 .WithEnvironment("Jwt__Issuer", identityApiHttpEndpoint)
-                .WithEnvironment("Jwt__Audience", identityApiHttpEndpoint);
+                .WithEnvironment("Jwt__Audience", identityApiHttpEndpoint)
+                .WithEnvironment("Apis__SystemAccessKey", systemAccessKey);
 
             for (var i = 0; i < corsAllowedOrigins.Length; i++)
                 api.WithEnvironment($"Cors__AllowedOrigins__{i}", corsAllowedOrigins[i]);

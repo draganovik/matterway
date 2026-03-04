@@ -86,6 +86,7 @@ Example:
 ## Authentication & Authorization
 
 -   JWT access + refresh tokens issued by **Identity.Api**
+-   Endpoints can explicitly require shared system access key (`X-System-Access-Key`)
 -   Role-based and permission-claim (`perm`) authorization
 -   Permission levels:
     -   `observer`
@@ -168,6 +169,7 @@ Set required secret parameters via user-secrets:
 
 ``` bash
 dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:SystemAccessKey" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:PostgresPassword" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootUser" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/Matterway.AppHost
