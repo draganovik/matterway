@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Matterway.ServiceDefaults.Authorization;
 using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,28 @@ public static class WebAppExtensions
             {
                 var options = httpContext.RequestServices.GetRequiredService<IOptions<RequestIdentityOptions>>().Value;
                 using var _ = RequestIdentity.PushOptions(options);
+                await next();
+            });
+            app.Use(async (httpContext, next) =>
+            {
+                var requiresSystemAccessKey =
+                    SystemAccessKeyEndpointExtensions.IsSystemAccessKeyRequired(httpContext.GetEndpoint()?.Metadata);
+
+                if (!requiresSystemAccessKey)
+                {
+                    await next();
+                    return;
+                }
+
+                var options = httpContext.RequestServices.GetRequiredService<IOptions<SystemAccessKeyOptions>>().Value;
+                if (!httpContext.Request.Headers.TryGetValue(SystemAccessKeyOptions.HeaderName, out var providedKey) ||
+                    string.IsNullOrWhiteSpace(providedKey) ||
+                    !string.Equals(providedKey.ToString().Trim(), options.AccessKey, StringComparison.Ordinal))
+                {
+                    httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
                 await next();
             });
             app.UseCors();

@@ -1,4 +1,5 @@
 import { useAuthSession } from "~/composables/useAuthSession"
+import { fetchWithTelemetry } from "~/utils/telemetry"
 import type { ApiResult, ApiService } from "~/types/common/api"
 
 function getBaseUrl(service: ApiService) {
@@ -107,7 +108,7 @@ export function useApiClient() {
     if (accessToken) headers.set("Authorization", accessToken)
 
     const runFetch = async () =>
-      fetch(url, {
+      fetchWithTelemetry(url, {
         ...options,
         headers,
       })

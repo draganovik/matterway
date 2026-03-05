@@ -16,6 +16,7 @@ public class SystemCreateCustomerUser : IEndpoint
             .Produces<CreateUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status403Forbidden)
+            .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

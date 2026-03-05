@@ -86,6 +86,7 @@ Example:
 ## Authentication & Authorization
 
 -   JWT access + refresh tokens issued by **Identity.Api**
+-   Endpoints can explicitly require shared system access key (`X-System-Access-Key`)
 -   Role-based and permission-claim (`perm`) authorization
 -   Permission levels:
     -   `observer`
@@ -168,6 +169,7 @@ Set required secret parameters via user-secrets:
 
 ``` bash
 dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:SystemAccessKey" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:PostgresPassword" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootUser" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/Matterway.AppHost
@@ -238,6 +240,16 @@ Provided by `Matterway.ServiceDefaults`:
 -   ProblemDetails standardization
 -   OpenAPI generation
 -   Centralized auth & CORS configuration
+
+### Web app tracing (Storefront server only)
+
+Nuxt OTEL server tracing is currently wired only for `Matterway.Storefront.Web`.
+
+The storefront Nuxt server reads OTLP settings from environment (`OTEL_EXPORTER_OTLP_*`,
+`OTEL_SERVICE_NAME`) and falls back to
+`DOTNET_DASHBOARD_OTLP_ENDPOINT_URL` when no explicit OTLP endpoint is provided.
+
+`Matterway.Dashboard.Web` currently has no server-side OTLP tracing setup.
 
 ------------------------------------------------------------------------
 
