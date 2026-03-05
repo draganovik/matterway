@@ -1,9 +1,15 @@
 import type { StripeEventWebhookPayload } from "../../types/payments"
+import type { Context } from "@opentelemetry/api"
+import type { H3Event } from "h3"
+import { fetchWithTelemetry } from "~/utils/telemetry"
 
 const config = useRuntimeConfig()
+const systemAccessKeyHeaderName = "X-System-Access-Key"
+type OtelH3Context = H3Event["context"] & { __otelRequestContext?: Context }
 
 export default defineEventHandler(async (event) => {
   const stripeEvent = (await readBody(event)) as StripeEventWebhookPayload
+  const requestContext = (event.context as OtelH3Context).__otelRequestContext
 
   if (stripeEvent.type !== "charge.succeeded") {
     console.log("Stripe event type not handled:", stripeEvent.type)
@@ -11,7 +17,7 @@ export default defineEventHandler(async (event) => {
     return { success: true, ignored: true, eventType: stripeEvent.type }
   }
 
-  const payment = await postPayment(stripeEvent)
+  const payment = await postPayment(stripeEvent, requestContext)
   if (!payment) {
     throw createError({
       statusCode: 500,
@@ -22,9 +28,17 @@ export default defineEventHandler(async (event) => {
   return { success: true, message: "Payment registered", data: { payment } }
 })
 
-const postPayment = async (event: StripeEventWebhookPayload) => {
+const postPayment = async (
+  event: StripeEventWebhookPayload,
+  requestContext?: Context,
+) => {
   if (!config.serverSalesApiBaseUrl) {
     console.error("[stripe] missing serverSalesApiBaseUrl runtime config")
+    return null
+  }
+
+  if (!config.systemAccessKey) {
+    console.error("[stripe] missing systemAccessKey runtime config")
     return null
   }
 
@@ -48,13 +62,14 @@ const postPayment = async (event: StripeEventWebhookPayload) => {
       ? new Date(stripeObject.created * 1000)
       : new Date()
 
-  const response = await fetch(
+  const response = await fetchWithTelemetry(
     `${config.serverSalesApiBaseUrl}/api/system/v1/payments`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         accept: "application/json",
+        [systemAccessKeyHeaderName]: config.systemAccessKey,
       },
       body: JSON.stringify({
         orderId,
@@ -65,6 +80,7 @@ const postPayment = async (event: StripeEventWebhookPayload) => {
         createdAt,
       }),
     },
+    requestContext,
   )
 
   if (!response.ok) {

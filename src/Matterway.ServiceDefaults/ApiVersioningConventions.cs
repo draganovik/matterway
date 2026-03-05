@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Matterway.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
@@ -68,23 +69,44 @@ public static class ApiVersioningConventions
                 In = ParameterLocation.Header,
                 Description = "JWT authorization header using the Bearer scheme."
             };
+            document.Components.SecuritySchemes["SystemAccessKey"] = new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.ApiKey,
+                Name = SystemAccessKeyOptions.HeaderName,
+                In = ParameterLocation.Header,
+                Description = "Shared system access key header."
+            };
 
             return Task.CompletedTask;
         });
 
         options.AddOperationTransformer((operation, context, _) =>
         {
-            var isAnonymous = context.Description.ActionDescriptor
-                .EndpointMetadata.OfType<AllowAnonymousAttribute>()
-                .Any();
-            if (isAnonymous) return Task.CompletedTask;
+            var endpointMetadata = context.Description.ActionDescriptor.EndpointMetadata;
+            var isAnonymous = endpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+            var requiresSystemAccessKey =
+                SystemAccessKeyEndpointExtensions.IsSystemAccessKeyRequired(endpointMetadata);
+
+            if (isAnonymous && !requiresSystemAccessKey)
+                return Task.CompletedTask;
 
             operation.Security ??= [];
-            var bearerReference = new OpenApiSecuritySchemeReference("Bearer");
-            operation.Security.Add(new OpenApiSecurityRequirement
+            var requirement = new OpenApiSecurityRequirement();
+
+            if (!isAnonymous)
             {
-                { bearerReference, [] }
-            });
+                var bearerReference = new OpenApiSecuritySchemeReference("Bearer");
+                requirement.Add(bearerReference, []);
+            }
+
+            if (requiresSystemAccessKey)
+            {
+                var systemAccessKeyReference = new OpenApiSecuritySchemeReference("SystemAccessKey");
+                requirement.Add(systemAccessKeyReference, []);
+            }
+
+            if (requirement.Count > 0)
+                operation.Security.Add(requirement);
 
             return Task.CompletedTask;
         });

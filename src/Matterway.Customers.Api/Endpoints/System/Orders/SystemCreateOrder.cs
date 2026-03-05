@@ -17,6 +17,7 @@ public class SystemCreateOrder : IEndpoint
             .Produces<CustomerOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
+            .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

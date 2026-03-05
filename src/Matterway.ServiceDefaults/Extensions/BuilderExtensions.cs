@@ -29,6 +29,7 @@ public static class BuilderExtensions
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
             ConfigureRequestIdentity(builder, apiDefinition.ServiceName);
+            ConfigureSystemAccessKey(builder);
             ConfigureProblemDetails(builder, customizeBadHttpRequestProblemDetails, customizeProblemDetails);
             ConfigureApiVersioning(builder, apiDefinition.SupportedApiVersions);
             ConfigureOpenApi(builder, apiDefinition.SupportedApiVersions);
@@ -87,6 +88,51 @@ public static class BuilderExtensions
         {
             ServiceName = serviceName
         }));
+    }
+
+    private static void ConfigureSystemAccessKey(IHostApplicationBuilder builder)
+    {
+        var accessKey = builder.Configuration[SystemAccessKeyOptions.ConfigurationPath];
+        if (string.IsNullOrWhiteSpace(accessKey))
+            throw new InvalidOperationException(
+                $"System access key not configured. Set '{SystemAccessKeyOptions.ConfigurationPath}'.");
+
+        var allowedAuthorities = ResolveInternalApiAuthorities(builder.Configuration);
+
+        builder.Services.AddSingleton<IOptions<SystemAccessKeyOptions>>(_ => Options.Create(new SystemAccessKeyOptions
+        {
+            AccessKey = accessKey,
+            AllowedAuthorities = allowedAuthorities
+        }));
+    }
+
+    private static IReadOnlySet<string> ResolveInternalApiAuthorities(IConfiguration configuration)
+    {
+        var knownApiServices = ApiDirectory.All
+            .Select(static api => api.ServiceName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var configuredAuthorities = configuration.GetSection("Apis:AccessOrigins")
+            .GetChildren()
+            .Where(section => knownApiServices.Contains(section.Key))
+            .Select(static section => section.Value)
+            .Where(static value => !string.IsNullOrWhiteSpace(value))
+            .Select(static value =>
+            {
+                return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                    ? uri.Authority
+                    : null;
+            })
+            .Where(static authority => !string.IsNullOrWhiteSpace(authority))
+            .Select(static authority => authority!);
+
+        var serviceDiscoveryAuthorities = ApiDirectory.All
+            .Select(static api => $"{api.ServiceName}-api");
+
+        return configuredAuthorities
+            .Concat(serviceDiscoveryAuthorities)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static void ConfigureCors(

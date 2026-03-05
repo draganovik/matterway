@@ -32,9 +32,7 @@ onMounted(() => {
 })
 
 const featured = computed(() => articles.value.slice(0, 4))
-const availableCount = computed(
-  () => articles.value.filter((article) => article.isAvailable).length,
-)
+const featuredCount = computed(() => featured.value.length)
 </script>
 
 <template>
@@ -69,8 +67,8 @@ const availableCount = computed(
             <p class="text-2xl font-semibold">{{ totalCount }}</p>
           </UCard>
           <UCard class="border-default bg-default border">
-            <p class="text-muted text-xs">Trenutno dostupno</p>
-            <p class="text-2xl font-semibold">{{ availableCount }}</p>
+            <p class="text-muted text-xs">Trenutno Izdvojeni</p>
+            <p class="text-2xl font-semibold">{{ featuredCount }}</p>
           </UCard>
           <UCard class="border-default bg-default col-span-2 border">
             <p class="text-muted text-xs">Stavki u vašoj korpi</p>

@@ -17,6 +17,7 @@ public class SystemRegisterPayment : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
+            .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1, 0));
     }
 

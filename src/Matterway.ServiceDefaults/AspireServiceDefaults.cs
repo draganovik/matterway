@@ -1,9 +1,11 @@
+using Matterway.ServiceDefaults.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -30,6 +32,11 @@ public static class AspireServiceDefaults
 
             // Turn on service discovery by default
             http.AddServiceDiscovery();
+
+            // Attach the shared system access key for internal API-to-API HTTP calls.
+            http.AddHttpMessageHandler(sp =>
+                new SystemAccessKeyHttpMessageHandler(
+                    sp.GetRequiredService<IOptions<SystemAccessKeyOptions>>()));
         });
 
         // Uncomment the following to restrict the allowed schemes for service discovery.

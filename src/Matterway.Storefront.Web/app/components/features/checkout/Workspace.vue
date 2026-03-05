@@ -3,6 +3,7 @@ import { useAuthSession } from "~/composables/useAuthSession"
 import { useCart } from "~/composables/useCart"
 import { useCustomersApi } from "~/composables/useCustomersApi"
 import { useSalesApi } from "~/composables/useSalesApi"
+import { fetchWithTelemetry } from "~/utils/telemetry"
 import type { CheckoutAddress } from "~/types/customers/address"
 
 const auth = useAuthSession()
@@ -241,7 +242,7 @@ async function submitCheckout() {
       return
     }
 
-    const paymentResponse = await fetch("/api/payments", {
+    const paymentResponse = await fetchWithTelemetry("/api/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
