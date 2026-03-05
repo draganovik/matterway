@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
+const string composeEnvironmentName = "matterway-platform";
 
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var systemAccessKey = builder.AddParameter("SystemAccessKey", true);
@@ -12,7 +13,7 @@ var minioUser = builder.AddParameter("MinioRootUser");
 var minioPassword = builder.AddParameter("MinioRootPassword", true);
 var stripeSecretKey = builder.AddParameter("StripeSecretKey", true);
 
-builder.AddDockerComposeEnvironment("matterway-platform")
+builder.AddDockerComposeEnvironment(composeEnvironmentName)
     .WithDashboard(dashboard =>
     {
         dashboard.WithHostPort(PlatformPorts.AspireDashboard);
@@ -122,6 +123,7 @@ WebAppComposition.AddWebApp(
         ConfigureEnvironment = environment =>
         {
             ConfigureCommonWebEnvironment(environment);
+            ConfigureWebTelemetryEnvironment(environment, "storefront-web");
             environment.WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey);
             environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
         }
@@ -165,6 +167,70 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
         });
 
     return configure(api);
+}
+
+void ConfigureWebTelemetryEnvironment(WebAppEnvironmentBuilder environment, string telemetryServiceName)
+{
+    static string? NormalizeHttpEndpoint(string? endpoint)
+    {
+        if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var endpointUri))
+            return null;
+        if (endpointUri is not { Scheme: "http" or "https" })
+            return null;
+
+        return endpointUri.GetLeftPart(UriPartial.Path).TrimEnd('/');
+    }
+
+    static string? ToTraceEndpoint(string? endpoint)
+    {
+        var normalized = NormalizeHttpEndpoint(endpoint);
+        if (string.IsNullOrWhiteSpace(normalized))
+            return null;
+
+        return normalized.EndsWith("/v1/traces", StringComparison.OrdinalIgnoreCase)
+            ? normalized
+            : $"{normalized}/v1/traces";
+    }
+
+    static string? ToBaseEndpoint(string? endpoint)
+    {
+        var normalized = NormalizeHttpEndpoint(endpoint);
+        if (string.IsNullOrWhiteSpace(normalized))
+            return null;
+
+        return normalized.EndsWith("/v1/traces", StringComparison.OrdinalIgnoreCase)
+            ? normalized[..^10].TrimEnd('/')
+            : normalized;
+    }
+
+    var publishDefaultEndpoint = builder.ExecutionContext.IsPublishMode
+        ? $"http://{composeEnvironmentName}-dashboard:18889"
+        : null;
+
+    var tracesEndpoint = ToTraceEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"])
+                         ?? ToTraceEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"])
+                         ?? ToTraceEndpoint(builder.Configuration["DOTNET_DASHBOARD_OTLP_ENDPOINT_URL"])
+                         ?? ToTraceEndpoint(publishDefaultEndpoint);
+
+    var baseEndpoint = ToBaseEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"])
+                       ?? ToBaseEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"])
+                       ?? ToBaseEndpoint(builder.Configuration["DOTNET_DASHBOARD_OTLP_ENDPOINT_URL"])
+                       ?? ToBaseEndpoint(publishDefaultEndpoint);
+
+    var protocol = builder.Configuration["OTEL_EXPORTER_OTLP_PROTOCOL"];
+    if (string.IsNullOrWhiteSpace(protocol))
+        protocol = "grpc";
+
+    environment
+        .WithEnvironment("OTEL_SERVICE_NAME", telemetryServiceName)
+        .WithEnvironment("OTEL_RESOURCE_ATTRIBUTES", $"service.name={telemetryServiceName}");
+
+    if (!string.IsNullOrWhiteSpace(tracesEndpoint))
+        environment.WithTrimmedEnvironment("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", tracesEndpoint);
+    if (!string.IsNullOrWhiteSpace(baseEndpoint))
+        environment.WithTrimmedEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", baseEndpoint);
+    if (!string.IsNullOrWhiteSpace(tracesEndpoint) || !string.IsNullOrWhiteSpace(baseEndpoint))
+        environment.WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", protocol);
 }
 
 void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)

@@ -4,6 +4,7 @@ import {
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { fetchWithTelemetry } from "~/utils/telemetry"
 import type {
   AuthSession,
   LoginPayload,
@@ -99,7 +100,7 @@ export function useAuthSession() {
     path: "login" | "logout" | "refresh",
     options: RequestInit,
   ) {
-    return fetch(`${getAuthBaseUrl()}/${path}`, options)
+    return fetchWithTelemetry(`${getAuthBaseUrl()}/${path}`, options)
   }
 
   function authJsonPost(

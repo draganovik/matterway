@@ -1,4 +1,5 @@
 import { payWithStripe } from "../services/stripeService"
+import type { Context } from "@opentelemetry/api"
 import type { H3Event } from "h3"
 import type { CardPaymentInput, PaymentAddress } from "../types/payments"
 
@@ -21,6 +22,8 @@ type PaymentRequestBody = {
   orderId?: unknown
   userId?: unknown
 }
+
+type OtelH3Context = H3Event["context"] & { __otelRequestContext?: Context }
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : ""
@@ -68,6 +71,7 @@ async function parseBody(event: H3Event) {
 }
 
 export default defineEventHandler(async (event) => {
+  const requestContext = (event.context as OtelH3Context).__otelRequestContext
   const body = await parseBody(event)
   const orderId = asString(body.orderId)
   if (!orderId) {
@@ -137,6 +141,7 @@ export default defineEventHandler(async (event) => {
     userId,
     orderId,
     config.stripeSecretKey,
+    requestContext,
   )
   return { clientSecret }
 })

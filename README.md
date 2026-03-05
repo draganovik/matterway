@@ -241,6 +241,16 @@ Provided by `Matterway.ServiceDefaults`:
 -   OpenAPI generation
 -   Centralized auth & CORS configuration
 
+### Web app tracing (Storefront server only)
+
+Nuxt OTEL server tracing is currently wired only for `Matterway.Storefront.Web`.
+
+The storefront Nuxt server reads OTLP settings from environment (`OTEL_EXPORTER_OTLP_*`,
+`OTEL_SERVICE_NAME`) and falls back to
+`DOTNET_DASHBOARD_OTLP_ENDPOINT_URL` when no explicit OTLP endpoint is provided.
+
+`Matterway.Dashboard.Web` currently has no server-side OTLP tracing setup.
+
 ------------------------------------------------------------------------
 
 ## Documentation Assets
