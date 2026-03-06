@@ -14,7 +14,7 @@ await initialize()
 
 <template>
   <div class="space-y-6">
-    <UCard class="border-default bg-elevated/60 border">
+    <UCard class="border-default border">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p class="text-primary text-xs tracking-[0.3em] uppercase">Korpa</p>

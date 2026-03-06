@@ -46,7 +46,7 @@ function showPrevious() {
 </script>
 
 <template>
-  <UCard class="border-default bg-default border">
+  <UCard class="border-default border">
     <div class="space-y-3">
       <div class="bg-elevated relative overflow-hidden rounded-xl">
         <div class="relative aspect-[4/3]">

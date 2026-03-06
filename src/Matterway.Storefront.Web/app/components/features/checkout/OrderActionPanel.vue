@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 <template>
   <UCard
-    class="border-default bg-default h-full border"
+    class="border-default h-full border"
     :ui="{ root: 'flex h-full flex-col', body: 'flex-1' }"
   >
     <template #header>

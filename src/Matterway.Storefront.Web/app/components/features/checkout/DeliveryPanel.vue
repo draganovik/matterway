@@ -5,10 +5,7 @@ const address = defineModel<CheckoutAddress>({ required: true })
 </script>
 
 <template>
-  <UCard
-    class="border-default bg-default h-full border"
-    :ui="{ body: 'h-full' }"
-  >
+  <UCard class="border-default h-full border" :ui="{ body: 'h-full' }">
     <template #header>
       <h2 class="text-lg font-semibold">Dostava</h2>
     </template>

@@ -26,7 +26,7 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
 
 <template>
   <UCard
-    class="border-default bg-default h-full overflow-hidden border"
+    class="border-default h-full overflow-hidden border"
     :ui="{
       root: 'h-full flex flex-col',
       header: 'p-0 sm:p-0',

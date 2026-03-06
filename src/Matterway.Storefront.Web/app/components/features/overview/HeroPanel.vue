@@ -7,7 +7,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <UCard class="border-default bg-elevated/60 border">
+  <UCard class="border-default border">
     <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
       <div class="space-y-4">
         <p class="text-primary text-xs tracking-[0.3em] uppercase">Pregled</p>
@@ -32,20 +32,34 @@ const props = defineProps<{
       </div>
 
       <div class="grid grid-cols-2 gap-3">
-        <UCard class="border-default bg-default border">
-          <p class="text-muted text-xs">Stavke u katalogu</p>
-          <p class="text-2xl font-semibold">{{ props.totalCount }}</p>
-        </UCard>
+        <div class="border-default bg-elevated/50 rounded-lg border px-4 py-3">
+          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
+            Stavke u katalogu
+          </p>
+          <p class="mt-1 text-2xl leading-none font-semibold">
+            {{ props.totalCount }}
+          </p>
+        </div>
 
-        <UCard class="border-default bg-default border">
-          <p class="text-muted text-xs">Trenutno Izdvojeni</p>
-          <p class="text-2xl font-semibold">{{ props.featuredCount }}</p>
-        </UCard>
+        <div class="border-default bg-elevated/50 rounded-lg border px-4 py-3">
+          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
+            Trenutno izdvojeni
+          </p>
+          <p class="mt-1 text-2xl leading-none font-semibold">
+            {{ props.featuredCount }}
+          </p>
+        </div>
 
-        <UCard class="border-default bg-default col-span-2 border">
-          <p class="text-muted text-xs">Stavki u vašoj korpi</p>
-          <p class="text-2xl font-semibold">{{ props.cartItems }}</p>
-        </UCard>
+        <div
+          class="border-primary/20 bg-primary/5 col-span-2 rounded-lg border px-4 py-3"
+        >
+          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
+            Stavki u vašoj korpi
+          </p>
+          <p class="mt-1 text-2xl leading-none font-semibold">
+            {{ props.cartItems }}
+          </p>
+        </div>
       </div>
     </div>
   </UCard>

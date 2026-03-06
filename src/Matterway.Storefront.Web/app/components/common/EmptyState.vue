@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <UCard class="border-default bg-elevated/60 border">
+  <UCard class="border-default border">
     <div class="flex flex-col items-center gap-3 py-8 text-center">
       <UIcon :name="icon || 'i-lucide-inbox'" class="text-muted h-8 w-8" />
       <h3 class="text-base font-semibold">{{ title }}</h3>

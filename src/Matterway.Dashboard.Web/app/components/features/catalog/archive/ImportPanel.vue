@@ -71,7 +71,10 @@ function clearSelection() {
 </script>
 
 <template>
-  <UCard class="!border-default h-full !border !ring-0">
+  <UCard
+    class="dashboard-panel-surface !border-default h-full rounded-2xl !border !shadow-sm !ring-0"
+    :ui="{ header: 'p-5 sm:p-5', body: 'px-5 pb-5 pt-0 sm:px-5 sm:pb-5' }"
+  >
     <template #header>
       <div>
         <h3 class="text-foreground text-sm font-semibold">Import Archive</h3>
@@ -94,7 +97,7 @@ function clearSelection() {
         />
         <button
           type="button"
-          class="border-default bg-elevated/40 w-full rounded-lg border border-dashed p-6 text-center transition"
+          class="border-default bg-default/70 w-full rounded-2xl border border-dashed p-6 text-center transition"
           :class="[
             isDragOver
               ? 'border-primary bg-primary/5'

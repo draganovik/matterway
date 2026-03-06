@@ -18,7 +18,7 @@ const hasDiscount = computed(
 </script>
 
 <template>
-  <UCard class="border-default bg-default border">
+  <UCard class="border-default border">
     <div class="space-y-4">
       <div>
         <p class="text-muted text-xs">#{{ props.article.articleCode }}</p>

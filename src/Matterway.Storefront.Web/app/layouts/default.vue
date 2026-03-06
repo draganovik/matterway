@@ -1,6 +1,6 @@
 <template>
   <div
-    class="text-default flex min-h-[calc(100vh+1rem)] flex-col bg-linear-to-b from-slate-200 via-slate-100 to-slate-100 dark:from-slate-950 dark:via-slate-950 dark:to-slate-950"
+    class="text-default flex min-h-[calc(100vh+1rem)] flex-col bg-linear-to-b from-stone-200 via-stone-100 to-stone-100 dark:from-stone-950 dark:via-stone-950 dark:to-stone-950"
   >
     <HeaderNavBar />
     <main
