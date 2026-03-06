@@ -40,7 +40,7 @@ function asDiscountItem(item: Record<string, unknown>) {
     percentage: number | string
     validFrom: string
     validTo?: string | null
-    articleIds: string[]
+    articleCodes: string[]
   }
 }
 </script>

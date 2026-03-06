@@ -4,14 +4,14 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEnti
 
 public interface IArticleDetailTextRepository
 {
-    Task<ArticleDetailText?> GetBy(Guid articleId, string detailSlug,
+    Task<ArticleDetailText?> GetBy(ArticleCode articleCode, string detailSlug,
         CancellationToken cancellationToken = default);
 
     Task<ArticleDetailText?> Create(ArticleDetailText requestModel, CancellationToken cancellationToken = default);
 
-    Task<ArticleDetailText?> Update(Guid articleId, string detailSlug, ArticleDetailText request,
+    Task<ArticleDetailText?> Update(ArticleCode articleCode, string detailSlug, ArticleDetailText request,
         CancellationToken cancellationToken = default);
 
-    Task<bool> Delete(Guid articleId, string detailSlug,
+    Task<bool> Delete(ArticleCode articleCode, string detailSlug,
         CancellationToken cancellationToken = default);
 }

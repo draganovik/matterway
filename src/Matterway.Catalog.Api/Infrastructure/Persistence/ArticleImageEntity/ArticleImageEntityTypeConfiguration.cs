@@ -10,7 +10,7 @@ internal sealed class ArticleImageEntityTypeConfiguration : IEntityTypeConfigura
     {
         builder.ToTable(nameof(ArticleImage));
 
-        builder.HasKey(pi => new { pi.Id, pi.ArticleId });
+        builder.HasKey(pi => new { pi.Id, pi.ArticleCode });
 
         builder.Property(pi => pi.OrderIndex)
             .IsRequired();
@@ -23,10 +23,15 @@ internal sealed class ArticleImageEntityTypeConfiguration : IEntityTypeConfigura
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.HasIndex(pi => new { pi.ArticleId, pi.OrderIndex }).IsUnique();
+        builder.Property(pi => pi.ArticleCode)
+            .HasMaxLength(ArticleCode.Length)
+            .IsRequired();
+
+        builder.HasIndex(pi => new { pi.ArticleCode, pi.OrderIndex }).IsUnique();
 
         builder.HasOne(pi => pi.Article)
             .WithMany(p => p.ArticleImages!)
-            .HasForeignKey(pi => pi.ArticleId);
+            .HasForeignKey(pi => pi.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
     }
 }

@@ -4,7 +4,7 @@ import { usePaginationState } from "~/composables/workflows/pagination/usePagina
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import type {
   CreateArticleResponse,
-  GetArticleByIdResponse,
+  GetArticleResponse,
   QueryArticleResponse,
 } from "~/types/catalog"
 
@@ -29,8 +29,8 @@ export function useCatalogArticlesPage() {
     watchPagination,
   } = usePaginationState({ pageSize: 20 })
 
-  const selectedId = ref<string | null>(null)
-  const selectedArticle = ref<GetArticleByIdResponse | null>(null)
+  const selectedCode = ref<string | null>(null)
+  const selectedArticle = ref<GetArticleResponse | null>(null)
   const articleState = useRequestState()
 
   const createModalOpen = ref(false)
@@ -40,7 +40,7 @@ export function useCatalogArticlesPage() {
     listState.error = ""
 
     const result = await api.queryArticles({
-      filter: filter.value.trim() || undefined,
+      filter: String(filter.value ?? "").trim() || undefined,
       page: pagination.page,
       pageSize: pagination.pageSize,
     })
@@ -63,20 +63,20 @@ export function useCatalogArticlesPage() {
     applyMeta(result.data.meta, articles.value.length)
 
     if (
-      selectedId.value &&
-      !articles.value.some((item) => item.id === selectedId.value)
+      selectedCode.value &&
+      !articles.value.some((item) => item.code === selectedCode.value)
     ) {
-      selectedId.value = null
+      selectedCode.value = null
       selectedArticle.value = null
       articleState.error = ""
     }
   }
 
-  async function loadArticle(id: string) {
+  async function loadArticle(code: string) {
     articleState.loading = true
     articleState.error = ""
 
-    const result = await api.getArticleById(id)
+    const result = await api.getArticle(code)
 
     articleState.loading = false
 
@@ -89,17 +89,17 @@ export function useCatalogArticlesPage() {
     selectedArticle.value = result.data || null
   }
 
-  function selectArticle(id: string) {
-    selectedId.value = id
-    void loadArticle(id)
+  function selectArticle(code: string) {
+    selectedCode.value = code
+    void loadArticle(code)
   }
 
-  function updateSelectedArticle(article: GetArticleByIdResponse | null) {
+  function updateSelectedArticle(article: GetArticleResponse | null) {
     selectedArticle.value = article
     if (!article) return
 
     articles.value = articles.value.map((item) =>
-      item.id === article.id
+      item.code === article.code
         ? {
             ...item,
             title: article.title,
@@ -114,11 +114,10 @@ export function useCatalogArticlesPage() {
   }
 
   function handleArticleCreated(created: CreateArticleResponse) {
-    if (!articles.value.some((item) => item.id === created.id)) {
+    if (!articles.value.some((item) => item.code === created.code)) {
       articles.value = [
         {
-          id: created.id,
-          code: created.articleCode,
+          code: created.code,
           title: created.title,
           basePrice: created.basePrice,
           price: created.price,
@@ -130,8 +129,8 @@ export function useCatalogArticlesPage() {
       pagination.totalCount += 1
     }
 
-    selectedId.value = created.id
-    void loadArticle(created.id)
+    selectedCode.value = created.code
+    void loadArticle(created.code)
   }
 
   function searchArticles() {
@@ -152,7 +151,7 @@ export function useCatalogArticlesPage() {
     pagination,
     changePage,
     changePageSize,
-    selectedId,
+    selectedCode,
     selectedArticle,
     articleState,
     createModalOpen,

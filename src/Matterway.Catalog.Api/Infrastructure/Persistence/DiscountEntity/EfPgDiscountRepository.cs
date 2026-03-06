@@ -8,6 +8,7 @@ public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscoun
     public async Task<IReadOnlyCollection<Discount>> Query(CancellationToken cancellationToken = default)
     {
         return await context.Discount
+            .Include(d => d.Article)
             .AsNoTracking()
             .OrderBy(d => d.Code)
             .ThenByDescending(d => d.ValidFrom)
@@ -19,6 +20,7 @@ public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscoun
     {
         var normalizedCode = code.Trim().ToUpperInvariant();
         return await context.Discount
+            .Include(d => d.Article)
             .Where(d => d.Code == normalizedCode)
             .ToListAsync(cancellationToken);
     }

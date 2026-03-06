@@ -37,7 +37,7 @@ public class SystemCreateOrder : IEndpoint
                 Detail = "CustomerId is required."
             });
 
-        if (request.OrderId == Guid.Empty)
+        if (request.OrderId == default)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
@@ -88,7 +88,7 @@ public class SystemCreateOrder : IEndpoint
         public Guid CustomerId { get; init; }
 
         [Required]
-        public Guid OrderId { get; init; }
+        public OrderId OrderId { get; init; }
 
         public DeliveryInfoRequest? DeliveryInfo { get; init; }
     }
@@ -115,7 +115,7 @@ public class SystemCreateOrder : IEndpoint
 
     public record CustomerOrderResponse
     {
-        public Guid OrderId { get; init; }
+        public OrderId OrderId { get; init; }
         public Guid CustomerId { get; init; }
         public DateTime PlacedAt { get; init; }
         public decimal TotalAmount { get; init; }
@@ -135,7 +135,7 @@ public class SystemCreateOrder : IEndpoint
 
     public record CustomerArticleResponse
     {
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
         public string? ArticleName { get; init; }
         public decimal? UnitPrice { get; init; }
         public int Quantity { get; init; }
@@ -170,7 +170,7 @@ public class SystemCreateOrder : IEndpoint
     {
         var items = order.Items.Select(item => new CustomerArticleResponse
         {
-            ArticleId = item.ArticleId,
+            ArticleCode = ArticleCode.Parse(item.ArticleCode, null),
             ArticleName = item.ArticleName,
             UnitPrice = item.UnitPrice,
             Quantity = item.Quantity

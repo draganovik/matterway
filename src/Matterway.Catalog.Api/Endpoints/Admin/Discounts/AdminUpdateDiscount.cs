@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DiscountEntity;
 
 namespace Matterway.Catalog.Api.Endpoints.Admin.Discounts;
@@ -9,7 +10,7 @@ public class AdminUpdateDiscount : IEndpoint
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Admin, "discounts/{code}", Handle)
-            .WithName("AdminUpdateDiscount").WithSummary("[admin] Create or replace a discount across article ids")
+            .WithName("AdminUpdateDiscount").WithSummary("[admin] Create or replace a discount across article codes")
             .WithTags(nameof(Discount))
             .Produces<UpdatedDiscountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -22,6 +23,7 @@ public class AdminUpdateDiscount : IEndpoint
     private static async Task<Results<Ok<UpdatedDiscountResponse>, BadRequest<ProblemDetails>>> Handle(
         string code,
         UpdateDiscountRequest request,
+        IArticleRepository articleRepository,
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
     {
@@ -44,15 +46,25 @@ public class AdminUpdateDiscount : IEndpoint
                 Detail = "ValidTo must be greater than or equal to ValidFrom."
             });
 
-        if (request.ArticleIds.Count == 0)
+        if (request.ArticleCodes.Count == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot update discounts",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "At least one articleId is required."
+                Detail = "At least one articleCode is required."
             });
 
-        var newDiscounts = MapToEntities(normalizedCode, request, validFrom, validTo).ToList();
+        var articles = await articleRepository.GetByCodes(request.ArticleCodes, cancellationToken);
+        var distinctCodes = request.ArticleCodes.Distinct().ToArray();
+        if (articles.Count != distinctCodes.Length)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Cannot update discounts",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more article codes do not exist."
+            });
+
+        var newDiscounts = MapToEntities(normalizedCode, request, articles, validFrom, validTo).ToList();
 
         IReadOnlyCollection<Discount> updated;
         try
@@ -83,8 +95,8 @@ public class AdminUpdateDiscount : IEndpoint
         public DateTime? ValidTo { get; init; }
 
         [Required]
-        [MinLength(1, ErrorMessage = "At least one articleId is required.")]
-        public required ICollection<Guid> ArticleIds { get; init; }
+        [MinLength(1, ErrorMessage = "At least one articleCode is required.")]
+        public required ICollection<ArticleCode> ArticleCodes { get; init; }
     }
 
     public record UpdatedDiscountResponse
@@ -93,22 +105,25 @@ public class AdminUpdateDiscount : IEndpoint
         public decimal Percentage { get; init; }
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
     }
 
-    private static IEnumerable<Discount> MapToEntities(string code, UpdateDiscountRequest request,
+    private static IEnumerable<Discount> MapToEntities(
+        string code,
+        UpdateDiscountRequest request,
+        IEnumerable<Article> articles,
         DateTime validFromUtc,
         DateTime? validToUtc)
     {
-        return request.ArticleIds
-            .Distinct()
-            .Select(articleId => new Discount
+        return articles
+            .Select(article => new Discount
             {
                 Code = code,
                 Percentage = request.Percentage,
                 ValidFrom = validFromUtc,
                 ValidTo = validToUtc,
-                ArticleId = articleId
+                ArticleCode = article.ArticleCode,
+                Article = article
             });
     }
 
@@ -120,7 +135,7 @@ public class AdminUpdateDiscount : IEndpoint
             Percentage = entity.Percentage,
             ValidFrom = entity.ValidFrom,
             ValidTo = entity.ValidTo,
-            ArticleId = entity.ArticleId
+            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null)
         };
     }
 }

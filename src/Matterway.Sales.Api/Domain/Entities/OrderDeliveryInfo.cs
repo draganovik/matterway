@@ -3,7 +3,7 @@ namespace Matterway.Sales.Api.Domain.Entities;
 public class OrderDeliveryInfo
 {
     public Guid Id { get; init; } = Guid.CreateVersion7();
-    public Guid OrderId { get; set; }
+    public OrderId OrderId { get; set; }
     public Order? Order { get; set; }
 
     public required string Country { get; set; } = string.Empty;

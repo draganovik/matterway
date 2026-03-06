@@ -14,15 +14,13 @@ internal sealed class PaymentEntityTypeConfiguration : IEntityTypeConfiguration<
         builder.HasKey(payment => payment.Id);
 
         builder.Property(payment => payment.OrderId)
+            .HasMaxLength(OrderId.MaxLength)
+            .HasConversion(orderId => orderId.Value, value => OrderId.FromStorage(value))
             .IsRequired();
 
         builder.Property(payment => payment.Provider)
             .IsRequired()
             .HasMaxLength(100);
-
-        builder.Property(payment => payment.ReferenceId)
-            .IsRequired()
-            .HasMaxLength(19);
 
         builder.Property(payment => payment.Amount)
             .HasPrecision(18, 2)

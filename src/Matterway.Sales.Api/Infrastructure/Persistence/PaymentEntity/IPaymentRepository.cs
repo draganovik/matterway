@@ -8,8 +8,8 @@ public interface IPaymentRepository
 
     Task<Payment?> GetById(Guid id, CancellationToken cancellationToken = default);
 
-    Task<ICollection<Payment>> Query(int pageIndex, int pageSize, Guid? orderId,
+    Task<ICollection<Payment>> Query(int pageIndex, int pageSize, OrderId? orderId,
         CancellationToken cancellationToken = default);
 
-    Task<int> Count(Guid? orderId, CancellationToken cancellationToken = default);
+    Task<int> Count(OrderId? orderId, CancellationToken cancellationToken = default);
 }

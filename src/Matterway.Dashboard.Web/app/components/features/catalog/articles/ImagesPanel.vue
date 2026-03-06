@@ -5,12 +5,12 @@ import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 const props = withDefaults(
   defineProps<{
-    articleId?: string | null
+    code?: string | null
     modelValue?: ArticleImageProperty[]
     canEdit?: boolean
   }>(),
   {
-    articleId: null,
+    code: null,
     modelValue: () => [],
     canEdit: false,
   },
@@ -38,7 +38,7 @@ watch(
 )
 
 watch(
-  () => props.articleId,
+  () => props.code,
   () => {
     addState.error = ""
     addState.success = ""
@@ -53,7 +53,7 @@ function updateImages(next: ArticleImageProperty[]) {
 function openAddImagesModal() {
   addState.error = ""
   addState.success = ""
-  if (!props.articleId) {
+  if (!props.code) {
     addState.error = "Create the article before adding images."
     return
   }
@@ -77,7 +77,7 @@ async function addImage(payload: {
 }) {
   addState.error = ""
   addState.success = ""
-  if (!props.articleId) {
+  if (!props.code) {
     addState.error = "Create the article before adding images."
     return
   }
@@ -86,7 +86,7 @@ async function addImage(payload: {
     return
   }
   addState.loading = true
-  const result = await api.addArticleImage(props.articleId, {
+  const result = await api.addArticleImage(props.code, {
     orderIndex: payload.orderIndex,
     file: payload.file,
     imageAlt: payload.imageAlt,
@@ -106,7 +106,7 @@ async function addImage(payload: {
 async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   updateState.error = ""
   updateState.success = ""
-  if (!props.articleId) return
+  if (!props.code) return
   if (!activeImage.value) {
     updateState.error = "Select an image to edit."
     return
@@ -118,7 +118,7 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   }
   updateState.loading = true
   const result = await api.updateArticleImage(
-    props.articleId,
+    props.code,
     targetOrderIndex,
     {
       imageAlt: payload.imageAlt,
@@ -148,9 +148,9 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
 async function removeImage(image: ArticleImageProperty) {
   removeState.error = ""
   removeState.success = ""
-  if (!props.articleId) return
+  if (!props.code) return
   removeState.loading = true
-  const result = await api.removeArticleImage(props.articleId, image.orderIndex)
+  const result = await api.removeArticleImage(props.code, image.orderIndex)
   removeState.loading = false
   if (!result.ok) {
     removeState.error = result.error || "Unable to remove image."
@@ -180,7 +180,7 @@ async function handleImageSubmit(payload: {
       <UButton
         color="primary"
         variant="outline"
-        :disabled="!canEdit || !articleId"
+        :disabled="!canEdit || !code"
         @click="openAddImagesModal"
       >
         Add Image
@@ -188,7 +188,7 @@ async function handleImageSubmit(payload: {
     </div>
 
     <div
-      v-if="!articleId"
+      v-if="!code"
       class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
       Create the article first to attach images.

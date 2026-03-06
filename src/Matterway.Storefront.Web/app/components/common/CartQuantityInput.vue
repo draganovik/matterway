@@ -6,7 +6,7 @@ const maxQuantity = 100
 
 const props = withDefaults(
   defineProps<{
-    articleId: string
+    articleCode: string
     quantity: number
     disabled?: boolean
     showRemove?: boolean
@@ -82,7 +82,7 @@ async function applyQuantity(nextValue?: number | null) {
   loading.value = true
 
   try {
-    await cart.setQuantity(props.articleId, nextQuantity)
+    await cart.setQuantity(props.articleCode, nextQuantity)
   } catch {
     inputValue.value = resolvedQuantity.value
     error.value = "Ažuriranje količine nije uspelo."

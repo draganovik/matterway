@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  remove: [articleId: string]
+  remove: [articleCode: string]
 }>()
 </script>
 
@@ -15,7 +15,7 @@ const emit = defineEmits<{
   <tr class="border-default border-t">
     <td class="px-3 py-3">
       <NuxtLink
-        :to="`/articles/${props.item.articleId}`"
+        :to="`/articles/${props.item.articleCode}`"
         class="truncate text-sm font-semibold hover:text-cyan-700"
       >
         {{ props.item.articleName }}
@@ -33,10 +33,10 @@ const emit = defineEmits<{
     <td class="px-3 py-3">
       <div class="flex items-center justify-center">
         <CartQuantityInput
-          :article-id="props.item.articleId"
+          :article-code="props.item.articleCode"
           :quantity="props.item.quantity"
           :show-remove="true"
-          @remove="emit('remove', props.item.articleId)"
+          @remove="emit('remove', props.item.articleCode)"
         />
       </div>
     </td>

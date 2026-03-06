@@ -9,9 +9,10 @@ public interface ICustomerArticleRepository
 
     Task<CustomerArticle?> UpsertCartItem(CustomerArticle requestModel, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteCartItem(Guid customerId, Guid articleId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteCartItem(Guid customerId, ArticleCode articleCode, CancellationToken cancellationToken = default);
 
-    Task<CustomerArticle?> GetCartItem(Guid customerId, Guid articleId, CancellationToken cancellationToken = default);
+    Task<CustomerArticle?> GetCartItem(Guid customerId, ArticleCode articleCode,
+        CancellationToken cancellationToken = default);
 
     Task<int> CountCart(Guid customerId, CancellationToken cancellationToken = default);
 }

@@ -15,13 +15,11 @@ type CreateCheckoutOrderRequest = {
 type CheckoutOrderResult = {
   ok: boolean
   data?: SalesOrder
-  referenceId?: string
   error?: string
 }
 
 type CheckoutOrderApiResponse = {
   order?: SalesOrder
-  referenceId?: string
 }
 
 function readErrorMessage(payload: unknown): string | undefined {
@@ -146,8 +144,6 @@ export function useStorefrontOrdersClient() {
     return {
       ok: true,
       data: body?.order,
-      referenceId:
-        typeof body?.referenceId === "string" ? body.referenceId : undefined,
     }
   }
 

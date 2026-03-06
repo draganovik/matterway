@@ -13,37 +13,43 @@ public sealed class EfPgArticleDetailTextRepository(CatalogDbComposer context) :
         if (affected > 0)
             return await context.ArticleDetailText.Include(x => x.Article).Include(x => x.Detail)
                 .FirstOrDefaultAsync(
-                    x => x.ArticleId == requestModel.ArticleId && x.DetailSlug == requestModel.DetailSlug,
+                    x => x.ArticleCode == requestModel.ArticleCode && x.DetailSlug == requestModel.DetailSlug,
                     cancellationToken);
 
         return null;
     }
 
-    public async Task<bool> Delete(Guid articleId, string detailSlug, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(ArticleCode articleCode, string detailSlug,
+        CancellationToken cancellationToken = default)
     {
+        var normalizedCode = articleCode.Value;
         var affected = await context.ArticleDetailText
-            .Where(model => model.ArticleId == articleId && model.DetailSlug == detailSlug)
+            .Where(model => model.ArticleCode == normalizedCode && model.DetailSlug == detailSlug)
             .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<ArticleDetailText?> GetBy(Guid articleId, string detailSlug,
+    public async Task<ArticleDetailText?> GetBy(ArticleCode articleCode, string detailSlug,
         CancellationToken cancellationToken = default)
     {
+        var normalizedCode = articleCode.Value;
         return await context.ArticleDetailText
             .Include(pd => pd.Detail)
-            .FirstOrDefaultAsync(pd => pd.ArticleId == articleId && pd.DetailSlug == detailSlug, cancellationToken);
+            .FirstOrDefaultAsync(pd => pd.ArticleCode == normalizedCode && pd.DetailSlug == detailSlug,
+                cancellationToken);
     }
 
-    public async Task<ArticleDetailText?> Update(Guid articleId, string detailSlug, ArticleDetailText request,
+    public async Task<ArticleDetailText?> Update(ArticleCode articleCode, string detailSlug, ArticleDetailText request,
         CancellationToken cancellationToken = default)
     {
+        var normalizedCode = articleCode.Value;
         context.ArticleDetailText.Update(request);
         var affected = await context.SaveChangesAsync(cancellationToken);
         if (affected > 0)
             return await context.ArticleDetailText
                 .Include(x => x.Detail)
-                .FirstOrDefaultAsync(x => x.ArticleId == articleId && x.DetailSlug == detailSlug, cancellationToken);
+                .FirstOrDefaultAsync(x => x.ArticleCode == normalizedCode && x.DetailSlug == detailSlug,
+                    cancellationToken);
 
         return null;
     }

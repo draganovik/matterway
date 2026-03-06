@@ -10,7 +10,11 @@ internal sealed class ArticleDetailNumericEntityTypeConfiguration : IEntityTypeC
     {
         builder.ToTable(nameof(ArticleDetailNumeric));
 
-        builder.HasKey(pd => new { pd.ArticleId, pd.DetailSlug });
+        builder.HasKey(pd => new { pd.ArticleCode, pd.DetailSlug });
+
+        builder.Property(pd => pd.ArticleCode)
+            .HasMaxLength(ArticleCode.Length)
+            .IsRequired();
 
         builder.Property(pd => pd.DetailSlug)
             .HasMaxLength(80)
@@ -27,6 +31,7 @@ internal sealed class ArticleDetailNumericEntityTypeConfiguration : IEntityTypeC
 
         builder.HasOne(pd => pd.Article)
             .WithMany(p => p.ArticleDetailNumerics)
-            .HasForeignKey(pd => pd.ArticleId);
+            .HasForeignKey(pd => pd.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
     }
 }

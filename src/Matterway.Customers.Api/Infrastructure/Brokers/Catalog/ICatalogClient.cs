@@ -2,14 +2,13 @@ namespace Matterway.Customers.Api.Infrastructure.Brokers.Catalog;
 
 public interface ICatalogClient
 {
-    Task<BrokerResponse<CatalogClientGetArticleByIdResponse>> GetArticleById(Guid id,
+    Task<BrokerResponse<CatalogClientGetArticleResponse>> GetArticleByCode(ArticleCode code,
         CancellationToken cancellationToken);
 }
 
-public record CatalogClientGetArticleByIdResponse
+public record CatalogClientGetArticleResponse
 {
-    public Guid Id { get; init; }
-    public string? Code { get; init; }
+    public ArticleCode Code { get; init; }
     public string? Title { get; init; }
     public decimal? BasePrice { get; init; }
     public decimal? Price { get; init; }

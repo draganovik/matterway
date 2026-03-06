@@ -6,7 +6,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  remove: [articleId: string]
+  remove: [articleCode: string]
 }>()
 </script>
 
@@ -29,7 +29,7 @@ const emit = defineEmits<{
         <tbody>
           <CartListItem
             v-for="item in props.items"
-            :key="item.articleId"
+            :key="item.articleCode"
             :item="item"
             @remove="emit('remove', $event)"
           />

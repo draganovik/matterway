@@ -17,8 +17,7 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "Article",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ArticleCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     BasePrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
@@ -28,7 +27,7 @@ namespace Matterway.Catalog.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Article", x => x.Id);
+                    table.PrimaryKey("PK_Article", x => x.ArticleCode);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,19 +48,19 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     OrderIndex = table.Column<int>(type: "integer", nullable: false),
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageAlt = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleImage", x => new { x.Id, x.ArticleId });
+                    table.PrimaryKey("PK_ArticleImage", x => new { x.Id, x.ArticleCode });
                     table.ForeignKey(
-                        name: "FK_ArticleImage_Article_ArticleId",
-                        column: x => x.ArticleId,
+                        name: "FK_ArticleImage_Article_ArticleCode",
+                        column: x => x.ArticleCode,
                         principalTable: "Article",
-                        principalColumn: "Id",
+                        principalColumn: "ArticleCode",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -70,19 +69,19 @@ namespace Matterway.Catalog.Api.Migrations
                 columns: table => new
                 {
                     Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Percentage = table.Column<decimal>(type: "numeric", nullable: false),
                     ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Discount", x => new { x.Code, x.ArticleId });
+                    table.PrimaryKey("PK_Discount", x => new { x.Code, x.ArticleCode });
                     table.ForeignKey(
-                        name: "FK_Discount_Article_ArticleId",
-                        column: x => x.ArticleId,
+                        name: "FK_Discount_Article_ArticleCode",
+                        column: x => x.ArticleCode,
                         principalTable: "Article",
-                        principalColumn: "Id",
+                        principalColumn: "ArticleCode",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -90,18 +89,18 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "ArticleDetailNumeric",
                 columns: table => new
                 {
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     DetailSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Value = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleDetailNumeric", x => new { x.ArticleId, x.DetailSlug });
+                    table.PrimaryKey("PK_ArticleDetailNumeric", x => new { x.ArticleCode, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_ArticleDetailNumeric_Article_ArticleId",
-                        column: x => x.ArticleId,
+                        name: "FK_ArticleDetailNumeric_Article_ArticleCode",
+                        column: x => x.ArticleCode,
                         principalTable: "Article",
-                        principalColumn: "Id",
+                        principalColumn: "ArticleCode",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArticleDetailNumeric_Detail_DetailSlug",
@@ -115,18 +114,18 @@ namespace Matterway.Catalog.Api.Migrations
                 name: "ArticleDetailText",
                 columns: table => new
                 {
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     DetailSlug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Value = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleDetailText", x => new { x.ArticleId, x.DetailSlug });
+                    table.PrimaryKey("PK_ArticleDetailText", x => new { x.ArticleCode, x.DetailSlug });
                     table.ForeignKey(
-                        name: "FK_ArticleDetailText_Article_ArticleId",
-                        column: x => x.ArticleId,
+                        name: "FK_ArticleDetailText_Article_ArticleCode",
+                        column: x => x.ArticleCode,
                         principalTable: "Article",
-                        principalColumn: "Id",
+                        principalColumn: "ArticleCode",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArticleDetailText_Detail_DetailSlug",
@@ -138,14 +137,14 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "Article",
-                columns: new[] { "Id", "ArticleCode", "BasePrice", "CreatedAt", "Description", "IsAvailable", "Title", "UpdatedAt" },
+                columns: new[] { "ArticleCode", "BasePrice", "CreatedAt", "Description", "IsAvailable", "Title", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "AL001", 27999m, new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc), "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.", true, "August Wi-Fi Smart Lock Pro", new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "AE004", 9999m, new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc), "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.", true, "Amazon Echo (4th Gen)", new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "RS001", 19999m, new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc), "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.", true, "Ring Spotlight Cam", new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "NT003", 24999m, new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc), "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.", true, "Nest Learning Thermostat", new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc) },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "PH002", 4999m, new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc), "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.", true, "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc) }
+                    { "AUGL0001", 27999m, new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc), "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.", true, "August Wi-Fi Smart Lock Pro", new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc) },
+                    { "ECHO0004", 9999m, new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc), "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.", true, "Amazon Echo (4th Gen)", new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc) },
+                    { "NEST0003", 24999m, new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc), "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.", true, "Nest Learning Thermostat", new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc) },
+                    { "PHUE0002", 4999m, new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc), "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.", true, "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc) },
+                    { "RING0001", 19999m, new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc), "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.", true, "Ring Spotlight Cam", new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -185,52 +184,46 @@ namespace Matterway.Catalog.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "ArticleDetailNumeric",
-                columns: new[] { "ArticleId", "DetailSlug", "Value" },
+                columns: new[] { "ArticleCode", "DetailSlug", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery-size", 3000m },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "weight", 400m },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "power", 15m },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "weight", 970m },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "power", 8m },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "weight", 480m },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "depth", 28m },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "height", 84m },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "power", 24m },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "screen-size", 2.0m },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "width", 84m },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "power", 9m },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "weight", 72m }
+                    { "AUGL0001", "battery-size", 3000m },
+                    { "AUGL0001", "weight", 400m },
+                    { "ECHO0004", "power", 15m },
+                    { "ECHO0004", "weight", 970m },
+                    { "NEST0003", "depth", 28m },
+                    { "NEST0003", "height", 84m },
+                    { "NEST0003", "power", 24m },
+                    { "NEST0003", "screen-size", 2.0m },
+                    { "NEST0003", "width", 84m },
+                    { "PHUE0002", "power", 9m },
+                    { "PHUE0002", "weight", 72m },
+                    { "RING0001", "power", 8m },
+                    { "RING0001", "weight", 480m }
                 });
 
             migrationBuilder.InsertData(
                 table: "ArticleDetailText",
-                columns: new[] { "ArticleId", "DetailSlug", "Value" },
+                columns: new[] { "ArticleCode", "DetailSlug", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "compatibility", "Works with Alexa, Google Assistant, and Siri" },
-                    { new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"), "connectivity", "Wi-Fi and Bluetooth" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "audio-quality", "Two-way audio with noise cancellation" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "connectivity", "Wi-Fi and Ethernet" },
-                    { new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "video-quality", "1080p HD" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
-                    { new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"), "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
-                    { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" }
+                    { "AUGL0001", "battery", "Uses four AA batteries (included), lasts up to 6 months depending on usage" },
+                    { "AUGL0001", "compatibility", "Works with Alexa, Google Assistant, and Siri" },
+                    { "AUGL0001", "connectivity", "Wi-Fi and Bluetooth" },
+                    { "ECHO0004", "connectivity", "Wi-Fi and Bluetooth" },
+                    { "NEST0003", "compatibility", "Works with Alexa, Google Assistant, and Apple HomeKit" },
+                    { "NEST0003", "display", "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)" },
+                    { "PHUE0002", "color-temperature", "Adjustable from warm white (2700K) to daylight (6500K)" },
+                    { "PHUE0002", "compatibility", "Works with Alexa, Google Assistant, and Samsung SmartThings" },
+                    { "RING0001", "audio-quality", "Two-way audio with noise cancellation" },
+                    { "RING0001", "connectivity", "Wi-Fi and Ethernet" },
+                    { "RING0001", "video-quality", "1080p HD" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Discount",
-                columns: new[] { "ArticleId", "Code", "Percentage", "ValidFrom", "ValidTo" },
-                values: new object[] { new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "WINTER25", 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Article_ArticleCode",
-                table: "Article",
-                column: "ArticleCode",
-                unique: true);
+                columns: new[] { "ArticleCode", "Code", "Percentage", "ValidFrom", "ValidTo" },
+                values: new object[] { "PHUE0002", "WINTER25", 0.25m, new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArticleDetailNumeric_DetailSlug",
@@ -243,15 +236,15 @@ namespace Matterway.Catalog.Api.Migrations
                 column: "DetailSlug");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArticleImage_ArticleId_OrderIndex",
+                name: "IX_ArticleImage_ArticleCode_OrderIndex",
                 table: "ArticleImage",
-                columns: new[] { "ArticleId", "OrderIndex" },
+                columns: new[] { "ArticleCode", "OrderIndex" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discount_ArticleId",
+                name: "IX_Discount_ArticleCode",
                 table: "Discount",
-                column: "ArticleId");
+                column: "ArticleCode");
         }
 
         /// <inheritdoc />

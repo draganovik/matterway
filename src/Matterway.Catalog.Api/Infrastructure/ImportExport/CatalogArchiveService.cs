@@ -53,14 +53,14 @@ public sealed class CatalogArchiveService(
         var discounts = (await context.Discount
                 .AsNoTracking()
                 .OrderBy(x => x.Code)
-                .ThenBy(x => x.ArticleId)
+                .ThenBy(x => x.ArticleCode)
                 .ToListAsync(cancellationToken))
             .Select(DiscountRow.FromEntity)
             .ToList();
 
         var articleDetailTexts = (await context.ArticleDetailText
                 .AsNoTracking()
-                .OrderBy(x => x.ArticleId)
+                .OrderBy(x => x.ArticleCode)
                 .ThenBy(x => x.DetailSlug)
                 .ToListAsync(cancellationToken))
             .Select(ArticleDetailTextRow.FromEntity)
@@ -68,7 +68,7 @@ public sealed class CatalogArchiveService(
 
         var articleDetailNumerics = (await context.ArticleDetailNumeric
                 .AsNoTracking()
-                .OrderBy(x => x.ArticleId)
+                .OrderBy(x => x.ArticleCode)
                 .ThenBy(x => x.DetailSlug)
                 .ToListAsync(cancellationToken))
             .Select(ArticleDetailNumericRow.FromEntity)
@@ -76,7 +76,7 @@ public sealed class CatalogArchiveService(
 
         var dbImages = await context.ArticleImage
             .AsNoTracking()
-            .OrderBy(x => x.ArticleId)
+            .OrderBy(x => x.ArticleCode)
             .ThenBy(x => x.OrderIndex)
             .ToListAsync(cancellationToken);
 
@@ -87,14 +87,14 @@ public sealed class CatalogArchiveService(
         {
             foreach (var dbImage in dbImages)
             {
-                var objectName = BuildObjectName(dbImage.ArticleId, dbImage.Id);
+                var objectName = BuildObjectName(dbImage.Id);
                 var (content, contentType) = await LoadImageContentAsync(
                     objectName,
                     dbImage.ImageUrl,
                     cancellationToken);
 
                 var fileExtension = ResolveExtension(contentType, dbImage.ImageUrl);
-                var imageFile = $"images/{dbImage.ArticleId:D}/{dbImage.Id:N}.{fileExtension}";
+                var imageFile = $"images/{dbImage.ArticleCode}/{dbImage.Id:N}.{fileExtension}";
                 await WriteBinaryEntryAsync(archive, imageFile, content, cancellationToken);
 
                 imageRows.Add(ArticleImageRow.FromEntity(dbImage, imageFile, contentType));
@@ -171,7 +171,7 @@ public sealed class CatalogArchiveService(
                     ? GuessContentType(image.ImageFile)
                     : image.ContentType;
 
-                var objectName = BuildObjectName(image.ArticleId, image.Id);
+                var objectName = BuildObjectName(image.Id);
                 await client.PutObjectAsync(new PutObjectArgs()
                         .WithBucket(_options.Bucket)
                         .WithObject(objectName)
@@ -205,7 +205,7 @@ public sealed class CatalogArchiveService(
                     context.ArticleDetailText.AddRange(articleDetailTexts.Select(x => x.ToEntity()));
                     context.ArticleDetailNumeric.AddRange(articleDetailNumerics.Select(x => x.ToEntity()));
                     context.ArticleImage.AddRange(
-                        articleImages.Select(x => x.ToEntity(BuildImageUrl(x.ArticleId, x.Id))));
+                        articleImages.Select(x => x.ToEntity(BuildImageUrl(x.Id))));
 
                     await context.SaveChangesAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
@@ -380,17 +380,17 @@ public sealed class CatalogArchiveService(
         };
     }
 
-    private string BuildImageUrl(Guid articleId, Guid imageId)
+    private string BuildImageUrl(Guid imageId)
     {
-        var objectName = BuildObjectName(articleId, imageId);
+        var objectName = BuildObjectName(imageId);
         var baseUrl = string.IsNullOrWhiteSpace(_options.PublicBaseUrl)
             ? _options.Endpoint
             : _options.PublicBaseUrl;
         return $"{baseUrl.TrimEnd('/')}/{_options.Bucket}/{objectName}";
     }
 
-    private static string BuildObjectName(Guid articleId, Guid imageId)
+    private static string BuildObjectName(Guid imageId)
     {
-        return $"{articleId:D}/{imageId:N}";
+        return $"images/{imageId:N}";
     }
 }

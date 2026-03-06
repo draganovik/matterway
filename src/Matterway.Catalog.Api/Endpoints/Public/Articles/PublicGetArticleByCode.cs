@@ -3,34 +3,33 @@ using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 
 namespace Matterway.Catalog.Api.Endpoints.Public.Articles;
 
-public class PublicGetArticleById : IEndpoint
+public class PublicGetArticleByCode : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapGet(EndpointKind.Public, "articles/{id:guid}", Handle)
-            .WithName("PublicGetArticleById").WithSummary("[public] Get an Article")
+        endpoints.MapGet(EndpointKind.Public, "articles/{code:ArticleCode}", Handle)
+            .WithName("PublicGetArticleByCode").WithSummary("[public] Get an Article")
             .WithTags("Articles")
-            .Produces<GetArticleByIdResponse>()
+            .Produces<GetArticleByCodeResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<GetArticleByIdResponse>, NotFound>> Handle(
-        Guid id,
+    private static async Task<Results<Ok<GetArticleByCodeResponse>, NotFound>> Handle(
+        ArticleCode code,
         IArticleRepository articleRepository,
         CancellationToken cancellationToken)
     {
-        var article = await articleRepository.GetBy(id, cancellationToken);
+        var article = await articleRepository.GetBy(code, cancellationToken);
 
         if (article == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(article));
     }
 
-    public record GetArticleByIdResponse
+    public record GetArticleByCodeResponse
     {
-        public Guid Id { get; init; }
-        public string? Code { get; init; }
+        public required ArticleCode Code { get; init; }
         public string? Title { get; init; }
         public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
@@ -67,15 +66,14 @@ public class PublicGetArticleById : IEndpoint
         public string? ImageAlt { get; init; }
     }
 
-    public static GetArticleByIdResponse MapToResponse(Article entity)
+    public static GetArticleByCodeResponse MapToResponse(Article entity)
     {
         var basePrice = entity.BasePrice;
         var price = entity.GetFinalPrice();
         var discount = entity.GetLatestActiveDiscount();
-        return new GetArticleByIdResponse
+        return new GetArticleByCodeResponse
         {
-            Id = entity.Id,
-            Code = entity.ArticleCode,
+            Code = ArticleCode.Parse(entity.ArticleCode, null),
             Title = entity.Title,
             BasePrice = basePrice,
             Price = price,

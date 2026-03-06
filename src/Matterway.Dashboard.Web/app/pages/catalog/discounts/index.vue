@@ -19,7 +19,7 @@ const {
   selectedDiscount,
   isCreateMode,
   form,
-  selectedArticleIds,
+  selectedArticleCodes,
   filteredDiscountCount,
   filteredDiscountPages,
   visibleDiscounts,
@@ -173,7 +173,7 @@ const percentageValue = computed({
                 </div>
 
                 <CatalogDiscountsArticleSelectionPanel
-                  v-model:model-value="selectedArticleIds"
+                  v-model:model-value="selectedArticleCodes"
                   :can-edit="canEdit"
                 />
 

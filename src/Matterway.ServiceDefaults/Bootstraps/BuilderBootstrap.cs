@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Matterway.ServiceDefaults.Identifiers;
+using Matterway.ServiceDefaults.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +27,12 @@ public static class BuilderBootstrap
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
         {
             jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        builder.Services.Configure<RouteOptions>(routeOptions =>
+        {
+            routeOptions.ConstraintMap[nameof(ArticleCode)] = typeof(ArticleCodeRouteConstraint);
+            routeOptions.ConstraintMap[nameof(OrderId)] = typeof(OrderIdRouteConstraint);
         });
 
         builder.Services.AddValidation();

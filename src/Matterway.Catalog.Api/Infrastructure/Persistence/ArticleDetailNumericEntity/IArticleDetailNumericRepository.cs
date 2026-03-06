@@ -4,15 +4,15 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericE
 
 public interface IArticleDetailNumericRepository
 {
-    Task<ArticleDetailNumeric?> GetBy(Guid articleId, string detailSlug,
+    Task<ArticleDetailNumeric?> GetBy(ArticleCode articleCode, string detailSlug,
         CancellationToken cancellationToken = default);
 
     Task<ArticleDetailNumeric?> Create(ArticleDetailNumeric requestModel,
         CancellationToken cancellationToken = default);
 
-    Task<ArticleDetailNumeric?> Update(Guid articleId, string detailSlug, ArticleDetailNumeric request,
+    Task<ArticleDetailNumeric?> Update(ArticleCode articleCode, string detailSlug, ArticleDetailNumeric request,
         CancellationToken cancellationToken = default);
 
-    Task<bool> Delete(Guid articleId, string detailSlug,
+    Task<bool> Delete(ArticleCode articleCode, string detailSlug,
         CancellationToken cancellationToken = default);
 }

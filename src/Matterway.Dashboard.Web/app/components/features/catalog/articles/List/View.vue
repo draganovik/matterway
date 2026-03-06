@@ -4,7 +4,7 @@ import type { QueryArticleResponse } from "~/types/catalog"
 withDefaults(
   defineProps<{
     items?: QueryArticleResponse[]
-    selectedId?: string | null
+    selectedCode?: string | null
     filter?: string
     loading?: boolean
     error?: string
@@ -16,7 +16,7 @@ withDefaults(
   }>(),
   {
     items: () => [],
-    selectedId: null,
+    selectedCode: null,
     filter: "",
     loading: false,
     error: "",
@@ -43,10 +43,10 @@ const emit = defineEmits<{
     title="Articles"
     description="Use RSQL filters to locate articles by title, code, or attributes."
     :items="items"
-    item-key="id"
+    item-key="code"
     item-title-key="title"
     item-subtitle-key="code"
-    :selected-id="selectedId"
+    :selected-id="selectedCode"
     :filter="filter"
     :loading="loading"
     :error="error"

@@ -7,6 +7,6 @@ public class Discount
     public DateTime ValidFrom { get; set; }
     public DateTime? ValidTo { get; set; }
 
-    public required Guid ArticleId { get; init; }
+    public required string ArticleCode { get; init; }
     public Article? Article { get; init; }
 }

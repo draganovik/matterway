@@ -3,7 +3,6 @@ using Matterway.Catalog.Api.Domain.Entities;
 namespace Matterway.Catalog.Api.Infrastructure.ImportExport.Rows;
 
 public sealed record ArticleRow(
-    Guid Id,
     string ArticleCode,
     string Title,
     string Description,
@@ -15,7 +14,6 @@ public sealed record ArticleRow(
     public static ArticleRow FromEntity(Article entity)
     {
         return new ArticleRow(
-            entity.Id,
             entity.ArticleCode,
             entity.Title,
             entity.Description,
@@ -29,7 +27,6 @@ public sealed record ArticleRow(
     {
         return new Article
         {
-            Id = Id,
             ArticleCode = ArticleCode,
             Title = Title,
             Description = Description,

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Matterway.Sales.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace Matterway.Sales.Api.Migrations
                 name: "Order",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: true),
                     Type = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     PlacedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -31,7 +31,7 @@ namespace Matterway.Sales.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ZipCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -55,8 +55,8 @@ namespace Matterway.Sales.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     ArticleTitle = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false)
@@ -78,7 +78,7 @@ namespace Matterway.Sales.Api.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     ChangedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Note = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
@@ -99,9 +99,8 @@ namespace Matterway.Sales.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     Provider = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ReferenceId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

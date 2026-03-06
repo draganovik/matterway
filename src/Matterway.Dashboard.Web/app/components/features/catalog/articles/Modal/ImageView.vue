@@ -117,7 +117,7 @@ function submit() {
   }
   emit("submit", {
     orderIndex: parsedOrder,
-    imageAlt: imageAlt.value.trim(),
+    imageAlt: String(imageAlt.value ?? "").trim(),
     file: file.value,
   })
 }

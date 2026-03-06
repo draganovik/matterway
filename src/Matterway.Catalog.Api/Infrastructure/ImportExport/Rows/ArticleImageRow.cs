@@ -4,7 +4,7 @@ namespace Matterway.Catalog.Api.Infrastructure.ImportExport.Rows;
 
 public sealed record ArticleImageRow(
     Guid Id,
-    Guid ArticleId,
+    string ArticleCode,
     int OrderIndex,
     string ImageAlt,
     string? OriginalImageUrl,
@@ -15,7 +15,7 @@ public sealed record ArticleImageRow(
     {
         return new ArticleImageRow(
             entity.Id,
-            entity.ArticleId,
+            entity.ArticleCode,
             entity.OrderIndex,
             entity.ImageAlt ?? string.Empty,
             entity.ImageUrl,
@@ -28,7 +28,7 @@ public sealed record ArticleImageRow(
         return new ArticleImage
         {
             Id = Id,
-            ArticleId = ArticleId,
+            ArticleCode = ArticleCode,
             OrderIndex = OrderIndex,
             ImageAlt = ImageAlt ?? string.Empty,
             ImageUrl = imageUrl

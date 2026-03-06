@@ -13,6 +13,8 @@ internal sealed class OrderDeliveryInfoEntityTypeConfiguration : IEntityTypeConf
         builder.HasKey(info => info.Id);
 
         builder.Property(info => info.OrderId)
+            .HasMaxLength(OrderId.MaxLength)
+            .HasConversion(orderId => orderId.Value, value => OrderId.FromStorage(value))
             .IsRequired();
 
         builder.HasIndex(info => info.OrderId)

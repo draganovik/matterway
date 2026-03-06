@@ -8,7 +8,7 @@ public class AdminGetOrderById : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapGet(EndpointKind.Admin, "orders/{orderId:guid}", Handler)
+        endpoints.MapGet(EndpointKind.Admin, "orders/{orderId:OrderId}", Handler)
             .WithName("AdminGetOrderById").WithSummary("[admin] Get Order by id")
             .WithTags(nameof(Order))
             .Produces<OrderResponse>()
@@ -21,7 +21,7 @@ public class AdminGetOrderById : IEndpoint
     }
 
     private static async Task<Results<Ok<OrderResponse>, NotFound>> Handler(
-        Guid orderId,
+        OrderId orderId,
         IOrderRepository orderRepository,
         CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ public class AdminGetOrderById : IEndpoint
 
     public record OrderResponse
     {
-        public Guid Id { get; init; }
+        public OrderId Id { get; init; }
         public Guid? CustomerId { get; init; }
         public EOrderType Type { get; init; }
         public decimal TotalAmount { get; init; }
@@ -56,7 +56,7 @@ public class AdminGetOrderById : IEndpoint
     public record OrderItemResponse
     {
         public Guid Id { get; init; }
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
         public string? ArticleTitle { get; init; }
         public decimal UnitPrice { get; init; }
         public int Quantity { get; init; }
@@ -73,7 +73,6 @@ public class AdminGetOrderById : IEndpoint
     {
         public Guid Id { get; init; }
         public string? Provider { get; init; }
-        public string? ReferenceId { get; init; }
         public decimal Amount { get; init; }
         public EPaymentStatus Status { get; init; }
         public DateTime CreatedAt { get; init; }
@@ -108,7 +107,7 @@ public class AdminGetOrderById : IEndpoint
             Items = entity.Items.Select(item => new OrderItemResponse
             {
                 Id = item.Id,
-                ArticleId = item.ArticleId,
+                ArticleCode = ArticleCode.Parse(item.ArticleCode, null),
                 ArticleTitle = item.ArticleTitle,
                 UnitPrice = item.UnitPrice,
                 Quantity = item.Quantity
@@ -123,7 +122,6 @@ public class AdminGetOrderById : IEndpoint
             {
                 Id = payment.Id,
                 Provider = payment.Provider,
-                ReferenceId = payment.ReferenceId,
                 Amount = payment.Amount,
                 Status = payment.Status,
                 CreatedAt = payment.CreatedAt

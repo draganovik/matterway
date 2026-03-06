@@ -41,7 +41,7 @@ public class SystemCreateOrder : IEndpoint
         if (customerId is null) return TypedResults.Forbid();
         var effectiveCustomerId = customerId.Value;
 
-        var orderId = Guid.CreateVersion7();
+        var orderId = OrderId.New();
         var customersRequest = MapToCustomersRequest(effectiveCustomerId, orderId, request);
         var customersResult = await customersClient.CreateOrderAsync(
             customersRequest,
@@ -120,7 +120,7 @@ public class SystemCreateOrder : IEndpoint
 
     public record OrderResponse
     {
-        public Guid Id { get; init; }
+        public OrderId Id { get; init; }
         public Guid? CustomerId { get; init; }
         public EOrderType Type { get; init; }
         public decimal TotalAmount { get; init; }
@@ -141,7 +141,7 @@ public class SystemCreateOrder : IEndpoint
 
     private static CustomersCreateOrderRequest MapToCustomersRequest(
         Guid customerId,
-        Guid orderId,
+        OrderId orderId,
         CreateOrderRequest request)
     {
         return new CustomersCreateOrderRequest
@@ -178,7 +178,7 @@ public class SystemCreateOrder : IEndpoint
         order.Items.AddRange(customerOrder.Items.Select(item => new OrderItem
         {
             OrderId = order.Id,
-            ArticleId = item.ArticleId,
+            ArticleCode = item.ArticleCode.ToString(),
             ArticleTitle = item.ArticleName?.Trim() ?? string.Empty,
             UnitPrice = item.UnitPrice!.Value,
             Quantity = item.Quantity
@@ -194,7 +194,7 @@ public class SystemCreateOrder : IEndpoint
         return order;
     }
 
-    private static OrderDeliveryInfo MapToDeliveryInfo(Guid orderId, CustomersDeliveryInfoResponse request)
+    private static OrderDeliveryInfo MapToDeliveryInfo(OrderId orderId, CustomersDeliveryInfoResponse request)
     {
         return new OrderDeliveryInfo
         {

@@ -20,8 +20,7 @@ export type CatalogArticleDetail = {
 }
 
 export type CatalogArticle = {
-  id: string
-  articleCode: string
+  code: string
   title: string
   basePrice: number
   price: number
@@ -48,6 +47,10 @@ function asRecord(value: unknown): AnyRecord {
 
 function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : []
+}
+
+function readCode(source: AnyRecord) {
+  return String(source.code ?? "")
 }
 
 function readDiscount(value: unknown): CatalogArticleDiscount | null {
@@ -85,8 +88,7 @@ export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
       : null)
 
   return {
-    id: String(source.id ?? ""),
-    articleCode: String(source.articleCode ?? source.code ?? ""),
+    code: readCode(source),
     title: String(source.title ?? ""),
     basePrice: asNumber(source.basePrice ?? source.price),
     price: asNumber(source.price ?? source.basePrice),
@@ -137,8 +139,7 @@ export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
   })
 
   return {
-    id: String(source.id ?? ""),
-    articleCode: String(source.articleCode ?? source.code ?? ""),
+    code: readCode(source),
     title: String(source.title ?? ""),
     basePrice: asNumber(source.basePrice ?? source.price),
     price: asNumber(source.price ?? source.basePrice),

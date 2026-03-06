@@ -22,14 +22,6 @@ export function parseStripeChargeSucceeded(
     })
   }
 
-  const referenceId = stripeObject.metadata?.reference_id?.trim()
-  if (!referenceId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing Stripe reference_id metadata",
-    })
-  }
-
   if (
     typeof stripeObject.amount !== "number" ||
     !Number.isFinite(stripeObject.amount)
@@ -43,7 +35,6 @@ export function parseStripeChargeSucceeded(
   return {
     orderId,
     amount: stripeObject.amount / 100,
-    referenceId,
     createdAt:
       typeof stripeObject.created === "number"
         ? new Date(stripeObject.created * 1000)

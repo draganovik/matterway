@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
-import type { GetArticleByIdResponse } from "~/types/catalog"
+import type { GetArticleResponse } from "~/types/catalog"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 const props = withDefaults(
   defineProps<{
-    article?: GetArticleByIdResponse | null
+    article?: GetArticleResponse | null
     error?: string
     canEdit?: boolean
   }>(),
@@ -17,8 +17,8 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (event: "update:article", value: GetArticleByIdResponse | null): void
-  (event: "updated", value: GetArticleByIdResponse): void
+  (event: "update:article", value: GetArticleResponse | null): void
+  (event: "updated", value: GetArticleResponse): void
 }>()
 
 const api = useCatalogClient()
@@ -26,7 +26,7 @@ const api = useCatalogClient()
 const updateState = useRequestState()
 
 type ArticleForm = {
-  articleCode: string
+  code: string
   title: string
   basePrice: number | string
   description: string
@@ -34,7 +34,7 @@ type ArticleForm = {
 }
 
 const form = ref<ArticleForm>({
-  articleCode: "",
+  code: "",
   title: "",
   basePrice: "",
   description: "",
@@ -46,7 +46,7 @@ watch(
   (article) => {
     if (!article) return
     form.value = {
-      articleCode: article.code || "",
+      code: article.code || "",
       title: article.title || "",
       basePrice: article.basePrice ?? "",
       description: article.description || "",
@@ -58,7 +58,7 @@ watch(
   { immediate: true },
 )
 
-function updateArticleData(patch: Partial<GetArticleByIdResponse>) {
+function updateArticleData(patch: Partial<GetArticleResponse>) {
   if (!props.article) return
   const next = { ...props.article, ...patch }
   emit("update:article", next)
@@ -70,12 +70,24 @@ async function saveArticle() {
   updateState.success = ""
   if (!props.article) return
   if (!props.canEdit) return
+
+  const code = String(form.value.code ?? "").trim().toUpperCase()
+  const title = String(form.value.title ?? "").trim()
+  const description = String(form.value.description ?? "").trim()
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+    updateState.error = "Article code must be exactly 8 letters or numbers."
+    return
+  }
+
+  form.value.code = code
+  form.value.title = title
+  form.value.description = description
   updateState.loading = true
-  const result = await api.updateArticle(props.article.id, {
-    articleCode: form.value.articleCode || null,
-    title: form.value.title || null,
+  const result = await api.updateArticle(props.article.code, {
+    code,
+    title: title || null,
     basePrice: form.value.basePrice || null,
-    description: form.value.description || null,
+    description: description || null,
     isAvailable: form.value.isAvailable,
   })
   updateState.loading = false
@@ -84,7 +96,7 @@ async function saveArticle() {
     return
   }
   updateArticleData({
-    code: result.data?.articleCode ?? form.value.articleCode,
+    code: result.data?.code ?? form.value.code,
     title: result.data?.title ?? form.value.title,
     basePrice: result.data?.basePrice ?? form.value.basePrice,
     description: result.data?.description ?? form.value.description,
@@ -94,11 +106,11 @@ async function saveArticle() {
   updateState.success = "Article updated."
 }
 
-function updateDetails(details: GetArticleByIdResponse["details"]) {
+function updateDetails(details: GetArticleResponse["details"]) {
   updateArticleData({ details })
 }
 
-function updateImages(images: GetArticleByIdResponse["images"]) {
+function updateImages(images: GetArticleResponse["images"]) {
   updateArticleData({ images })
 }
 </script>
@@ -136,7 +148,9 @@ function updateImages(images: GetArticleByIdResponse["images"]) {
               Update primary details and availability.
             </p>
           </div>
-          <div class="text-muted text-sm">ID: {{ article?.id }}</div>
+          <div class="text-muted text-sm">
+            Article Code: {{ article?.code }}
+          </div>
         </div>
 
         <div class="mt-4">
@@ -162,7 +176,7 @@ function updateImages(images: GetArticleByIdResponse["images"]) {
 
       <section class="space-y-3">
         <CatalogArticlesImagesPanel
-          :article-id="article?.id ?? null"
+          :code="article?.code ?? null"
           :model-value="article?.images || []"
           :can-edit="canEdit"
           @update:model-value="updateImages"
@@ -171,7 +185,7 @@ function updateImages(images: GetArticleByIdResponse["images"]) {
 
       <section class="space-y-3">
         <CatalogArticlesDetailsPanel
-          :article-id="article?.id ?? null"
+          :code="article?.code ?? null"
           :details="article?.details || []"
           :can-edit="canEdit"
           @update:details="updateDetails"

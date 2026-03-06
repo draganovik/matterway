@@ -33,7 +33,7 @@ public class AdminQueryDiscounts : IEndpoint
         public decimal Percentage { get; init; }
         public DateTime ValidFrom { get; init; }
         public DateTime? ValidTo { get; init; }
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
     }
 
     public static QueryDiscountResponse MapToResponse(Discount entity)
@@ -44,7 +44,7 @@ public class AdminQueryDiscounts : IEndpoint
             Percentage = entity.Percentage,
             ValidFrom = entity.ValidFrom,
             ValidTo = entity.ValidTo,
-            ArticleId = entity.ArticleId
+            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null)
         };
     }
 }

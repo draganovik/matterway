@@ -197,8 +197,8 @@ export function useArticlesBrowsePage() {
   async function loadDetailDefinitions(forVersion: number) {
     detailDefinitionsLoading.value = true
     try {
-      const articleIds = items.value.map((item) => item.id).slice(0, 24)
-      if (!articleIds.length) {
+      const articleCodes = items.value.map((item) => item.code).slice(0, 24)
+      if (!articleCodes.length) {
         if (forVersion === requestVersion.value) {
           detailDefinitions.value = withActiveFilterDefinitions(
             detailDefinitions.value,
@@ -208,7 +208,7 @@ export function useArticlesBrowsePage() {
       }
 
       const responses = await Promise.all(
-        articleIds.map((id) => catalogApi.getArticle(id)),
+        articleCodes.map((code) => catalogApi.getArticle(code)),
       )
 
       const rawDefinitions: Array<{

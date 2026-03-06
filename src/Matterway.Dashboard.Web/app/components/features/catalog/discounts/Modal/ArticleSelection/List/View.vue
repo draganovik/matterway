@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>()
 
 function resolveId(article: QueryArticleResponse) {
-  return article.id || ""
+  return article.code || ""
 }
 
 function isSelected(article: QueryArticleResponse) {

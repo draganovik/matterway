@@ -14,6 +14,8 @@ internal sealed class OrderStatusEntityTypeConfiguration : IEntityTypeConfigurat
         builder.HasKey(status => status.Id);
 
         builder.Property(status => status.OrderId)
+            .HasMaxLength(OrderId.MaxLength)
+            .HasConversion(orderId => orderId.Value, value => OrderId.FromStorage(value))
             .IsRequired();
 
         builder.Property(status => status.ChangedAt)

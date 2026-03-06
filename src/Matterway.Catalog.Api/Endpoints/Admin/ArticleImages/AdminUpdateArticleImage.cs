@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 
 namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleImages;
@@ -8,7 +9,7 @@ public class AdminUpdateArticleImage : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPatch(EndpointKind.Admin, "articles/{articleId:guid}/images/{orderIndex:int}", Handle)
+        endpoints.MapPatch(EndpointKind.Admin, "articles/{article:ArticleCode}/images/{orderIndex:int}", Handle)
             .WithName("AdminUpdateArticleImage").WithSummary("[admin] Update an ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<UpdateArticleImageResponse>()
@@ -21,13 +22,17 @@ public class AdminUpdateArticleImage : IEndpoint
     }
 
     private static async Task<Results<Ok<UpdateArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
-        Guid articleId,
+        ArticleCode article,
         int orderIndex,
         UpdateArticleImageRequest request,
+        IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await articleImageRepository.GetBy(articleId, orderIndex, cancellationToken);
+        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
+        if (articleEntity is null) return TypedResults.NotFound();
+
+        var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdates(entity, request);
@@ -40,7 +45,7 @@ public class AdminUpdateArticleImage : IEndpoint
 
         if (updated is null) return TypedResults.NotFound();
 
-        return TypedResults.Ok(MapToResponse(updated));
+        return TypedResults.Ok(MapToResponse(updated, article, articleEntity.Title));
     }
 
     public record UpdateArticleImageRequest
@@ -55,7 +60,7 @@ public class AdminUpdateArticleImage : IEndpoint
     {
         public Guid Id { get; init; }
         public int OrderIndex { get; init; }
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
         public string? ArticleName { get; init; }
         public string? ImageUrl { get; init; }
         public string? ImageAlt { get; init; }
@@ -66,14 +71,17 @@ public class AdminUpdateArticleImage : IEndpoint
         entity.ImageAlt = request.ImageAlt ?? entity.ImageAlt;
     }
 
-    public static UpdateArticleImageResponse MapToResponse(ArticleImage entity)
+    public static UpdateArticleImageResponse MapToResponse(
+        ArticleImage entity,
+        ArticleCode article,
+        string articleName)
     {
         return new UpdateArticleImageResponse
         {
             Id = entity.Id,
             OrderIndex = entity.OrderIndex,
-            ArticleId = entity.ArticleId,
-            ArticleName = entity.Article?.Title,
+            ArticleCode = article,
+            ArticleName = articleName,
             ImageUrl = entity.ImageUrl,
             ImageAlt = entity.ImageAlt
         };

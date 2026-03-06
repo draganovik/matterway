@@ -8,7 +8,7 @@ public class AdminGetCartItemById : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/cart-items/{articleId:guid}", Handler)
+        endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
             .WithName("AdminGetCartItemById").WithSummary("[admin] Get CartItem by id")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
@@ -22,11 +22,11 @@ public class AdminGetCartItemById : IEndpoint
 
     private static async Task<Results<Ok<CartItemResponse>, NotFound>> Handler(
         Guid customerId,
-        Guid articleId,
+        ArticleCode article,
         ICustomerArticleRepository cartItemRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await cartItemRepository.GetCartItem(customerId, articleId, cancellationToken);
+        var entity = await cartItemRepository.GetCartItem(customerId, article, cancellationToken);
         if (entity == null) return TypedResults.NotFound();
 
         return TypedResults.Ok(MapToResponse(entity));
@@ -41,7 +41,7 @@ public class AdminGetCartItemById : IEndpoint
         public string? ArticleName { get; init; }
 
         [Required]
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -57,7 +57,7 @@ public class AdminGetCartItemById : IEndpoint
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ArticleId = entity.ArticleId,
+            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null),
             ArticleName = entity.ArticleName,
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice

@@ -44,7 +44,7 @@ const definitionState = useRequestState()
 const searchTerm = ref("")
 const detailOptions = ref<QueryDetailResponse[]>([])
 const selectedKey = ref("")
-const valueInput = ref("")
+const valueInput = ref<string | number>("")
 const validationError = ref("")
 
 const isOpen = computed({
@@ -155,7 +155,7 @@ function submit() {
     validationError.value = "Select a detail."
     return
   }
-  const rawValue = valueInput.value.trim()
+  const rawValue = String(valueInput.value ?? "").trim()
   if (!rawValue) {
     validationError.value = "Provide a value."
     return

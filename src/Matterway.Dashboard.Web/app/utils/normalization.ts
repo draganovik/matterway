@@ -1,7 +1,12 @@
 export function normalizeSlug(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, "-")
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
 }
 
 export function normalizeCode(value: string) {
-  return value.trim().toUpperCase()
+  return String(value ?? "")
+    .trim()
+    .toUpperCase()
 }

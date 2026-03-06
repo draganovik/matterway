@@ -1,6 +1,6 @@
 <script setup lang="ts">
 type ArticleForm = {
-  articleCode: string
+  code: string
   title: string
   basePrice: number | string
   description: string
@@ -39,11 +39,12 @@ const basePriceValue = computed({
     <UFormField
       label="Article Code"
       required
-      help="5-10 uppercase letters or numbers"
+      help="Exactly 8 uppercase letters or numbers"
     >
       <UInput
-        v-model="form.articleCode"
-        placeholder="ABCDE"
+        v-model="form.code"
+        placeholder="PHUE0002"
+        maxlength="8"
         :disabled="disabled"
         class="w-full"
       />

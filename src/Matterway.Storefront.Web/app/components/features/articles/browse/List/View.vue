@@ -15,7 +15,7 @@ const props = defineProps<{
     >
       <ArticlesBrowseListItem
         v-for="article in props.items"
-        :key="article.id"
+        :key="article.code"
         :article="article"
       />
     </div>

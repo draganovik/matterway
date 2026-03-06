@@ -58,6 +58,6 @@ public class AdminQueryPayments : IEndpoint
 
     public sealed record QueryPaymentsParameters : PaginationRequestParameters
     {
-        public Guid? OrderId { get; init; }
+        public OrderId? OrderId { get; init; }
     }
 }
