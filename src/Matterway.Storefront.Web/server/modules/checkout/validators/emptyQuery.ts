@@ -1,7 +1,7 @@
 import type { EmptyQuery } from "../contracts/types"
 import { isRecord } from "./parsers"
 
-export function validateEmptyQuery(data: unknown): EmptyQuery {
+export function validateNoQueryParams(data: unknown): EmptyQuery {
   if (!isRecord(data)) {
     return {}
   }

@@ -1,20 +1,17 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCartStore } from "~/composables/stores/useCartStore"
-import { useSalesClient } from "~/composables/api/useSalesClient"
-import { useStorefrontPaymentsClient } from "~/composables/api/useStorefrontPaymentsClient"
+import { useStorefrontOrdersClient } from "~/composables/api/useStorefrontOrdersClient"
 import { useCheckoutAddressForm } from "./useCheckoutAddressForm"
 import { useCheckoutPaymentForm } from "./useCheckoutPaymentForm"
 
 export function useCheckoutPage() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
-  const salesApi = useSalesClient()
-  const paymentsApi = useStorefrontPaymentsClient()
+  const ordersApi = useStorefrontOrdersClient()
 
   const {
     address,
     hasRequiredAddressFields,
-    toDeliveryInfo,
     loadDefaultAddress,
   } = useCheckoutAddressForm()
   const {
@@ -76,29 +73,17 @@ export function useCheckoutPage() {
         return
       }
 
-      const orderResponse = await salesApi.placeSelfOrder({
+      const orderResponse = await ordersApi.createOrder({
         customerId: auth.customerId.value,
-        type: "Ecommerce",
-        deliveryInfo: toDeliveryInfo(),
-      })
-
-      if (!orderResponse.ok || !orderResponse.data?.id) {
-        error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo."
-        return
-      }
-
-      const paymentResult = await paymentsApi.createPayment({
-        orderId: orderResponse.data.id,
-        userId: auth.customerId.value,
-        amount: orderResponse.data.totalAmount ?? cart.totalPrice.value,
+        amount: cart.totalPrice.value,
         address,
         cardNumber: getCardDigits(),
         cvc: payment.cvc.replace(/\D/g, ""),
         expiry,
       })
 
-      if (!paymentResult.ok) {
-        error.value = paymentResult.error || "Plaćanje nije uspelo."
+      if (!orderResponse.ok || !orderResponse.data?.id) {
+        error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo."
         return
       }
 

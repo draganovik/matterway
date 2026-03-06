@@ -7,7 +7,7 @@ import type {
 
 const systemAccessKeyHeaderName = "X-System-Access-Key"
 
-export async function registerStripePayment(
+export async function registerSalesPayment(
   charge: StripeChargeSucceeded,
   config: SystemPaymentConfig,
   requestContext?: Context,
@@ -34,7 +34,10 @@ export async function registerStripePayment(
   )
 
   if (!response.ok) {
-    console.error("[stripe] failed to register payment", await response.text())
+    console.error(
+      "[checkout-webhook] failed to register payment",
+      await response.text(),
+    )
     throw createError({
       statusCode: 500,
       statusMessage: "Failed to register payment",

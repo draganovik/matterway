@@ -1,5 +1,4 @@
 import Stripe from "stripe"
-import type { CardPaymentInput, PaymentAddress } from "../contracts/types"
 import {
   SpanKind,
   SpanStatusCode,
@@ -7,7 +6,11 @@ import {
   type Context,
   type Span,
 } from "@opentelemetry/api"
-import { createReferenceId } from "../utils/referenceId"
+import type {
+  CardPaymentInput,
+  PaymentAddress,
+  StripePaymentSession,
+} from "../contracts/types"
 
 type StripeSpanOptions = {
   operation: string
@@ -17,6 +20,7 @@ type StripeSpanOptions = {
 
 function setStripeResponseAttributes(span: Span, value: unknown) {
   if (!value || typeof value !== "object") return
+
   const withResponse = value as {
     id?: unknown
     object?: unknown
@@ -67,11 +71,12 @@ async function recordStripeSpan<T>(
     span.setAttribute("http.url", `https://api.stripe.com${options.endpoint}`)
     span.setAttribute("server.address", "api.stripe.com")
     span.setAttribute("stripe.endpoint", options.endpoint)
-    Object.entries(options.requestAttributes || {}).forEach(([key, value]) => {
+
+    for (const [key, value] of Object.entries(options.requestAttributes || {})) {
       if (value !== undefined) {
         span.setAttribute(key, value)
       }
-    })
+    }
 
     const result = await fn()
     setStripeResponseAttributes(span, result)
@@ -98,6 +103,7 @@ async function recordStripeSpan<T>(
         span.setAttribute("http.status_code", withStripeDetails.statusCode)
       }
     }
+
     span.setStatus({ code: SpanStatusCode.ERROR, message })
     span.recordException(error as Error)
     throw error
@@ -106,27 +112,50 @@ async function recordStripeSpan<T>(
   }
 }
 
-export async function payWithStripe(
+function buildStripeClient(secretKey: string) {
+  return new Stripe(secretKey, {
+    apiVersion: "2025-10-29.clover",
+  })
+}
+
+function toStripeShippingAddress(address: PaymentAddress) {
+  return {
+    line1: address.street,
+    line2: address.residence,
+    city: address.city,
+    postal_code: address.zipCode,
+    country: "RS",
+  }
+}
+
+function wrapStripeError(error: unknown, fallback: string) {
+  console.error("[checkout] stripe request failed", error)
+  const message = error instanceof Error ? error.message : fallback
+  return createError({
+    statusCode: 502,
+    statusMessage: message || fallback,
+  })
+}
+
+export async function createStripePaymentIntent(
   cardPayment: CardPaymentInput,
   address: PaymentAddress,
   userId: string,
-  orderId: string,
-  secretkey: string,
+  referenceId: string,
+  secretKey: string,
   parentContext?: Context,
-): Promise<string> {
-  const referenceId = createReferenceId()
+): Promise<StripePaymentSession> {
   const amountInMinor = Math.round(cardPayment.amount * 100)
-  const stripe = new Stripe(secretkey, {
-    apiVersion: "2025-10-29.clover",
-  })
+  const stripe = buildStripeClient(secretKey)
+
   try {
     const paymentMethod = await recordStripeSpan(
       {
         operation: "paymentMethods.create",
         endpoint: "/v1/payment_methods",
         requestAttributes: {
-          "sales.order_id": orderId,
           "sales.customer_id": userId,
+          "payment.reference_id": referenceId,
         },
       },
       parentContext,
@@ -147,7 +176,6 @@ export async function payWithStripe(
         operation: "paymentIntents.create",
         endpoint: "/v1/payment_intents",
         requestAttributes: {
-          "sales.order_id": orderId,
           "sales.customer_id": userId,
           "payment.amount_minor": amountInMinor,
           "payment.currency": "RSD",
@@ -162,29 +190,107 @@ export async function payWithStripe(
           currency: "rsd",
           payment_method_types: ["card"],
           payment_method: paymentMethod.id,
-          confirm: true,
+          confirm: false,
           shipping: {
             name: address.receiverName,
-            address: {
-              line1: address.street,
-              line2: address.residence,
-              city: address.city,
-              postal_code: address.zipCode,
-              country: "RS",
-            },
+            address: toStripeShippingAddress(address),
           },
           metadata: {
             client_id: userId,
-            order_id: orderId,
             reference_id: referenceId,
             note: address.note || "",
           },
         }),
     )
 
-    return paymentIntent.client_secret || ""
+    return {
+      paymentIntentId: paymentIntent.id,
+      referenceId,
+    }
   } catch (error) {
-    console.error("[payments] stripe charge failed", error)
-    throw new Error("Payment failed. Please try again.")
+    throw wrapStripeError(error, "Stripe payment initialization failed.")
+  }
+}
+
+export async function confirmStripePaymentIntent(
+  paymentIntentId: string,
+  orderId: string,
+  referenceId: string,
+  secretKey: string,
+  parentContext?: Context,
+) {
+  const stripe = buildStripeClient(secretKey)
+
+  try {
+    await recordStripeSpan(
+      {
+        operation: "paymentIntents.update",
+        endpoint: `/v1/payment_intents/${paymentIntentId}`,
+        requestAttributes: {
+          "sales.order_id": orderId,
+          "payment.reference_id": referenceId,
+        },
+      },
+      parentContext,
+      async () =>
+        stripe.paymentIntents.update(paymentIntentId, {
+          metadata: {
+            order_id: orderId,
+            reference_id: referenceId,
+          },
+        }),
+    )
+
+    const confirmedIntent = await recordStripeSpan(
+      {
+        operation: "paymentIntents.confirm",
+        endpoint: `/v1/payment_intents/${paymentIntentId}/confirm`,
+        requestAttributes: {
+          "sales.order_id": orderId,
+          "payment.reference_id": referenceId,
+        },
+      },
+      parentContext,
+      async () => stripe.paymentIntents.confirm(paymentIntentId),
+    )
+
+    if (
+      confirmedIntent.status === "requires_payment_method" ||
+      confirmedIntent.status === "canceled"
+    ) {
+      throw createError({
+        statusCode: 402,
+        statusMessage: "Stripe payment confirmation failed.",
+      })
+    }
+  } catch (error) {
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error
+    }
+    throw wrapStripeError(error, "Stripe payment confirmation failed.")
+  }
+}
+
+export async function cancelStripePaymentIntent(
+  paymentIntentId: string,
+  secretKey: string,
+  parentContext?: Context,
+) {
+  const stripe = buildStripeClient(secretKey)
+
+  try {
+    await recordStripeSpan(
+      {
+        operation: "paymentIntents.cancel",
+        endpoint: `/v1/payment_intents/${paymentIntentId}/cancel`,
+      },
+      parentContext,
+      async () => stripe.paymentIntents.cancel(paymentIntentId),
+    )
+  } catch (error) {
+    console.error(
+      `[checkout] failed to cancel stripe intent ${paymentIntentId}`,
+      error,
+    )
   }
 }

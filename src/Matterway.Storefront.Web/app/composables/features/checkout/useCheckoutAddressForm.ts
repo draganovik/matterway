@@ -28,17 +28,6 @@ export function useCheckoutAddressForm() {
     ].every((item) => item.trim().length > 0)
   }
 
-  function toDeliveryInfo() {
-    return {
-      country: address.country || "Srbija",
-      city: address.city,
-      zipCode: address.zipCode,
-      addressLine1: address.street,
-      addressLine2: address.residence || undefined,
-      contactPhone: address.contactPhone || undefined,
-    }
-  }
-
   async function loadDefaultAddress() {
     const response = await customersApi.getSelfAddress()
     if (!response.ok || !response.data) {
@@ -68,7 +57,6 @@ export function useCheckoutAddressForm() {
   return {
     address,
     hasRequiredAddressFields,
-    toDeliveryInfo,
     loadDefaultAddress,
   }
 }
