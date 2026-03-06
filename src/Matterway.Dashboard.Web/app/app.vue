@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 
-const auth = useAuthSession()
+const auth = useAuthSessionStore()
 const route = useRoute()
 const appTitle = "Matterway Dashboard"
 const isBooting = computed(

@@ -22,7 +22,6 @@ type HasPermission = (
 
 export function getAuthorizedSections(hasPermission: HasPermission) {
   return serviceSections
-    .filter((section) => hasPermission(section.service, section.allowed))
     .map((section) => ({
       ...section,
       features: section.features.filter((feature) =>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAuthorizedSections } from "~/composables/useAuthorizedSections"
+import { useDashboardOverviewPage } from "~/composables/features/overview/useDashboardOverviewPage"
 
 definePageMeta({
   title: "Overview",
 })
 
-const sections = useAuthorizedSections()
+const { sections } = useDashboardOverviewPage()
 </script>
 
 <template>
@@ -42,7 +42,7 @@ const sections = useAuthorizedSections()
             <div class="flex flex-wrap gap-2">
               <UBadge color="primary" variant="soft"> Employee </UBadge>
               <UBadge color="neutral" variant="soft"> Catalog </UBadge>
-              <UBadge color="neutral" variant="soft"> Customers </UBadge>
+              <UBadge color="neutral" variant="soft"> Users </UBadge>
               <UBadge color="neutral" variant="soft">
                 Permission Scoped
               </UBadge>

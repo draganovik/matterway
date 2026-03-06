@@ -1,8 +1,8 @@
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { getFeatureByRoute } from "~/data/serviceRegistry"
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthSession()
+  const auth = useAuthSessionStore()
 
   if (to.meta.public) {
     void auth.initialize()

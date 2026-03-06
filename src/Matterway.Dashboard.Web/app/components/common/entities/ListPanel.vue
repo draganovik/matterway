@@ -59,9 +59,20 @@ const pageSizes = [10, 20, 50, 100].map((value) => ({
   value,
 }))
 
+const safeTotal = computed(() =>
+  Math.max(0, Number(props.totalCount) || props.items.length || 0),
+)
+
 const safeTotalPages = computed(() =>
   Math.max(1, Number(props.totalPages) || 1),
 )
+
+const normalizedFilterPlaceholder = computed(() => {
+  const placeholder = (props.filterPlaceholder || "").trim()
+  if (!placeholder) return "Search"
+  if (/search/i.test(placeholder)) return placeholder
+  return `Search ${placeholder.charAt(0).toLowerCase()}${placeholder.slice(1)}`
+})
 
 function applySearch() {
   emit("update:filter", filterInput.value.trim())
@@ -84,46 +95,56 @@ function updatePageSize(value: number) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <header class="space-y-1">
-      <h2 class="text-foreground text-base font-semibold">
-        {{ title }}
-      </h2>
-      <p v-if="description" class="text-muted text-sm">
-        {{ description }}
-      </p>
-    </header>
-
-    <div class="flex flex-col gap-3">
-      <UFormField>
-        <UTextarea
-          v-if="filterInputType === 'textarea'"
-          v-model="filterInput"
-          :placeholder="filterPlaceholder"
-          size="md"
-          :rows="3"
-          class="w-full"
-        />
+  <div class="flex h-full min-h-0 flex-col gap-4">
+    <div class="shrink-0 space-y-3">
+      <div v-if="filterInputType === 'input'">
         <UInput
-          v-else
           v-model="filterInput"
-          :placeholder="filterPlaceholder"
+          :placeholder="normalizedFilterPlaceholder"
           size="lg"
           class="w-full"
           @keydown.enter.prevent="applySearch"
         />
-      </UFormField>
-      <UButton
-        color="primary"
-        :loading="loading"
-        class="w-full"
-        @click="applySearch"
-      >
-        Search
-      </UButton>
+      </div>
+
+      <template v-else>
+        <UTextarea
+          v-model="filterInput"
+          :placeholder="normalizedFilterPlaceholder"
+          size="md"
+          :rows="3"
+          class="w-full"
+        />
+      </template>
+
+      <div class="flex flex-wrap items-end gap-3 [&>*]:min-w-0 [&>*]:flex-1">
+        <slot name="search-controls" />
+        <UFormField label="Page Size" class="w-full">
+          <USelectMenu
+            :items="pageSizes"
+            :model-value="pageSize"
+            value-key="value"
+            label-key="label"
+            placeholder="Select size"
+            class="w-full"
+            @update:model-value="updatePageSize"
+          />
+        </UFormField>
+        <UButton
+          color="primary"
+          size="lg"
+          :loading="loading"
+          loading-icon="i-lucide-loader-2"
+          :disabled="loading"
+          class="w-full justify-center"
+          @click="applySearch"
+        >
+          Search
+        </UButton>
+      </div>
     </div>
 
-    <div class="flex min-h-0 flex-1 flex-col gap-3">
+    <div class="min-h-0 flex-1 overflow-y-auto">
       <StatusMessages
         v-if="error || loading || !items.length"
         :error="error"
@@ -157,40 +178,16 @@ function updatePageSize(value: number) {
       </div>
     </div>
 
-    <div
-      class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
-    >
-      <div class="text-muted text-sm">
-        Page {{ page }} of {{ safeTotalPages }} - {{ totalCount }} total
-      </div>
-      <div class="flex items-center gap-2">
-        <UFormField label="Page Size">
-          <USelectMenu
-            :items="pageSizes"
-            :model-value="pageSize"
-            value-key="value"
-            label-key="label"
-            placeholder="Select size"
-            class="min-w-34"
-            @update:model-value="updatePageSize"
-          />
-        </UFormField>
-        <div class="flex items-center gap-1">
-          <UButton
-            variant="outline"
-            :disabled="page <= 1"
-            @click="updatePage(page - 1)"
-          >
-            Prev
-          </UButton>
-          <UButton
-            variant="outline"
-            :disabled="page >= safeTotalPages"
-            @click="updatePage(page + 1)"
-          >
-            Next
-          </UButton>
-        </div>
+    <div class="border-default shrink-0 border-t pt-3">
+      <div class="flex justify-center">
+        <UPagination
+          :page="page"
+          :items-per-page="pageSize"
+          :total="safeTotal"
+          :sibling-count="1"
+          show-controls
+          @update:page="updatePage"
+        />
       </div>
     </div>
   </div>
