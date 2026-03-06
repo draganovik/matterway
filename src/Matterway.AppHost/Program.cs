@@ -158,7 +158,7 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     Func<IResourceBuilder<ProjectResource>, IResourceBuilder<ProjectResource>> configure)
     where TProject : IProjectMetadata, new()
 {
-    var api = builder.AddProject<TProject>($"{apiDefinition.ServiceName}-api")
+    var api = builder.AddProject<TProject>(apiDefinition.AspireServiceName)
         .WithExternalHttpEndpoints()
         .PublishAsDockerComposeService((_, service) =>
         {
@@ -245,9 +245,11 @@ void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
         .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
         .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
         .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL",
-            builder.Configuration["Apis:AccessOrigins:Identity"])
-        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Catalog"])
+            builder.Configuration[ApiDirectory.Identity.AccessOriginConfigurationPath])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL",
+            builder.Configuration[ApiDirectory.Catalog.AccessOriginConfigurationPath])
         .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL",
-            builder.Configuration["Apis:AccessOrigins:Customers"])
-        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", builder.Configuration["Apis:AccessOrigins:Sales"]);
+            builder.Configuration[ApiDirectory.Customers.AccessOriginConfigurationPath])
+        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL",
+            builder.Configuration[ApiDirectory.Sales.AccessOriginConfigurationPath]);
 }

@@ -32,6 +32,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\Shared\ApiGlobalUsings.cs" Link="GlobalUsings.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
         <Folder Include="Infrastructure\"/>
     </ItemGroup>
 

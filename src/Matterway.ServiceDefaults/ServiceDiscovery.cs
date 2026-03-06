@@ -6,6 +6,16 @@ public static class ServiceDiscovery
 {
     extension(IConfiguration configuration)
     {
+        public Uri ResolveServiceUri(ApiDefinition apiDefinition)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(apiDefinition);
+
+            return configuration.ResolveServiceUri(
+                apiDefinition.AspireServiceName,
+                apiDefinition.AccessOriginConfigurationPath);
+        }
+
         public Uri ResolveServiceUri(string aspireServiceName,
             string? configurationKey = null)
         {
@@ -14,28 +24,11 @@ public static class ServiceDiscovery
             if (string.IsNullOrWhiteSpace(aspireServiceName))
                 throw new ArgumentException("Service name must be provided.", nameof(aspireServiceName));
 
-            if (configurationKey is not null)
-            {
-                var explicitValue = configuration[configurationKey];
-                if (!string.IsNullOrWhiteSpace(explicitValue)) return CreateUri(explicitValue, configurationKey);
-            }
-
-            var inferredKey = configurationKey ?? $"Apis:AccessOrigins:{ToPascalCase(aspireServiceName)}";
-            var configuredValue = configuration[inferredKey];
-            if (!string.IsNullOrWhiteSpace(configuredValue)) return CreateUri(configuredValue, inferredKey);
-
-            if (configurationKey is null)
-            {
-                var legacyApiKey = $"Api:AccessOrigins:{ToPascalCase(aspireServiceName)}";
-                var legacyApiConfiguredValue = configuration[legacyApiKey];
-                if (!string.IsNullOrWhiteSpace(legacyApiConfiguredValue))
-                    return CreateUri(legacyApiConfiguredValue, legacyApiKey);
-
-                var legacyKey = $"Services:{ToPascalCase(aspireServiceName)}:Url";
-                var legacyConfiguredValue = configuration[legacyKey];
-                if (!string.IsNullOrWhiteSpace(legacyConfiguredValue))
-                    return CreateUri(legacyConfiguredValue, legacyKey);
-            }
+            var effectiveConfigurationKey = configurationKey ??
+                                            $"Apis:AccessOrigins:{ToAccessOriginKeySegment(aspireServiceName)}";
+            var configuredValue = configuration[effectiveConfigurationKey];
+            if (!string.IsNullOrWhiteSpace(configuredValue))
+                return CreateUri(configuredValue, effectiveConfigurationKey);
 
             return new Uri($"http://{aspireServiceName}", UriKind.Absolute);
         }
@@ -48,6 +41,15 @@ public static class ServiceDiscovery
                 $"Configuration value '{value}' for '{key}' is not a valid absolute URI.");
 
         return uri;
+    }
+
+    private static string ToAccessOriginKeySegment(string aspireServiceName)
+    {
+        var normalizedServiceName = aspireServiceName.EndsWith("-api", StringComparison.OrdinalIgnoreCase)
+            ? aspireServiceName[..^4]
+            : aspireServiceName;
+
+        return ToPascalCase(normalizedServiceName);
     }
 
     private static string ToPascalCase(string value)

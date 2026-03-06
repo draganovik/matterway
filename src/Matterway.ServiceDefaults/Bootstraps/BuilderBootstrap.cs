@@ -10,18 +10,13 @@ public static class BuilderBootstrap
 {
     public static WebApplicationBuilder CreateBuilder(string[] args, bool? throwOnBadRequest = null)
     {
-        var contentRootPath = Directory.GetCurrentDirectory();
+        var builder = WebApplication.CreateBuilder(args);
 
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-        {
-            Args = args,
-            ContentRootPath = contentRootPath
-        });
+        builder.Configuration.AddJsonFile("Properties/appsettings.json", true, true);
+        builder.Configuration.AddEnvironmentVariables();
 
-        builder.Configuration
-            .SetBasePath(contentRootPath)
-            .AddJsonFile("Properties/appsettings.json", true, true)
-            .AddEnvironmentVariables();
+        if (args.Length > 0)
+            builder.Configuration.AddCommandLine(args);
 
         if (throwOnBadRequest is { } throwOnBadRequestValue)
             builder.Services.Configure<RouteHandlerOptions>(routeHandlerOptions =>

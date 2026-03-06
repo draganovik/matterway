@@ -10,7 +10,7 @@ var builder = BuilderBootstrap.CreateBuilder(args);
 builder
     .ConfigureApi(apiContract)
     .ConfigureAuthentication()
-    .ConfigureCustomersIntegration()
+    .ConfigureApiHttpClient<ICustomersClient, HttpCustomersClient>(ApiDirectory.Customers)
     .ConfigurePersistence()
     .ConfigureEndpoints();
 
