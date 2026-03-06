@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCart } from "~/composables/useCart"
+import { useCartStore } from "~/composables/stores/useCartStore"
 
 type ControlSize = "xs" | "sm" | "md" | "lg" | "xl"
 
@@ -22,10 +22,10 @@ const emit = defineEmits<{
   remove: []
 }>()
 
-const cart = useCart()
+const cart = useCartStore()
 const isOpen = ref(false)
 const loading = ref(false)
-const quantityInput = ref<string | number>("")
+const quantityInput = ref<string>("")
 const error = ref("")
 
 const resolvedQuantity = computed(() => {
@@ -41,7 +41,7 @@ function openEditor() {
   isOpen.value = true
 }
 
-function parseQuantity(value: string | number) {
+function parseQuantity(value: string) {
   const trimmed = String(value ?? "").trim()
   if (!/^\d+$/.test(trimmed)) return null
   const parsed = Number(trimmed)

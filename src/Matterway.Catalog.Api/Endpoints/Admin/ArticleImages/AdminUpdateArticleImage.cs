@@ -17,7 +17,7 @@ public class AdminUpdateArticleImage : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<UpdateArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(

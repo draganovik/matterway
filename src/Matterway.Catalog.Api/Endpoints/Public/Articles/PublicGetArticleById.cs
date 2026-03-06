@@ -12,7 +12,7 @@ public class PublicGetArticleById : IEndpoint
             .WithTags("Articles")
             .Produces<GetArticleByIdResponse>()
             .Produces(StatusCodes.Status404NotFound)
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<GetArticleByIdResponse>, NotFound>> Handle(

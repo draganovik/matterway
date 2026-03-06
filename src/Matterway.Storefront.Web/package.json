@@ -16,14 +16,12 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.86",
     "@nuxt/ui": "^4.4.0",
-    "nuxt": "^4.2.2",
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/context-zone": "^2.6.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.213.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.213.0",
     "@opentelemetry/resources": "^2.6.0",
     "@opentelemetry/sdk-trace-base": "^2.6.0",
-    "@opentelemetry/sdk-trace-web": "^2.6.0",
+    "nuxt": "^4.2.2",
     "stripe": "^19.3.0",
     "tailwindcss": "^4.1.18"
   },

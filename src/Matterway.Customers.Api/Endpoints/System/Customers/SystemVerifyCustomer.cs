@@ -15,7 +15,7 @@ public class SystemVerifyCustomer : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .RequireSystemAccessKey()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<CustomerResponse>, NotFound, BadRequest>> Handler(

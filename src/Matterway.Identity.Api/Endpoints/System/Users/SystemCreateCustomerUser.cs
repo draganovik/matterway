@@ -17,7 +17,7 @@ public class SystemCreateCustomerUser : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status403Forbidden)
             .RequireSystemAccessKey()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<CreateUserResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>

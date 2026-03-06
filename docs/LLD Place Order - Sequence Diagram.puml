@@ -17,59 +17,73 @@ participant "Stripe" as Stripe
 
 Customer -> Checkout : Place order
 activate Checkout
-note over SalesApi
-Sales resolves `customerId` from customer JWT.
-end note
 alt Client-side validation fails
   Checkout --> Customer : Show validation errors\n(no API calls)
+  deactivate Checkout
 
 else Validation passes
-  Checkout -> SalesApi : POST /api/self/v1/orders\n{type, deliveryInfo} + Bearer customer JWT
-  activate SalesApi
-  SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
-  activate CustomersApi
-  CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId)
-  activate CustomersDb
-  CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
-  deactivate CustomersDb
-  CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
-  deactivate CustomersApi
-
-  SalesApi -> SalesDb : Save Order + Items + DeliveryInfo\nAdd initial status=Processing
-  activate SalesDb
-  SalesDb --> SalesApi : Order created
-  deactivate SalesDb
-  SalesApi --> Checkout : 201 Created {id, totalAmount, ...}
-  deactivate SalesApi
-
-  Checkout -> StorefrontServer : POST /api/v1/payments\n{orderId, userId, amount, card, address}
+  Checkout -> StorefrontServer : POST /api/v1/orders\n{customerId, order, payment, address} + Bearer customer JWT
   activate StorefrontServer
-  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=true)\nmetadata:{order_id, reference_id, client_id}
+  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=false)\nmetadata:{reference_id, client_id}
   activate Stripe
 
   note over Stripe, StorefrontServer
-  Order creation and payment registration are separate steps.
-  Payment registration in Sales happens asynchronously via Stripe webhook.
+  Storefront generates `reference_id` from hex timestamp.
+  Stripe init happens before Sales order creation.
   end note
 
-  alt Stripe payment intent creation fails
+  alt Stripe payment init fails
     Stripe --> StorefrontServer : Error
-    StorefrontServer --> Checkout : 500 Payment failed
+    deactivate Stripe
+    StorefrontServer --> Checkout : 500 Payment initialization failed
     deactivate StorefrontServer
-    Checkout -> Checkout : cart.clear()
-    Checkout --> Customer : Show payment error\n(order not payed)
-  else Stripe payment intent created
-    Stripe --> StorefrontServer : 200 {client_secret}
-    activate StorefrontServer
-    StorefrontServer --> Checkout : 200 {clientSecret}
-    deactivate StorefrontServer
-    Checkout -> Checkout : cart.clear()
-    Checkout --> Customer : Redirect to /orders
+    Checkout --> Customer : Show payment error
+  else Stripe payment init succeeds
+    Stripe --> StorefrontServer : 200 {paymentIntentId}
+
+    StorefrontServer -> SalesApi : POST /api/system/v1/orders\n{type, deliveryInfo} + Bearer customer JWT + X-System-Access-Key
+    activate SalesApi
+    note over SalesApi
+    Sales validates both customer JWT and system access key.
+    Customer identity is resolved from JWT claims.
+    end note
+    SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
+    activate CustomersApi
+    CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId)
+    activate CustomersDb
+    CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
+    deactivate CustomersDb
+    CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
+    deactivate CustomersApi
+
+    SalesApi -> SalesDb : Save Order + Items + DeliveryInfo\nAdd initial status=Processing
+    activate SalesDb
+    SalesDb --> SalesApi : Order created
+    deactivate SalesDb
+    SalesApi --> StorefrontServer : 201 Created {id, totalAmount, ...}
+    deactivate SalesApi
+
+    alt Sales order creation fails
+      StorefrontServer -> Stripe : Cancel PaymentIntent
+      Stripe --> StorefrontServer : 200 Canceled
+      StorefrontServer --> Checkout : 500 Order creation failed
+      deactivate StorefrontServer
+      Checkout --> Customer : Show checkout error
+    else Sales order created
+      StorefrontServer -> Stripe : Update metadata(order_id, reference_id)\n+ Confirm PaymentIntent
+      Stripe --> StorefrontServer : 200 Confirmed
+      StorefrontServer --> Checkout : 200 {order, referenceId}
+      deactivate StorefrontServer
+      Checkout -> Checkout : cart.clear()
+      Checkout --> Customer : Redirect to /orders
+    end
+    deactivate Stripe
   end
   deactivate Checkout
 
   ... asynchronous webhook handling ...
 
+  activate Stripe
   alt Stripe sends charge.succeeded
     Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\ncharge.succeeded(order_id, amount, reference_id)
     activate StorefrontServer
@@ -88,8 +102,8 @@ else Validation passes
     activate StorefrontServer
     StorefrontServer --> Stripe : 304 Event ignored
     deactivate StorefrontServer
-    deactivate Stripe
   end
+  deactivate Stripe
 end
 
 @enduml

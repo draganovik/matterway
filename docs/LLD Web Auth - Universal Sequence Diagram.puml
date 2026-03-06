@@ -1,0 +1,188 @@
+@startuml LLD: Web Auth - Universal Sequence Diagram
+skinparam actorStyle hollow
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 120
+
+actor "User" as User
+participant "Web Page\n(Storefront or Dashboard)" as Page
+participant "Nuxt Route Middleware\n(auth.global.ts)" as Middleware
+participant "Auth Session Store\n(useAuthSessionStore)" as AuthStore
+participant "Feature Registry\n(Dashboard)" as Registry
+participant "API Client\n(useApiClient)" as ApiClient
+box "Outbound Systems" #FFF7ED
+participant "Identity API\n/auth endpoints" as IdentityApi #FDBA74
+participant "Domain API\n(catalog/customers/identity/sales)" as DomainApi #FDBA74
+end box
+
+note over Page, IdentityApi
+Storefront variant:
+- Required role: customer
+- Auth base path: /api/public/v1/auth
+- Unauthenticated redirect: /login?next=...
+
+Dashboard variant:
+- Required role: employee
+- Auth base path: /api/public/v1/auth
+- Unauthenticated redirect: /login
+- Permission check via service + level (observer/operator/manager)
+end note
+
+== Login (Getting the token) ==
+User -> Page : 1.1 Open /login
+activate Page
+Page -> AuthStore : 1.2 initialize()
+activate AuthStore
+AuthStore --> Page : 1.3 return initialized session state
+deactivate AuthStore
+
+User -> Page : 1.4 Submit credentials
+Page -> AuthStore : 1.5 login(email, password)
+activate AuthStore
+AuthStore -> IdentityApi : 1.6 POST /login
+activate IdentityApi
+alt Login succeeds and role matches app policy
+  IdentityApi --> AuthStore : 1.6.1.1 HTTP 200 LoginResponse
+  AuthStore -> AuthStore : 1.6.1.2 setSession + write refresh cookie + scheduleRefresh
+  AuthStore --> Page : 1.6.1.3 return login success
+  alt Dashboard
+    Page -> Registry : 1.6.1.4 Resolve first permitted feature route
+    activate Registry
+    Registry --> Page : 1.6.1.5 return first authorized route
+    deactivate Registry
+    Page --> User : 1.6.1.6 Navigate to first authorized route
+  else Storefront
+    Page -> Page : 1.6.1.4 optional post-login cleanup (for example cart clear)
+    Page --> User : 1.6.1.5 Navigate to next route (or "/")
+  end
+else Login fails or role mismatches app policy
+  IdentityApi --> AuthStore : 1.6.2.1 HTTP 401/403 error payload
+  AuthStore -> AuthStore : 1.6.2.2 clearSession()
+  AuthStore --> Page : 1.6.2.3 return login error
+  Page --> User : 1.6.2.4 Show login error
+end
+deactivate IdentityApi
+deactivate AuthStore
+deactivate Page
+
+== Refresh strategy ==
+User -> Page : 2.1 Open route
+activate Page
+Page -> Middleware : 2.2 Route navigation
+activate Middleware
+Middleware -> AuthStore : 2.3 initialize()
+activate AuthStore
+alt Access token exists and is not expired
+  AuthStore -> AuthStore : 2.3.1.1 scheduleRefresh(2/3 token lifetime)
+  AuthStore --> Middleware : 2.3.1.2 return initialized (authenticated)
+else Access token missing/expired and refresh cookie exists,\nand refresh succeeds
+  AuthStore -> IdentityApi : 2.3.2.1 POST /refresh {refreshToken}
+  activate IdentityApi
+  IdentityApi --> AuthStore : 2.3.2.2 HTTP 200 LoginResponse
+  AuthStore -> AuthStore : 2.3.2.3 setSession + write refresh cookie + scheduleRefresh
+  AuthStore --> Middleware : 2.3.2.4 return initialized (authenticated)
+  deactivate IdentityApi
+else Access token missing/expired and refresh cookie exists,\nand refresh fails
+  AuthStore -> IdentityApi : 2.3.3.1 POST /refresh {refreshToken}
+  activate IdentityApi
+  IdentityApi --> AuthStore : 2.3.3.2 HTTP 401/403 error
+  AuthStore -> AuthStore : 2.3.3.3 clearSession()
+  AuthStore --> Middleware : 2.3.3.4 return initialized (anonymous)
+  deactivate IdentityApi
+else No access token and no refresh cookie
+  AuthStore --> Middleware : 2.3.4.1 return initialized (anonymous)
+end
+deactivate AuthStore
+
+alt Not authenticated for protected route
+  Middleware --> Page : 2.4.1.1 Redirect to login variant
+else Authenticated but not authorized (Dashboard only)
+  Middleware -> Registry : 2.4.2.1 Resolve feature + required permissions
+  activate Registry
+  Registry --> Middleware : 2.4.2.2 return feature metadata
+  deactivate Registry
+  Middleware -> AuthStore : 2.4.2.3 hasPermission(service, allowedLevels)
+  activate AuthStore
+  AuthStore --> Middleware : 2.4.2.4 return false
+  deactivate AuthStore
+  Middleware --> Page : 2.4.2.5 Redirect to fallback authorized route
+else Authenticated and authorized
+  alt Dashboard
+    Middleware -> Registry : 2.4.3.1 Resolve feature + required permissions
+    activate Registry
+    Registry --> Middleware : 2.4.3.2 return feature metadata
+    deactivate Registry
+    Middleware -> AuthStore : 2.4.3.3 hasPermission(service, allowedLevels)
+    activate AuthStore
+    AuthStore --> Middleware : 2.4.3.4 return true
+    deactivate AuthStore
+    Middleware --> Page : 2.4.3.5 Continue navigation
+  else Storefront
+    Middleware --> Page : 2.4.3.1 Continue navigation
+  end
+end
+deactivate Middleware
+deactivate Page
+
+User -> Page : 3.1 Trigger API action
+activate Page
+Page -> ApiClient : 3.2 request(service, path)
+activate ApiClient
+ApiClient -> AuthStore : 3.3 initialize() if needed
+activate AuthStore
+AuthStore --> ApiClient : 3.4 return auth ready
+deactivate AuthStore
+
+ApiClient -> DomainApi : 3.5 HTTP request + Bearer token
+activate DomainApi
+alt Domain API returns 401 and refresh succeeds
+  DomainApi --> ApiClient : 3.5.1.1 HTTP 401 Unauthorized
+  ApiClient -> AuthStore : 3.5.1.2 refreshTokens()
+  activate AuthStore
+  AuthStore -> IdentityApi : 3.5.1.3 POST /refresh
+  activate IdentityApi
+  IdentityApi --> AuthStore : 3.5.1.4 HTTP 200 LoginResponse
+  deactivate IdentityApi
+  AuthStore --> ApiClient : 3.5.1.5 return refreshed token state
+  deactivate AuthStore
+  ApiClient -> DomainApi : 3.5.1.6 Retry HTTP request with new Bearer
+  activate DomainApi
+  DomainApi --> ApiClient : 3.5.1.7 HTTP retried response
+  deactivate DomainApi
+else Domain API returns 401 and refresh fails
+  DomainApi --> ApiClient : 3.5.2.1 HTTP 401 Unauthorized
+  deactivate DomainApi
+  ApiClient -> AuthStore : 3.5.2.2 refreshTokens()
+  activate AuthStore
+  AuthStore -> IdentityApi : 3.5.2.3 POST /refresh
+  activate IdentityApi
+  IdentityApi --> AuthStore : 3.5.2.4 HTTP 401/403 error
+  AuthStore -> AuthStore : 3.5.2.5 clearSession()
+  AuthStore --> ApiClient : 3.5.2.6 return refresh failure
+  deactivate IdentityApi
+  deactivate AuthStore
+else Domain API returns non-401
+  DomainApi --> ApiClient : 3.5.3.1 HTTP response
+  deactivate DomainApi
+end
+
+ApiClient --> Page : 3.6 return ApiResult
+deactivate ApiClient
+deactivate Page
+
+== Logout ==
+User -> Page : 4.1 Click logout
+activate Page
+Page -> AuthStore : 4.2 logout()
+activate AuthStore
+AuthStore -> IdentityApi : 4.3 POST /logout (best effort)
+activate IdentityApi
+IdentityApi --> AuthStore : 4.4 HTTP 200/401/network error ignored
+deactivate IdentityApi
+AuthStore -> AuthStore : 4.5 clearSession() + remove refresh cookie
+AuthStore --> Page : 4.6 return logout completed
+deactivate AuthStore
+Page --> User : 4.7 Navigate to app logout target
+deactivate Page
+
+@enduml

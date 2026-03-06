@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useResetOnModalOpen } from "~/composables/useResetOnModalOpen"
-import { useRequestState } from "~/composables/useRequestState"
-import { useSalesApi } from "~/composables/useSalesApi"
+import { useResetOnModalOpen } from "~/composables/workflows/modal/useResetOnModalOpen"
+import { useRequestState } from "~/composables/workflows/state/useRequestState"
+import { useSalesClient } from "~/composables/api/useSalesClient"
 import type { OrderStatusType } from "~/types/sales"
 
 const props = withDefaults(
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = defineModel<boolean>("open", { required: true })
-const api = useSalesApi()
+const api = useSalesClient()
 const createState = useRequestState()
 
 const statusOptions: Array<{ label: string; value: OrderStatusType }> = [

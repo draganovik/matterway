@@ -16,7 +16,7 @@ public class SelfQueryOrders : IEndpoint
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<PaginationResponse<CustomerOrderResponse>>, NoContent, ForbidHttpResult>>

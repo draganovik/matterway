@@ -21,16 +21,3 @@ export type SalesOrder = {
     addressLine1?: string
   }
 }
-
-export type PlaceOrderPayload = {
-  customerId?: string
-  type: "Ecommerce"
-  deliveryInfo: {
-    country: string
-    city: string
-    zipCode: string
-    addressLine1: string
-    addressLine2?: string
-    contactPhone?: string
-  }
-}

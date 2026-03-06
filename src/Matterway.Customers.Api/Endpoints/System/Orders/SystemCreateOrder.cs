@@ -18,7 +18,7 @@ public class SystemCreateOrder : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
             .RequireSystemAccessKey()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<CustomerOrderResponse>, BadRequest<ProblemDetails>, NotFound>> Handler(

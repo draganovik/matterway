@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui"
 import { getJwtStringClaim } from "~/utils/jwt"
-import { useAuthSession } from "~/composables/useAuthSession"
-import { useCart } from "~/composables/useCart"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { useCartStore } from "~/composables/stores/useCartStore"
 
-const auth = useAuthSession()
-const cart = useCart()
+const auth = useAuthSessionStore()
+const cart = useCartStore()
 
 const userLabel = computed(() => {
   if (auth.customerId.value?.trim()) return auth.customerId.value.trim()

@@ -14,7 +14,7 @@ public class AdminExportCatalogArchive : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<FileContentHttpResult> Handle(

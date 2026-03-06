@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui"
-import { useAuthorizedSections } from "~/composables/useAuthorizedSections"
+import { useAuthorizedSections } from "~/composables/workflows/useAuthorizedSections"
 
 const open = ref(false)
 const authorizedSections = useAuthorizedSections()
 
 const iconMap: Record<string, string> = {
   catalog: "i-lucide-package",
-  customers: "i-lucide-users",
+  users: "i-lucide-users",
   sales: "i-lucide-receipt-text",
-  identity: "i-lucide-shield-user",
 }
 
 const navItems = computed<NavigationMenuItem[]>(() => {

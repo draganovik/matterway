@@ -10,16 +10,16 @@ public class SelfQueryOrders : IEndpoint
         endpoints.MapGet(EndpointKind.Self, "orders", Handler)
             .WithName("SelfQueryOrders").WithSummary("[self] Query own Orders.")
             .WithTags(nameof(Order))
-            .Produces<PaginationResponse<SelfCreateOrder.OrderResponse>>()
+            .Produces<PaginationResponse<SelfGetOrderById.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<SelfCreateOrder.OrderResponse>>, NoContent, ValidationProblem>>
+        Task<Results<Ok<PaginationResponse<SelfGetOrderById.OrderResponse>>, NoContent, ValidationProblem>>
         Handler([AsParameters] QueryOrdersParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -44,9 +44,9 @@ public class SelfQueryOrders : IEndpoint
             "SelfQueryOrders",
             null);
 
-        var results = entities.Select(SelfCreateOrder.MapToResponse).ToList();
+        var results = entities.Select(SelfGetOrderById.MapToResponse).ToList();
 
-        var paginationResponse = PaginationResponse<SelfCreateOrder.OrderResponse>.Create(
+        var paginationResponse = PaginationResponse<SelfGetOrderById.OrderResponse>.Create(
             results,
             total,
             queryParameters.Page,
