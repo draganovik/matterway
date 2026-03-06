@@ -17,6 +17,7 @@ export function useCheckoutPage() {
     getCardDigits,
     getParsedExpiry,
     getValidationError,
+    normalizeExpMonthOnBlur,
   } = useCheckoutPaymentForm()
 
   const error = ref("")
@@ -101,5 +102,6 @@ export function useCheckoutPage() {
     loading,
     initialize,
     submitCheckout,
+    normalizeExpMonthOnBlur,
   }
 }

@@ -82,6 +82,18 @@ export function useCheckoutPaymentForm() {
     return null
   }
 
+  function normalizeExpMonthOnBlur() {
+    const current = String(payment.expMonth ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 2)
+
+    if (current.length !== 1) {
+      return
+    }
+
+    payment.expMonth = current === "0" ? "01" : `0${current}`
+  }
+
   watch(
     () => payment.cardNumber,
     (value) => {
@@ -108,6 +120,10 @@ export function useCheckoutPaymentForm() {
       let normalized = String(value ?? "")
         .replace(/\D/g, "")
         .slice(0, 2)
+
+      if (normalized === "00") {
+        normalized = "01"
+      }
 
       if (normalized.length === 2 && Number(normalized) > 12) {
         normalized = "12"
@@ -137,5 +153,6 @@ export function useCheckoutPaymentForm() {
     getCardDigits,
     getParsedExpiry,
     getValidationError,
+    normalizeExpMonthOnBlur,
   }
 }

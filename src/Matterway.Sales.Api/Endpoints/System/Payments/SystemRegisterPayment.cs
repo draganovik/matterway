@@ -18,7 +18,7 @@ public class SystemRegisterPayment : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
             .RequireSystemAccessKey()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<PaymentResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(

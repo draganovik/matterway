@@ -17,7 +17,7 @@ public class AdminImportCatalogArchive : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<ImportCatalogArchiveResponse>, BadRequest<ProblemDetails>>> Handle(

@@ -15,7 +15,7 @@ public class SystemIntrospect : IEndpoint
             .Produces(StatusCodes.Status401Unauthorized)
             .RequireSystemAccessKey()
             .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static Results<Ok<AuthIntrospectResponse>, UnauthorizedHttpResult> Handler(HttpContext context)

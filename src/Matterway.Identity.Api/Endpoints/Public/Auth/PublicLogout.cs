@@ -16,7 +16,7 @@ public class PublicLogout : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)
             .RequireAuthorization()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<NoContent, UnauthorizedHttpResult>> Handler(

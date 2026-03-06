@@ -25,7 +25,7 @@ public class SystemCreateOrder : IEndpoint
             .RequireSystemAccessKey()
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
                 RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<OrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult>>

@@ -15,6 +15,7 @@ const {
   loading,
   initialize,
   submitCheckout,
+  normalizeExpMonthOnBlur,
 } = useCheckoutPage()
 
 await initialize()
@@ -41,7 +42,11 @@ await initialize()
     <div class="grid gap-6 lg:grid-cols-[1fr_22rem]">
       <div class="space-y-6">
         <CheckoutDeliveryPanel v-model="address" />
-        <CheckoutPaymentPanel v-model="payment" :current-year="currentYear" />
+        <CheckoutPaymentPanel
+          v-model="payment"
+          :current-year="currentYear"
+          @month-blur="normalizeExpMonthOnBlur"
+        />
       </div>
 
       <CheckoutOrderActionPanel

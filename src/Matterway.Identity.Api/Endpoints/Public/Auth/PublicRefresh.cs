@@ -15,7 +15,7 @@ public class PublicRefresh : IEndpoint
             .Produces(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem()
             .AllowAnonymous()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<RefreshResponse>, UnauthorizedHttpResult>> Handler(

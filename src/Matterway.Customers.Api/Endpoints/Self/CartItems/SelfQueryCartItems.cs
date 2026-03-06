@@ -15,7 +15,7 @@ public class SelfQueryCartItems : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<PaginationResponse<CartItemResponse>>, NoContent, ForbidHttpResult>>

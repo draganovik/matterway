@@ -15,7 +15,7 @@ public class SelfQueryOrders : IEndpoint
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async

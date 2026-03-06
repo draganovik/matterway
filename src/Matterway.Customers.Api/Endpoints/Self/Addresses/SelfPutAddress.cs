@@ -19,7 +19,7 @@ public class SelfPutAddress : IEndpoint
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
                 RequestIdentity.IsCustomer(context.User) ||
                 RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<

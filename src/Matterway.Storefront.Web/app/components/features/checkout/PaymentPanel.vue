@@ -5,6 +5,10 @@ const props = defineProps<{
   currentYear: number
 }>()
 
+const emit = defineEmits<{
+  monthBlur: []
+}>()
+
 const payment = defineModel<CheckoutPaymentForm>({ required: true })
 </script>
 
@@ -50,6 +54,7 @@ const payment = defineModel<CheckoutPaymentForm>({ required: true })
           pattern="(0[1-9]|1[0-2])"
           class="w-full"
           required
+          @blur="emit('monthBlur')"
         />
       </UFormField>
 

@@ -15,7 +15,7 @@ public class SelfGetOrderById : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<OrderResponse>, NotFound, ForbidHttpResult>> Handler(

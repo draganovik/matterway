@@ -16,7 +16,7 @@ public class AdminQueryDetails : IEndpoint
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
                     RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Ok<ICollection<QueryDetailResponse>>> Handle(

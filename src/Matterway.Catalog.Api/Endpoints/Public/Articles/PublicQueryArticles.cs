@@ -14,7 +14,7 @@ public class PublicQueryArticles : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
-            .MapToApiVersion(new ApiVersion(1, 0))
+            .MapToApiVersion(new ApiVersion(1))
             .AddOpenApiOperationTransformer((operation, context, ct) =>
             {
                 var filterParam = operation.Parameters?
