@@ -8,6 +8,7 @@ export function useCheckoutPage() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
   const ordersApi = useStorefrontOrdersClient()
+  const nuxtApp = useNuxtApp()
 
   const { address, hasRequiredAddressFields, loadDefaultAddress } =
     useCheckoutAddressForm()
@@ -31,11 +32,11 @@ export function useCheckoutPage() {
     await cart.refreshFromRemote().catch(() => null)
 
     if (isCartEmpty.value) {
-      await navigateTo("/cart")
+      await nuxtApp.runWithContext(() => navigateTo("/cart"))
       return
     }
 
-    await loadDefaultAddress()
+    await nuxtApp.runWithContext(() => loadDefaultAddress())
   }
 
   async function submitCheckout() {
@@ -86,7 +87,7 @@ export function useCheckoutPage() {
       }
 
       await cart.clear()
-      await navigateTo("/orders")
+      await nuxtApp.runWithContext(() => navigateTo("/orders"))
     } finally {
       loading.value = false
     }

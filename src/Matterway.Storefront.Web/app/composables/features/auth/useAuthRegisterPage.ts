@@ -23,6 +23,7 @@ export function useAuthRegisterPage() {
   const registerCustomer = useAuthRegistrationWorkflow()
   const cart = useCartStore()
   const route = useRoute()
+  const nuxtApp = useNuxtApp()
 
   const model = reactive<RegisterForm>({
     firstName: "",
@@ -54,7 +55,7 @@ export function useAuthRegisterPage() {
       })
 
       await cart.clear()
-      await navigateTo(resolveNextRoute(route))
+      await nuxtApp.runWithContext(() => navigateTo(resolveNextRoute(route)))
     } catch (err) {
       error.value =
         err instanceof Error ? err.message : "Registracija nije uspela."

@@ -1,10 +1,10 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import type { ApiResult, ApiService } from "~/types/common/api"
+import type { RuntimeConfig } from "nuxt/schema"
 
 const validEndpointKinds = new Set(["self", "admin", "public", "system"])
 
-function getBaseUrl(service: ApiService) {
-  const config = useRuntimeConfig()
+function getBaseUrl(service: ApiService, config: RuntimeConfig) {
   if (service === "catalog") return config.public.catalogApiBaseUrl
   if (service === "customers") return config.public.customersApiBaseUrl
   if (service === "identity") return config.public.identityApiBaseUrl
@@ -60,6 +60,7 @@ function getErrorMessage(payload: unknown) {
 
 export function useApiClient() {
   const auth = useAuthSessionStore()
+  const config = useRuntimeConfig()
 
   async function request<T>(
     service: ApiService,
@@ -71,7 +72,7 @@ export function useApiClient() {
       await auth.initialize()
     }
 
-    const baseUrl = getBaseUrl(service)
+    const baseUrl = getBaseUrl(service, config)
     if (!baseUrl) {
       return {
         ok: false,
