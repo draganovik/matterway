@@ -8,7 +8,7 @@ public class HttpCatalogClient(HttpClient httpClient) : ICatalogClient
     public async Task<BrokerResponse<CatalogClientGetArticleByIdResponse>> GetArticleById(Guid id,
         CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/public/v1.0/articles/{id}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/public/v1/articles/{id}");
         var response = await httpClient.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {

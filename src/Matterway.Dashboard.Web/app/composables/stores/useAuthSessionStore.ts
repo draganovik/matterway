@@ -8,7 +8,7 @@ import type { AuthSession, LoginResponse } from "~/types/auth/session"
 import type { PermissionLevel } from "~/types/services/definitions"
 
 const refreshCookieName = "mw_refresh"
-const authPath = "/api/public/v1.0/auth"
+const authPath = "/api/public/v1/auth"
 const authJsonHeaders = {
   "Content-Type": "application/json",
   accept: "application/json",

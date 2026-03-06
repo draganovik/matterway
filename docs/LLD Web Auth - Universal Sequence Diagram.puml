@@ -23,7 +23,7 @@ Storefront variant:
 
 Dashboard variant:
 - Required role: employee
-- Auth base path: /api/public/v1.0/auth
+- Auth base path: /api/public/v1/auth
 - Unauthenticated redirect: /login
 - Permission check via service + level (observer/operator/manager)
 end note

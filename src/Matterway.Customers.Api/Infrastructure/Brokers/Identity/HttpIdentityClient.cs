@@ -4,7 +4,7 @@ namespace Matterway.Customers.Api.Infrastructure.Brokers.Identity;
 
 public class HttpIdentityClient(HttpClient httpClient) : IIdentityClient
 {
-    private const string CreateCustomerUserPath = "/api/system/v1.0/users/customer";
+    private const string CreateCustomerUserPath = "/api/system/v1/users/customer";
 
     public async Task<BrokerResponse<CreateCustomerUserResponse>> CreateCustomerUserAsync(
         CreateCustomerUserRequest request,
