@@ -1,7 +1,7 @@
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthSession()
+  const auth = useAuthSessionStore()
 
   if (to.meta.public) {
     void auth.initialize()

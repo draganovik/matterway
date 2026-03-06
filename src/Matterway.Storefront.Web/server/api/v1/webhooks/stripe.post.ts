@@ -1,4 +1,3 @@
-import type { H3Event } from "h3"
 import { getSystemPaymentConfig } from "../../../modules/payments/config/runtime"
 import { parseStripeChargeSucceeded } from "../../../modules/payments/mappers/stripeCharge"
 import { registerStripePayment } from "../../../modules/payments/services/salesPayments"
@@ -6,7 +5,7 @@ import { validateEmptyQuery } from "../../../modules/payments/validators/query"
 import { validateStripeWebhookPayload } from "../../../modules/payments/validators/stripeWebhookPayload"
 import { getRequestTraceContext } from "../../../modules/shared/requestContext"
 
-async function handleStripeWebhook(event: H3Event) {
+export default defineEventHandler(async (event) => {
   await getValidatedQuery(event, validateEmptyQuery)
   const stripeEvent = await readValidatedBody(
     event,
@@ -26,6 +25,4 @@ async function handleStripeWebhook(event: H3Event) {
   )
 
   return { success: true, message: "Payment registered", data: { payment } }
-}
-
-export default defineEventHandler(handleStripeWebhook)
+})

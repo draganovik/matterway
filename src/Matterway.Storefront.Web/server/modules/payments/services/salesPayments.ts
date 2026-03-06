@@ -1,5 +1,5 @@
 import type { Context } from "@opentelemetry/api"
-import { fetchWithTelemetry } from "../../../../app/utils/telemetry"
+import { fetchWithTrace } from "../../shared/fetchWithTrace"
 import type {
   StripeChargeSucceeded,
   SystemPaymentConfig,
@@ -12,7 +12,7 @@ export async function registerStripePayment(
   config: SystemPaymentConfig,
   requestContext?: Context,
 ) {
-  const response = await fetchWithTelemetry(
+  const response = await fetchWithTrace(
     `${config.serverSalesApiBaseUrl}/api/system/v1/payments`,
     {
       method: "POST",

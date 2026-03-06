@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession"
-import { useCart } from "~/composables/useCart"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { useCartStore } from "~/composables/stores/useCartStore"
 
 const colorMode = useColorMode()
 const color = computed(() =>
   colorMode.value === "dark" ? "#020617" : "#f1f5f9",
 )
-const auth = useAuthSession()
-const cart = useCart()
+const auth = useAuthSessionStore()
+const cart = useCartStore()
 const route = useRoute()
 const appTitle = "Matterway prodavnica"
 const isBooting = computed(

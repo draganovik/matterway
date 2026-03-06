@@ -1,11 +1,10 @@
-import type { H3Event } from "h3"
 import { getStripeSecretKey } from "../../modules/payments/config/runtime"
 import { payWithStripe } from "../../modules/payments/services/stripeGateway"
 import { validateCreatePaymentRequest } from "../../modules/payments/validators/createPaymentRequest"
 import { validateEmptyQuery } from "../../modules/payments/validators/query"
 import { getRequestTraceContext } from "../../modules/shared/requestContext"
 
-async function handleCreatePayment(event: H3Event) {
+export default defineEventHandler(async (event) => {
   await getValidatedQuery(event, validateEmptyQuery)
   const paymentRequest = await readValidatedBody(
     event,
@@ -22,6 +21,4 @@ async function handleCreatePayment(event: H3Event) {
   )
 
   return { clientSecret }
-}
-
-export default defineEventHandler(handleCreatePayment)
+})

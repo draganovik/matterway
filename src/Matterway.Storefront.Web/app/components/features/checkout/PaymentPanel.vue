@@ -1,16 +1,11 @@
 <script setup lang="ts">
-type PaymentForm = {
-  cardNumber: string
-  expMonth: string
-  expYear: string
-  cvc: string
-}
+import type { CheckoutPaymentForm } from "~/types/checkout"
 
 const props = defineProps<{
   currentYear: number
 }>()
 
-const payment = defineModel<PaymentForm>({ required: true })
+const payment = defineModel<CheckoutPaymentForm>({ required: true })
 </script>
 
 <template>
@@ -50,7 +45,9 @@ const payment = defineModel<PaymentForm>({ required: true })
           placeholder="MM"
           autocomplete="cc-exp-month"
           inputmode="numeric"
+          minlength="2"
           maxlength="2"
+          pattern="(0[1-9]|1[0-2])"
           class="w-full"
           required
         />
