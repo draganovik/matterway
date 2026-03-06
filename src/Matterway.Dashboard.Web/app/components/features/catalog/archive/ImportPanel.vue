@@ -23,8 +23,7 @@ const emit = defineEmits<{
   (event: "upload" | "clear"): void
 }>()
 
-const fileInputRef = ref<HTMLInputElement | null>(null)
-const isDragOver = ref(false)
+const selectedFile = ref<File | null>(null)
 
 const actionColor = computed(() =>
   props.hasSelectedFile ? "success" : "neutral",
@@ -32,42 +31,39 @@ const actionColor = computed(() =>
 
 const controlsDisabled = computed(() => !props.canOperate || props.loading)
 
-function openPicker() {
-  if (controlsDisabled.value) return
-  fileInputRef.value?.click()
-}
+function handleSelectedFileChange(file: File | null | undefined) {
+  const nextFile = file ?? null
 
-function onFileInputChange(event: Event) {
-  const target = event.target as HTMLInputElement | null
-  emit("select-file", target?.files?.[0] ?? null)
-}
+  if (!nextFile) {
+    selectedFile.value = null
+    emit("select-file", null)
+    return
+  }
 
-function onDragEnter() {
-  if (controlsDisabled.value) return
-  isDragOver.value = true
-}
+  if (!nextFile.name.toLowerCase().endsWith(".zip")) {
+    selectedFile.value = null
+    emit("select-file", nextFile)
+    return
+  }
 
-function onDragOver() {
-  if (controlsDisabled.value) return
-  isDragOver.value = true
-}
-
-function onDragLeave() {
-  isDragOver.value = false
-}
-
-function onDrop(event: DragEvent) {
-  if (controlsDisabled.value) return
-  isDragOver.value = false
-  emit("select-file", event.dataTransfer?.files?.[0] ?? null)
+  selectedFile.value = nextFile
+  emit("select-file", nextFile)
 }
 
 function clearSelection() {
   if (controlsDisabled.value) return
-  if (fileInputRef.value) fileInputRef.value.value = ""
-  isDragOver.value = false
+  selectedFile.value = null
   emit("clear")
 }
+
+watch(
+  () => props.hasSelectedFile,
+  (hasSelectedFile) => {
+    if (hasSelectedFile) return
+    selectedFile.value = null
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -87,38 +83,29 @@ function clearSelection() {
 
     <div class="space-y-4">
       <UFormField label="Archive File (.zip)" required>
-        <input
-          ref="fileInputRef"
-          class="hidden"
-          type="file"
+        <UFileUpload
+          :model-value="selectedFile"
           accept=".zip,application/zip"
+          :preview="false"
+          :interactive="!controlsDisabled"
           :disabled="controlsDisabled"
-          @change="onFileInputChange"
-        />
-        <button
-          type="button"
-          class="border-default bg-default/70 w-full rounded-2xl border border-dashed p-6 text-center transition"
-          :class="[
-            isDragOver
-              ? 'border-primary bg-primary/5'
-              : 'hover:border-primary/60',
-            controlsDisabled
-              ? 'cursor-not-allowed opacity-60'
-              : 'cursor-pointer',
-          ]"
-          :disabled="controlsDisabled"
-          @click="openPicker"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
+          class="w-full"
+          :ui="{
+            base: `border-default bg-default/70 w-full rounded-2xl border border-dashed p-6 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
+            wrapper: 'flex flex-col items-center gap-2',
+            avatar: 'hidden',
+            label: 'mt-0 text-sm font-medium',
+            description: 'text-muted mt-0 text-xs',
+            actions: 'hidden',
+          }"
+          label="Drag and drop a .zip archive"
+          description="or click to browse"
+          @update:model-value="handleSelectedFileChange"
         >
-          <div class="flex flex-col items-center gap-2">
+          <template #leading>
             <UIcon name="i-lucide-file-up" class="size-6" />
-            <p class="text-sm font-medium">Drag and drop a .zip archive</p>
-            <p class="text-muted text-xs">or click to browse</p>
-          </div>
-        </button>
+          </template>
+        </UFileUpload>
 
         <p class="text-muted mt-2 text-xs">
           {{

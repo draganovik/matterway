@@ -37,8 +37,6 @@ const isOpen = computed({
 })
 
 const file = ref<File | null>(null)
-const fileInputRef = ref<HTMLInputElement | null>(null)
-const isDragOver = ref(false)
 const orderIndex = ref<number | string>(0)
 const imageAlt = ref("")
 const validationError = ref("")
@@ -47,13 +45,21 @@ const controlsDisabled = computed(
   () => !props.canEdit || props.loading || props.mode !== "add",
 )
 
+const orderIndexValue = computed({
+  get: () => {
+    const parsed = Number(orderIndex.value)
+    return Number.isFinite(parsed) ? parsed : null
+  },
+  set: (value: number | null | undefined) => {
+    orderIndex.value = value == null ? "" : Math.trunc(value)
+  },
+})
+
 watch(
   () => props.open,
   (open) => {
     if (!open) {
       file.value = null
-      if (fileInputRef.value) fileInputRef.value.value = ""
-      isDragOver.value = false
       orderIndex.value = 0
       imageAlt.value = ""
       validationError.value = ""
@@ -63,14 +69,10 @@ watch(
       orderIndex.value = props.image.orderIndex ?? 0
       imageAlt.value = props.image.imageAlt || ""
       file.value = null
-      if (fileInputRef.value) fileInputRef.value.value = ""
-      isDragOver.value = false
     } else {
       orderIndex.value = 0
       imageAlt.value = ""
       file.value = null
-      if (fileInputRef.value) fileInputRef.value.value = ""
-      isDragOver.value = false
     }
   },
 )
@@ -92,42 +94,14 @@ function setSelectedFile(next: File | null) {
   file.value = next
 }
 
-function openPicker() {
-  if (controlsDisabled.value) return
-  fileInputRef.value?.click()
-}
-
-function onFileInputChange(event: Event) {
-  const target = event.target as HTMLInputElement | null
-  setSelectedFile(target?.files?.[0] ?? null)
-}
-
-function onDragEnter() {
-  if (controlsDisabled.value) return
-  isDragOver.value = true
-}
-
-function onDragOver() {
-  if (controlsDisabled.value) return
-  isDragOver.value = true
-}
-
-function onDragLeave() {
-  isDragOver.value = false
-}
-
-function onDrop(event: DragEvent) {
-  if (controlsDisabled.value) return
-  isDragOver.value = false
-  setSelectedFile(event.dataTransfer?.files?.[0] ?? null)
+function handleSelectedFileChange(nextFile: File | null | undefined) {
+  setSelectedFile(nextFile ?? null)
 }
 
 function clearSelection() {
   if (controlsDisabled.value) return
   validationError.value = ""
   file.value = null
-  isDragOver.value = false
-  if (fileInputRef.value) fileInputRef.value.value = ""
 }
 
 function submit() {
@@ -169,38 +143,29 @@ function submit() {
     <template #body>
       <div class="grid gap-4">
         <UFormField v-if="mode === 'add'" label="File" required>
-          <input
-            ref="fileInputRef"
-            class="hidden"
-            type="file"
+          <UFileUpload
+            :model-value="file"
             accept="image/*"
+            :preview="false"
+            :interactive="!controlsDisabled"
             :disabled="controlsDisabled"
-            @change="onFileInputChange"
-          />
-          <button
-            type="button"
-            class="border-default bg-elevated/40 w-full rounded-lg border border-dashed p-5 text-center transition"
-            :class="[
-              isDragOver
-                ? 'border-primary bg-primary/5'
-                : 'hover:border-primary/60',
-              controlsDisabled
-                ? 'cursor-not-allowed opacity-60'
-                : 'cursor-pointer',
-            ]"
-            :disabled="controlsDisabled"
-            @click="openPicker"
-            @dragenter.prevent="onDragEnter"
-            @dragover.prevent="onDragOver"
-            @dragleave.prevent="onDragLeave"
-            @drop.prevent="onDrop"
+            class="w-full"
+            :ui="{
+              base: `border-default bg-elevated/40 w-full rounded-lg border border-dashed p-5 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
+              wrapper: 'flex flex-col items-center gap-2',
+              avatar: 'hidden',
+              label: 'mt-0 text-sm font-medium',
+              description: 'text-muted mt-0 text-xs',
+              actions: 'hidden',
+            }"
+            label="Drag and drop an image"
+            description="or click to browse"
+            @update:model-value="handleSelectedFileChange"
           >
-            <div class="flex flex-col items-center gap-2">
+            <template #leading>
               <UIcon name="i-lucide-image-up" class="size-6" />
-              <p class="text-sm font-medium">Drag and drop an image</p>
-              <p class="text-muted text-xs">or click to browse</p>
-            </div>
-          </button>
+            </template>
+          </UFileUpload>
           <p class="text-muted mt-2 text-xs">
             {{ file ? `Selected: ${file.name}` : "No image selected." }}
           </p>
@@ -218,12 +183,17 @@ function submit() {
         </UFormField>
 
         <UFormField label="Order Index" required>
-          <UInput
-            v-model="orderIndex"
-            type="number"
-            min="0"
+          <UInputNumber
+            v-model="orderIndexValue"
+            orientation="vertical"
+            :min="0"
+            :step="1"
+            step-snapping
+            variant="outline"
             placeholder="0"
             :disabled="!canEdit"
+            class="w-full"
+            :ui="{ root: 'w-full', base: 'w-full text-left' }"
           />
         </UFormField>
 

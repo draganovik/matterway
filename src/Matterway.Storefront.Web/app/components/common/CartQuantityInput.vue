@@ -128,7 +128,6 @@ onBeforeUnmount(() => {
         :max="maxQuantity"
         :step="1"
         step-snapping
-        color="neutral"
         variant="outline"
         :size="props.size"
         :disabled="props.disabled || loading"

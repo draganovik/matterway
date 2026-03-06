@@ -104,24 +104,30 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
       />
 
       <template v-if="isNumeric">
-        <UInput
-          :model-value="detailFilter.min"
-          type="number"
-          min="0"
+        <UInputNumber
+          :model-value="detailFilter.min ?? null"
+          orientation="vertical"
+          :min="0"
+          :step="0.01"
+          variant="outline"
           placeholder="Od"
           aria-label="Minimalna vrednost"
           size="sm"
           class="w-full"
+          :ui="{ root: 'w-full', base: 'w-full text-left' }"
           @update:model-value="emit('setMin', toNumberOrUndefined($event))"
         />
-        <UInput
-          :model-value="detailFilter.max"
-          type="number"
-          min="0"
+        <UInputNumber
+          :model-value="detailFilter.max ?? null"
+          orientation="vertical"
+          :min="0"
+          :step="0.01"
+          variant="outline"
           placeholder="Do"
           aria-label="Maksimalna vrednost"
           size="sm"
           class="w-full"
+          :ui="{ root: 'w-full', base: 'w-full text-left' }"
           @update:model-value="emit('setMax', toNumberOrUndefined($event))"
         />
       </template>

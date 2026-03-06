@@ -70,24 +70,30 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Min cena">
-          <UInput
-            :model-value="filters.minPrice"
-            type="number"
-            min="0"
+          <UInputNumber
+            :model-value="filters.minPrice ?? null"
+            orientation="vertical"
+            :min="0"
+            :step="0.01"
+            variant="outline"
             placeholder="0"
             class="w-full"
+            :ui="{ root: 'w-full', base: 'w-full text-left' }"
             @update:model-value="
               emit('setMinPrice', toNumberOrUndefined($event))
             "
           />
         </UFormField>
         <UFormField label="Max cena">
-          <UInput
-            :model-value="filters.maxPrice"
-            type="number"
-            min="0"
+          <UInputNumber
+            :model-value="filters.maxPrice ?? null"
+            orientation="vertical"
+            :min="0"
+            :step="0.01"
+            variant="outline"
             placeholder="100000"
             class="w-full"
+            :ui="{ root: 'w-full', base: 'w-full text-left' }"
             @update:model-value="
               emit('setMaxPrice', toNumberOrUndefined($event))
             "

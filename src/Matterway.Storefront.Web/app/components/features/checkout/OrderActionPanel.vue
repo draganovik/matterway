@@ -15,6 +15,34 @@ const emit = defineEmits<{
   monthBlur: []
   submit: []
 }>()
+
+function parseOptionalNumber(value: string) {
+  const trimmed = String(value ?? "").trim()
+  if (!trimmed) return null
+
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+const expMonthValue = computed({
+  get: () => parseOptionalNumber(payment.value.expMonth),
+  set: (value: number | null | undefined) => {
+    if (value == null) {
+      payment.value.expMonth = ""
+      return
+    }
+
+    const normalized = Math.max(1, Math.min(12, Math.trunc(value)))
+    payment.value.expMonth = String(normalized).padStart(2, "0")
+  },
+})
+
+const expYearValue = computed({
+  get: () => parseOptionalNumber(payment.value.expYear),
+  set: (value: number | null | undefined) => {
+    payment.value.expYear = value == null ? "" : String(Math.trunc(value))
+  },
+})
 </script>
 
 <template>
@@ -77,32 +105,38 @@ const emit = defineEmits<{
           </UFormField>
 
           <UFormField label="Mesec" required>
-            <UInput
-              v-model="payment.expMonth"
-              type="number"
-              min="1"
-              max="12"
-              step="1"
+            <UInputNumber
+              v-model="expMonthValue"
+              orientation="vertical"
+              :min="1"
+              :max="12"
+              :step="1"
+              step-snapping
+              variant="outline"
               placeholder="MM"
+              :format-options="{ useGrouping: false, minimumIntegerDigits: 2 }"
               autocomplete="cc-exp-month"
-              inputmode="numeric"
               class="w-full"
+              :ui="{ root: 'w-full', base: 'w-full text-left' }"
               required
               @blur="emit('monthBlur')"
             />
           </UFormField>
 
           <UFormField label="Godina" required>
-            <UInput
-              v-model="payment.expYear"
-              type="number"
+            <UInputNumber
+              v-model="expYearValue"
+              orientation="vertical"
               :min="props.currentYear"
               :max="props.currentYear + 30"
-              step="1"
+              :step="1"
+              step-snapping
+              variant="outline"
               placeholder="GGGG"
+              :format-options="{ useGrouping: false }"
               autocomplete="cc-exp-year"
-              inputmode="numeric"
               class="w-full"
+              :ui="{ root: 'w-full', base: 'w-full text-left' }"
               required
             />
           </UFormField>

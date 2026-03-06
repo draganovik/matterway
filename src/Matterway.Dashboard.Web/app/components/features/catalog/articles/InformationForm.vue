@@ -12,6 +12,16 @@ const { disabled = false } = defineProps<{
 }>()
 
 const form = defineModel<ArticleForm>({ required: true })
+
+const basePriceValue = computed({
+  get: () => {
+    const parsed = Number(form.value.basePrice)
+    return Number.isFinite(parsed) ? parsed : null
+  },
+  set: (value: number | null | undefined) => {
+    form.value.basePrice = value == null ? "" : value
+  },
+})
 </script>
 
 <template>
@@ -40,14 +50,16 @@ const form = defineModel<ArticleForm>({ required: true })
     </UFormField>
 
     <UFormField label="Base Price" required>
-      <UInput
-        v-model="form.basePrice"
-        type="number"
-        min="0.01"
-        step="0.01"
+      <UInputNumber
+        v-model="basePriceValue"
+        orientation="vertical"
+        :min="0.01"
+        :step="0.01"
+        variant="outline"
         placeholder="0.00"
         :disabled="disabled"
         class="w-full"
+        :ui="{ root: 'w-full', base: 'w-full text-left' }"
       />
     </UFormField>
 
