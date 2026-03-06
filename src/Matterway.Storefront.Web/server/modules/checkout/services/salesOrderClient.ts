@@ -1,9 +1,6 @@
 import type { Context } from "@opentelemetry/api"
 import { fetchWithTrace } from "../../shared/fetchWithTrace"
-import type {
-  CheckoutOrderInput,
-  SalesOrderResponse,
-} from "../contracts/types"
+import type { CheckoutOrderInput, SalesOrderResponse } from "../contracts/types"
 
 function extractErrorMessage(payload: unknown, fallback: string) {
   if (typeof payload === "string" && payload.trim()) {

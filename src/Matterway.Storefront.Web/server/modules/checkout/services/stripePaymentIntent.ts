@@ -72,7 +72,9 @@ async function recordStripeSpan<T>(
     span.setAttribute("server.address", "api.stripe.com")
     span.setAttribute("stripe.endpoint", options.endpoint)
 
-    for (const [key, value] of Object.entries(options.requestAttributes || {})) {
+    for (const [key, value] of Object.entries(
+      options.requestAttributes || {},
+    )) {
       if (value !== undefined) {
         span.setAttribute(key, value)
       }

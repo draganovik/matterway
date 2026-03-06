@@ -133,9 +133,9 @@ export function useStorefrontOrdersClient() {
       response = await runFetch(authorization)
     }
 
-    const body = (await response.json().catch(() => null)) as
-      | CheckoutOrderApiResponse
-      | null
+    const body = (await response
+      .json()
+      .catch(() => null)) as CheckoutOrderApiResponse | null
     if (!response.ok) {
       return {
         ok: false,

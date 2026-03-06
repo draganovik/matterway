@@ -93,7 +93,11 @@ function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
     type: "Ecommerce",
     deliveryInfo: {
       country: asOptionalString(deliveryInfo, "country") || "Serbia",
-      city: asRequiredString(deliveryInfo, "city", "Delivery city is required."),
+      city: asRequiredString(
+        deliveryInfo,
+        "city",
+        "Delivery city is required.",
+      ),
       zipCode: asRequiredString(
         deliveryInfo,
         "zipCode",
@@ -110,7 +114,9 @@ function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
   }
 }
 
-export function validateCheckoutOrderRequest(data: unknown): CheckoutOrderRequest {
+export function validateCheckoutOrderRequest(
+  data: unknown,
+): CheckoutOrderRequest {
   const body = asObject(data, "Invalid request body.")
   const orderBody = asObject(body.order, "Order payload is required.")
   const paymentBody = asObject(body.payment, "Payment payload is required.")
@@ -130,7 +136,11 @@ export function validateCheckoutOrderRequest(data: unknown): CheckoutOrderReques
   }
 
   return {
-    customerId: asRequiredString(body, "customerId", "Customer ID is required."),
+    customerId: asRequiredString(
+      body,
+      "customerId",
+      "Customer ID is required.",
+    ),
     order: parseOrder(orderBody),
     payment: {
       type: "stripe",

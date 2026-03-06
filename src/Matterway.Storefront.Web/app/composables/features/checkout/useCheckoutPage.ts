@@ -9,11 +9,8 @@ export function useCheckoutPage() {
   const cart = useCartStore()
   const ordersApi = useStorefrontOrdersClient()
 
-  const {
-    address,
-    hasRequiredAddressFields,
-    loadDefaultAddress,
-  } = useCheckoutAddressForm()
+  const { address, hasRequiredAddressFields, loadDefaultAddress } =
+    useCheckoutAddressForm()
   const {
     payment,
     currentYear,

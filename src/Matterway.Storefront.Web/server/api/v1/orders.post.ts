@@ -63,8 +63,9 @@ export default defineEventHandler(async (event) => {
 
     if (typeof createdOrder.totalAmount === "number") {
       const amountMismatch =
-        Math.abs(createdOrder.totalAmount - orderRequest.payment.cardPayment.amount) >
-        0.009
+        Math.abs(
+          createdOrder.totalAmount - orderRequest.payment.cardPayment.amount,
+        ) > 0.009
 
       if (amountMismatch) {
         throw createError({
