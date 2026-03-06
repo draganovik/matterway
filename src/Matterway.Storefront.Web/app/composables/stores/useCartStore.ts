@@ -183,6 +183,68 @@ export function useCartStore() {
     items.value = []
   }
 
+  async function mergeGuestItemsIntoRemote() {
+    hydrate()
+
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
+      return { ok: true as const, skipped: true as const }
+    }
+
+    const guestItems = items.value.map((item) => ({ ...item }))
+    if (!guestItems.length) {
+      return { ok: true as const, skipped: true as const }
+    }
+
+    const remote = await customers.listSelfCartItems(1, 100)
+    if (remote.error) {
+      return {
+        ok: false as const,
+        error: remote.error,
+      }
+    }
+
+    const remoteQuantities = new Map(
+      remote.items
+        .map((item) => [item.articleId, normalizeNumber(item.quantity, 1)])
+        .filter(([articleId]) => Boolean(articleId)) as Array<[string, number]>,
+    )
+
+    const results = await Promise.all(
+      guestItems.map(async (item) => {
+        try {
+          return await customers.upsertSelfCartItem(
+            item.articleId,
+            item.quantity + (remoteQuantities.get(item.articleId) ?? 0),
+          )
+        } catch {
+          return {
+            ok: false as const,
+            status: 0,
+            error: "Spajanje korpe nije uspelo.",
+          }
+        }
+      }),
+    )
+
+    const firstFailure = results.find((result) => !result.ok)
+    const refreshed = await refreshFromRemote().catch(() => ({
+      ok: false as const,
+      error: "Osvežavanje korpe nije uspelo.",
+    }))
+
+    if (firstFailure || !refreshed.ok) {
+      return {
+        ok: false as const,
+        error:
+          firstFailure && "error" in firstFailure && firstFailure.error
+            ? firstFailure.error
+            : refreshed.error,
+      }
+    }
+
+    return { ok: true as const }
+  }
+
   async function refreshFromRemote() {
     hydrate()
     if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
@@ -233,6 +295,7 @@ export function useCartStore() {
     setQuantity,
     remove,
     clear,
+    mergeGuestItemsIntoRemote,
     refreshFromRemote,
     hasArticle,
     quantityFor,

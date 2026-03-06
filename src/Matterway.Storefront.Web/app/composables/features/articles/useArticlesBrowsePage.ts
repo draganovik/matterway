@@ -157,10 +157,6 @@ export function useArticlesBrowsePage() {
     () => loading.value && !hasLoadedOnce.value,
   )
   const isRefreshing = computed(() => loading.value && hasLoadedOnce.value)
-  const pages = computed(() => {
-    const total = meta.value?.totalPages ?? 0
-    return total ? Array.from({ length: total }, (_, index) => index + 1) : []
-  })
 
   function withActiveFilterDefinitions(definitions: DetailFilterDefinition[]) {
     const map = new Map(
@@ -454,7 +450,6 @@ export function useArticlesBrowsePage() {
     detailDefinitions,
     detailDefinitionsLoading,
     pageOptions,
-    pages,
     submitFilters,
     resetFilters,
     addDetailFilter,

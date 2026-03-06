@@ -85,69 +85,70 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 </script>
 
 <template>
-  <UCard class="border-default bg-default border">
-    <div class="space-y-3">
-      <UFormField label="Detalj" required>
-        <USelectMenu
-          v-model="selectedSlug"
-          v-model:search-term="searchTerm"
-          :items="definitionItems"
-          value-key="id"
-          label-key="displayLabel"
-          :search-input="true"
-          placeholder="Izaberi detalj"
-          class="w-full"
-          :ui="{ content: 'border border-default bg-default shadow-sm' }"
-        />
-      </UFormField>
+  <div class="border-default bg-default rounded-lg border p-2">
+    <div
+      class="grid gap-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_2.5rem] lg:items-center"
+    >
+      <USelectMenu
+        v-model="selectedSlug"
+        v-model:search-term="searchTerm"
+        :items="definitionItems"
+        value-key="id"
+        label-key="displayLabel"
+        :search-input="true"
+        placeholder="Detalj"
+        aria-label="Detalj"
+        size="sm"
+        class="w-full"
+        :ui="{ content: 'border border-default bg-default shadow-sm' }"
+      />
 
       <template v-if="isNumeric">
-        <div class="grid grid-cols-2 gap-3">
-          <UFormField label="Od">
-            <UInput
-              :model-value="detailFilter.min"
-              type="number"
-              min="0"
-              placeholder="npr. 10"
-              class="w-full"
-              @update:model-value="emit('setMin', toNumberOrUndefined($event))"
-            />
-          </UFormField>
-          <UFormField label="Do">
-            <UInput
-              :model-value="detailFilter.max"
-              type="number"
-              min="0"
-              placeholder="npr. 100"
-              class="w-full"
-              @update:model-value="emit('setMax', toNumberOrUndefined($event))"
-            />
-          </UFormField>
-        </div>
+        <UInput
+          :model-value="detailFilter.min"
+          type="number"
+          min="0"
+          placeholder="Od"
+          aria-label="Minimalna vrednost"
+          size="sm"
+          class="w-full"
+          @update:model-value="emit('setMin', toNumberOrUndefined($event))"
+        />
+        <UInput
+          :model-value="detailFilter.max"
+          type="number"
+          min="0"
+          placeholder="Do"
+          aria-label="Maksimalna vrednost"
+          size="sm"
+          class="w-full"
+          @update:model-value="emit('setMax', toNumberOrUndefined($event))"
+        />
       </template>
       <template v-else>
-        <UFormField label="Vrednost">
-          <UInput
-            :model-value="detailFilter.value"
-            placeholder="Unesite vrednost"
-            class="w-full"
-            @update:model-value="emit('setValue', String($event ?? ''))"
-          />
-        </UFormField>
+        <UInput
+          :model-value="detailFilter.value"
+          placeholder="Vrednost"
+          aria-label="Vrednost detalja"
+          size="sm"
+          class="w-full lg:col-span-2"
+          @update:model-value="emit('setValue', String($event ?? ''))"
+        />
       </template>
 
-      <div class="w-full">
+      <div class="flex justify-end">
         <UButton
           type="button"
           color="error"
           variant="ghost"
           icon="i-lucide-trash"
-          block
+          size="sm"
+          square
+          aria-label="Ukloni filter"
+          title="Ukloni filter"
           @click="emit('remove')"
-        >
-          Ukloni
-        </UButton>
+        />
       </div>
     </div>
-  </UCard>
+  </div>
 </template>

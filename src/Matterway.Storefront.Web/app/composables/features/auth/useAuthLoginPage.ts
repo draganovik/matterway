@@ -36,7 +36,7 @@ export function useAuthLoginPage() {
         password: model.password,
       })
 
-      await cart.clear()
+      await cart.mergeGuestItemsIntoRemote().catch(() => null)
       await nuxtApp.runWithContext(() => navigateTo(resolveNextRoute(route)))
     } catch (err) {
       error.value = err instanceof Error ? err.message : "Prijava nije uspela."

@@ -17,7 +17,6 @@ const {
   detailDefinitions,
   detailDefinitionsLoading,
   pageOptions,
-  pages,
   submitFilters,
   resetFilters,
   addDetailFilter,
@@ -36,28 +35,36 @@ const {
 
 <template>
   <div class="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
-    <div class="space-y-5">
-      <ArticlesBrowseSearchFilterPanel
-        :filters="filters"
-        :detail-definitions="detailDefinitions"
-        :detail-definitions-loading="detailDefinitionsLoading"
-        @submit="submitFilters"
-        @reset="resetFilters"
-        @add-detail-filter="addDetailFilter"
-        @remove-detail-filter="removeDetailFilter"
-        @set-search="setSearch"
-        @set-min-price="setMinPrice"
-        @set-max-price="setMaxPrice"
-        @set-detail-filter-slug="onDetailFilterSlugChange"
-        @set-detail-filter-value="setDetailFilterValue"
-        @set-detail-filter-min="setDetailFilterMin"
-        @set-detail-filter-max="setDetailFilterMax"
-      />
+    <div
+      class="flex flex-col gap-5 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:max-h-[56rem] lg:min-h-0"
+    >
+      <div class="lg:min-h-0 lg:flex-1">
+        <ArticlesBrowseSearchFilterPanel
+          :filters="filters"
+          :detail-definitions="detailDefinitions"
+          :detail-definitions-loading="detailDefinitionsLoading"
+          @submit="submitFilters"
+          @reset="resetFilters"
+          @add-detail-filter="addDetailFilter"
+          @remove-detail-filter="removeDetailFilter"
+          @set-search="setSearch"
+          @set-min-price="setMinPrice"
+          @set-max-price="setMaxPrice"
+          @set-detail-filter-slug="onDetailFilterSlugChange"
+          @set-detail-filter-value="setDetailFilterValue"
+          @set-detail-filter-min="setDetailFilterMin"
+          @set-detail-filter-max="setDetailFilterMax"
+        />
+      </div>
 
-      <ArticlesBrowseSearchSummaryPanel
-        :total-count="meta?.totalCount ?? 0"
+      <ArticlesBrowsePaginationPanel
+        class="mt-auto"
+        :page="pagination.page"
         :page-size="pagination.pageSize"
         :page-options="pageOptions"
+        :total-count="meta?.totalCount ?? 0"
+        :total-pages="meta?.totalPages ?? 0"
+        @go-to-page="goToPage"
         @update:page-size="changePageSize"
       />
     </div>
@@ -91,13 +98,6 @@ const {
         v-else
         :items="items"
         :is-refreshing="isRefreshing"
-      />
-
-      <ArticlesBrowsePaginationPanel
-        :page="pagination.page"
-        :pages="pages"
-        :total-pages="meta?.totalPages ?? 0"
-        @go-to-page="goToPage"
       />
     </div>
   </div>
