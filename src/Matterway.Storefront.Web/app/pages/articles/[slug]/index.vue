@@ -8,9 +8,7 @@ definePageMeta({
 const { article, error, loading, gallery, initialize } =
   useArticlesInstancePage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>

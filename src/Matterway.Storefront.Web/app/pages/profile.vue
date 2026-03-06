@@ -22,9 +22,7 @@ const {
   initialize,
 } = useProfilePage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>

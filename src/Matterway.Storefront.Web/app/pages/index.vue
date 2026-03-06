@@ -16,9 +16,7 @@ const {
   initialize,
 } = useOverviewPage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>

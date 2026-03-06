@@ -8,9 +8,7 @@ definePageMeta({
 
 const { model, loading, error, initialize, submit } = useAuthLoginPage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>

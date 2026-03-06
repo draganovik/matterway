@@ -33,6 +33,8 @@ export function useCheckoutPage() {
   const isCartEmpty = computed(() => totalItems.value === 0)
 
   async function initialize() {
+    await cart.refreshFromRemote().catch(() => null)
+
     if (isCartEmpty.value) {
       await navigateTo("/cart")
       return

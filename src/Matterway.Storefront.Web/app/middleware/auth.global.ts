@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthSessionStore()
 
   if (to.meta.public) {
-    void auth.initialize()
+    await auth.initialize()
     return
   }
 

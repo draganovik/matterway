@@ -9,15 +9,11 @@ definePageMeta({
 
 const { model, error, loading, initialize, submit } = useAuthLoginPage()
 
-onMounted(async () => {
-  await initialize()
-})
+await initialize()
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-stone-100 via-stone-50 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950"
-  >
+  <div class="bg-default min-h-screen">
     <div
       class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6"
     >

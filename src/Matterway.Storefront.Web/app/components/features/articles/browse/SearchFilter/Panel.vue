@@ -101,10 +101,6 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           </UButton>
         </div>
 
-        <p v-if="props.detailDefinitionsLoading" class="text-muted text-xs">
-          Učitavanje tipova detalja...
-        </p>
-
         <div v-if="filters.detailFilters.length" class="space-y-3">
           <ArticlesBrowseSearchFilterListItem
             v-for="(detailFilter, index) in filters.detailFilters"
@@ -123,7 +119,6 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             @set-max="emit('setDetailFilterMax', { index, value: $event })"
           />
         </div>
-        <p v-else class="text-muted text-xs">Nema izabranih filtera detalja.</p>
       </div>
 
       <div class="space-y-2">

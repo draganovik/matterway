@@ -17,9 +17,7 @@ const {
   submitCheckout,
 } = useCheckoutPage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>

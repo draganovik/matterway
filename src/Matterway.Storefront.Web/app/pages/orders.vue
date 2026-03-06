@@ -9,17 +9,20 @@ const {
   loading,
   error,
   orders,
+  currentPage,
+  pageSize,
+  totalPages,
+  totalCount,
   statusHistoryOpen,
   itemsOpen,
   selectedOrder,
   openStatusHistory,
   openItems,
+  changePage,
   initialize,
 } = useOrdersPage()
 
-onMounted(() => {
-  void initialize()
-})
+await initialize()
 </script>
 
 <template>
@@ -54,6 +57,24 @@ onMounted(() => {
       @reveal-status-history="openStatusHistory"
       @reveal-items="openItems"
     />
+
+    <div
+      v-if="!loading && !error && orders.length"
+      class="border-default bg-default flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
+    >
+      <p class="text-muted text-sm">
+        Strana {{ currentPage }} od {{ Math.max(totalPages, 1) }} •
+        {{ totalCount }} porudžbina
+      </p>
+      <UPagination
+        :page="currentPage"
+        :items-per-page="pageSize"
+        :total="totalCount"
+        :sibling-count="1"
+        show-controls
+        @update:page="changePage"
+      />
+    </div>
 
     <OrdersModalStatusHistoryView
       v-model:open="statusHistoryOpen"

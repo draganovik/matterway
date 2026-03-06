@@ -12,7 +12,9 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <div class="text-sm text-slate-500">{{ props.totalCount }} rezultata</div>
+    <div class="text-sm text-slate-500 sm:mt-6">
+      {{ props.totalCount }} rezultata
+    </div>
     <div class="w-full sm:w-auto">
       <UFormField label="Po stranici">
         <USelect

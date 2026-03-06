@@ -64,7 +64,6 @@ function handleVisibilityChange() {
 
 onMounted(() => {
   if (!import.meta.client) return
-  void auth.initialize()
   window.addEventListener("focus", handleWindowFocus)
   document.addEventListener("visibilitychange", handleVisibilityChange)
   void refreshCartFromRemote()
@@ -81,23 +80,7 @@ onBeforeUnmount(() => {
   <UApp>
     <NuxtLoadingIndicator color="var(--ui-primary)" />
     <NuxtLayout>
-      <NuxtPage v-slot="{ Component, route: pageRoute }">
-        <Transition name="app-content-fade" mode="out-in" appear>
-          <component :is="Component" :key="pageRoute.fullPath" />
-        </Transition>
-      </NuxtPage>
+      <NuxtPage />
     </NuxtLayout>
   </UApp>
 </template>
-
-<style>
-.app-content-fade-enter-active,
-.app-content-fade-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.app-content-fade-enter-from,
-.app-content-fade-leave-to {
-  opacity: 0;
-}
-</style>

@@ -17,8 +17,25 @@ const authJsonHeaders = {
   accept: "application/json",
 } as const
 
-let refreshPromise: Promise<void> | null = null
-let initPromise: Promise<void> | null = null
+type AuthRuntimeState = {
+  refreshPromise: Promise<void> | null
+  initPromise: Promise<void> | null
+}
+
+function useAuthRuntimeState() {
+  const nuxtApp = useNuxtApp() as ReturnType<typeof useNuxtApp> & {
+    _mwStorefrontAuthRuntime?: AuthRuntimeState
+  }
+
+  if (!nuxtApp._mwStorefrontAuthRuntime) {
+    nuxtApp._mwStorefrontAuthRuntime = {
+      refreshPromise: null,
+      initPromise: null,
+    }
+  }
+
+  return nuxtApp._mwStorefrontAuthRuntime
+}
 
 function useSessionState() {
   return useState<AuthSession>("storefront-auth-session", () => ({
@@ -39,7 +56,7 @@ function parseDate(value: string | null | undefined): Date | null {
 function getCookieOptions() {
   const secure = import.meta.client
     ? window.location.protocol === "https:"
-    : false
+    : useRequestURL().protocol === "https:"
   return {
     sameSite: "lax" as const,
     secure,
@@ -48,6 +65,7 @@ function getCookieOptions() {
 }
 
 export function useAuthSessionStore() {
+  const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
     ...getCookieOptions(),
@@ -212,10 +230,10 @@ export function useAuthSessionStore() {
   }
 
   async function refreshTokens() {
-    if (refreshPromise) return refreshPromise
+    if (runtime.refreshPromise) return runtime.refreshPromise
     const refreshToken = refreshCookie.value
     if (!refreshToken) return
-    refreshPromise = (async () => {
+    runtime.refreshPromise = (async () => {
       try {
         const response = await authJsonPost("refresh", { refreshToken })
 
@@ -235,9 +253,9 @@ export function useAuthSessionStore() {
     })()
 
     try {
-      await refreshPromise
+      await runtime.refreshPromise
     } finally {
-      refreshPromise = null
+      runtime.refreshPromise = null
     }
   }
 
@@ -249,8 +267,8 @@ export function useAuthSessionStore() {
 
   async function initialize() {
     if (isInitialized.value) return
-    if (initPromise) return initPromise
-    initPromise = (async () => {
+    if (runtime.initPromise) return runtime.initPromise
+    runtime.initPromise = (async () => {
       if (session.value.accessToken) {
         if (!isAccessExpired()) {
           scheduleRefresh()
@@ -270,9 +288,9 @@ export function useAuthSessionStore() {
     })()
 
     try {
-      await initPromise
+      await runtime.initPromise
     } finally {
-      initPromise = null
+      runtime.initPromise = null
     }
   }
 
