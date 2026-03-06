@@ -10,9 +10,6 @@ const auth = useAuthSessionStore()
 const cart = useCartStore()
 const route = useRoute()
 const appTitle = "Matterway prodavnica"
-const isBooting = computed(
-  () => !auth.isInitialized.value && !route.meta?.public,
-)
 const pageTitle = computed(() => {
   const title = route.meta?.title
   return typeof title === "string" && title.trim().length ? title : undefined
@@ -83,22 +80,24 @@ onBeforeUnmount(() => {
 <template>
   <UApp>
     <NuxtLoadingIndicator color="var(--ui-primary)" />
-    <div
-      v-if="isBooting"
-      class="min-h-screen bg-linear-to-br from-slate-200 via-slate-100 to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-950"
-    >
-      <div
-        class="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6"
-      >
-        <div class="flex flex-col items-center gap-4 text-center">
-          <div
-            class="h-10 w-10 animate-spin rounded-full border border-slate-500 border-t-transparent dark:border-slate-400"
-          />
-        </div>
-      </div>
-    </div>
-    <NuxtLayout v-else>
-      <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage v-slot="{ Component, route: pageRoute }">
+        <Transition name="app-content-fade" mode="out-in" appear>
+          <component :is="Component" :key="pageRoute.fullPath" />
+        </Transition>
+      </NuxtPage>
     </NuxtLayout>
   </UApp>
 </template>
+
+<style>
+.app-content-fade-enter-active,
+.app-content-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.app-content-fade-enter-from,
+.app-content-fade-leave-to {
+  opacity: 0;
+}
+</style>

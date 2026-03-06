@@ -2,11 +2,8 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 
 const auth = useAuthSessionStore()
-const route = useRoute()
 const appTitle = "Matterway Dashboard"
-const isBooting = computed(
-  () => !auth.isInitialized.value && !route.meta?.public,
-)
+const route = useRoute()
 const pageTitle = computed(() => {
   const title = route.meta?.title
   return typeof title === "string" && title.trim().length ? title : undefined
@@ -47,22 +44,24 @@ onMounted(() => {
 <template>
   <UApp>
     <NuxtLoadingIndicator />
-    <div
-      v-if="isBooting"
-      class="min-h-screen bg-linear-to-br from-stone-100 via-stone-50 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950"
-    >
-      <div
-        class="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6"
-      >
-        <div class="flex flex-col items-center gap-4 text-center">
-          <div
-            class="h-10 w-10 animate-spin rounded-full border border-orange-500 border-t-transparent"
-          />
-        </div>
-      </div>
-    </div>
-    <NuxtLayout v-else>
-      <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage v-slot="{ Component, route: pageRoute }">
+        <Transition name="app-content-fade" mode="out-in" appear>
+          <component :is="Component" :key="pageRoute.fullPath" />
+        </Transition>
+      </NuxtPage>
     </NuxtLayout>
   </UApp>
 </template>
+
+<style>
+.app-content-fade-enter-active,
+.app-content-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.app-content-fade-enter-from,
+.app-content-fade-leave-to {
+  opacity: 0;
+}
+</style>

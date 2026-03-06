@@ -17,18 +17,21 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(
-          135deg,
-          #f5f5f4 0%,
-          #fafaf9 55%,
-          #e7e5e4 100%
-        );
+        background: #ffffff;
         font-family:
           ui-sans-serif,
           system-ui,
           -apple-system,
           "Segoe UI",
           sans-serif;
+      }
+      body.login-route {
+        background: linear-gradient(
+          135deg,
+          #f5f5f4 0%,
+          #fafaf9 55%,
+          #e7e5e4 100%
+        );
       }
       .spinner {
         width: 44px;
@@ -48,6 +51,9 @@
       }
       @media (prefers-color-scheme: dark) {
         body {
+          background: #09090b;
+        }
+        body.login-route {
           background: linear-gradient(
             135deg,
             #0c0a09 0%,
@@ -70,5 +76,14 @@
     <svg class="spinner" viewBox="0 0 44 44" aria-label="Loading" role="img">
       <circle cx="22" cy="22" r="19" />
     </svg>
+    <script>
+      (() => {
+        const normalizedPath =
+          window.location.pathname.replace(/\/+$/, "") || "/";
+        if (normalizedPath === "/login") {
+          document.body.classList.add("login-route");
+        }
+      })();
+    </script>
   </body>
 </html>
