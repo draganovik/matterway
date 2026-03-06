@@ -266,7 +266,6 @@ export function useAuthSessionStore() {
   }
 
   async function initialize() {
-    if (isInitialized.value) return
     if (runtime.initPromise) return runtime.initPromise
     runtime.initPromise = (async () => {
       if (session.value.accessToken) {
@@ -277,13 +276,17 @@ export function useAuthSessionStore() {
         }
         session.value.accessToken = null
       }
+
       if (refreshCookie.value) {
         try {
           await refreshTokens()
         } catch {
           clearSession()
         }
+      } else {
+        clearRefreshTimer()
       }
+
       isInitialized.value = true
     })()
 
