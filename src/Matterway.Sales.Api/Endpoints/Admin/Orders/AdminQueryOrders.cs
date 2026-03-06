@@ -1,5 +1,4 @@
 using Matterway.Sales.Api.Domain.Entities;
-using Matterway.Sales.Api.Endpoints.Self.Orders;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 
 namespace Matterway.Sales.Api.Endpoints.Admin.Orders;
@@ -11,7 +10,7 @@ public class AdminQueryOrders : IEndpoint
         endpoints.MapGet(EndpointKind.Admin, "orders", Handler)
             .WithName("AdminQueryOrders").WithSummary("[admin] Query Orders")
             .WithTags(nameof(Order))
-            .Produces<PaginationResponse<SelfCreateOrder.OrderResponse>>()
+            .Produces<PaginationResponse<AdminGetOrderById.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
@@ -22,7 +21,7 @@ public class AdminQueryOrders : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<SelfCreateOrder.OrderResponse>>, NoContent, ValidationProblem>>
+        Task<Results<Ok<PaginationResponse<AdminGetOrderById.OrderResponse>>, NoContent, ValidationProblem>>
         Handler([AsParameters] QueryOrdersParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -44,9 +43,9 @@ public class AdminQueryOrders : IEndpoint
             "AdminQueryOrders",
             null);
 
-        var results = entities.Select(SelfCreateOrder.MapToResponse).ToList();
+        var results = entities.Select(AdminGetOrderById.MapToResponse).ToList();
 
-        var paginationResponse = PaginationResponse<SelfCreateOrder.OrderResponse>.Create(
+        var paginationResponse = PaginationResponse<AdminGetOrderById.OrderResponse>.Create(
             results,
             total,
             queryParameters.Page,

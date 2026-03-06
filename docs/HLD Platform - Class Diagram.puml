@@ -207,7 +207,7 @@ package "Sales" {
     Current checkout flow
     1) Storefront -> Storefront Server: POST /api/v1/orders
     2) Storefront Server -> Stripe: initialize payment intent
-    3) Storefront Server -> Sales: create order
+    3) Storefront Server -> Sales: POST /api/system/v1/orders (+ customer JWT + system key)
     4) Storefront Server -> Stripe: confirm payment with order_id + reference_id
     5) Stripe webhook -> Sales system/payment registration
   end note

@@ -1,5 +1,5 @@
 import {
-  getServerSalesApiBaseUrl,
+  getSystemPaymentConfig,
   getStripeSecretKey,
 } from "../../modules/checkout/config/runtime"
 import { createSalesOrder } from "../../modules/checkout/services/salesOrderClient"
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 
   const requestContext = getRequestTraceContext(event)
   const stripeSecretKey = getStripeSecretKey()
-  const salesApiBaseUrl = getServerSalesApiBaseUrl()
+  const systemPaymentConfig = getSystemPaymentConfig()
 
   const referenceId = createOrderReferenceId()
   let paymentIntentId: string | null = null
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     const createdOrder = await createSalesOrder(
       orderRequest.order,
       authorization,
-      salesApiBaseUrl,
+      systemPaymentConfig,
       requestContext,
     )
 

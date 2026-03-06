@@ -41,10 +41,11 @@ else Validation passes
   else Stripe payment init succeeds
     Stripe --> StorefrontServer : 200 {paymentIntentId}
 
-    StorefrontServer -> SalesApi : POST /api/self/v1/orders\n{type, deliveryInfo} + Bearer customer JWT
+    StorefrontServer -> SalesApi : POST /api/system/v1/orders\n{type, deliveryInfo} + Bearer customer JWT + X-System-Access-Key
     activate SalesApi
     note over SalesApi
-    Sales resolves `customerId` from customer JWT.
+    Sales validates both customer JWT and system access key.
+    Customer identity is resolved from JWT claims.
     end note
     SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
     activate CustomersApi

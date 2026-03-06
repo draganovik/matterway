@@ -12,13 +12,6 @@ function asRequiredRuntimeValue(value: unknown, message: string): string {
   })
 }
 
-export function getServerSalesApiBaseUrl(): string {
-  return asRequiredRuntimeValue(
-    useRuntimeConfig().serverSalesApiBaseUrl,
-    "Missing serverSalesApiBaseUrl runtime config",
-  )
-}
-
 export function getStripeSecretKey(): string {
   return asRequiredRuntimeValue(
     useRuntimeConfig().stripeSecretKey,

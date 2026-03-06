@@ -1,6 +1,10 @@
 import type { Context } from "@opentelemetry/api"
 import { fetchWithTrace } from "../../shared/fetchWithTrace"
-import type { CheckoutOrderInput, SalesOrderResponse } from "../contracts/types"
+import type {
+  CheckoutOrderInput,
+  SalesOrderResponse,
+  SystemPaymentConfig,
+} from "../contracts/types"
 
 function extractErrorMessage(payload: unknown, fallback: string) {
   if (typeof payload === "string" && payload.trim()) {
@@ -33,17 +37,18 @@ function extractErrorMessage(payload: unknown, fallback: string) {
 export async function createSalesOrder(
   order: CheckoutOrderInput,
   authorization: string,
-  salesApiBaseUrl: string,
+  systemConfig: SystemPaymentConfig,
   requestContext?: Context,
 ): Promise<SalesOrderResponse> {
   const response = await fetchWithTrace(
-    `${salesApiBaseUrl}/api/self/v1/orders`,
+    `${systemConfig.serverSalesApiBaseUrl}/api/system/v1/orders`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         accept: "application/json",
         Authorization: authorization,
+        "X-System-Access-Key": systemConfig.systemAccessKey,
       },
       body: JSON.stringify(order),
     },
