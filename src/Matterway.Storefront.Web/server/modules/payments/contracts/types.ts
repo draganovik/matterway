@@ -17,8 +17,17 @@ export interface PaymentAddress {
   note?: string
 }
 
+export type EmptyQuery = Record<string, never>
+
+export interface CreatePaymentRequest {
+  orderId: string
+  userId: string
+  cardPayment: CardPaymentInput
+  address: PaymentAddress
+}
+
 export interface StripeEventWebhookPayload {
-  type?: string
+  type: string
   data?: {
     object?: {
       amount?: number
@@ -26,4 +35,16 @@ export interface StripeEventWebhookPayload {
       metadata?: Record<string, string | undefined>
     }
   }
+}
+
+export type SystemPaymentConfig = {
+  serverSalesApiBaseUrl: string
+  systemAccessKey: string
+}
+
+export type StripeChargeSucceeded = {
+  orderId: string
+  amount: number
+  referenceId: string
+  createdAt: Date
 }

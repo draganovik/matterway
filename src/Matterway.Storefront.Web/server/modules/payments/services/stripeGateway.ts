@@ -1,5 +1,5 @@
 import Stripe from "stripe"
-import type { CardPaymentInput, PaymentAddress } from "../types/payments"
+import type { CardPaymentInput, PaymentAddress } from "../contracts/types"
 import {
   SpanKind,
   SpanStatusCode,
@@ -7,6 +7,7 @@ import {
   type Context,
   type Span,
 } from "@opentelemetry/api"
+import { createReferenceId } from "../utils/referenceId"
 
 type StripeSpanOptions = {
   operation: string
@@ -184,11 +185,6 @@ export async function payWithStripe(
     return paymentIntent.client_secret || ""
   } catch (error) {
     console.error("[payments] stripe charge failed", error)
-    throw new Error("Plaćanje nije uspelo. Pokušajte ponovo.")
+    throw new Error("Payment failed. Please try again.")
   }
-}
-
-function createReferenceId() {
-  const segment = () => Math.floor(1000 + Math.random() * 9000).toString()
-  return `${segment()}-${segment()}-${segment()}-${segment()}`
 }

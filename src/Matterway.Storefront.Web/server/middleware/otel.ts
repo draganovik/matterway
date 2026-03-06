@@ -1,11 +1,11 @@
 import {
   context,
   propagation,
-  Span,
   SpanKind,
   SpanStatusCode,
   trace,
   type Context,
+  type Span,
 } from "@opentelemetry/api"
 import {
   BasicTracerProvider,

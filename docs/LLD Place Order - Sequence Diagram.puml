@@ -42,7 +42,7 @@ else Validation passes
   SalesApi --> Checkout : 201 Created {id, totalAmount, ...}
   deactivate SalesApi
 
-  Checkout -> StorefrontServer : POST /api/payments\n{orderId, userId, amount, card, address}
+  Checkout -> StorefrontServer : POST /api/v1/payments\n{orderId, userId, amount, card, address}
   activate StorefrontServer
   StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=true)\nmetadata:{order_id, reference_id, client_id}
   activate Stripe
@@ -71,7 +71,7 @@ else Validation passes
   ... asynchronous webhook handling ...
 
   alt Stripe sends charge.succeeded
-    Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\ncharge.succeeded(order_id, amount, reference_id)
+    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\ncharge.succeeded(order_id, amount, reference_id)
     activate StorefrontServer
     StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, referenceId, amount, status=Charged, createdAt}
     activate SalesApi
@@ -84,7 +84,7 @@ else Validation passes
     StorefrontServer --> Stripe : 200 OK
     deactivate StorefrontServer
   else Stripe sends non-charge event
-    Stripe -> StorefrontServer : POST /api/webhooks/stripe-intent\n<other event type>
+    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\n<other event type>
     activate StorefrontServer
     StorefrontServer --> Stripe : 304 Event ignored
     deactivate StorefrontServer

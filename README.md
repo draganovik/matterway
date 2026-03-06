@@ -200,7 +200,7 @@ Apply database migrations:
 Stripe webhook forwarding:
 
 ``` bash
-stripe listen --forward-to http://localhost:3001/api/webhooks/stripe-intent
+stripe listen --forward-to http://localhost:3001/api/v1/webhooks/stripe
 ```
 
 ------------------------------------------------------------------------
