@@ -38,10 +38,11 @@ const { cart, isEmpty, goToCheckout, clearCart } = useCartPage()
       <UButton to="/articles" color="primary">Pregledaj artikle</UButton>
     </EmptyState>
 
-    <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
+    <div v-else class="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">
       <CartListView :items="cart.items.value" @remove="cart.remove" />
 
       <CartActionPanel
+        class="lg:sticky lg:top-24"
         :total-items="cart.totalItems.value"
         :total-price="cart.totalPrice.value"
         @checkout="goToCheckout"

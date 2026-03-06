@@ -37,24 +37,32 @@ await initialize()
       </div>
     </UCard>
 
-    <StatusMessages v-if="error" :error="error" />
+    <div
+      class="grid items-start gap-6 lg:grid-cols-[1fr_26rem] lg:items-stretch"
+    >
+      <CheckoutDeliveryPanel v-model="address" />
 
-    <div class="grid gap-6 lg:grid-cols-[1fr_22rem]">
-      <div class="space-y-6">
-        <CheckoutDeliveryPanel v-model="address" />
-        <CheckoutPaymentPanel
+      <div
+        class="grid gap-4 lg:h-full lg:min-h-0"
+        :class="
+          error
+            ? 'lg:grid-rows-[minmax(0,1fr)_auto]'
+            : 'lg:grid-rows-[minmax(0,1fr)]'
+        "
+      >
+        <CheckoutOrderActionPanel
           v-model="payment"
+          class="lg:sticky lg:top-24 lg:h-full"
           :current-year="currentYear"
+          :total-items="totalItems"
+          :total-price="totalPrice"
+          :loading="loading"
           @month-blur="normalizeExpMonthOnBlur"
+          @submit="submitCheckout"
         />
-      </div>
 
-      <CheckoutOrderActionPanel
-        :total-items="totalItems"
-        :total-price="totalPrice"
-        :loading="loading"
-        @submit="submitCheckout"
-      />
+        <StatusMessages v-if="error" :error="error" />
+      </div>
     </div>
   </div>
 </template>
