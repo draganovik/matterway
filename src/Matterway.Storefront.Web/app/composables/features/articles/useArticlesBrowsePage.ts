@@ -157,10 +157,6 @@ export function useArticlesBrowsePage() {
     () => loading.value && !hasLoadedOnce.value,
   )
   const isRefreshing = computed(() => loading.value && hasLoadedOnce.value)
-  const pages = computed(() => {
-    const total = meta.value?.totalPages ?? 0
-    return total ? Array.from({ length: total }, (_, index) => index + 1) : []
-  })
 
   function withActiveFilterDefinitions(definitions: DetailFilterDefinition[]) {
     const map = new Map(
@@ -201,8 +197,8 @@ export function useArticlesBrowsePage() {
   async function loadDetailDefinitions(forVersion: number) {
     detailDefinitionsLoading.value = true
     try {
-      const articleIds = items.value.map((item) => item.id).slice(0, 24)
-      if (!articleIds.length) {
+      const articleCodes = items.value.map((item) => item.code).slice(0, 24)
+      if (!articleCodes.length) {
         if (forVersion === requestVersion.value) {
           detailDefinitions.value = withActiveFilterDefinitions(
             detailDefinitions.value,
@@ -212,7 +208,7 @@ export function useArticlesBrowsePage() {
       }
 
       const responses = await Promise.all(
-        articleIds.map((id) => catalogApi.getArticle(id)),
+        articleCodes.map((code) => catalogApi.getArticle(code)),
       )
 
       const rawDefinitions: Array<{
@@ -454,7 +450,6 @@ export function useArticlesBrowsePage() {
     detailDefinitions,
     detailDefinitionsLoading,
     pageOptions,
-    pages,
     submitFilters,
     resetFilters,
     addDetailFilter,

@@ -4,16 +4,24 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"
 
 const storageKey = "mw-storefront-cart-v1"
+const articleCodePattern = /^[A-Z0-9]{8}$/
 
 function normalizeNumber(value: unknown, fallback = 0) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
+function normalizeArticleCode(value: unknown) {
+  const normalized = String(value ?? "")
+    .trim()
+    .toUpperCase()
+  return articleCodePattern.test(normalized) ? normalized : ""
+}
+
 function createCartItem(article: CatalogArticle): CartItem {
+  const articleCode = normalizeArticleCode(article.code)
   return {
-    articleId: article.id,
-    articleCode: article.articleCode,
+    articleCode,
     articleName: article.title,
     unitPrice: normalizeNumber(article.price ?? article.basePrice, 0),
     quantity: 1,
@@ -21,17 +29,16 @@ function createCartItem(article: CatalogArticle): CartItem {
 }
 
 function mapRemoteCartItem(item: {
-  articleId?: string
   articleCode?: string
   articleName?: string
   unitPrice?: number
   quantity?: number
 }): CartItem | null {
-  if (!item.articleId) return null
+  const articleCode = normalizeArticleCode(item.articleCode)
+  if (!articleCode) return null
 
   return {
-    articleId: String(item.articleId),
-    articleCode: item.articleCode ? String(item.articleCode) : "",
+    articleCode,
     articleName: item.articleName ? String(item.articleName) : "",
     unitPrice: normalizeNumber(item.unitPrice),
     quantity: Math.max(1, normalizeNumber(item.quantity, 1)),
@@ -64,15 +71,15 @@ export function useCartStore() {
             item && typeof item === "object"
               ? (item as Record<string, unknown>)
               : {}
+          const articleCode = normalizeArticleCode(source.articleCode)
           return {
-            articleId: String(source.articleId ?? ""),
-            articleCode: String(source.articleCode ?? ""),
+            articleCode,
             articleName: String(source.articleName ?? ""),
             unitPrice: normalizeNumber(source.unitPrice),
             quantity: Math.max(1, normalizeNumber(source.quantity, 1)),
           }
         })
-        .filter((item: CartItem) => item.articleId)
+        .filter((item: CartItem) => item.articleCode)
     } catch {
       items.value = []
     } finally {
@@ -96,89 +103,155 @@ export function useCartStore() {
     watchStarted.value = true
   }
 
-  onMounted(() => {
-    hydrate()
-  })
-
-  async function syncItem(articleId: string, quantity: number) {
-    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
-    await customers.upsertSelfCartItem(articleId, quantity)
+  if (import.meta.client && getCurrentInstance()) {
+    onMounted(() => {
+      hydrate()
+    })
   }
 
-  async function removeRemoteItem(articleId: string) {
+  async function syncItem(articleCode: string, quantity: number) {
     if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
-    await customers.deleteSelfCartItem(articleId)
+    await customers.upsertSelfCartItem(articleCode, quantity)
+  }
+
+  async function removeRemoteItem(articleCode: string) {
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
+    await customers.deleteSelfCartItem(articleCode)
   }
 
   async function add(article: CatalogArticle) {
     hydrate()
-    const existing = items.value.find((item) => item.articleId === article.id)
+    const articleCode = normalizeArticleCode(article.code)
+    if (!articleCode) return
+    const existing = items.value.find((item) => item.articleCode === articleCode)
     if (existing) {
       existing.quantity += 1
-      await syncItem(existing.articleId, existing.quantity)
+      await syncItem(existing.articleCode, existing.quantity)
       return
     }
 
     const item = createCartItem(article)
     items.value = [...items.value, item]
-    await syncItem(item.articleId, item.quantity)
+    await syncItem(item.articleCode, item.quantity)
   }
 
-  async function increase(articleId: string) {
+  async function increase(articleCode: string) {
     hydrate()
-    const existing = items.value.find((item) => item.articleId === articleId)
+    const existing = items.value.find((item) => item.articleCode === articleCode)
     if (!existing) return
 
     existing.quantity += 1
-    await syncItem(existing.articleId, existing.quantity)
+    await syncItem(existing.articleCode, existing.quantity)
   }
 
-  async function decrease(articleId: string) {
+  async function decrease(articleCode: string) {
     hydrate()
-    const existing = items.value.find((item) => item.articleId === articleId)
+    const existing = items.value.find((item) => item.articleCode === articleCode)
     if (!existing) return
 
     if (existing.quantity <= 1) {
-      await remove(articleId)
+      await remove(articleCode)
       return
     }
 
     existing.quantity -= 1
-    await syncItem(existing.articleId, existing.quantity)
+    await syncItem(existing.articleCode, existing.quantity)
   }
 
-  async function setQuantity(articleId: string, quantity: number) {
+  async function setQuantity(articleCode: string, quantity: number) {
     hydrate()
-    const existing = items.value.find((item) => item.articleId === articleId)
+    const existing = items.value.find((item) => item.articleCode === articleCode)
     if (!existing) return
 
     const normalized = Math.max(1, Math.trunc(normalizeNumber(quantity, 1)))
     if (existing.quantity === normalized) return
 
     existing.quantity = normalized
-    await syncItem(existing.articleId, existing.quantity)
+    await syncItem(existing.articleCode, existing.quantity)
   }
 
-  async function remove(articleId: string) {
+  async function remove(articleCode: string) {
     hydrate()
-    items.value = items.value.filter((item) => item.articleId !== articleId)
-    await removeRemoteItem(articleId)
+    items.value = items.value.filter((item) => item.articleCode !== articleCode)
+    await removeRemoteItem(articleCode)
   }
 
   async function clearRemote() {
     if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
     const remote = await customers.listSelfCartItems(1, 100)
     const uniqueIds = Array.from(
-      new Set(remote.items.map((item) => item.articleId).filter(Boolean)),
+      new Set(remote.items.map((item) => item.articleCode).filter(Boolean)),
     ) as string[]
 
-    await Promise.all(uniqueIds.map((articleId) => removeRemoteItem(articleId)))
+    await Promise.all(uniqueIds.map((articleCode) => removeRemoteItem(articleCode)))
   }
 
   async function clear() {
     hydrate()
     await clearRemote().catch(() => null)
     items.value = []
+  }
+
+  async function mergeGuestItemsIntoRemote() {
+    hydrate()
+
+    if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
+      return { ok: true as const, skipped: true as const }
+    }
+
+    const guestItems = items.value.map((item) => ({ ...item }))
+    if (!guestItems.length) {
+      return { ok: true as const, skipped: true as const }
+    }
+
+    const remote = await customers.listSelfCartItems(1, 100)
+    if (remote.error) {
+      return {
+        ok: false as const,
+        error: remote.error,
+      }
+    }
+
+    const remoteQuantities = new Map(
+      remote.items
+        .map((item) => [item.articleCode, normalizeNumber(item.quantity, 1)])
+        .filter(([articleCode]) => Boolean(articleCode)) as Array<[string, number]>,
+    )
+
+    const results = await Promise.all(
+      guestItems.map(async (item) => {
+        try {
+          return await customers.upsertSelfCartItem(
+            item.articleCode,
+            item.quantity + (remoteQuantities.get(item.articleCode) ?? 0),
+          )
+        } catch {
+          return {
+            ok: false as const,
+            status: 0,
+            error: "Spajanje korpe nije uspelo.",
+          }
+        }
+      }),
+    )
+
+    const firstFailure = results.find((result) => !result.ok)
+    const refreshed = await refreshFromRemote().catch(() => ({
+      ok: false as const,
+      error: "Osvežavanje korpe nije uspelo.",
+    }))
+
+    if (firstFailure || !refreshed.ok) {
+      return {
+        ok: false as const,
+        error:
+          firstFailure && "error" in firstFailure && firstFailure.error
+            ? firstFailure.error
+            : refreshed.error,
+      }
+    }
+
+    return { ok: true as const }
   }
 
   async function refreshFromRemote() {
@@ -198,6 +271,7 @@ export function useCartStore() {
     items.value = remote.items
       .map(mapRemoteCartItem)
       .filter((item): item is CartItem => item !== null)
+    hydrated.value = true
 
     return { ok: true as const }
   }
@@ -210,13 +284,13 @@ export function useCartStore() {
     items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
   )
 
-  function hasArticle(articleId: string) {
-    return items.value.some((item) => item.articleId === articleId)
+  function hasArticle(articleCode: string) {
+    return items.value.some((item) => item.articleCode === articleCode)
   }
 
-  function quantityFor(articleId: string) {
+  function quantityFor(articleCode: string) {
     return (
-      items.value.find((item) => item.articleId === articleId)?.quantity ?? 0
+      items.value.find((item) => item.articleCode === articleCode)?.quantity ?? 0
     )
   }
 
@@ -230,6 +304,7 @@ export function useCartStore() {
     setQuantity,
     remove,
     clear,
+    mergeGuestItemsIntoRemote,
     refreshFromRemote,
     hasArticle,
     quantityFor,

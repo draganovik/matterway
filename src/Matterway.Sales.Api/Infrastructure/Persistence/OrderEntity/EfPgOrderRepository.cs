@@ -16,7 +16,7 @@ public sealed class EfPgOrderRepository(SalesDbComposer context) : IOrderReposit
         return null;
     }
 
-    public async Task<Order?> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Order?> GetById(OrderId id, CancellationToken cancellationToken = default)
     {
         return await QueryWithDetails()
             .AsNoTracking()
@@ -48,7 +48,7 @@ public sealed class EfPgOrderRepository(SalesDbComposer context) : IOrderReposit
         return await query.CountAsync(cancellationToken);
     }
 
-    public Task<bool> Exists(Guid id, CancellationToken cancellationToken = default)
+    public Task<bool> Exists(OrderId id, CancellationToken cancellationToken = default)
     {
         return context.Order.AnyAsync(order => order.Id == id, cancellationToken);
     }

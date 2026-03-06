@@ -24,7 +24,6 @@ export async function registerSalesPayment(
       body: JSON.stringify({
         orderId: charge.orderId,
         provider: "Stripe",
-        referenceId: charge.referenceId,
         amount: charge.amount,
         status: "Charged",
         createdAt: charge.createdAt,

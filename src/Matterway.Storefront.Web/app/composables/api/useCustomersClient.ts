@@ -9,7 +9,6 @@ import type {
 } from "~/types/customers/address"
 
 type RemoteCartItem = {
-  articleId?: string
   articleName?: string
   quantity?: number
   unitPrice?: number
@@ -82,11 +81,11 @@ export function useCustomersClient() {
     }
   }
 
-  async function upsertSelfCartItem(articleId: string, quantity: number) {
+  async function upsertSelfCartItem(articleCode: string, quantity: number) {
     const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleId)}`,
+      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
       {
         method: "PUT",
         body: JSON.stringify({ quantity }),
@@ -94,11 +93,11 @@ export function useCustomersClient() {
     )
   }
 
-  async function deleteSelfCartItem(articleId: string) {
+  async function deleteSelfCartItem(articleCode: string) {
     const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleId)}`,
+      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
       {
         method: "DELETE",
       },

@@ -4,7 +4,7 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 
 public interface IArticleImageRepository
 {
-    Task<ArticleImage?> GetBy(Guid parentId, int orderIndex,
+    Task<ArticleImage?> GetBy(ArticleCode articleCode, int orderIndex,
         CancellationToken cancellationToken = default);
 
     Task<ArticleImage?> Create(ArticleImage requestModel, CancellationToken cancellationToken = default);
@@ -12,5 +12,5 @@ public interface IArticleImageRepository
     Task<ArticleImage?> Update(ArticleImage request, int targetOrderIndex,
         CancellationToken cancellationToken = default);
 
-    Task<bool> Delete(Guid parentId, int orderIndex, CancellationToken cancellationToken = default);
+    Task<bool> Delete(ArticleCode articleCode, int orderIndex, CancellationToken cancellationToken = default);
 }

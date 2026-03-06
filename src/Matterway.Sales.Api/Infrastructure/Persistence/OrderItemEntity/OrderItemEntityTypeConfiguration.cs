@@ -12,11 +12,18 @@ internal sealed class OrderItemEntityTypeConfiguration : IEntityTypeConfiguratio
 
         builder.HasKey(item => item.Id);
 
-        builder.Property(item => item.ArticleId)
+        builder.Property(item => item.OrderId)
+            .HasMaxLength(OrderId.MaxLength)
+            .HasConversion(orderId => orderId.Value, value => OrderId.FromStorage(value))
             .IsRequired();
 
-        builder.Property(item => item.ArticleTitle)
+        builder.Property(item => item.ArticleCode)
             .IsRequired()
+            .HasMaxLength(ArticleCode.Length);
+
+        builder.Property(item => item.ArticleTitle)
+            .IsRequired();
+        builder.Property(item => item.ArticleTitle)
             .HasMaxLength(200);
 
         builder.Property(item => item.UnitPrice)

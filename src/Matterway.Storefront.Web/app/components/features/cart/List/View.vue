@@ -6,18 +6,18 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  remove: [articleId: string]
+  remove: [articleCode: string]
 }>()
 </script>
 
 <template>
   <UCard
     :ui="{ body: 'p-0 sm:p-0' }"
-    class="border-default bg-default overflow-hidden border"
+    class="border-default overflow-hidden border"
   >
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="bg-elevated text-muted">
+        <thead class="storefront-subtle-surface text-muted">
           <tr>
             <th class="px-3 py-2 font-medium">Artikal</th>
             <th class="px-3 py-2 font-medium">Sifra</th>
@@ -29,7 +29,7 @@ const emit = defineEmits<{
         <tbody>
           <CartListItem
             v-for="item in props.items"
-            :key="item.articleId"
+            :key="item.articleCode"
             :item="item"
             @remove="emit('remove', $event)"
           />

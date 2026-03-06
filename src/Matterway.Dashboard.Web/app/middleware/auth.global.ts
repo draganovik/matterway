@@ -21,7 +21,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (requiredService && requiredPermissions?.length) {
     if (!auth.hasPermission(requiredService, requiredPermissions)) {
-      return navigateTo(feature?.route || "/")
+      await auth.logout()
+      return navigateTo("/login")
     }
   }
 })

@@ -1,4 +1,5 @@
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 
@@ -8,7 +9,7 @@ public class AdminRemoveArticleImage : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapDelete(EndpointKind.Admin, "articles/{articleId:guid}/images/{orderIndex:int}", Handle)
+        endpoints.MapDelete(EndpointKind.Admin, "articles/{article:ArticleCode}/images/{orderIndex:int}", Handle)
             .WithName("AdminRemoveArticleImage").WithSummary("[admin] Remove an ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces(StatusCodes.Status200OK)
@@ -20,22 +21,26 @@ public class AdminRemoveArticleImage : IEndpoint
     }
 
     private static async Task<Results<Ok<RemoveArticleImageResponse>, NotFound>> Handle(
-        Guid articleId,
+        ArticleCode article,
         int orderIndex,
+        IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var entity = await articleImageRepository.GetBy(articleId, orderIndex, cancellationToken);
+        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
+        if (articleEntity is null) return TypedResults.NotFound();
+
+        var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
 
-        var isDeleted = await articleImageRepository.Delete(articleId, orderIndex, cancellationToken);
+        var isDeleted = await articleImageRepository.Delete(article, orderIndex, cancellationToken);
 
         if (!isDeleted) return TypedResults.NotFound();
 
-        await imageStorageService.DeleteAsync(entity.ArticleId, entity.Id, cancellationToken);
-        return TypedResults.Ok(MapToResponse(entity));
+        await imageStorageService.DeleteAsync(entity.Id, cancellationToken);
+        return TypedResults.Ok(MapToResponse(entity, article));
     }
 
     public record RemoveArticleImageResponse
@@ -44,17 +49,17 @@ public class AdminRemoveArticleImage : IEndpoint
         public int OrderIndex { get; init; }
         public required string ImageUrl { get; init; }
         public string? ImageAlt { get; init; }
-        public required Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
         public string Message { get; init; } = "Article image removed successfully.";
     }
 
-    public static RemoveArticleImageResponse MapToResponse(ArticleImage entity)
+    public static RemoveArticleImageResponse MapToResponse(ArticleImage entity, ArticleCode article)
     {
         return new RemoveArticleImageResponse
         {
             Id = entity.Id,
             OrderIndex = entity.OrderIndex,
-            ArticleId = entity.ArticleId,
+            ArticleCode = article,
             ImageUrl = entity.ImageUrl,
             ImageAlt = entity.ImageAlt
         };

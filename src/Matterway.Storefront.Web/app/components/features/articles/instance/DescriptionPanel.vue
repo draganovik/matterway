@@ -5,7 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <UCard class="border-default bg-default border">
+  <UCard class="border-default border">
     <template #header>
       <h2 class="text-lg font-semibold">Opis</h2>
     </template>

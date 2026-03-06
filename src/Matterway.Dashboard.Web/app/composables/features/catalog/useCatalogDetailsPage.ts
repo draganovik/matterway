@@ -76,7 +76,7 @@ export function useCatalogDetailsPage() {
 
     const result = await api.queryDetails({
       limit: Math.min(50, Math.max(1, limit.value)),
-      titleLike: filter.value.trim() || undefined,
+      titleLike: String(filter.value ?? "").trim() || undefined,
     })
 
     listState.loading = false
@@ -134,8 +134,8 @@ export function useCatalogDetailsPage() {
     if (!canEdit.value) return
 
     const slug = normalizeSlug(selectedSlug.value || "")
-    const title = form.value.title.trim()
-    const unit = form.value.unit.trim()
+    const title = String(form.value.title ?? "").trim()
+    const unit = String(form.value.unit ?? "").trim()
 
     if (!slug) {
       saveState.error = "Select a detail to update."

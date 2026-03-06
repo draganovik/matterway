@@ -69,11 +69,9 @@ export type SystemPaymentConfig = {
 export type StripeChargeSucceeded = {
   orderId: string
   amount: number
-  referenceId: string
   createdAt: Date
 }
 
 export type StripePaymentSession = {
   paymentIntentId: string
-  referenceId: string
 }

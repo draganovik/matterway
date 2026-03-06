@@ -32,7 +32,7 @@ const listState = useRequestState({ empty: "No articles found." })
 
 const articles = ref<QueryArticleResponse[]>([])
 const filter = ref("")
-const selectedArticleIds = ref<string[]>([])
+const selectedArticleCodes = ref<string[]>([])
 const pagination = reactive({
   page: 1,
   pageSize: 20,
@@ -52,7 +52,9 @@ const safeTotal = computed(() =>
 const selectedOnPageCount = computed(
   () =>
     articles.value.filter(
-      (item) => item.id && selectedArticleIds.value.includes(item.id),
+      (item) =>
+        item.code &&
+        selectedArticleCodes.value.includes(item.code),
     ).length,
 )
 const allCurrentPageSelected = computed(
@@ -65,7 +67,7 @@ watch(
   () => props.open,
   (open) => {
     if (!open) return
-    selectedArticleIds.value = [...new Set(props.selectedIds)]
+    selectedArticleCodes.value = [...new Set(props.selectedIds)]
     pagination.page = 1
     void loadArticles()
   },
@@ -81,7 +83,7 @@ async function loadArticles() {
   listState.error = ""
 
   const result = await api.queryArticles({
-    filter: filter.value.trim() || undefined,
+    filter: String(filter.value ?? "").trim() || undefined,
     page: pagination.page,
     pageSize: pagination.pageSize,
   })
@@ -143,44 +145,44 @@ function changePageSize(value: number) {
 }
 
 function isSelected(id: string) {
-  return selectedArticleIds.value.includes(id)
+  return selectedArticleCodes.value.includes(id)
 }
 
 function toggleSelection(id: string) {
   if (isSelected(id)) {
-    selectedArticleIds.value = selectedArticleIds.value.filter(
+    selectedArticleCodes.value = selectedArticleCodes.value.filter(
       (item) => item !== id,
     )
     return
   }
-  selectedArticleIds.value = [...selectedArticleIds.value, id]
+  selectedArticleCodes.value = [...selectedArticleCodes.value, id]
 }
 
 function togglePageSelection() {
   const currentIds = articles.value
-    .map((item) => item.id)
+    .map((item) => item.code)
     .filter((id): id is string => Boolean(id))
 
   if (!currentIds.length) return
 
   if (allCurrentPageSelected.value) {
-    selectedArticleIds.value = selectedArticleIds.value.filter(
+    selectedArticleCodes.value = selectedArticleCodes.value.filter(
       (id) => !currentIds.includes(id),
     )
     return
   }
 
-  const next = new Set(selectedArticleIds.value)
+  const next = new Set(selectedArticleCodes.value)
   currentIds.forEach((id) => next.add(id))
-  selectedArticleIds.value = [...next]
+  selectedArticleCodes.value = [...next]
 }
 
 function clearSelection() {
-  selectedArticleIds.value = []
+  selectedArticleCodes.value = []
 }
 
 function submitSelection() {
-  emit("submit", [...new Set(selectedArticleIds.value)])
+  emit("submit", [...new Set(selectedArticleCodes.value)])
   isOpen.value = false
 }
 </script>
@@ -224,7 +226,7 @@ function submitSelection() {
           </UButton>
           <UButton
             variant="ghost"
-            :disabled="!selectedArticleIds.length"
+            :disabled="!selectedArticleCodes.length"
             @click="clearSelection"
           >
             Clear
@@ -233,7 +235,7 @@ function submitSelection() {
 
         <CatalogDiscountsModalArticleSelectionListView
           :items="articles"
-          :selected-ids="selectedArticleIds"
+          :selected-ids="selectedArticleCodes"
           :loading="listState.loading"
           :error="listState.error"
           :empty-message="listState.empty"
@@ -276,7 +278,7 @@ function submitSelection() {
       <div class="flex w-full justify-between">
         <UButton variant="ghost" @click="isOpen = false"> Cancel </UButton>
         <UButton color="primary" :disabled="!canEdit" @click="submitSelection">
-          Save Selection ({{ selectedArticleIds.length }})
+          Save Selection ({{ selectedArticleCodes.length }})
         </UButton>
       </div>
     </template>

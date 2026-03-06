@@ -1,8 +1,8 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import type { ApiResult, ApiService } from "~/types/common/api"
+import type { RuntimeConfig } from "nuxt/schema"
 
-function getBaseUrl(service: ApiService) {
-  const config = useRuntimeConfig()
+function getBaseUrl(service: ApiService, config: RuntimeConfig) {
   if (service === "catalog") return config.public.catalogApiBaseUrl
   if (service === "customers") return config.public.customersApiBaseUrl
   if (service === "identity") return config.public.identityApiBaseUrl
@@ -58,6 +58,7 @@ function getErrorMessage(payload: unknown) {
 
 export function useApiClient() {
   const auth = useAuthSessionStore()
+  const config = useRuntimeConfig()
   const validEndpointKinds = new Set(["self", "admin", "public", "system"])
 
   async function request<T>(
@@ -69,7 +70,7 @@ export function useApiClient() {
     if (!auth.isInitialized.value) {
       await auth.initialize()
     }
-    const baseUrl = getBaseUrl(service)
+    const baseUrl = getBaseUrl(service, config)
     if (!baseUrl) {
       return {
         ok: false,
@@ -115,8 +116,10 @@ export function useApiClient() {
     if (response.status === 401 && !allowUnauthorized) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) headers.set("Authorization", refreshedToken)
-      response = await runFetch()
+      if (refreshedToken) {
+        headers.set("Authorization", refreshedToken)
+        response = await runFetch()
+      }
     }
 
     if (response.status === 204) {

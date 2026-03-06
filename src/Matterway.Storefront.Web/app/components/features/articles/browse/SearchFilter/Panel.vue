@@ -38,15 +38,26 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 </script>
 
 <template>
-  <UCard class="border-default bg-elevated/60 h-fit border">
-    <template #header>
-      <div class="space-y-1">
-        <p class="text-primary text-xs tracking-[0.3em] uppercase">Pretraga</p>
-        <h2 class="text-lg font-semibold">Pronađi artikle</h2>
+  <div class="h-fit lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+    <form
+      class="space-y-3 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden"
+      @submit.prevent="emit('submit')"
+    >
+      <div class="flex items-center gap-2">
+        <UButton type="submit" color="primary" class="flex-1 justify-center">
+          Primeni filtere
+        </UButton>
+        <UButton
+          type="button"
+          color="neutral"
+          variant="soft"
+          icon="i-lucide-x"
+          aria-label="Poništi filtere"
+          title="Poništi filtere"
+          @click="emit('reset')"
+        />
       </div>
-    </template>
 
-    <form class="space-y-4" @submit.prevent="emit('submit')">
       <UFormField label="Naziv">
         <UInput
           :model-value="filters.search"
@@ -59,24 +70,30 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Min cena">
-          <UInput
-            :model-value="filters.minPrice"
-            type="number"
-            min="0"
+          <UInputNumber
+            :model-value="filters.minPrice ?? null"
+            orientation="vertical"
+            :min="0"
+            :step="0.01"
+            variant="outline"
             placeholder="0"
             class="w-full"
+            :ui="{ root: 'w-full', base: 'w-full text-left' }"
             @update:model-value="
               emit('setMinPrice', toNumberOrUndefined($event))
             "
           />
         </UFormField>
         <UFormField label="Max cena">
-          <UInput
-            :model-value="filters.maxPrice"
-            type="number"
-            min="0"
+          <UInputNumber
+            :model-value="filters.maxPrice ?? null"
+            orientation="vertical"
+            :min="0"
+            :step="0.01"
+            variant="outline"
             placeholder="100000"
             class="w-full"
+            :ui="{ root: 'w-full', base: 'w-full text-left' }"
             @update:model-value="
               emit('setMaxPrice', toNumberOrUndefined($event))
             "
@@ -84,7 +101,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
         </UFormField>
       </div>
 
-      <div class="space-y-3">
+      <div class="space-y-3 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
         <div class="flex items-center justify-between">
           <p class="text-sm font-medium">Filtriraj po detalju</p>
           <UButton
@@ -101,7 +118,10 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           </UButton>
         </div>
 
-        <div v-if="filters.detailFilters.length" class="space-y-3">
+        <div
+          v-if="filters.detailFilters.length"
+          class="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
+        >
           <ArticlesBrowseSearchFilterListItem
             v-for="(detailFilter, index) in filters.detailFilters"
             :key="`detail-filter-${index}-${detailFilter.slug}`"
@@ -120,19 +140,6 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           />
         </div>
       </div>
-
-      <div class="space-y-2">
-        <UButton type="submit" color="primary" block>Primeni filtere</UButton>
-        <UButton
-          type="button"
-          color="neutral"
-          variant="soft"
-          block
-          @click="emit('reset')"
-        >
-          Poništi
-        </UButton>
-      </div>
     </form>
-  </UCard>
+  </div>
 </template>

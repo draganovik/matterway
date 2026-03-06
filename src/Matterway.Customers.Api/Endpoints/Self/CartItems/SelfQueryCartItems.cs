@@ -57,10 +57,7 @@ public class SelfQueryCartItems : IEndpoint
         public string? ArticleName { get; init; }
 
         [Required]
-        public string? ArticleCode { get; init; }
-
-        [Required]
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -76,9 +73,8 @@ public class SelfQueryCartItems : IEndpoint
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ArticleId = entity.ArticleId,
             ArticleName = entity.ArticleName,
-            ArticleCode = entity.ArticleCode ?? string.Empty,
+            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null),
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

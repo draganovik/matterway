@@ -4,7 +4,7 @@ namespace Matterway.Catalog.Api.Infrastructure.ImportExport.Rows;
 
 public sealed record DiscountRow(
     string Code,
-    Guid ArticleId,
+    string ArticleCode,
     decimal Percentage,
     DateTime ValidFrom,
     DateTime? ValidTo)
@@ -13,7 +13,7 @@ public sealed record DiscountRow(
     {
         return new DiscountRow(
             entity.Code,
-            entity.ArticleId,
+            entity.ArticleCode,
             entity.Percentage,
             entity.ValidFrom,
             entity.ValidTo);
@@ -24,7 +24,7 @@ public sealed record DiscountRow(
         return new Discount
         {
             Code = Code,
-            ArticleId = ArticleId,
+            ArticleCode = ArticleCode,
             Percentage = Percentage,
             ValidFrom = ValidFrom,
             ValidTo = ValidTo

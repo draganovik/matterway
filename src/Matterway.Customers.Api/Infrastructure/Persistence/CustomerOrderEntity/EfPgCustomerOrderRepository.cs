@@ -5,7 +5,7 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerOrderEntity
 
 public class EfPgCustomerOrderRepository(CustomersDbComposer context) : ICustomerOrderRepository
 {
-    public async Task<CustomerOrder?> CreateFromCart(Guid customerId, Guid orderId,
+    public async Task<CustomerOrder?> CreateFromCart(Guid customerId, OrderId orderId,
         CancellationToken cancellationToken = default)
     {
         var existing = await context.CustomerOrder

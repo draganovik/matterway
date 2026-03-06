@@ -31,6 +31,6 @@ public class CatalogDbComposer(DbContextOptions<CatalogDbComposer> options) : Db
         modelBuilder.ApplyConfiguration(new ArticleDetailTextEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ArticleDetailNumericEntityTypeConfiguration());
 
-        ModelDataLoader.InitializeDemo(modelBuilder);
+        ModelDataLoader.Initialize(modelBuilder);
     }
 }

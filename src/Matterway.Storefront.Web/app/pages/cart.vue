@@ -7,12 +7,14 @@ definePageMeta({
   public: true,
 })
 
-const { cart, isEmpty, goToCheckout, clearCart } = useCartPage()
+const { cart, isEmpty, initialize, goToCheckout, clearCart } = useCartPage()
+
+await initialize()
 </script>
 
 <template>
   <div class="space-y-6">
-    <UCard class="border-default bg-elevated/60 border">
+    <UCard class="border-default border">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p class="text-primary text-xs tracking-[0.3em] uppercase">Korpa</p>
@@ -38,10 +40,11 @@ const { cart, isEmpty, goToCheckout, clearCart } = useCartPage()
       <UButton to="/articles" color="primary">Pregledaj artikle</UButton>
     </EmptyState>
 
-    <div v-else class="grid gap-6 lg:grid-cols-[1fr_20rem]">
+    <div v-else class="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">
       <CartListView :items="cart.items.value" @remove="cart.remove" />
 
       <CartActionPanel
+        class="lg:sticky lg:top-24"
         :total-items="cart.totalItems.value"
         :total-price="cart.totalPrice.value"
         @checkout="goToCheckout"

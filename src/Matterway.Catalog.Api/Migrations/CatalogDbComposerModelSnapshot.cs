@@ -24,14 +24,9 @@ namespace Matterway.Catalog.Api.Migrations
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.Article", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
                     b.Property<string>("ArticleCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<decimal>("BasePrice")
                         .HasPrecision(18, 2)
@@ -56,18 +51,14 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleCode")
-                        .IsUnique();
+                    b.HasKey("ArticleCode");
 
                     b.ToTable("Article", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
-                            ArticleCode = "PH002",
+                            ArticleCode = "PHUE0002",
                             BasePrice = 4999m,
                             CreatedAt = new DateTime(2024, 6, 1, 9, 0, 0, 0, DateTimeKind.Utc),
                             Description = "The Philips Hue White and Color Ambiance A19 Smart LED Bulb lets you control your lights from your smartphone or tablet. Choose from 16 million colors to match the mood of any room, and set the lights to turn on and off on a schedule or when you're away from home.",
@@ -77,8 +68,7 @@ namespace Matterway.Catalog.Api.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
-                            ArticleCode = "NT003",
+                            ArticleCode = "NEST0003",
                             BasePrice = 24999m,
                             CreatedAt = new DateTime(2024, 6, 2, 14, 30, 0, 0, DateTimeKind.Utc),
                             Description = "The 3rd generation Nest Learning Thermostat programs itself and automatically saves energy when you're away. It learns what temperature you like and builds a schedule around yours.",
@@ -88,8 +78,7 @@ namespace Matterway.Catalog.Api.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
-                            ArticleCode = "AL001",
+                            ArticleCode = "AUGL0001",
                             BasePrice = 27999m,
                             CreatedAt = new DateTime(2024, 6, 3, 16, 45, 0, 0, DateTimeKind.Utc),
                             Description = "The August Wi-Fi Smart Lock Pro + Connect lets you add secure keyless entry to your home. Lock and unlock your door with your phone, and give keyless entry to family, friends, housekeepers, and other home services without worrying about lost or copied keys.",
@@ -99,8 +88,7 @@ namespace Matterway.Catalog.Api.Migrations
                         },
                         new
                         {
-                            Id = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
-                            ArticleCode = "AE004",
+                            ArticleCode = "ECHO0004",
                             BasePrice = 9999m,
                             CreatedAt = new DateTime(2024, 6, 4, 11, 15, 0, 0, DateTimeKind.Utc),
                             Description = "The Amazon Echo (4th Gen) is a hands-free smart speaker that you control with your voice. It connects to Alexa to play music, make calls, set alarms and timers, ask questions, control smart home devices, and more.",
@@ -110,8 +98,7 @@ namespace Matterway.Catalog.Api.Migrations
                         },
                         new
                         {
-                            Id = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
-                            ArticleCode = "RS001",
+                            ArticleCode = "RING0001",
                             BasePrice = 19999m,
                             CreatedAt = new DateTime(2024, 6, 5, 13, 20, 0, 0, DateTimeKind.Utc),
                             Description = "The Ring Spotlight Cam is a wireless security camera that lets you see, hear, and speak to anyone on your property from your phone, tablet, or PC. It has built-in spotlights and a siren to deter intruders, and it works with Alexa to let you control it with your voice.",
@@ -123,8 +110,9 @@ namespace Matterway.Catalog.Api.Migrations
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailNumeric", b =>
                 {
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ArticleCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("DetailSlug")
                         .HasMaxLength(80)
@@ -134,7 +122,7 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.HasKey("ArticleId", "DetailSlug");
+                    b.HasKey("ArticleCode", "DetailSlug");
 
                     b.HasIndex("DetailSlug");
 
@@ -143,79 +131,79 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasData(
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "power",
                             Value = 24m
                         },
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "width",
                             Value = 84m
                         },
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "height",
                             Value = 84m
                         },
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "depth",
                             Value = 28m
                         },
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "screen-size",
                             Value = 2.0m
                         },
                         new
                         {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            ArticleCode = "AUGL0001",
                             DetailSlug = "battery-size",
                             Value = 3000m
                         },
                         new
                         {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            ArticleCode = "AUGL0001",
                             DetailSlug = "weight",
                             Value = 400m
                         },
                         new
                         {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             DetailSlug = "power",
                             Value = 9m
                         },
                         new
                         {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             DetailSlug = "weight",
                             Value = 72m
                         },
                         new
                         {
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
+                            ArticleCode = "ECHO0004",
                             DetailSlug = "weight",
                             Value = 970m
                         },
                         new
                         {
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
+                            ArticleCode = "ECHO0004",
                             DetailSlug = "power",
                             Value = 15m
                         },
                         new
                         {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             DetailSlug = "power",
                             Value = 8m
                         },
                         new
                         {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             DetailSlug = "weight",
                             Value = 480m
                         });
@@ -223,8 +211,9 @@ namespace Matterway.Catalog.Api.Migrations
 
             modelBuilder.Entity("Matterway.Catalog.Api.Domain.Entities.ArticleDetailText", b =>
                 {
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ArticleCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("DetailSlug")
                         .HasMaxLength(80)
@@ -235,7 +224,7 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("ArticleId", "DetailSlug");
+                    b.HasKey("ArticleCode", "DetailSlug");
 
                     b.HasIndex("DetailSlug");
 
@@ -244,67 +233,67 @@ namespace Matterway.Catalog.Api.Migrations
                     b.HasData(
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Apple HomeKit"
                         },
                         new
                         {
-                            ArticleId = new Guid("8d9d9e68-6d44-49c7-8fcb-a6db28969e5a"),
+                            ArticleCode = "NEST0003",
                             DetailSlug = "display",
                             Value = "24-bit color LCD, 480 x 480 resolution at 229 pixels per inch (PPI)"
                         },
                         new
                         {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            ArticleCode = "AUGL0001",
                             DetailSlug = "connectivity",
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            ArticleCode = "AUGL0001",
                             DetailSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Siri"
                         },
                         new
                         {
-                            ArticleId = new Guid("0d6a9017-47e1-4477-86a9-67d9d9e468b8"),
+                            ArticleCode = "AUGL0001",
                             DetailSlug = "battery",
                             Value = "Uses four AA batteries (included), lasts up to 6 months depending on usage"
                         },
                         new
                         {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             DetailSlug = "color-temperature",
                             Value = "Adjustable from warm white (2700K) to daylight (6500K)"
                         },
                         new
                         {
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             DetailSlug = "compatibility",
                             Value = "Works with Alexa, Google Assistant, and Samsung SmartThings"
                         },
                         new
                         {
-                            ArticleId = new Guid("20d76c1a-6d4e-4f22-9262-c20dc62f6f2c"),
+                            ArticleCode = "ECHO0004",
                             DetailSlug = "connectivity",
                             Value = "Wi-Fi and Bluetooth"
                         },
                         new
                         {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             DetailSlug = "video-quality",
                             Value = "1080p HD"
                         },
                         new
                         {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             DetailSlug = "audio-quality",
                             Value = "Two-way audio with noise cancellation"
                         },
                         new
                         {
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             DetailSlug = "connectivity",
                             Value = "Wi-Fi and Ethernet"
                         });
@@ -315,8 +304,9 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ArticleCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("ImageAlt")
                         .IsRequired()
@@ -331,9 +321,9 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id", "ArticleId");
+                    b.HasKey("Id", "ArticleCode");
 
-                    b.HasIndex("ArticleId", "OrderIndex")
+                    b.HasIndex("ArticleCode", "OrderIndex")
                         .IsUnique();
 
                     b.ToTable("ArticleImage", (string)null);
@@ -517,8 +507,9 @@ namespace Matterway.Catalog.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ArticleCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<decimal>("Percentage")
                         .HasColumnType("numeric");
@@ -529,9 +520,9 @@ namespace Matterway.Catalog.Api.Migrations
                     b.Property<DateTime?>("ValidTo")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Code", "ArticleId");
+                    b.HasKey("Code", "ArticleCode");
 
-                    b.HasIndex("ArticleId");
+                    b.HasIndex("ArticleCode");
 
                     b.ToTable("Discount", (string)null);
 
@@ -539,7 +530,7 @@ namespace Matterway.Catalog.Api.Migrations
                         new
                         {
                             Code = "WINTER25",
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             Percentage = 0.25m,
                             ValidFrom = new DateTime(2025, 11, 19, 23, 0, 0, 0, DateTimeKind.Utc),
                             ValidTo = new DateTime(2026, 3, 19, 23, 0, 0, 0, DateTimeKind.Utc)
@@ -550,7 +541,7 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
                         .WithMany("ArticleDetailNumerics")
-                        .HasForeignKey("ArticleId")
+                        .HasForeignKey("ArticleCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -569,7 +560,7 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
                         .WithMany("ArticleDetailTexts")
-                        .HasForeignKey("ArticleId")
+                        .HasForeignKey("ArticleCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -588,7 +579,7 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
                         .WithMany("ArticleImages")
-                        .HasForeignKey("ArticleId")
+                        .HasForeignKey("ArticleCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -599,7 +590,7 @@ namespace Matterway.Catalog.Api.Migrations
                 {
                     b.HasOne("Matterway.Catalog.Api.Domain.Entities.Article", "Article")
                         .WithMany("Discounts")
-                        .HasForeignKey("ArticleId")
+                        .HasForeignKey("ArticleCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

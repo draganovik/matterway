@@ -10,7 +10,7 @@ public class SelfUpsertCartItem : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPut(EndpointKind.Self, "customers/{customerId:guid}/cart-items/{articleId:guid}", Handler)
+        endpoints.MapPut(EndpointKind.Self, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
             .WithName("SelfUpsertCartItem").WithSummary("[self] Upsert own CartItem.")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
@@ -26,7 +26,7 @@ public class SelfUpsertCartItem : IEndpoint
     private static async Task<
             Results<Ok<CartItemResponse>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>>
         Handler(Guid customerId,
-            Guid articleId,
+            ArticleCode article,
             CartItemRequest request,
             HttpContext httpContext,
             ICustomerArticleRepository cartItemRepository,
@@ -36,7 +36,7 @@ public class SelfUpsertCartItem : IEndpoint
         if (!RequestIdentity.CanManageOwnedResource(httpContext.User, customerId))
             return TypedResults.Forbid();
 
-        var articleResponse = await catalogClient.GetArticleById(articleId, cancellationToken);
+        var articleResponse = await catalogClient.GetArticleByCode(article, cancellationToken);
         if (!articleResponse.IsSuccess || articleResponse.Data is null)
             return articleResponse.StatusCode == HttpStatusCode.NotFound
                 ? TypedResults.NotFound()
@@ -47,9 +47,9 @@ public class SelfUpsertCartItem : IEndpoint
                     Detail = articleResponse.ErrorMessage ?? "Unable to retrieve article."
                 });
 
-        var article = articleResponse.Data;
+        var catalogArticle = articleResponse.Data;
 
-        var resolvedPrice = article.Price ?? article.BasePrice;
+        var resolvedPrice = catalogArticle.Price ?? catalogArticle.BasePrice;
         if (resolvedPrice is null)
             return TypedResults.BadRequest(new ProblemDetails
             {
@@ -61,10 +61,9 @@ public class SelfUpsertCartItem : IEndpoint
         var entity = new CustomerArticle
         {
             CustomerId = customerId,
-            ArticleId = articleId,
             Quantity = request.Quantity,
-            ArticleName = article.Title,
-            ArticleCode = article.Code,
+            ArticleName = catalogArticle.Title,
+            ArticleCode = catalogArticle.Code.ToString(),
             UnitPrice = resolvedPrice
         };
 
@@ -95,10 +94,7 @@ public class SelfUpsertCartItem : IEndpoint
         public string? ArticleName { get; init; }
 
         [Required]
-        public string? ArticleCode { get; init; }
-
-        [Required]
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
 
         [Required]
         [Range(1, int.MaxValue)]
@@ -121,9 +117,8 @@ public class SelfUpsertCartItem : IEndpoint
         return new CartItemResponse
         {
             CustomerId = entity.CustomerId,
-            ArticleId = entity.ArticleId,
             ArticleName = entity.ArticleName,
-            ArticleCode = entity.ArticleCode ?? string.Empty,
+            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null),
             Quantity = entity.Quantity,
             UnitPrice = entity.UnitPrice
         };

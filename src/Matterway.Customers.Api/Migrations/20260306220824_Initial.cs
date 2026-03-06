@@ -56,7 +56,7 @@ namespace Matterway.Customers.Api.Migrations
                 name: "CustomerOrder",
                 columns: table => new
                 {
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     PlacedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -79,10 +79,9 @@ namespace Matterway.Customers.Api.Migrations
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
                     ArticleName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    ArticleCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
-                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleCode = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: true)
+                    OrderId = table.Column<string>(type: "character varying(19)", maxLength: 19, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,11 +121,11 @@ namespace Matterway.Customers.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "CustomerArticle",
-                columns: new[] { "Id", "ArticleCode", "ArticleId", "ArticleName", "CustomerId", "OrderId", "Quantity", "UnitPrice" },
+                columns: new[] { "Id", "ArticleCode", "ArticleName", "CustomerId", "OrderId", "Quantity", "UnitPrice" },
                 values: new object[,]
                 {
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), null, new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"), "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 3, 4999m },
-                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), null, new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"), "Ring Spotlight Cam", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 1, 19999m }
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"), "PHUE0002", "Philips Hue White and Color Ambiance A19 Smart LED Bulb", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 3, 4999m },
+                    { new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"), "RING0001", "Ring Spotlight Cam", new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"), null, 1, 19999m }
                 });
 
             migrationBuilder.CreateIndex(
@@ -141,16 +140,16 @@ namespace Matterway.Customers.Api.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerArticle_CustomerId_ArticleId",
+                name: "IX_CustomerArticle_CustomerId_ArticleCode",
                 table: "CustomerArticle",
-                columns: new[] { "CustomerId", "ArticleId" },
+                columns: new[] { "CustomerId", "ArticleCode" },
                 unique: true,
                 filter: "\"OrderId\" IS NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerArticle_CustomerId_ArticleId_OrderId",
+                name: "IX_CustomerArticle_CustomerId_ArticleCode_OrderId",
                 table: "CustomerArticle",
-                columns: new[] { "CustomerId", "ArticleId", "OrderId" },
+                columns: new[] { "CustomerId", "ArticleCode", "OrderId" },
                 unique: true,
                 filter: "\"OrderId\" IS NOT NULL");
 

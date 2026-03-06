@@ -7,7 +7,7 @@ namespace Matterway.Identity.Api.Infrastructure.Persistence;
 
 public static class ModelDataLoader
 {
-    public static void InitializeDemo(ModelBuilder modelBuilder)
+    public static void Initialize(ModelBuilder modelBuilder)
     {
         var employeeRoleId = new Guid("6f055a46-6bf0-4fdb-8c27-1877a2b6f811");
         var customerRoleId = new Guid("c4c29ba9-3b22-416f-8a37-8a7c3d6ed1f9");

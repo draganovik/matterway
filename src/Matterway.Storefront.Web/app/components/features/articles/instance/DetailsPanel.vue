@@ -27,14 +27,14 @@ const detailRows = computed(() =>
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0 sm:p-0' }" class="border-default bg-default border">
+  <UCard :ui="{ body: 'p-0 sm:p-0' }" class="border-default border">
     <template #header>
       <h2 class="text-lg font-semibold">Detalji</h2>
     </template>
 
     <table class="w-full border-collapse text-sm">
       <thead>
-        <tr class="bg-elevated/70">
+        <tr class="storefront-subtle-surface">
           <th class="border-default border-b px-3 py-2 text-left font-semibold">
             Naziv
           </th>

@@ -128,15 +128,6 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                   </div>
 
                   <div>
-                    <dt class="text-muted text-xs">Reference ID</dt>
-                    <dd
-                      class="text-foreground mt-1 font-mono text-sm break-all"
-                    >
-                      {{ payment.referenceId || "-" }}
-                    </dd>
-                  </div>
-
-                  <div>
                     <dt class="text-muted text-xs">Amount</dt>
                     <dd class="text-foreground mt-1 text-sm font-medium">
                       {{ formatMoney(payment.amount) }}

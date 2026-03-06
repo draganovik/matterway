@@ -5,12 +5,12 @@ import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 const props = withDefaults(
   defineProps<{
-    articleId?: string | null
+    code?: string | null
     details?: ArticleDetailProperty[]
     canEdit?: boolean
   }>(),
   {
-    articleId: null,
+    code: null,
     details: () => [],
     canEdit: false,
   },
@@ -45,12 +45,9 @@ function updateDetails(next: ArticleDetailProperty[]) {
 async function removeDetail(detail: ArticleDetailProperty) {
   removeState.error = ""
   removeState.success = ""
-  if (!props.articleId || !detail.detailSlug) return
+  if (!props.code || !detail.detailSlug) return
   removeState.loading = true
-  const result = await api.removeArticleDetail(
-    props.articleId,
-    detail.detailSlug,
-  )
+  const result = await api.removeArticleDetail(props.code, detail.detailSlug)
   removeState.loading = false
   if (!result.ok) {
     removeState.error = result.error || "Unable to remove detail."
@@ -65,7 +62,7 @@ async function removeDetail(detail: ArticleDetailProperty) {
 function openAddDetailsModal() {
   mutateState.error = ""
   mutateState.success = ""
-  if (!props.articleId) {
+  if (!props.code) {
     mutateState.error = "Create the article before adding details."
     return
   }
@@ -91,7 +88,7 @@ async function handleDetailSubmit(payload: {
 }) {
   mutateState.error = ""
   mutateState.success = ""
-  if (!props.articleId) {
+  if (!props.code) {
     mutateState.error = "Create the article before adding details."
     return
   }
@@ -102,7 +99,7 @@ async function handleDetailSubmit(payload: {
   )
   if (detailModalMode.value === "edit" && activeDetail.value?.detailSlug) {
     const targetSlug = activeDetail.value.detailSlug
-    const result = await api.updateArticleDetail(props.articleId, targetSlug, {
+    const result = await api.updateArticleDetail(props.code, targetSlug, {
       textValue: payload.textValue ?? undefined,
       numericValue: payload.numericValue ?? undefined,
     })
@@ -132,7 +129,7 @@ async function handleDetailSubmit(payload: {
     mutateState.error = "Detail already exists."
     return
   }
-  const addResult = await api.addArticleDetail(props.articleId, {
+  const addResult = await api.addArticleDetail(props.code, {
     detailSlug: payload.detailSlug,
     textValue: payload.textValue ?? undefined,
     numericValue: payload.numericValue ?? undefined,
@@ -164,7 +161,7 @@ async function handleDetailSubmit(payload: {
       <UButton
         color="primary"
         variant="outline"
-        :disabled="!canEdit || !articleId"
+        :disabled="!canEdit || !code"
         @click="openAddDetailsModal"
       >
         Add Detail
@@ -172,7 +169,7 @@ async function handleDetailSubmit(payload: {
     </div>
 
     <div
-      v-if="!articleId"
+      v-if="!code"
       class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
       Create the article first to attach details.

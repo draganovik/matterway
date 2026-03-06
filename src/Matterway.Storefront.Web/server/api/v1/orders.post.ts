@@ -8,7 +8,6 @@ import {
   confirmStripePaymentIntent,
   createStripePaymentIntent,
 } from "../../modules/checkout/services/stripePaymentIntent"
-import { createOrderReferenceId } from "../../modules/checkout/utils/orderReferenceId"
 import { validateCheckoutOrderRequest } from "../../modules/checkout/validators/checkoutOrderRequest"
 import { validateNoQueryParams } from "../../modules/checkout/validators/emptyQuery"
 import { getRequestTraceContext } from "../../modules/shared/requestContext"
@@ -32,7 +31,6 @@ export default defineEventHandler(async (event) => {
   const stripeSecretKey = getStripeSecretKey()
   const systemPaymentConfig = getSystemPaymentConfig()
 
-  const referenceId = createOrderReferenceId()
   let paymentIntentId: string | null = null
 
   try {
@@ -40,7 +38,6 @@ export default defineEventHandler(async (event) => {
       orderRequest.payment.cardPayment,
       orderRequest.address,
       orderRequest.customerId,
-      referenceId,
       stripeSecretKey,
       requestContext,
     )
@@ -78,14 +75,12 @@ export default defineEventHandler(async (event) => {
     await confirmStripePaymentIntent(
       stripeSession.paymentIntentId,
       createdOrder.id,
-      stripeSession.referenceId,
       stripeSecretKey,
       requestContext,
     )
 
     return {
       order: createdOrder,
-      referenceId: stripeSession.referenceId,
     }
   } catch (error) {
     if (paymentIntentId) {

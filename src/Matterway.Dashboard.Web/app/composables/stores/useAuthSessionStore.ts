@@ -72,6 +72,7 @@ function normalizePermissionLevel(raw: string): PermissionLevel | null {
 }
 
 export function useAuthSessionStore() {
+  const config = useRuntimeConfig()
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
@@ -107,7 +108,6 @@ export function useAuthSessionStore() {
   )
 
   function getAuthBaseUrl() {
-    const config = useRuntimeConfig()
     return `${config.public.identityApiBaseUrl}${authPath}`
   }
 
@@ -280,7 +280,6 @@ export function useAuthSessionStore() {
   }
 
   async function initialize() {
-    if (isInitialized.value) return
     if (runtime.initPromise) return runtime.initPromise
     runtime.initPromise = (async () => {
       if (session.value.accessToken) {
@@ -291,13 +290,17 @@ export function useAuthSessionStore() {
         }
         session.value.accessToken = null
       }
+
       if (refreshCookie.value) {
         try {
           await refreshTokens()
         } catch {
           clearSession()
         }
+      } else {
+        clearRefreshTimer()
       }
+
       isInitialized.value = true
     })()
 

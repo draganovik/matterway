@@ -19,37 +19,37 @@ Customer -> Checkout : Place order
 activate Checkout
 alt Client-side validation fails
   Checkout --> Customer : Show validation errors\n(no API calls)
-  deactivate Checkout
 
 else Validation passes
   Checkout -> StorefrontServer : POST /api/v1/orders\n{customerId, order, payment, address} + Bearer customer JWT
   activate StorefrontServer
-  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=false)\nmetadata:{reference_id, client_id}
+  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=false)\nmetadata:{client_id, note}
   activate Stripe
 
   note over Stripe, StorefrontServer
-  Storefront generates `reference_id` from hex timestamp.
   Stripe init happens before Sales order creation.
+  No `order_id` metadata exists yet.
   end note
 
   alt Stripe payment init fails
     Stripe --> StorefrontServer : Error
-    deactivate Stripe
     StorefrontServer --> Checkout : 500 Payment initialization failed
     deactivate StorefrontServer
     Checkout --> Customer : Show payment error
   else Stripe payment init succeeds
     Stripe --> StorefrontServer : 200 {paymentIntentId}
-
+    activate StorefrontServer
     StorefrontServer -> SalesApi : POST /api/system/v1/orders\n{type, deliveryInfo} + Bearer customer JWT + X-System-Access-Key
     activate SalesApi
     note over SalesApi
+    Sales generates the canonical `OrderId`
+    (19 lowercase hex chars).
     Sales validates both customer JWT and system access key.
     Customer identity is resolved from JWT claims.
     end note
     SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
     activate CustomersApi
-    CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId)
+    CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId,\ncopy articleCode/title/unitPrice into order mirror)
     activate CustomersDb
     CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
     deactivate CustomersDb
@@ -67,27 +67,25 @@ else Validation passes
       StorefrontServer -> Stripe : Cancel PaymentIntent
       Stripe --> StorefrontServer : 200 Canceled
       StorefrontServer --> Checkout : 500 Order creation failed
-      deactivate StorefrontServer
       Checkout --> Customer : Show checkout error
     else Sales order created
-      StorefrontServer -> Stripe : Update metadata(order_id, reference_id)\n+ Confirm PaymentIntent
+      StorefrontServer -> Stripe : Update metadata(order_id)\n+ Confirm PaymentIntent
       Stripe --> StorefrontServer : 200 Confirmed
-      StorefrontServer --> Checkout : 200 {order, referenceId}
+      StorefrontServer --> Checkout : 200 {order}
       deactivate StorefrontServer
       Checkout -> Checkout : cart.clear()
       Checkout --> Customer : Redirect to /orders
+      deactivate Checkout
     end
-    deactivate Stripe
+
   end
-  deactivate Checkout
 
-  ... asynchronous webhook handling ...
+  == Asynchronous webhook handling ==
 
-  activate Stripe
   alt Stripe sends charge.succeeded
-    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\ncharge.succeeded(order_id, amount, reference_id)
+    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\ncharge.succeeded(order_id, amount)
     activate StorefrontServer
-    StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, referenceId, amount, status=Charged, createdAt}
+    StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, amount, status=Charged, createdAt}
     activate SalesApi
     SalesApi -> SalesDb : Verify order exists + insert Payment
     activate SalesDb
@@ -101,9 +99,9 @@ else Validation passes
     Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\n<other event type>
     activate StorefrontServer
     StorefrontServer --> Stripe : 304 Event ignored
+    deactivate Stripe
     deactivate StorefrontServer
   end
-  deactivate Stripe
 end
 
 @enduml

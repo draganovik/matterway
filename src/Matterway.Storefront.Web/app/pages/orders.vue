@@ -27,7 +27,7 @@ await initialize()
 
 <template>
   <div class="space-y-6">
-    <UCard class="border-default bg-elevated/60 border">
+    <UCard class="border-default border">
       <div>
         <p class="text-primary text-xs tracking-[0.3em] uppercase">
           Porudžbine
@@ -38,7 +38,7 @@ await initialize()
 
     <StatusMessages v-if="error" :error="error" />
 
-    <UCard v-if="loading" class="border-default bg-default border">
+    <UCard v-if="loading" class="border-default border">
       <USkeleton class="h-8" />
       <USkeleton class="mt-2 h-8" />
       <USkeleton class="mt-2 h-8" />
@@ -60,7 +60,7 @@ await initialize()
 
     <div
       v-if="!loading && !error && orders.length"
-      class="border-default bg-default flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
+      class="storefront-subtle-surface border-default flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
     >
       <p class="text-muted text-sm">
         Strana {{ currentPage }} od {{ Math.max(totalPages, 1) }} •

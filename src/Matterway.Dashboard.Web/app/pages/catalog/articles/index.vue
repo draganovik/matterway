@@ -15,7 +15,7 @@ const {
   pagination,
   changePage,
   changePageSize,
-  selectedId,
+  selectedCode,
   selectedArticle,
   articleState,
   createModalOpen,
@@ -73,7 +73,7 @@ const {
             <template #list>
               <CatalogArticlesListView
                 :items="articles"
-                :selected-id="selectedId"
+                :selected-code="selectedCode"
                 :filter="filter"
                 :loading="listState.loading"
                 :error="listState.error"

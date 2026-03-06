@@ -46,8 +46,8 @@ async function createDetail() {
   if (!canEdit) return
 
   const slug = normalizeSlug(form.value.slug)
-  const title = form.value.title.trim()
-  const unit = form.value.unit.trim()
+  const title = String(form.value.title ?? "").trim()
+  const unit = String(form.value.unit ?? "").trim()
 
   if (!slug || !title) {
     createState.error = "Slug and title are required."

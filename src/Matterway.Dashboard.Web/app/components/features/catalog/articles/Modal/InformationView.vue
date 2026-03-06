@@ -5,7 +5,7 @@ import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { useResetOnModalOpen } from "~/composables/workflows/modal/useResetOnModalOpen"
 
 type ArticleBaseForm = {
-  articleCode: string
+  code: string
   title: string
   basePrice: number | string
   description: string
@@ -26,7 +26,7 @@ const api = useCatalogClient()
 const createState = useRequestState()
 
 const form = ref<ArticleBaseForm>({
-  articleCode: "",
+  code: "",
   title: "",
   basePrice: "",
   description: "",
@@ -35,7 +35,7 @@ const form = ref<ArticleBaseForm>({
 
 function resetForm() {
   form.value = {
-    articleCode: "",
+    code: "",
     title: "",
     basePrice: "",
     description: "",
@@ -51,19 +51,26 @@ async function createArticle() {
   if (!canEdit) return
 
   const payload = form.value
-  const articleCode = payload.articleCode.trim()
-  const title = payload.title.trim()
-  const description = payload.description.trim()
+  const code = String(payload.code ?? "").trim().toUpperCase()
+  const title = String(payload.title ?? "").trim()
+  const description = String(payload.description ?? "").trim()
 
-  if (!articleCode || !title || !payload.basePrice || !description) {
+  if (!code || !title || !payload.basePrice || !description) {
     createState.error =
       "Fill in all required fields before creating the article."
     return
   }
 
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+    createState.error = "Article code must be exactly 8 letters or numbers."
+    return
+  }
+
+  form.value.code = code
+
   createState.loading = true
   const result = await api.createArticle({
-    articleCode,
+    code,
     title,
     basePrice: payload.basePrice,
     description,

@@ -19,13 +19,14 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
                 .Include(x => x.ArticleDetailNumerics!)
                 .ThenInclude(pd => pd!.Detail)
                 .Include(x => x.ArticleImages)
-                .FirstOrDefaultAsync(x => x.Id == requestModel.Id, cancellationToken);
+                .FirstOrDefaultAsync(x => x.ArticleCode == requestModel.ArticleCode, cancellationToken);
 
         return null;
     }
 
-    public async Task<bool> Delete(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(ArticleCode code, CancellationToken cancellationToken = default)
     {
+        var normalizedCode = code.Value;
         var strategy = context.Database.CreateExecutionStrategy();
 
         return await strategy.ExecuteAsync(async () =>
@@ -33,7 +34,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
             await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             try
             {
-                var exists = await context.Article.AnyAsync(p => p.Id == id, cancellationToken);
+                var exists = await context.Article.AnyAsync(p => p.ArticleCode == normalizedCode, cancellationToken);
                 if (!exists)
                 {
                     await transaction.RollbackAsync(cancellationToken);
@@ -41,23 +42,23 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
                 }
 
                 await context.ArticleImage
-                    .Where(model => model.ArticleId == id)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 await context.ArticleDetailText
-                    .Where(model => model.ArticleId == id)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 await context.ArticleDetailNumeric
-                    .Where(model => model.ArticleId == id)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 await context.Discount
-                    .Where(model => model.ArticleId == id)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 var affected = await context.Article
-                    .Where(model => model.Id == id)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .ExecuteDeleteAsync(cancellationToken);
 
                 if (affected != 1)
@@ -77,7 +78,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         });
     }
 
-    public async Task<Article?> GetBy(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Article?> GetBy(ArticleCode code, CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
         return await context.Article
@@ -87,7 +88,22 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
             .Include(x => x.ArticleDetailNumerics!)
             .ThenInclude(pd => pd!.Detail)
             .Include(x => x.ArticleImages)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.ArticleCode == code.Value, cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<Article>> GetByCodes(IEnumerable<ArticleCode> codes,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedCodes = codes
+            .Select(code => code.Value)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        if (normalizedCodes.Length == 0) return [];
+
+        return await context.Article
+            .Where(article => normalizedCodes.Contains(article.ArticleCode))
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<int> Count(string? filter,
@@ -114,20 +130,89 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Article?> Update(Article request, CancellationToken cancellationToken = default)
+    public async Task<Article?> Update(Article request, ArticleCode originalCode,
+        CancellationToken cancellationToken = default)
     {
-        context.Article.Update(request);
-        var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected > 0)
-            return await context.Article
-                .Include(x => x.Discounts)
-                .Include(x => x.ArticleDetailTexts!)
-                .ThenInclude(pd => pd.Detail)
-                .Include(x => x.ArticleDetailNumerics)
-                .ThenInclude(pd => pd.Detail)
-                .Include(x => x.ArticleImages)
-                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        var originalCodeValue = originalCode.Value;
+        var nextCodeValue = request.ArticleCode;
 
-        return null;
+        if (string.Equals(originalCodeValue, nextCodeValue, StringComparison.Ordinal))
+        {
+            context.Article.Update(request);
+            var affected = await context.SaveChangesAsync(cancellationToken);
+            if (affected > 0)
+                return await context.Article
+                    .Include(x => x.Discounts)
+                    .Include(x => x.ArticleDetailTexts!)
+                    .ThenInclude(pd => pd.Detail)
+                    .Include(x => x.ArticleDetailNumerics)
+                    .ThenInclude(pd => pd.Detail)
+                    .Include(x => x.ArticleImages)
+                    .FirstOrDefaultAsync(x => x.ArticleCode == request.ArticleCode, cancellationToken);
+
+            return null;
+        }
+
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var replacement = new Article
+                {
+                    ArticleCode = nextCodeValue,
+                    Title = request.Title,
+                    Description = request.Description,
+                    BasePrice = request.BasePrice,
+                    IsAvailable = request.IsAvailable,
+                    CreatedAt = request.CreatedAt,
+                    UpdatedAt = request.UpdatedAt
+                };
+
+                context.Article.Add(replacement);
+                await context.SaveChangesAsync(cancellationToken);
+
+                await context.ArticleImage
+                    .Where(model => model.ArticleCode == originalCodeValue)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(model => model.ArticleCode, nextCodeValue), cancellationToken);
+
+                await context.ArticleDetailText
+                    .Where(model => model.ArticleCode == originalCodeValue)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(model => model.ArticleCode, nextCodeValue), cancellationToken);
+
+                await context.ArticleDetailNumeric
+                    .Where(model => model.ArticleCode == originalCodeValue)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(model => model.ArticleCode, nextCodeValue), cancellationToken);
+
+                await context.Discount
+                    .Where(model => model.ArticleCode == originalCodeValue)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(model => model.ArticleCode, nextCodeValue), cancellationToken);
+
+                await context.Article
+                    .Where(model => model.ArticleCode == originalCodeValue)
+                    .ExecuteDeleteAsync(cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+
+                return await context.Article
+                    .Include(x => x.Discounts)
+                    .Include(x => x.ArticleDetailTexts!)
+                    .ThenInclude(pd => pd.Detail)
+                    .Include(x => x.ArticleDetailNumerics)
+                    .ThenInclude(pd => pd.Detail)
+                    .Include(x => x.ArticleImages)
+                    .FirstOrDefaultAsync(x => x.ArticleCode == nextCodeValue, cancellationToken);
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
     }
 }

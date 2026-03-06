@@ -22,7 +22,7 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
         var existing = await context.CustomerArticle
             .FirstOrDefaultAsync(article =>
                     article.CustomerId == requestModel.CustomerId &&
-                    article.ArticleId == requestModel.ArticleId &&
+                    article.ArticleCode == requestModel.ArticleCode &&
                     article.OrderId == null,
                 cancellationToken);
 
@@ -44,23 +44,23 @@ public class EfPgCustomerArticleRepository(CustomersDbComposer context) : ICusto
         return affected > 0 ? existing ?? requestModel : null;
     }
 
-    public async Task<bool> DeleteCartItem(Guid customerId, Guid articleId,
+    public async Task<bool> DeleteCartItem(Guid customerId, ArticleCode articleCode,
         CancellationToken cancellationToken = default)
     {
         var affected = await context.CustomerArticle
             .Where(model => model.CustomerId == customerId)
-            .Where(model => model.ArticleId == articleId)
+            .Where(model => model.ArticleCode == articleCode.Value)
             .Where(model => model.OrderId == null)
             .ExecuteDeleteAsync(cancellationToken);
         return affected == 1;
     }
 
-    public async Task<CustomerArticle?> GetCartItem(Guid customerId, Guid articleId,
+    public async Task<CustomerArticle?> GetCartItem(Guid customerId, ArticleCode articleCode,
         CancellationToken cancellationToken = default)
     {
         return await context.CustomerArticle.FirstOrDefaultAsync(article =>
                 article.CustomerId == customerId &&
-                article.ArticleId == articleId &&
+                article.ArticleCode == articleCode.Value &&
                 article.OrderId == null,
             cancellationToken);
     }

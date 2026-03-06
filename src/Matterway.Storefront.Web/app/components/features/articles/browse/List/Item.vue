@@ -21,12 +21,12 @@ const discountLabel = computed(() =>
     : null,
 )
 
-const currentQty = computed(() => cart.quantityFor(props.article.id))
+const currentQty = computed(() => cart.quantityFor(props.article.code))
 </script>
 
 <template>
   <UCard
-    class="border-default bg-default h-full overflow-hidden border"
+    class="border-default h-full overflow-hidden border"
     :ui="{
       root: 'h-full flex flex-col',
       header: 'p-0 sm:p-0',
@@ -34,7 +34,7 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
     }"
   >
     <template #header>
-      <NuxtLink :to="`/articles/${article.id}`" class="block">
+      <NuxtLink :to="`/articles/${article.code}`" class="block">
         <div class="bg-elevated aspect-4/3 w-full overflow-hidden">
           <ImageWithFallback
             :src="article.thumbnailImage?.imageUrl || null"
@@ -49,12 +49,12 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
     <div class="flex flex-1 flex-col gap-3">
       <div class="space-y-1">
         <NuxtLink
-          :to="`/articles/${article.id}`"
+          :to="`/articles/${article.code}`"
           class="line-clamp-2 text-base font-semibold hover:text-cyan-700"
         >
           {{ article.title }}
         </NuxtLink>
-        <p class="text-muted text-xs">#{{ article.articleCode }}</p>
+        <p class="text-muted text-xs">#{{ article.code }}</p>
       </div>
 
       <div class="flex flex-1 items-end justify-between">
@@ -80,13 +80,13 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
         </UBadge>
 
         <div class="flex items-center gap-2">
-          <ModalQuantityEditor
+          <CartQuantityInput
             v-if="currentQty > 0"
-            :article-id="article.id"
+            :article-code="article.code"
             :quantity="currentQty"
             :disabled="!article.isAvailable"
             :show-remove="true"
-            @remove="cart.remove(article.id)"
+            @remove="cart.remove(article.code)"
           />
           <UButton
             v-else

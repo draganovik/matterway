@@ -24,14 +24,14 @@ public sealed class EfPgPaymentRepository(SalesDbComposer context) : IPaymentRep
             .FirstOrDefaultAsync(payment => payment.Id == id, cancellationToken);
     }
 
-    public async Task<ICollection<Payment>> Query(int pageIndex, int pageSize, Guid? orderId,
+    public async Task<ICollection<Payment>> Query(int pageIndex, int pageSize, OrderId? orderId,
         CancellationToken cancellationToken = default)
     {
         var query = context.Payment
             .AsNoTracking();
 
-        if (orderId.HasValue)
-            query = query.Where(payment => payment.OrderId == orderId);
+        if (orderId is { } filterOrderId)
+            query = query.Where(payment => payment.OrderId == filterOrderId);
 
         return await query
             .OrderByDescending(payment => payment.CreatedAt)
@@ -40,11 +40,11 @@ public sealed class EfPgPaymentRepository(SalesDbComposer context) : IPaymentRep
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> Count(Guid? orderId, CancellationToken cancellationToken = default)
+    public async Task<int> Count(OrderId? orderId, CancellationToken cancellationToken = default)
     {
         var query = context.Payment.AsQueryable();
-        if (orderId.HasValue)
-            query = query.Where(payment => payment.OrderId == orderId);
+        if (orderId is { } filterOrderId)
+            query = query.Where(payment => payment.OrderId == filterOrderId);
 
         return await query.CountAsync(cancellationToken);
     }

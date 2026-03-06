@@ -5,7 +5,7 @@ const { item } = defineProps<{
     percentage: number | string
     validFrom: string
     validTo?: string | null
-    articleIds: string[]
+    articleCodes: string[]
   }
 }>()
 
@@ -24,7 +24,7 @@ function formatDateTime(value?: string | null) {
         {{ item.code || "Missing Code" }}
       </p>
       <UBadge color="neutral" variant="subtle">
-        {{ item.articleIds.length }} articles
+        {{ item.articleCodes.length }} articles
       </UBadge>
     </div>
 

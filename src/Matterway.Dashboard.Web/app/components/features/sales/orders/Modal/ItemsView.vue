@@ -92,9 +92,9 @@ const quantitySum = computed(() => quantitySumOf(order.value))
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Article ID</dt>
+                  <dt class="text-muted text-xs">Article Code</dt>
                   <dd class="text-foreground mt-1 font-mono text-sm break-all">
-                    {{ item.articleId }}
+                    {{ item.articleCode }}
                   </dd>
                 </div>
 

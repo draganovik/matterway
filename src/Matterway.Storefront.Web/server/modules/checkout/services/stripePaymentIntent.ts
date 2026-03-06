@@ -143,7 +143,6 @@ export async function createStripePaymentIntent(
   cardPayment: CardPaymentInput,
   address: PaymentAddress,
   userId: string,
-  referenceId: string,
   secretKey: string,
   parentContext?: Context,
 ): Promise<StripePaymentSession> {
@@ -157,7 +156,6 @@ export async function createStripePaymentIntent(
         endpoint: "/v1/payment_methods",
         requestAttributes: {
           "sales.customer_id": userId,
-          "payment.reference_id": referenceId,
         },
       },
       parentContext,
@@ -182,7 +180,6 @@ export async function createStripePaymentIntent(
           "payment.amount_minor": amountInMinor,
           "payment.currency": "RSD",
           "payment.method_id": paymentMethod.id,
-          "payment.reference_id": referenceId,
         },
       },
       parentContext,
@@ -199,7 +196,6 @@ export async function createStripePaymentIntent(
           },
           metadata: {
             client_id: userId,
-            reference_id: referenceId,
             note: address.note || "",
           },
         }),
@@ -207,7 +203,6 @@ export async function createStripePaymentIntent(
 
     return {
       paymentIntentId: paymentIntent.id,
-      referenceId,
     }
   } catch (error) {
     throw wrapStripeError(error, "Stripe payment initialization failed.")
@@ -217,7 +212,6 @@ export async function createStripePaymentIntent(
 export async function confirmStripePaymentIntent(
   paymentIntentId: string,
   orderId: string,
-  referenceId: string,
   secretKey: string,
   parentContext?: Context,
 ) {
@@ -230,7 +224,6 @@ export async function confirmStripePaymentIntent(
         endpoint: `/v1/payment_intents/${paymentIntentId}`,
         requestAttributes: {
           "sales.order_id": orderId,
-          "payment.reference_id": referenceId,
         },
       },
       parentContext,
@@ -238,7 +231,6 @@ export async function confirmStripePaymentIntent(
         stripe.paymentIntents.update(paymentIntentId, {
           metadata: {
             order_id: orderId,
-            reference_id: referenceId,
           },
         }),
     )
@@ -249,7 +241,6 @@ export async function confirmStripePaymentIntent(
         endpoint: `/v1/payment_intents/${paymentIntentId}/confirm`,
         requestAttributes: {
           "sales.order_id": orderId,
-          "payment.reference_id": referenceId,
         },
       },
       parentContext,

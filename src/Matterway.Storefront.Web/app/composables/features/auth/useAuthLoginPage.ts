@@ -11,6 +11,7 @@ export function useAuthLoginPage() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
   const route = useRoute()
+  const nuxtApp = useNuxtApp()
 
   const model = reactive<LoginForm>({
     email: "",
@@ -22,7 +23,7 @@ export function useAuthLoginPage() {
   async function initialize() {
     await auth.initialize()
     if (auth.isLoggedIn.value && auth.isCustomer.value) {
-      await navigateTo(resolveNextRoute(route))
+      await nuxtApp.runWithContext(() => navigateTo(resolveNextRoute(route)))
     }
   }
 
@@ -35,8 +36,8 @@ export function useAuthLoginPage() {
         password: model.password,
       })
 
-      await cart.clear()
-      await navigateTo(resolveNextRoute(route))
+      await cart.mergeGuestItemsIntoRemote().catch(() => null)
+      await nuxtApp.runWithContext(() => navigateTo(resolveNextRoute(route)))
     } catch (err) {
       error.value = err instanceof Error ? err.message : "Prijava nije uspela."
     } finally {

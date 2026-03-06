@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const cart = useCartStore()
-const quantity = computed(() => cart.quantityFor(props.article.id))
+const quantity = computed(() => cart.quantityFor(props.article.code))
 
 const hasDiscount = computed(
   () =>
@@ -18,10 +18,10 @@ const hasDiscount = computed(
 </script>
 
 <template>
-  <UCard class="border-default bg-default border">
+  <UCard class="border-default border">
     <div class="space-y-4">
       <div>
-        <p class="text-muted text-xs">#{{ props.article.articleCode }}</p>
+        <p class="text-muted text-xs">#{{ props.article.code }}</p>
         <h1 class="text-2xl font-semibold">{{ props.article.title }}</h1>
       </div>
 
@@ -59,12 +59,12 @@ const hasDiscount = computed(
         </UButton>
         <template v-else>
           <span class="text-muted text-sm font-medium">U korpi:</span>
-          <ModalQuantityEditor
-            :article-id="props.article.id"
+          <CartQuantityInput
+            :article-code="props.article.code"
             :quantity="quantity"
             size="lg"
             :show-remove="true"
-            @remove="cart.remove(props.article.id)"
+            @remove="cart.remove(props.article.code)"
           />
         </template>
       </div>

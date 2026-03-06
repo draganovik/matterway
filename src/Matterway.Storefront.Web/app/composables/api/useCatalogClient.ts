@@ -47,13 +47,13 @@ export function useCatalogClient() {
     }
   }
 
-  async function getArticle(id: string): Promise<{
+  async function getArticle(code: string): Promise<{
     item: CatalogArticle | null
     error?: string
   }> {
     const response = await api.request<Record<string, unknown>>(
       "catalog",
-      `public/articles/${encodeURIComponent(id)}`,
+      `public/articles/${encodeURIComponent(code)}`,
       { method: "GET" },
       true,
     )

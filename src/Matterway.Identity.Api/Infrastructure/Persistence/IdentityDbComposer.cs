@@ -12,6 +12,6 @@ public class IdentityDbComposer(DbContextOptions<IdentityDbComposer> options)
     {
         base.OnModelCreating(modelBuilder);
 
-        ModelDataLoader.InitializeDemo(modelBuilder);
+        ModelDataLoader.Initialize(modelBuilder);
     }
 }

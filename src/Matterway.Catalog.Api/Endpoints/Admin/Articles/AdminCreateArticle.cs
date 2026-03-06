@@ -39,10 +39,10 @@ public class AdminCreateArticle : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "PublicGetArticleById",
+            "PublicGetArticleByCode",
             new
             {
-                id = created.Id
+                code = created.ArticleCode
             });
 
         return TypedResults.Created(location, MapToResponse(created));
@@ -51,9 +51,7 @@ public class AdminCreateArticle : IEndpoint
     public record CreateArticleRequest
     {
         [Required]
-        [RegularExpression(@"^[A-Z0-9]{5,10}$",
-            ErrorMessage = "Article code must be 5-10 characters and only contain uppercase letters and numbers.")]
-        public required string ArticleCode { get; init; }
+        public required ArticleCode Code { get; init; }
 
         [Required]
         public required string Title { get; init; }
@@ -70,8 +68,7 @@ public class AdminCreateArticle : IEndpoint
 
     public record CreateArticleResponse
     {
-        public Guid Id { get; init; }
-        public string? ArticleCode { get; init; }
+        public required ArticleCode Code { get; init; }
         public string? Title { get; init; }
         public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
@@ -85,7 +82,7 @@ public class AdminCreateArticle : IEndpoint
     {
         var article = new Article
         {
-            ArticleCode = request.ArticleCode,
+            ArticleCode = request.Code.ToString(),
             Title = request.Title,
             Description = request.Description
         };
@@ -98,8 +95,7 @@ public class AdminCreateArticle : IEndpoint
     {
         return new CreateArticleResponse
         {
-            Id = entity.Id,
-            ArticleCode = entity.ArticleCode,
+            Code = ArticleCode.Parse(entity.ArticleCode, null),
             Title = entity.Title,
             BasePrice = entity.BasePrice,
             Price = entity.GetFinalPrice(),

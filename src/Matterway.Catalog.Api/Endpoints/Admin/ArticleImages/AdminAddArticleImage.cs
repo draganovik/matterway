@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 
@@ -9,10 +10,11 @@ public class AdminAddArticleImage : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.Admin, "articles/{articleId:guid}/images", Handle)
+        endpoints.MapPost(EndpointKind.Admin, "articles/{article:ArticleCode}/images", Handle)
             .WithName("AdminAddArticleImage").WithSummary("[admin] Add a new ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<AddArticleImageResponse>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Accepts<AddArticleImageRequest>("multipart/form-data")
             .RequireAuthorization(policy =>
@@ -21,16 +23,20 @@ public class AdminAddArticleImage : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AddArticleImageResponse>, BadRequest<ProblemDetails>>> Handle(
+    private static async Task<Results<Created<AddArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
         [FromRoute]
-        Guid articleId,
+        ArticleCode article,
         [FromForm]
         AddArticleImageRequest request,
         HttpContext httpContext,
+        IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
+        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
+        if (articleEntity is null) return TypedResults.NotFound();
+
         if (request.File is null || request.File.Length == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
@@ -43,8 +49,7 @@ public class AdminAddArticleImage : IEndpoint
         ImageStorageUploadResult uploadResult;
         try
         {
-            uploadResult =
-                await imageStorageService.UploadAsync(articleId, imageId, request.File, cancellationToken);
+            uploadResult = await imageStorageService.UploadAsync(imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -56,7 +61,7 @@ public class AdminAddArticleImage : IEndpoint
             });
         }
 
-        var entity = MapToEntity(articleId, request, uploadResult);
+        var entity = MapToEntity(article, request, uploadResult);
         ArticleImage? created;
 
         try
@@ -65,15 +70,15 @@ public class AdminAddArticleImage : IEndpoint
         }
         catch
         {
-            await imageStorageService.DeleteAsync(articleId, imageId, cancellationToken);
+            await imageStorageService.DeleteAsync(imageId, cancellationToken);
             throw;
         }
 
-        var articleImageModel = MapToResponse(created);
+        var articleImageModel = MapToResponse(created, article, articleEntity.Title);
 
         if (articleImageModel is null)
         {
-            await imageStorageService.DeleteAsync(articleId, imageId, cancellationToken);
+            await imageStorageService.DeleteAsync(imageId, cancellationToken);
             var problemDetails = new ProblemDetails
             {
                 Title = "Bad Request",
@@ -103,26 +108,26 @@ public class AdminAddArticleImage : IEndpoint
     {
         public Guid Id { get; init; }
         public int OrderIndex { get; init; }
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
         public string? ArticleName { get; init; }
         public string? ImageUrl { get; init; }
         public string? ImageAlt { get; init; }
     }
 
-    public static ArticleImage MapToEntity(Guid articleId, AddArticleImageRequest request,
+    public static ArticleImage MapToEntity(ArticleCode article, AddArticleImageRequest request,
         ImageStorageUploadResult uploadResult)
     {
         return new ArticleImage
         {
             Id = uploadResult.ImageId,
-            ArticleId = articleId,
+            ArticleCode = article.ToString(),
             OrderIndex = request.OrderIndex,
             ImageUrl = uploadResult.ImageUrl,
             ImageAlt = request.ImageAlt ?? string.Empty
         };
     }
 
-    public static AddArticleImageResponse? MapToResponse(ArticleImage? entity)
+    public static AddArticleImageResponse? MapToResponse(ArticleImage? entity, ArticleCode article, string articleName)
     {
         return entity is null
             ? null
@@ -130,8 +135,8 @@ public class AdminAddArticleImage : IEndpoint
             {
                 Id = entity.Id,
                 OrderIndex = entity.OrderIndex,
-                ArticleId = entity.ArticleId,
-                ArticleName = entity.Article?.Title,
+                ArticleCode = article,
+                ArticleName = articleName,
                 ImageUrl = entity.ImageUrl,
                 ImageAlt = entity.ImageAlt
             };

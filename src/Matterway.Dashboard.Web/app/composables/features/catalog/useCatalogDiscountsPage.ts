@@ -14,7 +14,7 @@ type DiscountListItem = {
   percentage: number | string
   validFrom: string
   validTo?: string | null
-  articleIds: string[]
+  articleCodes: string[]
 }
 
 type DiscountForm = {
@@ -51,7 +51,7 @@ export function useCatalogDiscountsPage() {
     validFrom: getDefaultDateTimeLocal(),
     validTo: "",
   })
-  const selectedArticleIds = ref<string[]>([])
+  const selectedArticleCodes = ref<string[]>([])
 
   function getDefaultDateTimeLocal() {
     const now = new Date()
@@ -106,7 +106,7 @@ export function useCatalogDiscountsPage() {
       validFrom: getDefaultDateTimeLocal(),
       validTo: "",
     }
-    selectedArticleIds.value = []
+    selectedArticleCodes.value = []
     resetMessages()
   }
 
@@ -120,7 +120,7 @@ export function useCatalogDiscountsPage() {
         toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
       validTo: toLocalDateTimeInput(discount.validTo),
     }
-    selectedArticleIds.value = [...discount.articleIds]
+    selectedArticleCodes.value = [...discount.articleCodes]
     resetMessages()
   }
 
@@ -131,7 +131,7 @@ export function useCatalogDiscountsPage() {
   }
 
   const filteredDiscounts = computed(() => {
-    const search = discountFilter.value.trim().toLowerCase()
+    const search = String(discountFilter.value ?? "").trim().toLowerCase()
     if (!search) return discounts.value
     return discounts.value.filter(
       (item) =>
@@ -202,7 +202,7 @@ export function useCatalogDiscountsPage() {
     const grouped = new Map<string, DiscountListItem>()
 
     for (const article of articleRows) {
-      if (!article.discount || !article.id) continue
+      if (!article.discount || !article.code) continue
       const code = normalizeCode((article.discount.code ?? "").toString())
       const percentage = article.discount.percentage
       const validFrom = article.discount.validFrom
@@ -217,12 +217,12 @@ export function useCatalogDiscountsPage() {
           percentage,
           validFrom,
           validTo,
-          articleIds: [article.id],
+          articleCodes: [article.code],
         })
         continue
       }
-      if (!existing.articleIds.includes(article.id)) {
-        existing.articleIds.push(article.id)
+      if (!existing.articleCodes.includes(article.code)) {
+        existing.articleCodes.push(article.code)
       }
     }
 
@@ -238,7 +238,7 @@ export function useCatalogDiscountsPage() {
       const validFrom = row.validFrom ?? ""
       const validTo = row.validTo ?? null
       const key = code || `${percentage}|${validFrom}|${validTo || ""}`
-      const articleId = row.articleId?.toString() ?? ""
+      const articleCode = row.articleCode?.toString() ?? ""
 
       const existing = grouped.get(key)
       if (!existing) {
@@ -248,12 +248,12 @@ export function useCatalogDiscountsPage() {
           percentage,
           validFrom,
           validTo,
-          articleIds: articleId ? [articleId] : [],
+          articleCodes: articleCode ? [articleCode] : [],
         })
         continue
       }
-      if (articleId && !existing.articleIds.includes(articleId)) {
-        existing.articleIds.push(articleId)
+      if (articleCode && !existing.articleCodes.includes(articleCode)) {
+        existing.articleCodes.push(articleCode)
       }
     }
 
@@ -293,8 +293,8 @@ export function useCatalogDiscountsPage() {
   function buildPayload() {
     const code = normalizeCode(form.value.code)
     const percentage = Number(form.value.percentage)
-    const validFrom = toIsoDateTime(form.value.validFrom)
-    const validToInput = form.value.validTo.trim()
+    const validFrom = toIsoDateTime(String(form.value.validFrom ?? ""))
+    const validToInput = String(form.value.validTo ?? "").trim()
     const validTo = validToInput ? toIsoDateTime(validToInput) : null
 
     if (!code) {
@@ -319,8 +319,8 @@ export function useCatalogDiscountsPage() {
       return null
     }
 
-    const articleIds = [...new Set(selectedArticleIds.value)]
-    if (!articleIds.length) {
+    const articleCodes = [...new Set(selectedArticleCodes.value)]
+    if (!articleCodes.length) {
       submitState.error = "Select at least one article."
       return null
     }
@@ -331,7 +331,7 @@ export function useCatalogDiscountsPage() {
         percentage,
         validFrom,
         validTo,
-        articleIds,
+        articleCodes,
       },
     }
   }
@@ -359,7 +359,7 @@ export function useCatalogDiscountsPage() {
       percentage: built.payload.percentage,
       validFrom: built.payload.validFrom,
       validTo: built.payload.validTo,
-      articleIds: built.payload.articleIds,
+      articleCodes: built.payload.articleCodes,
     }
 
     discounts.value = sortDiscounts([
@@ -418,7 +418,7 @@ export function useCatalogDiscountsPage() {
     selectedDiscount,
     isCreateMode,
     form,
-    selectedArticleIds,
+    selectedArticleCodes,
     filteredDiscountCount,
     filteredDiscountPages,
     visibleDiscounts,

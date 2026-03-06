@@ -1,6 +1,7 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCartStore } from "~/composables/stores/useCartStore"
 import { useStorefrontOrdersClient } from "~/composables/api/useStorefrontOrdersClient"
+import { useCustomerSessionSync } from "~/composables/features/auth/useCustomerSessionSync"
 import { useCheckoutAddressForm } from "./useCheckoutAddressForm"
 import { useCheckoutPaymentForm } from "./useCheckoutPaymentForm"
 
@@ -8,6 +9,8 @@ export function useCheckoutPage() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
   const ordersApi = useStorefrontOrdersClient()
+  const nuxtApp = useNuxtApp()
+  const { syncCustomerSession } = useCustomerSessionSync()
 
   const { address, hasRequiredAddressFields, loadDefaultAddress } =
     useCheckoutAddressForm()
@@ -28,14 +31,14 @@ export function useCheckoutPage() {
   const isCartEmpty = computed(() => totalItems.value === 0)
 
   async function initialize() {
-    await cart.refreshFromRemote().catch(() => null)
+    await syncCustomerSession({ force: true })
 
     if (isCartEmpty.value) {
-      await navigateTo("/cart")
+      await nuxtApp.runWithContext(() => navigateTo("/cart"))
       return
     }
 
-    await loadDefaultAddress()
+    await nuxtApp.runWithContext(() => loadDefaultAddress())
   }
 
   async function submitCheckout() {
@@ -86,7 +89,7 @@ export function useCheckoutPage() {
       }
 
       await cart.clear()
-      await navigateTo("/orders")
+      await nuxtApp.runWithContext(() => navigateTo("/orders"))
     } finally {
       loading.value = false
     }

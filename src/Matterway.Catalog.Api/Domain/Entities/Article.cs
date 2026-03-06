@@ -2,7 +2,6 @@
 
 public class Article
 {
-    public Guid Id { get; init; } = Guid.CreateVersion7();
     public required string ArticleCode { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
@@ -16,10 +15,10 @@ public class Article
     public List<ArticleImage> ArticleImages { get; } = [];
     public List<Discount> Discounts { get; } = [];
 
-    public void UpdateDetails(string? articleCode, string? title, string? description)
+    public void UpdateDetails(ArticleCode? code, string? title, string? description)
     {
-        if (!string.IsNullOrWhiteSpace(articleCode))
-            ArticleCode = articleCode;
+        if (code is { } nextCode)
+            ArticleCode = nextCode.Value;
 
         if (!string.IsNullOrWhiteSpace(title))
             Title = title;

@@ -19,7 +19,7 @@ const {
   selectedDiscount,
   isCreateMode,
   form,
-  selectedArticleIds,
+  selectedArticleCodes,
   filteredDiscountCount,
   filteredDiscountPages,
   visibleDiscounts,
@@ -32,6 +32,16 @@ const {
   saveDiscount,
   removeDiscount,
 } = useCatalogDiscountsPage()
+
+const percentageValue = computed({
+  get: () => {
+    const parsed = Number(form.value.percentage)
+    return Number.isFinite(parsed) ? parsed : null
+  },
+  set: (value: number | null | undefined) => {
+    form.value.percentage = value == null ? "" : value
+  },
+})
 </script>
 
 <template>
@@ -127,15 +137,17 @@ const {
                     required
                     help="Decimal range: 0.01 to 1."
                   >
-                    <UInput
-                      v-model="form.percentage"
-                      type="number"
-                      min="0.01"
-                      max="1"
-                      step="0.01"
+                    <UInputNumber
+                      v-model="percentageValue"
+                      orientation="vertical"
+                      :min="0.01"
+                      :max="1"
+                      :step="0.01"
+                      variant="outline"
                       placeholder="0.15"
                       :disabled="!canEdit"
                       class="w-full"
+                      :ui="{ root: 'w-full', base: 'w-full text-left' }"
                     />
                   </UFormField>
 
@@ -161,7 +173,7 @@ const {
                 </div>
 
                 <CatalogDiscountsArticleSelectionPanel
-                  v-model:model-value="selectedArticleIds"
+                  v-model:model-value="selectedArticleCodes"
                   :can-edit="canEdit"
                 />
 
