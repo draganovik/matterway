@@ -242,7 +242,7 @@ async function submitCheckout() {
       return
     }
 
-    const paymentResponse = await fetchWithTelemetry("/api/payments", {
+    const paymentResponse = await fetchWithTelemetry("/api/v1/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
