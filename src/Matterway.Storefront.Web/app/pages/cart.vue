@@ -7,7 +7,9 @@ definePageMeta({
   public: true,
 })
 
-const { cart, isEmpty, goToCheckout, clearCart } = useCartPage()
+const { cart, isEmpty, initialize, goToCheckout, clearCart } = useCartPage()
+
+await initialize()
 </script>
 
 <template>

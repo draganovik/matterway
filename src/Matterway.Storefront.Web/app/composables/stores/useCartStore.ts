@@ -96,9 +96,11 @@ export function useCartStore() {
     watchStarted.value = true
   }
 
-  onMounted(() => {
-    hydrate()
-  })
+  if (import.meta.client && getCurrentInstance()) {
+    onMounted(() => {
+      hydrate()
+    })
+  }
 
   async function syncItem(articleId: string, quantity: number) {
     if (!auth.isLoggedIn.value || !auth.isCustomer.value) return
@@ -198,6 +200,7 @@ export function useCartStore() {
     items.value = remote.items
       .map(mapRemoteCartItem)
       .filter((item): item is CartItem => item !== null)
+    hydrated.value = true
 
     return { ok: true as const }
   }

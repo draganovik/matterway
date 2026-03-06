@@ -8,6 +8,7 @@ type LoginForm = {
 
 export function useAuthLoginPage() {
   const auth = useAuthSessionStore()
+  const nuxtApp = useNuxtApp()
 
   const model = reactive<LoginForm>({
     email: "",
@@ -28,8 +29,8 @@ export function useAuthLoginPage() {
 
   async function initialize() {
     await auth.initialize()
-    if (auth.isLoggedIn.value) {
-      await navigateTo(getFirstRoute())
+    if (auth.isLoggedIn.value && auth.isEmployee.value) {
+      await nuxtApp.runWithContext(() => navigateTo(getFirstRoute()))
     }
   }
 
@@ -47,7 +48,7 @@ export function useAuthLoginPage() {
     loading.value = true
     try {
       await auth.login(email, password)
-      await navigateTo(getFirstRoute())
+      await nuxtApp.runWithContext(() => navigateTo(getFirstRoute()))
     } catch (err) {
       error.value = err instanceof Error ? err.message : "Login failed."
     } finally {

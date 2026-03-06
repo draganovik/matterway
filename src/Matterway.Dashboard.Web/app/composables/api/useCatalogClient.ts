@@ -39,6 +39,7 @@ const ADMIN_DISCOUNTS_PATH = "admin/discounts"
 export function useCatalogClient() {
   const api = useApiClient()
   const auth = useAuthSessionStore()
+  const config = useRuntimeConfig()
 
   async function queryArticles(params: QueryArticlesParams) {
     const query = buildQuery({
@@ -255,7 +256,6 @@ export function useCatalogClient() {
     ApiResult<ExportCatalogArchiveResponse>
   > {
     await auth.initialize()
-    const config = useRuntimeConfig()
     const baseUrl = config.public.catalogApiBaseUrl
     if (!baseUrl) {
       return {
@@ -281,8 +281,10 @@ export function useCatalogClient() {
     if (response.status === 401) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) headers.set("Authorization", refreshedToken)
-      response = await runFetch()
+      if (refreshedToken) {
+        headers.set("Authorization", refreshedToken)
+        response = await runFetch()
+      }
     }
 
     if (!response.ok) {

@@ -20,12 +20,15 @@ Storefront variant:
 - Required role: customer
 - Auth base path: /api/public/v1/auth
 - Unauthenticated redirect: /login?next=...
+- After auth restore, a customer-session hook syncs the remote cart once;
+  cart and checkout also force a sync on entry.
 
 Dashboard variant:
 - Required role: employee
 - Auth base path: /api/public/v1/auth
 - Unauthenticated redirect: /login
 - Permission check via service + level (observer/operator/manager)
+- Authenticated-but-unauthorized route access logs out and redirects to /login
 end note
 
 == Login (Getting the token) ==
@@ -55,11 +58,16 @@ alt Login succeeds and role matches app policy
     Page -> Page : 1.6.1.4 optional post-login cleanup (for example cart clear)
     Page --> User : 1.6.1.5 Navigate to next route (or "/")
   end
-else Login fails or role mismatches app policy
+else Login fails
   IdentityApi --> AuthStore : 1.6.2.1 HTTP 401/403 error payload
-  AuthStore -> AuthStore : 1.6.2.2 clearSession()
-  AuthStore --> Page : 1.6.2.3 return login error
-  Page --> User : 1.6.2.4 Show login error
+  AuthStore --> Page : 1.6.2.2 return login error
+  Page --> User : 1.6.2.3 Show login error
+else Login succeeds but role mismatches app policy
+  IdentityApi --> AuthStore : 1.6.3.1 HTTP 200 LoginResponse
+  AuthStore -> AuthStore : 1.6.3.2 setSession + write refresh cookie + scheduleRefresh
+  AuthStore -> AuthStore : 1.6.3.3 clearSession()
+  AuthStore --> Page : 1.6.3.4 return role error
+  Page --> User : 1.6.3.5 Show login error
 end
 deactivate IdentityApi
 deactivate AuthStore
@@ -82,12 +90,18 @@ else Access token missing/expired and refresh cookie exists,\nand refresh succee
   AuthStore -> AuthStore : 2.3.2.3 setSession + write refresh cookie + scheduleRefresh
   AuthStore --> Middleware : 2.3.2.4 return initialized (authenticated)
   deactivate IdentityApi
-else Access token missing/expired and refresh cookie exists,\nand refresh fails
+else Access token missing/expired and refresh cookie exists,\nand refresh returns wrong role or fails
   AuthStore -> IdentityApi : 2.3.3.1 POST /refresh {refreshToken}
   activate IdentityApi
-  IdentityApi --> AuthStore : 2.3.3.2 HTTP 401/403 error
-  AuthStore -> AuthStore : 2.3.3.3 clearSession()
-  AuthStore --> Middleware : 2.3.3.4 return initialized (anonymous)
+  alt HTTP 200 LoginResponse but role mismatches app policy
+    IdentityApi --> AuthStore : 2.3.3.2 HTTP 200 LoginResponse
+    AuthStore -> AuthStore : 2.3.3.3 setSession + write refresh cookie + scheduleRefresh
+    AuthStore -> AuthStore : 2.3.3.4 clearSession()
+  else HTTP 401/403 error or network failure
+    IdentityApi --> AuthStore : 2.3.3.2 HTTP 401/403 error
+    AuthStore -> AuthStore : 2.3.3.3 clearSession()
+  end
+  AuthStore --> Middleware : 2.3.3.5 return initialized (anonymous)
   deactivate IdentityApi
 else No access token and no refresh cookie
   AuthStore --> Middleware : 2.3.4.1 return initialized (anonymous)
@@ -104,8 +118,14 @@ else Authenticated but not authorized (Dashboard only)
   Middleware -> AuthStore : 2.4.2.3 hasPermission(service, allowedLevels)
   activate AuthStore
   AuthStore --> Middleware : 2.4.2.4 return false
+  Middleware -> AuthStore : 2.4.2.5 logout()
+  AuthStore -> IdentityApi : 2.4.2.6 POST /logout (best effort)
+  activate IdentityApi
+  IdentityApi --> AuthStore : 2.4.2.7 HTTP 200/401/network error ignored
+  deactivate IdentityApi
+  AuthStore -> AuthStore : 2.4.2.8 clearSession() + remove refresh cookie
   deactivate AuthStore
-  Middleware --> Page : 2.4.2.5 Redirect to fallback authorized route
+  Middleware --> Page : 2.4.2.9 Redirect to /login
 else Authenticated and authorized
   alt Dashboard
     Middleware -> Registry : 2.4.3.1 Resolve feature + required permissions
@@ -156,11 +176,12 @@ else Domain API returns 401 and refresh fails
   activate AuthStore
   AuthStore -> IdentityApi : 3.5.2.3 POST /refresh
   activate IdentityApi
-  IdentityApi --> AuthStore : 3.5.2.4 HTTP 401/403 error
+  IdentityApi --> AuthStore : 3.5.2.4 HTTP 200 wrong-role response or 401/403 error
   AuthStore -> AuthStore : 3.5.2.5 clearSession()
-  AuthStore --> ApiClient : 3.5.2.6 return refresh failure
+  AuthStore --> ApiClient : 3.5.2.6 return refresh failure (no token)
   deactivate IdentityApi
   deactivate AuthStore
+  ApiClient --> Page : 3.5.2.7 Return original 401 ApiResult (no retry)
 else Domain API returns non-401
   DomainApi --> ApiClient : 3.5.3.1 HTTP response
   deactivate DomainApi

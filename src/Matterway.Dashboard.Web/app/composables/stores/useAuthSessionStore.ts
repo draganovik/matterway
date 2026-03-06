@@ -72,6 +72,7 @@ function normalizePermissionLevel(raw: string): PermissionLevel | null {
 }
 
 export function useAuthSessionStore() {
+  const config = useRuntimeConfig()
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
@@ -107,7 +108,6 @@ export function useAuthSessionStore() {
   )
 
   function getAuthBaseUrl() {
-    const config = useRuntimeConfig()
     return `${config.public.identityApiBaseUrl}${authPath}`
   }
 

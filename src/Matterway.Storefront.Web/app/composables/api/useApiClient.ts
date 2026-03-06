@@ -118,8 +118,10 @@ export function useApiClient() {
     if (response.status === 401 && !allowUnauthorized) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) headers.set("Authorization", refreshedToken)
-      response = await runFetch()
+      if (refreshedToken) {
+        headers.set("Authorization", refreshedToken)
+        response = await runFetch()
+      }
     }
 
     if (response.status === 204) {
