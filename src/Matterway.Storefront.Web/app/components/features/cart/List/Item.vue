@@ -32,7 +32,7 @@ const emit = defineEmits<{
 
     <td class="px-3 py-3">
       <div class="flex items-center justify-center">
-        <ModalQuantityEditor
+        <CartQuantityInput
           :article-id="props.item.articleId"
           :quantity="props.item.quantity"
           :show-remove="true"

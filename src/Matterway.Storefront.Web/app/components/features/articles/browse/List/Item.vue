@@ -80,7 +80,7 @@ const currentQty = computed(() => cart.quantityFor(props.article.id))
         </UBadge>
 
         <div class="flex items-center gap-2">
-          <ModalQuantityEditor
+          <CartQuantityInput
             v-if="currentQty > 0"
             :article-id="article.id"
             :quantity="currentQty"

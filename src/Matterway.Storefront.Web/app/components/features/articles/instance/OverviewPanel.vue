@@ -59,7 +59,7 @@ const hasDiscount = computed(
         </UButton>
         <template v-else>
           <span class="text-muted text-sm font-medium">U korpi:</span>
-          <ModalQuantityEditor
+          <CartQuantityInput
             :article-id="props.article.id"
             :quantity="quantity"
             size="lg"
