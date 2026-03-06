@@ -18,7 +18,7 @@ public class SystemRegisterPayment : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
             .RequireSystemAccessKey()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<PaymentResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
@@ -53,15 +53,10 @@ public class SystemRegisterPayment : IEndpoint
     public record RegisterPaymentRequest
     {
         [Required]
-        public Guid OrderId { get; init; }
+        public OrderId OrderId { get; init; }
 
         [Required]
         public required string Provider { get; init; }
-
-        [Required]
-        [RegularExpression(@"^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$",
-            ErrorMessage = "Invalid ReferenceId. ReferenceId format must be: 0000-0000-0000-0000")]
-        public required string ReferenceId { get; init; }
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
@@ -75,9 +70,8 @@ public class SystemRegisterPayment : IEndpoint
     public record PaymentResponse
     {
         public Guid Id { get; init; }
-        public Guid OrderId { get; init; }
+        public OrderId OrderId { get; init; }
         public string? Provider { get; init; }
-        public string? ReferenceId { get; init; }
         public decimal Amount { get; init; }
         public EPaymentStatus Status { get; init; }
         public DateTime CreatedAt { get; init; }
@@ -89,7 +83,6 @@ public class SystemRegisterPayment : IEndpoint
         {
             OrderId = request.OrderId,
             Provider = request.Provider,
-            ReferenceId = request.ReferenceId,
             Amount = request.Amount,
             Status = request.Status,
             CreatedAt = request.CreatedAt ?? DateTime.UtcNow
@@ -103,7 +96,6 @@ public class SystemRegisterPayment : IEndpoint
             Id = entity.Id,
             OrderId = entity.OrderId,
             Provider = entity.Provider,
-            ReferenceId = entity.ReferenceId,
             Amount = entity.Amount,
             Status = entity.Status,
             CreatedAt = entity.CreatedAt

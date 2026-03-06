@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useOrderReveal } from "~/composables/useOrderReveal"
+import { useOrderRevealModal } from "~/composables/features/sales/useOrderRevealModal"
 import { formatDateTime, formatMoney } from "~/utils/formatters"
 import { paymentSumOf, paymentsBalanced } from "~/utils/salesOrderMetrics"
 
@@ -16,7 +16,7 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
-const { order, notFound, loadState, displayLabel } = useOrderReveal({
+const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   isOpen,
   orderId: toRef(props, "orderId"),
   orderLabel: toRef(props, "orderLabel"),
@@ -124,15 +124,6 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                     <dt class="text-muted text-xs">Provider</dt>
                     <dd class="text-foreground mt-1 text-sm">
                       {{ payment.provider || "-" }}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt class="text-muted text-xs">Reference ID</dt>
-                    <dd
-                      class="text-foreground mt-1 font-mono text-sm break-all"
-                    >
-                      {{ payment.referenceId || "-" }}
                     </dd>
                   </div>
 

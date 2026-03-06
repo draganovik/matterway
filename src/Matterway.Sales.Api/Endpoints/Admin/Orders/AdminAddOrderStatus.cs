@@ -10,7 +10,7 @@ public class AdminAddOrderStatus : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.Admin, "orders/{orderId:guid}/statuses", Handle)
+        endpoints.MapPost(EndpointKind.Admin, "orders/{orderId:OrderId}/statuses", Handle)
             .WithName("AdminAddOrderStatus").WithSummary("[admin] Add an Order status entry")
             .WithTags(nameof(OrderStatus))
             .Produces<OrderStatusResponse>(StatusCodes.Status201Created)
@@ -20,11 +20,11 @@ public class AdminAddOrderStatus : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<OrderStatusResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
-        Guid orderId,
+        OrderId orderId,
         AddOrderStatusRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,

@@ -37,6 +37,7 @@ internal static class WebAppComposition
         }
 
         var development = builder.AddViteApp(options.ServiceName, options.RelativePath)
+            .WithEnvironment("HOST", "localhost")
             .WithEnvironment("PORT", options.HostPort.ToString())
             .WithEndpoint(httpEndpoint, endpoint =>
             {

@@ -13,7 +13,23 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
-const items = computed(() => props.order?.items ?? [])
+const cachedOrder = ref<SalesOrder | null>(props.order)
+
+watch(
+  () => props.order,
+  (order) => {
+    if (order) {
+      cachedOrder.value = order
+    }
+  },
+  { immediate: true },
+)
+
+const displayOrder = computed(() =>
+  isOpen.value ? props.order : props.order ?? cachedOrder.value,
+)
+
+const items = computed(() => displayOrder.value?.items ?? [])
 
 const totalQuantity = computed(() =>
   items.value.reduce((sum, item) => sum + (item.quantity ?? 0), 0),
@@ -34,12 +50,14 @@ function lineTotalOf(quantity?: number, unitPrice?: number) {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-base font-semibold">Stavke porudžbine</h3>
-        <p class="text-muted text-sm">Porudžbina: {{ order?.id || "-" }}</p>
+        <p class="text-muted text-sm">
+          Porudžbina: {{ displayOrder?.id || "-" }}
+        </p>
       </div>
     </template>
 
     <template #body>
-      <div v-if="order" class="space-y-4">
+      <div v-if="displayOrder" class="space-y-4">
         <div class="grid gap-3 sm:grid-cols-2">
           <div class="border-default/70 rounded-md border px-3 py-2">
             <p class="text-muted text-xs">Broj stavki</p>
@@ -62,7 +80,7 @@ function lineTotalOf(quantity?: number, unitPrice?: number) {
         <div v-else class="space-y-2">
           <div
             v-for="(item, index) in items"
-            :key="`${order.id}-${item.articleTitle || 'item'}-${index}`"
+            :key="`${displayOrder.id}-${item.articleTitle || 'item'}-${index}`"
             class="border-default/70 rounded-md border px-3 py-2"
           >
             <dl class="grid gap-2 sm:grid-cols-2">

@@ -1,14 +1,18 @@
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { useCustomerSessionSync } from "~/composables/features/auth/useCustomerSessionSync"
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthSession()
+  const auth = useAuthSessionStore()
+  const { syncCustomerSession } = useCustomerSessionSync()
 
   if (to.meta.public) {
-    void auth.initialize()
+    await auth.initialize()
+    await syncCustomerSession()
     return
   }
 
   await auth.initialize()
+  await syncCustomerSession()
 
   if (!auth.isLoggedIn.value || !auth.isCustomer.value) {
     const nextPath = encodeURIComponent(to.fullPath)

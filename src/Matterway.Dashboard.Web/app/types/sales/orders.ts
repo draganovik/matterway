@@ -39,7 +39,7 @@ export type OrderDeliveryInfoResponse = {
 
 export type OrderItemResponse = {
   id: string
-  articleId: string
+  articleCode: string
   articleTitle?: string | null
   unitPrice: number | string
   quantity: number | string
@@ -54,7 +54,6 @@ export type OrderStatusResponse = {
 export type PaymentSnapshotResponse = {
   id: string
   provider?: string | null
-  referenceId?: string | null
   amount: number | string
   status: PaymentStatusType
   createdAt: string

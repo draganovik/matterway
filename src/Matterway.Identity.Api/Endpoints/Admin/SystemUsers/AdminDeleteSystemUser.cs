@@ -15,7 +15,7 @@ public class AdminDeleteSystemUser : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<NoContent, NotFound, ProblemHttpResult>> Handler(

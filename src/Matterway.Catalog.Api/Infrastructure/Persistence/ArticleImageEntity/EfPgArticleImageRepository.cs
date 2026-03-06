@@ -14,13 +14,13 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
             try
             {
                 var existingCount = await context.ArticleImage
-                    .Where(pi => pi.ArticleId == requestModel.ArticleId)
+                    .Where(pi => pi.ArticleCode == requestModel.ArticleCode)
                     .CountAsync(cancellationToken);
 
                 requestModel.OrderIndex = Math.Clamp(requestModel.OrderIndex, 0, existingCount);
 
                 await context.ArticleImage
-                    .Where(pi => pi.ArticleId == requestModel.ArticleId)
+                    .Where(pi => pi.ArticleCode == requestModel.ArticleCode)
                     .Where(pi => pi.OrderIndex >= requestModel.OrderIndex)
                     .ExecuteUpdateAsync(setters =>
                         setters.SetProperty(pi => pi.OrderIndex, pi => pi.OrderIndex + 1), cancellationToken);
@@ -37,7 +37,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
 
                 return await context.ArticleImage.Include(x => x.Article)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ArticleId == requestModel.ArticleId,
+                    .FirstOrDefaultAsync(x => x.Id == requestModel.Id && x.ArticleCode == requestModel.ArticleCode,
                         cancellationToken);
             }
             catch
@@ -48,8 +48,10 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
         });
     }
 
-    public async Task<bool> Delete(Guid parentId, int orderIndex, CancellationToken cancellationToken = default)
+    public async Task<bool> Delete(ArticleCode articleCode, int orderIndex,
+        CancellationToken cancellationToken = default)
     {
+        var normalizedCode = articleCode.Value;
         var strategy = context.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async () =>
         {
@@ -57,7 +59,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
             try
             {
                 var affected = await context.ArticleImage
-                    .Where(model => model.ArticleId == parentId)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .Where(model => model.OrderIndex == orderIndex)
                     .ExecuteDeleteAsync(cancellationToken);
                 if (affected != 1)
@@ -67,7 +69,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 }
 
                 await context.ArticleImage
-                    .Where(model => model.ArticleId == parentId)
+                    .Where(model => model.ArticleCode == normalizedCode)
                     .Where(model => model.OrderIndex > orderIndex)
                     .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(model => model.OrderIndex, model => model.OrderIndex - 1),
@@ -84,11 +86,12 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
         });
     }
 
-    public async Task<ArticleImage?> GetBy(Guid parentId, int orderIndex,
+    public async Task<ArticleImage?> GetBy(ArticleCode articleCode, int orderIndex,
         CancellationToken cancellationToken = default)
     {
+        var normalizedCode = articleCode.Value;
         return await
-            context.ArticleImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ArticleId == parentId,
+            context.ArticleImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ArticleCode == normalizedCode,
                 cancellationToken);
     }
 
@@ -103,7 +106,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
             {
                 var existing = await context.ArticleImage
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ArticleId == request.ArticleId && x.Id == request.Id,
+                    .FirstOrDefaultAsync(x => x.ArticleCode == request.ArticleCode && x.Id == request.Id,
                         cancellationToken);
 
                 if (existing is null)
@@ -113,7 +116,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 }
 
                 var total = await context.ArticleImage
-                    .Where(x => x.ArticleId == request.ArticleId)
+                    .Where(x => x.ArticleCode == request.ArticleCode)
                     .CountAsync(cancellationToken);
 
                 if (total == 0)
@@ -126,13 +129,13 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
 
                 if (clampedTarget < existing.OrderIndex)
                     await context.ArticleImage
-                        .Where(x => x.ArticleId == request.ArticleId)
+                        .Where(x => x.ArticleCode == request.ArticleCode)
                         .Where(x => x.OrderIndex >= clampedTarget && x.OrderIndex < existing.OrderIndex)
                         .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1), cancellationToken);
                 else if (clampedTarget > existing.OrderIndex)
                     await context.ArticleImage
-                        .Where(x => x.ArticleId == request.ArticleId)
+                        .Where(x => x.ArticleCode == request.ArticleCode)
                         .Where(x => x.OrderIndex > existing.OrderIndex && x.OrderIndex <= clampedTarget)
                         .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1), cancellationToken);
@@ -140,7 +143,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
 
                 var updatedRows = await context.ArticleImage
-                    .Where(x => x.ArticleId == request.ArticleId && x.Id == request.Id)
+                    .Where(x => x.ArticleCode == request.ArticleCode && x.Id == request.Id)
                     .ExecuteUpdateAsync(setters =>
                         setters.SetProperty(x => x.OrderIndex, x => clampedTarget)
                             .SetProperty(x => x.ImageAlt, x => newAlt), cancellationToken);
@@ -155,7 +158,7 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
 
                 return await context.ArticleImage.Include(x => x.Article)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ArticleId == request.ArticleId && x.Id == request.Id,
+                    .FirstOrDefaultAsync(x => x.ArticleCode == request.ArticleCode && x.Id == request.Id,
                         cancellationToken);
             }
             catch

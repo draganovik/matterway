@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui"
 import { getJwtStringClaim } from "~/utils/jwt"
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 
 defineProps<{
   collapsed?: boolean
 }>()
 
-const auth = useAuthSession()
+const auth = useAuthSessionStore()
 const userLabel = computed(() => {
   const payload = auth.payload.value
   const candidates = [

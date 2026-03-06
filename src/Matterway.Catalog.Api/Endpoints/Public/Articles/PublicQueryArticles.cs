@@ -14,7 +14,7 @@ public class PublicQueryArticles : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
-            .MapToApiVersion(new ApiVersion(1, 0))
+            .MapToApiVersion(new ApiVersion(1))
             .AddOpenApiOperationTransformer((operation, context, ct) =>
             {
                 var filterParam = operation.Parameters?
@@ -77,8 +77,7 @@ public class PublicQueryArticles : IEndpoint
 
     public record QueryArticleResponse
     {
-        public Guid Id { get; set; }
-        public string? Code { get; set; }
+        public required ArticleCode Code { get; set; }
         public string? Title { get; set; }
         public decimal? BasePrice { get; set; }
         public decimal? Price { get; set; }
@@ -103,8 +102,7 @@ public class PublicQueryArticles : IEndpoint
         var discount = entity.GetLatestActiveDiscount();
         return new QueryArticleResponse
         {
-            Id = entity.Id,
-            Code = entity.ArticleCode,
+            Code = ArticleCode.Parse(entity.ArticleCode, null),
             Title = entity.Title,
             BasePrice = basePrice,
             Price = price,

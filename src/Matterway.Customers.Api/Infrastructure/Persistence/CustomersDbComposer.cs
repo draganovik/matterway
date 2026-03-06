@@ -24,6 +24,6 @@ public class CustomersDbComposer(DbContextOptions<CustomersDbComposer> options) 
         modelBuilder.ApplyConfiguration(new CustomerArticleEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new CustomerOrderEntityTypeConfiguration());
 
-        ModelDataLoader.InitializeDemo(modelBuilder);
+        ModelDataLoader.Initialize(modelBuilder);
     }
 }

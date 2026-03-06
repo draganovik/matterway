@@ -13,8 +13,7 @@ export type QueryArticlesParams = {
 }
 
 export type QueryArticleResponse = {
-  id: string
-  code?: string | null
+  code: string
   title?: string | null
   basePrice?: NumberInput | null
   price?: NumberInput | null
@@ -25,9 +24,8 @@ export type QueryArticleResponse = {
   isAvailable: boolean
 }
 
-export type GetArticleByIdResponse = {
-  id: string
-  code?: string | null
+export type GetArticleResponse = {
+  code: string
   title?: string | null
   basePrice?: NumberInput | null
   price?: NumberInput | null
@@ -43,7 +41,7 @@ export type GetArticleByIdResponse = {
 export type QueryArticlesResponse = PaginationResponse<QueryArticleResponse>
 
 export type CreateArticleRequest = {
-  articleCode: string
+  code: string
   title: string
   basePrice: NumberInput
   description: string
@@ -51,7 +49,7 @@ export type CreateArticleRequest = {
 }
 
 export type UpdateArticleRequest = {
-  articleCode?: string | null
+  code?: string | null
   title?: string | null
   basePrice?: NumberInput | null
   description?: string | null
@@ -59,8 +57,7 @@ export type UpdateArticleRequest = {
 }
 
 export type CreateArticleResponse = {
-  id: string
-  articleCode?: string | null
+  code: string
   title?: string | null
   basePrice?: NumberInput | null
   price?: NumberInput | null
@@ -71,8 +68,7 @@ export type CreateArticleResponse = {
 }
 
 export type UpdateArticleResponse = {
-  id: string
-  articleCode?: string | null
+  code: string
   title?: string | null
   basePrice?: NumberInput | null
   price?: NumberInput | null

@@ -15,7 +15,7 @@ public class SelfCreateCustomer : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
                 RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<CustomerResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>

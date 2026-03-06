@@ -4,7 +4,7 @@ using Domain;
 
 public class Order
 {
-    public Guid Id { get; init; } = Guid.CreateVersion7();
+    public OrderId Id { get; init; } = OrderId.New();
     public Guid? CustomerId { get; set; }
     public EOrderType Type { get; set; } = EOrderType.Ecommerce;
     public DateTime PlacedAt { get; init; } = DateTime.UtcNow;

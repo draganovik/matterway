@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useOrderReveal } from "~/composables/useOrderReveal"
+import { useOrderRevealModal } from "~/composables/features/sales/useOrderRevealModal"
 import { formatMoney } from "~/utils/formatters"
 import { lineTotalOf, quantitySumOf } from "~/utils/salesOrderMetrics"
 
@@ -16,7 +16,7 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
-const { order, notFound, loadState, displayLabel } = useOrderReveal({
+const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   isOpen,
   orderId: toRef(props, "orderId"),
   orderLabel: toRef(props, "orderLabel"),
@@ -92,9 +92,9 @@ const quantitySum = computed(() => quantitySumOf(order.value))
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Article ID</dt>
+                  <dt class="text-muted text-xs">Article Code</dt>
                   <dd class="text-foreground mt-1 font-mono text-sm break-all">
-                    {{ item.articleId }}
+                    {{ item.articleCode }}
                   </dd>
                 </div>
 

@@ -16,7 +16,7 @@ public class SelfQueryOrders : IEndpoint
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<PaginationResponse<CustomerOrderResponse>>, NoContent, ForbidHttpResult>>
@@ -51,7 +51,7 @@ public class SelfQueryOrders : IEndpoint
 
     public record CustomerOrderResponse
     {
-        public Guid OrderId { get; init; }
+        public OrderId OrderId { get; init; }
         public Guid CustomerId { get; init; }
         public DateTime PlacedAt { get; init; }
         public decimal TotalAmount { get; init; }
@@ -61,7 +61,7 @@ public class SelfQueryOrders : IEndpoint
     public record CustomerArticleResponse
     {
         [Required]
-        public Guid ArticleId { get; init; }
+        public ArticleCode ArticleCode { get; init; }
 
         [Required]
         public string? ArticleName { get; init; }
@@ -77,7 +77,7 @@ public class SelfQueryOrders : IEndpoint
     {
         var items = order.Items.Select(item => new CustomerArticleResponse
         {
-            ArticleId = item.ArticleId,
+            ArticleCode = ArticleCode.Parse(item.ArticleCode, null),
             ArticleName = item.ArticleName,
             UnitPrice = item.UnitPrice,
             Quantity = item.Quantity

@@ -8,7 +8,7 @@ public class AdminUpdateArticle : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPatch(EndpointKind.Admin, "articles/{id:guid}", Handle)
+        endpoints.MapPatch(EndpointKind.Admin, "articles/{code:ArticleCode}", Handle)
             .WithName("AdminUpdateArticle").WithSummary("[admin] Update an Article")
             .WithTags("Articles")
             .Produces<UpdateArticleResponse>()
@@ -17,21 +17,21 @@ public class AdminUpdateArticle : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<UpdateArticleResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
-        Guid id,
+        ArticleCode code,
         UpdateArticleRequest request,
         IArticleRepository articleRepository,
         CancellationToken cancellationToken)
     {
-        var entity = await articleRepository.GetBy(id, cancellationToken);
+        var entity = await articleRepository.GetBy(code, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
         MapUpdate(entity, request);
 
-        var updated = await articleRepository.Update(entity, cancellationToken);
+        var updated = await articleRepository.Update(entity, code, cancellationToken);
 
         if (updated is null) return TypedResults.NotFound();
 
@@ -40,10 +40,7 @@ public class AdminUpdateArticle : IEndpoint
 
     public record UpdateArticleRequest
     {
-        [StringLength(10, MinimumLength = 5, ErrorMessage = "Article code must be between 5 and 10 characters.")]
-        [RegularExpression(@"^[A-Z0-9]{5,10}$",
-            ErrorMessage = "Article code must contain only uppercase letters and numbers.")]
-        public string? ArticleCode { get; init; }
+        public ArticleCode? Code { get; init; }
 
         [MinLength(1, ErrorMessage = "Title cannot be empty if provided.")]
         public string? Title { get; init; }
@@ -59,8 +56,7 @@ public class AdminUpdateArticle : IEndpoint
 
     public record UpdateArticleResponse
     {
-        public Guid Id { get; init; }
-        public string? ArticleCode { get; init; }
+        public required ArticleCode Code { get; init; }
         public string? Title { get; init; }
         public decimal? BasePrice { get; init; }
         public decimal? Price { get; init; }
@@ -72,7 +68,7 @@ public class AdminUpdateArticle : IEndpoint
 
     public static void MapUpdate(Article entity, UpdateArticleRequest request)
     {
-        entity.UpdateDetails(request.ArticleCode, request.Title, request.Description);
+        entity.UpdateDetails(request.Code, request.Title, request.Description);
         entity.SetAvailability(request.IsAvailable);
 
         if (request.BasePrice is not null)
@@ -83,8 +79,7 @@ public class AdminUpdateArticle : IEndpoint
     {
         return new UpdateArticleResponse
         {
-            Id = entity.Id,
-            ArticleCode = entity.ArticleCode,
+            Code = ArticleCode.Parse(entity.ArticleCode, null),
             Title = entity.Title,
             BasePrice = entity.BasePrice,
             Price = entity.GetFinalPrice(),

@@ -11,7 +11,7 @@ export type {
   AddArticleImageResponse,
   CreateArticleRequest,
   CreateArticleResponse,
-  GetArticleByIdResponse,
+  GetArticleResponse,
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,

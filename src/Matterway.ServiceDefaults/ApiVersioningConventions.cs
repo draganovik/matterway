@@ -143,7 +143,7 @@ public static class ApiVersioningConventions
             int.TryParse(versionParts[0], out var majorVersion) &&
             majorVersion > 0)
         {
-            version = new ApiVersion(majorVersion, 0);
+            version = new ApiVersion(majorVersion);
             return true;
         }
 

@@ -16,7 +16,7 @@ public class PublicRegisterCustomer : IEndpoint
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .AllowAnonymous()
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<CustomerResponse>, BadRequest<ProblemDetails>>> Handler(

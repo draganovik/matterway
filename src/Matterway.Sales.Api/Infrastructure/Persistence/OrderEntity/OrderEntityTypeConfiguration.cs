@@ -13,6 +13,11 @@ internal sealed class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Or
 
         builder.HasKey(order => order.Id);
 
+        builder.Property(order => order.Id)
+            .HasMaxLength(OrderId.MaxLength)
+            .HasConversion(orderId => orderId.Value, value => OrderId.FromStorage(value))
+            .IsRequired();
+
         builder.Property(order => order.CustomerId)
             .IsRequired(false);
 

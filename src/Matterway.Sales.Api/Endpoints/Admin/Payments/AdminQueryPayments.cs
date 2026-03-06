@@ -18,7 +18,7 @@ public class AdminQueryPayments : IEndpoint
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
                     RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async
@@ -58,6 +58,6 @@ public class AdminQueryPayments : IEndpoint
 
     public sealed record QueryPaymentsParameters : PaginationRequestParameters
     {
-        public Guid? OrderId { get; init; }
+        public OrderId? OrderId { get; init; }
     }
 }

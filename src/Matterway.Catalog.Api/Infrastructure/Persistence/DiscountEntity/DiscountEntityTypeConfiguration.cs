@@ -10,10 +10,14 @@ internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration
     {
         builder.ToTable(nameof(Discount));
 
-        builder.HasKey(d => new { d.Code, d.ArticleId });
+        builder.HasKey(d => new { d.Code, d.ArticleCode });
 
         builder.Property(d => d.Code)
             .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(d => d.ArticleCode)
+            .HasMaxLength(ArticleCode.Length)
             .IsRequired();
 
         builder.Property(d => d.Percentage)
@@ -26,6 +30,7 @@ internal sealed class DiscountEntityTypeConfiguration : IEntityTypeConfiguration
 
         builder.HasOne(d => d.Article)
             .WithMany(a => a.Discounts)
-            .HasForeignKey(d => d.ArticleId);
+            .HasForeignKey(d => d.ArticleCode)
+            .HasPrincipalKey(a => a.ArticleCode);
     }
 }

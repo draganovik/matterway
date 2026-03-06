@@ -7,6 +7,6 @@ public class ArticleImage
     public required string ImageUrl { get; set; }
     public string? ImageAlt { get; set; }
 
-    public required Guid ArticleId { get; set; }
+    public required string ArticleCode { get; set; }
     public Article? Article { get; set; }
 }

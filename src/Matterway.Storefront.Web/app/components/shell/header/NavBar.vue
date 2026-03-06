@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAuthSession } from "~/composables/useAuthSession"
-import { useCart } from "~/composables/useCart"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { useCartStore } from "~/composables/stores/useCartStore"
 import { getJwtStringClaim } from "~/utils/jwt"
 
-const auth = useAuthSession()
-const cart = useCart()
+const auth = useAuthSessionStore()
+const cart = useCartStore()
 const route = useRoute()
 const router = useRouter()
 

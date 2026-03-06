@@ -1,11 +1,11 @@
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { getFeatureByRoute } from "~/data/serviceRegistry"
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const auth = useAuthSession()
+  const auth = useAuthSessionStore()
 
   if (to.meta.public) {
-    void auth.initialize()
+    await auth.initialize()
     return
   }
 
@@ -21,7 +21,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (requiredService && requiredPermissions?.length) {
     if (!auth.hasPermission(requiredService, requiredPermissions)) {
-      return navigateTo(feature?.route || "/")
+      await auth.logout()
+      return navigateTo("/login")
     }
   }
 })

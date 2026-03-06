@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
@@ -10,28 +11,33 @@ public class AdminAddArticleDetail : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.Admin, "articles/{articleId:Guid}/details", Handle)
+        endpoints.MapPost(EndpointKind.Admin, "articles/{article:ArticleCode}/details", Handle)
             .WithName("AdminAddArticleDetail").WithSummary("[admin] Add a new ArticleDetail")
             .WithTags("ArticleDetail")
             .Produces<AddArticleDetailResponse>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AddArticleDetailResponse>, BadRequest<ProblemDetails>>> Handle(
+    private static async Task<Results<Created<AddArticleDetailResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
         [FromRoute]
-        Guid articleId,
+        ArticleCode article,
         AddArticleDetailRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,
+        IArticleRepository articleRepository,
         IDetailRepository detailRepository,
         IArticleDetailTextRepository detailTextRepository,
         IArticleDetailNumericRepository detailNumericRepository,
         CancellationToken cancellationToken)
     {
+        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
+        if (articleEntity is null) return TypedResults.NotFound();
+
         var normalizedSlug = request.DetailSlug.Trim().ToLower();
         var validation = ValidateRequest(request);
         if (validation is not null) return validation;
@@ -51,8 +57,8 @@ public class AdminAddArticleDetail : IEndpoint
         if (!isNumeric && string.IsNullOrWhiteSpace(request.TextValue))
             return TypedResults.BadRequest(BuildValueMismatchProblem(detail, "text"));
 
-        var existingText = await detailTextRepository.GetBy(articleId, normalizedSlug, cancellationToken);
-        var existingNumeric = await detailNumericRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        var existingText = await detailTextRepository.GetBy(article, normalizedSlug, cancellationToken);
+        var existingNumeric = await detailNumericRepository.GetBy(article, normalizedSlug, cancellationToken);
         if (existingText is not null || existingNumeric is not null)
             return TypedResults.BadRequest(new ProblemDetails
             {
@@ -66,35 +72,35 @@ public class AdminAddArticleDetail : IEndpoint
         {
             var entity = new ArticleDetailNumeric
             {
-                ArticleId = articleId,
+                ArticleCode = article.ToString(),
                 DetailSlug = normalizedSlug,
                 Value = request.NumericValue!.Value
             };
 
             var saved = await detailNumericRepository.Create(entity, cancellationToken);
             if (saved is null) return TypedResults.BadRequest(BuildCreateProblem());
-            created = MapToResponse(saved);
+            created = MapToResponse(saved, article, articleEntity.Title);
         }
         else
         {
             var entity = new ArticleDetailText
             {
-                ArticleId = articleId,
+                ArticleCode = article.ToString(),
                 DetailSlug = normalizedSlug,
                 Value = request.TextValue!.Trim()
             };
 
             var saved = await detailTextRepository.Create(entity, cancellationToken);
             if (saved is null) return TypedResults.BadRequest(BuildCreateProblem());
-            created = MapToResponse(saved);
+            created = MapToResponse(saved, article, articleEntity.Title);
         }
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "PublicGetArticleById",
+            "PublicGetArticleByCode",
             new
             {
-                id = created.ArticleId
+                code = created.ArticleCode
             });
 
         return TypedResults.Created(location, created);
@@ -111,7 +117,7 @@ public class AdminAddArticleDetail : IEndpoint
 
     public record AddArticleDetailResponse
     {
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
         public string? ArticleTitle { get; init; }
         public string? DetailSlug { get; init; }
         public string? Title { get; init; }
@@ -155,12 +161,15 @@ public class AdminAddArticleDetail : IEndpoint
         };
     }
 
-    public static AddArticleDetailResponse MapToResponse(ArticleDetailText entity)
+    public static AddArticleDetailResponse MapToResponse(
+        ArticleDetailText entity,
+        ArticleCode article,
+        string articleTitle)
     {
         return new AddArticleDetailResponse
         {
-            ArticleId = entity.ArticleId,
-            ArticleTitle = entity.Article?.Title,
+            ArticleCode = article,
+            ArticleTitle = articleTitle,
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
             Unit = entity.Detail?.Unit,
@@ -169,12 +178,15 @@ public class AdminAddArticleDetail : IEndpoint
         };
     }
 
-    public static AddArticleDetailResponse MapToResponse(ArticleDetailNumeric entity)
+    public static AddArticleDetailResponse MapToResponse(
+        ArticleDetailNumeric entity,
+        ArticleCode article,
+        string articleTitle)
     {
         return new AddArticleDetailResponse
         {
-            ArticleId = entity.ArticleId,
-            ArticleTitle = entity.Article?.Title,
+            ArticleCode = article,
+            ArticleTitle = articleTitle,
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
             Unit = entity.Detail?.Unit,

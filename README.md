@@ -6,8 +6,8 @@
 Matterway is a full-stack commerce platform designed as a
 service-oriented backend with two modern Nuxt-based web applications:
 
--   **Storefront.Web** --- Customer-facing shopping experience\
--   **Dashboard.Web** --- Internal ERP / administration console
+-   **Storefront.Web** --- Customer-facing SSR shopping experience\
+-   **Dashboard.Web** --- Internal SSR ERP / administration console
 
 The system follows strict service ownership boundaries (Catalog,
 Customers, Identity, Sales), centralized schema migration execution, and
@@ -58,7 +58,7 @@ flowchart LR
 
 -   **Style**: ASP.NET Core Minimal APIs
 -   **Structure**: Feature-first layout (`Endpoints/<Scope>/<Endpoint>`)
--   **Versioning**: URL segment versioning (`v1.0`)
+-   **Versioning**: URL segment versioning (`v1`)
 -   **Data ownership**: Each service owns its schema and database
 -   **Cross-service calls**: Typed HttpClients with resilient defaults
 
@@ -77,9 +77,9 @@ Where scope is:
 
 Example:
 
-    /api/public/v1.0/articles
-    /api/self/v1.0/profile
-    /api/admin/v1.0/orders
+    /api/public/v1/auth
+    /api/self/v1/orders
+    /api/admin/v1/orders
 
 ------------------------------------------------------------------------
 
@@ -105,8 +105,8 @@ Example:
   Customers.Api      2002    Profiles, addresses, carts, order mirror
   Identity.Api       2003    Authentication, token issuance, permissions
   Sales.Api          2005    Order lifecycle, payments, status tracking
-  Storefront.Web     3001    Customer SPA (Nuxt 4)
-  Dashboard.Web      3002    Admin SPA (Nuxt 4)
+  Storefront.Web     3001    Customer SSR app (Nuxt 4)
+  Dashboard.Web      3002    Admin SSR app (Nuxt 4)
   PostgreSQL         15432   Relational datastore
   MinIO API          19000   Object storage API
   MinIO Console      19001   Storage admin console
@@ -200,7 +200,13 @@ Apply database migrations:
 Stripe webhook forwarding:
 
 ``` bash
-stripe listen --forward-to http://localhost:3001/api/webhooks/stripe-intent
+stripe listen --forward-to http://localhost:3001/api/v1/webhooks/stripe
+```
+
+Checkout orchestration endpoint:
+
+``` bash
+POST http://localhost:3001/api/v1/orders
 ```
 
 ------------------------------------------------------------------------

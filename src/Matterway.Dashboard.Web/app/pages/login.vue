@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { serviceSections } from "~/data/serviceRegistry"
-import { useAuthSession } from "~/composables/useAuthSession"
+import { useAuthLoginPage } from "~/composables/features/auth/useAuthLoginPage"
 
 definePageMeta({
   layout: false,
@@ -8,59 +7,13 @@ definePageMeta({
   title: "Sign In",
 })
 
-const auth = useAuthSession()
-const model = reactive({
-  email: "",
-  password: "",
-})
-const error = ref("")
-const loading = ref(false)
+const { model, error, loading, initialize, submit } = useAuthLoginPage()
 
-onMounted(async () => {
-  await auth.initialize()
-  if (auth.isLoggedIn.value) {
-    await navigateTo(getFirstRoute())
-  }
-})
-
-function getFirstRoute() {
-  for (const service of serviceSections) {
-    if (!auth.hasPermission(service.service, service.allowed)) continue
-    const feature = service.features.find((item) =>
-      auth.hasPermission(item.service, item.allowed),
-    )
-    if (feature) return feature.route
-  }
-  return "/"
-}
-
-async function handleSubmit() {
-  const email = model.email.trim()
-  const password = model.password
-
-  error.value = ""
-
-  if (!email || !password.trim()) {
-    error.value = "Email and password are required."
-    return
-  }
-
-  loading.value = true
-  try {
-    await auth.login(email, password)
-    await navigateTo(getFirstRoute())
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : "Login failed."
-  } finally {
-    loading.value = false
-  }
-}
+await initialize()
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-stone-100 via-stone-50 to-stone-200 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950"
-  >
+  <div class="bg-default min-h-screen">
     <div
       class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6"
     >
@@ -88,7 +41,7 @@ async function handleSubmit() {
             </div>
           </template>
 
-          <form class="space-y-4" @submit.prevent="handleSubmit">
+          <form class="space-y-4" @submit.prevent="submit">
             <UFormField label="Email" required>
               <UInput
                 v-model="model.email"

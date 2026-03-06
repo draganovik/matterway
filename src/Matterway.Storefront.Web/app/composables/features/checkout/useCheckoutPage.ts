@@ -1,0 +1,110 @@
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { useCartStore } from "~/composables/stores/useCartStore"
+import { useStorefrontOrdersClient } from "~/composables/api/useStorefrontOrdersClient"
+import { useCustomerSessionSync } from "~/composables/features/auth/useCustomerSessionSync"
+import { useCheckoutAddressForm } from "./useCheckoutAddressForm"
+import { useCheckoutPaymentForm } from "./useCheckoutPaymentForm"
+
+export function useCheckoutPage() {
+  const auth = useAuthSessionStore()
+  const cart = useCartStore()
+  const ordersApi = useStorefrontOrdersClient()
+  const nuxtApp = useNuxtApp()
+  const { syncCustomerSession } = useCustomerSessionSync()
+
+  const { address, hasRequiredAddressFields, loadDefaultAddress } =
+    useCheckoutAddressForm()
+  const {
+    payment,
+    currentYear,
+    getCardDigits,
+    getParsedExpiry,
+    getValidationError,
+    normalizeExpMonthOnBlur,
+  } = useCheckoutPaymentForm()
+
+  const error = ref("")
+  const loading = ref(false)
+
+  const totalItems = computed(() => cart.totalItems.value)
+  const totalPrice = computed(() => cart.totalPrice.value)
+  const isCartEmpty = computed(() => totalItems.value === 0)
+
+  async function initialize() {
+    await syncCustomerSession({ force: true })
+
+    if (isCartEmpty.value) {
+      await nuxtApp.runWithContext(() => navigateTo("/cart"))
+      return
+    }
+
+    await nuxtApp.runWithContext(() => loadDefaultAddress())
+  }
+
+  async function submitCheckout() {
+    if (loading.value) return
+    error.value = ""
+
+    if (!auth.customerId.value) {
+      error.value = "Korisnička sesija nije dostupna."
+      return
+    }
+
+    loading.value = true
+    try {
+      if (isCartEmpty.value) {
+        error.value = "Korpa je prazna."
+        return
+      }
+
+      if (!hasRequiredAddressFields()) {
+        error.value = "Popunite sva obavezna polja za dostavu."
+        return
+      }
+
+      const paymentValidationError = getValidationError()
+      if (paymentValidationError) {
+        error.value = paymentValidationError
+        return
+      }
+
+      const expiry = getParsedExpiry()
+      if (!expiry) {
+        error.value = "Unesite ispravan datum isteka kartice."
+        return
+      }
+
+      const orderResponse = await ordersApi.createOrder({
+        customerId: auth.customerId.value,
+        amount: cart.totalPrice.value,
+        address,
+        cardNumber: getCardDigits(),
+        cvc: payment.cvc.replace(/\D/g, ""),
+        expiry,
+      })
+
+      if (!orderResponse.ok || !orderResponse.data?.id) {
+        error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo."
+        return
+      }
+
+      await cart.clear()
+      await nuxtApp.runWithContext(() => navigateTo("/orders"))
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    address,
+    payment,
+    currentYear,
+    totalItems,
+    totalPrice,
+    error,
+    loading,
+    initialize,
+    submitCheckout,
+    normalizeExpMonthOnBlur,
+  }
+}

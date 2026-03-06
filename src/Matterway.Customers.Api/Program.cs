@@ -11,8 +11,8 @@ var builder = BuilderBootstrap.CreateBuilder(args);
 builder
     .ConfigureApi(apiContract)
     .ConfigureAuthentication()
-    .ConfigureCatalogIntegration()
-    .ConfigureIdentityIntegration()
+    .ConfigureApiHttpClient<ICatalogClient, HttpCatalogClient>(ApiDirectory.Catalog)
+    .ConfigureApiHttpClient<IIdentityClient, HttpIdentityClient>(ApiDirectory.Identity)
     .ConfigurePersistence()
     .ConfigureEndpoints();
 

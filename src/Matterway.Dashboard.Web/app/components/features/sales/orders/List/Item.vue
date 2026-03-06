@@ -13,20 +13,13 @@ const latestStatus = computed(() => {
 })
 
 const isPaymentBalanced = computed(() => paymentsBalanced(item))
-
-const shortOrderId = computed(() => {
-  const value = String(item.id || "").trim()
-  if (!value) return "No ID"
-  const segments = value.split("-").filter(Boolean)
-  return segments.length ? segments[segments.length - 1] : value
-})
 </script>
 
 <template>
   <div class="flex w-full items-end justify-between gap-3">
     <div class="min-w-0 space-y-1">
-      <p class="text-foreground truncate font-mono text-base font-medium">
-        {{ shortOrderId }}
+      <p class="text-foreground break-all font-mono text-sm font-medium leading-snug">
+        {{ item.id || "No ID" }}
       </p>
       <p class="text-muted truncate text-xs">
         Placed: {{ formatDateTime(item.placedAt) }}

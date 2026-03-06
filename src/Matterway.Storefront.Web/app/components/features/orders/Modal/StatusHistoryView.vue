@@ -13,6 +13,22 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
+const cachedOrder = ref<SalesOrder | null>(props.order)
+
+watch(
+  () => props.order,
+  (order) => {
+    if (order) {
+      cachedOrder.value = order
+    }
+  },
+  { immediate: true },
+)
+
+const displayOrder = computed(() =>
+  isOpen.value ? props.order : props.order ?? cachedOrder.value,
+)
+
 function toTimestamp(value?: string | null) {
   if (!value) return 0
   const timestamp = new Date(value).getTime()
@@ -20,7 +36,7 @@ function toTimestamp(value?: string | null) {
 }
 
 const statusHistory = computed(() => {
-  const entries = [...(props.order?.statusHistory ?? [])]
+  const entries = [...(displayOrder.value?.statusHistory ?? [])]
   entries.sort(
     (left, right) => toTimestamp(right.changedAt) - toTimestamp(left.changedAt),
   )
@@ -33,12 +49,14 @@ const statusHistory = computed(() => {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-base font-semibold">Istorija statusa porudžbine</h3>
-        <p class="text-muted text-sm">Porudžbina: {{ order?.id || "-" }}</p>
+        <p class="text-muted text-sm">
+          Porudžbina: {{ displayOrder?.id || "-" }}
+        </p>
       </div>
     </template>
 
     <template #body>
-      <div v-if="order" class="space-y-4">
+      <div v-if="displayOrder" class="space-y-4">
         <div class="flex items-center justify-between gap-3">
           <h4 class="text-sm font-semibold">Vremenska linija</h4>
           <UBadge color="neutral" variant="subtle" class="font-normal">

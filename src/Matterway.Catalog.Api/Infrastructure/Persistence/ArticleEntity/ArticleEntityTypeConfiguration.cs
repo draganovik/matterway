@@ -10,13 +10,11 @@ internal sealed class ArticleEntityTypeConfiguration : IEntityTypeConfiguration<
     {
         builder.ToTable(nameof(Article));
 
-        builder.HasKey(p => p.Id);
-
-        builder.HasIndex(p => p.ArticleCode)
-            .IsUnique();
+        builder.HasKey(p => p.ArticleCode);
 
         builder.Property(p => p.ArticleCode)
-            .HasMaxLength(10)
+            .HasMaxLength(ArticleCode.Length)
+            .ValueGeneratedNever()
             .IsRequired();
 
         builder.Property(p => p.Title)
@@ -42,18 +40,22 @@ internal sealed class ArticleEntityTypeConfiguration : IEntityTypeConfiguration<
 
         builder.HasMany(p => p.ArticleDetailTexts)
             .WithOne(pd => pd.Article)
-            .HasForeignKey(pd => pd.ArticleId);
+            .HasForeignKey(pd => pd.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
 
         builder.HasMany(p => p.ArticleDetailNumerics)
             .WithOne(pd => pd.Article)
-            .HasForeignKey(pd => pd.ArticleId);
+            .HasForeignKey(pd => pd.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
 
         builder.HasMany(p => p.ArticleImages)
             .WithOne(pi => pi.Article)
-            .HasForeignKey(pi => pi.ArticleId);
+            .HasForeignKey(pi => pi.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
 
         builder.HasMany(p => p.Discounts)
             .WithOne(d => d.Article)
-            .HasForeignKey(d => d.ArticleId);
+            .HasForeignKey(d => d.ArticleCode)
+            .HasPrincipalKey(p => p.ArticleCode);
     }
 }

@@ -1,4 +1,5 @@
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
@@ -9,7 +10,7 @@ public class AdminUpdateArticleDetail : IEndpoint
 {
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPatch(EndpointKind.Admin, "articles/{articleId:guid}/details/{detailSlug}", Handle)
+        endpoints.MapPatch(EndpointKind.Admin, "articles/{article:ArticleCode}/details/{detailSlug}", Handle)
             .WithName("AdminUpdateArticleDetail").WithSummary("[admin] Update an ArticleDetail")
             .WithTags("ArticleDetail")
             .Produces<UpdateArticleDetailResponse>()
@@ -18,19 +19,23 @@ public class AdminUpdateArticleDetail : IEndpoint
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Ok<UpdateArticleDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
         Handle(
-            Guid articleId,
+            ArticleCode article,
             string detailSlug,
             UpdateArticleDetailRequest request,
+            IArticleRepository articleRepository,
             IDetailRepository detailRepository,
             IArticleDetailTextRepository detailTextRepository,
             IArticleDetailNumericRepository detailNumericRepository,
             CancellationToken cancellationToken)
     {
+        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
+        if (articleEntity is null) return TypedResults.NotFound();
+
         var normalizedSlug = detailSlug.Trim().ToLower();
         var validation = ValidateRequest(request);
         if (validation is not null) return validation;
@@ -52,20 +57,20 @@ public class AdminUpdateArticleDetail : IEndpoint
 
         if (isNumeric)
         {
-            var entity = await detailNumericRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+            var entity = await detailNumericRepository.GetBy(article, normalizedSlug, cancellationToken);
             if (entity is null) return TypedResults.NotFound();
             entity.Value = request.NumericValue!.Value;
-            var updated = await detailNumericRepository.Update(articleId, normalizedSlug, entity, cancellationToken);
+            var updated = await detailNumericRepository.Update(article, normalizedSlug, entity, cancellationToken);
             if (updated is null) return TypedResults.NotFound();
-            return TypedResults.Ok(MapToResponse(updated));
+            return TypedResults.Ok(MapToResponse(updated, article, articleEntity.Title));
         }
 
-        var textEntity = await detailTextRepository.GetBy(articleId, normalizedSlug, cancellationToken);
+        var textEntity = await detailTextRepository.GetBy(article, normalizedSlug, cancellationToken);
         if (textEntity is null) return TypedResults.NotFound();
         textEntity.Value = request.TextValue!.Trim();
-        var savedText = await detailTextRepository.Update(articleId, normalizedSlug, textEntity, cancellationToken);
+        var savedText = await detailTextRepository.Update(article, normalizedSlug, textEntity, cancellationToken);
         if (savedText is null) return TypedResults.NotFound();
-        return TypedResults.Ok(MapToResponse(savedText));
+        return TypedResults.Ok(MapToResponse(savedText, article, articleEntity.Title));
     }
 
     public record UpdateArticleDetailRequest
@@ -76,7 +81,7 @@ public class AdminUpdateArticleDetail : IEndpoint
 
     public record UpdateArticleDetailResponse
     {
-        public Guid ArticleId { get; init; }
+        public required ArticleCode ArticleCode { get; init; }
         public string? ArticleTitle { get; init; }
         public string? DetailSlug { get; init; }
         public string? Title { get; init; }
@@ -110,12 +115,15 @@ public class AdminUpdateArticleDetail : IEndpoint
         };
     }
 
-    public static UpdateArticleDetailResponse MapToResponse(ArticleDetailText entity)
+    public static UpdateArticleDetailResponse MapToResponse(
+        ArticleDetailText entity,
+        ArticleCode article,
+        string articleTitle)
     {
         return new UpdateArticleDetailResponse
         {
-            ArticleId = entity.ArticleId,
-            ArticleTitle = entity.Article?.Title,
+            ArticleCode = article,
+            ArticleTitle = articleTitle,
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
             Unit = entity.Detail?.Unit,
@@ -124,12 +132,15 @@ public class AdminUpdateArticleDetail : IEndpoint
         };
     }
 
-    public static UpdateArticleDetailResponse MapToResponse(ArticleDetailNumeric entity)
+    public static UpdateArticleDetailResponse MapToResponse(
+        ArticleDetailNumeric entity,
+        ArticleCode article,
+        string articleTitle)
     {
         return new UpdateArticleDetailResponse
         {
-            ArticleId = entity.ArticleId,
-            ArticleTitle = entity.Article?.Title,
+            ArticleCode = article,
+            ArticleTitle = articleTitle,
             DetailSlug = entity.DetailSlug,
             Title = entity.Detail?.Title,
             Unit = entity.Detail?.Unit,

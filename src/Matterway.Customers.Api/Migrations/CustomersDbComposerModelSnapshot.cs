@@ -145,11 +145,9 @@ namespace Matterway.Customers.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ArticleCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uuid");
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("ArticleName")
                         .IsRequired()
@@ -159,8 +157,9 @@ namespace Matterway.Customers.Api.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("OrderId")
+                        .HasMaxLength(19)
+                        .HasColumnType("character varying(19)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
@@ -175,11 +174,11 @@ namespace Matterway.Customers.Api.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("CustomerId", "ArticleId")
+                    b.HasIndex("CustomerId", "ArticleCode")
                         .IsUnique()
                         .HasFilter("\"OrderId\" IS NULL");
 
-                    b.HasIndex("CustomerId", "ArticleId", "OrderId")
+                    b.HasIndex("CustomerId", "ArticleCode", "OrderId")
                         .IsUnique()
                         .HasFilter("\"OrderId\" IS NOT NULL");
 
@@ -192,7 +191,7 @@ namespace Matterway.Customers.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b7"),
-                            ArticleId = new Guid("a301b154-9867-431f-a9c9-0328b2ce350f"),
+                            ArticleCode = "PHUE0002",
                             ArticleName = "Philips Hue White and Color Ambiance A19 Smart LED Bulb",
                             CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                             Quantity = 3,
@@ -201,7 +200,7 @@ namespace Matterway.Customers.Api.Migrations
                         new
                         {
                             Id = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b8"),
-                            ArticleId = new Guid("853cb7f2-bd31-4627-9da5-17b32cc8c157"),
+                            ArticleCode = "RING0001",
                             ArticleName = "Ring Spotlight Cam",
                             CustomerId = new Guid("a9d64b64-93c1-41a8-a742-8a8ba81e20b4"),
                             Quantity = 1,
@@ -211,9 +210,9 @@ namespace Matterway.Customers.Api.Migrations
 
             modelBuilder.Entity("Matterway.Customers.Api.Domain.Entities.CustomerOrder", b =>
                 {
-                    b.Property<Guid>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("OrderId")
+                        .HasMaxLength(19)
+                        .HasColumnType("character varying(19)");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");

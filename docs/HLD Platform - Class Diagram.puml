@@ -2,6 +2,24 @@
 skinparam classAttributeIconSize 10
 hide circle
 
+class ArticleCode <<value object>> {
+  +value: String
+}
+
+note right of ArticleCode
+  Exactly 8 uppercase
+  letters or digits
+end note
+
+class OrderId <<value object>> {
+  +value: String
+}
+
+note right of OrderId
+  Canonical form:
+  19 lowercase hex chars
+end note
+
 package "Identity" {
   enum EIdentityRole {
     Customer
@@ -63,7 +81,7 @@ package "Catalog" {
   class Discount {
     +code: String
     --
-    +articleId: UUID
+    +articleCode: ArticleCode
     ..
     +percentage: Numeric
     +validFrom: DateTime
@@ -71,9 +89,8 @@ package "Catalog" {
   }
 
   class Article {
-    +id: UUID
+    +code: ArticleCode
     --
-    +articleCode: String
     +title: String
     +description: String
     +basePrice: Money
@@ -83,14 +100,14 @@ package "Catalog" {
   }
 
   class ArticleDetailText {
-    +articleId: UUID
+    +articleCode: ArticleCode
     +detailSlug: String
     --
     +value: String
   }
 
   class ArticleDetailNumeric {
-    +articleId: UUID
+    +articleCode: ArticleCode
     +detailSlug: String
     --
     +value: Numeric
@@ -106,19 +123,19 @@ package "Catalog" {
   class ArticleImage {
     +id: UUID
     --
-    +articleId: UUID
+    +articleCode: ArticleCode
     ..
     +orderIndex: Numeric
     +imageUrl: String
     +imageAlt: String?
   }
 
-  Discount "0..*" -- "1" Article : articleId
-  ArticleDetailText "0..*" -- "1" Article : articleId
+  Discount "0..*" -- "1" Article : articleCode
+  ArticleDetailText "0..*" -- "1" Article : articleCode
   ArticleDetailText "0..*" -- "1" Detail : detailSlug
-  ArticleDetailNumeric "0..*" -- "1" Article : articleId
+  ArticleDetailNumeric "0..*" -- "1" Article : articleCode
   ArticleDetailNumeric "0..*" -- "1" Detail : detailSlug
-  ArticleImage "0..*" -- "1" Article : articleId
+  ArticleImage "0..*" -- "1" Article : articleCode
 }
 
 package "Customers" {
@@ -146,17 +163,17 @@ package "Customers" {
 
   class CustomerArticle {
     +id: UUID
-    +articleId: UUID
+    +articleCode: ArticleCode
     --
     +customerId: UUID
-    +orderId: UUID?
+    +orderId: OrderId?
     +articleName: String?
     +unitPrice: Money?
     +quantity: Numeric
   }
 
   class CustomerOrder {
-    +orderId: UUID
+    +orderId: OrderId
     --
     +customerId: UUID
     ..
@@ -174,7 +191,7 @@ package "Sales" {
   class OrderDeliveryInfo {
     +id: UUID
     --
-    +orderId: UUID
+    +orderId: OrderId
     ..
     +country: String
     +city: String
@@ -184,7 +201,7 @@ package "Sales" {
     +contactPhone: String
   }
   class Order {
-    +id: UUID
+    +id: OrderId
     --
     +customerId: UUID?
     ..
@@ -195,9 +212,9 @@ package "Sales" {
   class OrderItem {
     +id: UUID
     --
-    +orderId: UUID
+    +orderId: OrderId
     ..
-    +articleId: UUID
+    +articleCode: ArticleCode
     +articleTitle: String
     +unitPrice: Money
     +quantity: Numeric
@@ -205,11 +222,12 @@ package "Sales" {
 
   note left of Order
     Current checkout flow
-    1) Storefront -> Sales: create order
-    2) Sales -> Customers: create CustomerOrder from cart
-    3) Sales persists Order + Processing status
-    4) Storefront charges via Stripe
-    5) Stripe webhook -> Sales system/payment registration
+    1) Storefront -> Storefront Server: POST /api/v1/orders
+    2) Storefront Server -> Stripe: initialize payment intent
+    3) Storefront Server -> Sales: POST /api/system/v1/orders (+ customer JWT + system key)
+    4) Sales generates OrderId and mirrors cart items in Customers
+    5) Storefront Server -> Stripe: attach metadata(order_id) + confirm payment intent
+    6) Stripe webhook -> Sales system/payment registration
   end note
 
   enum EOrderType {
@@ -228,7 +246,7 @@ package "Sales" {
   class OrderStatus {
     +id: Numeric
     --
-    +orderId: UUID
+    +orderId: OrderId
     ..
     +changedAt: DateTime
     +status: EOrderStatusType
@@ -238,10 +256,9 @@ package "Sales" {
   class Payment {
     +id: UUID
     --
-    +orderId: UUID
+    +orderId: OrderId
     ..
     +provider: String
-    +referenceId: String
     +amount: Money
     +status: EPaymentStatus
     +createdAt: DateTime

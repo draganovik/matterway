@@ -8,7 +8,7 @@ Customer-facing storefront for Matterway, aligned with the same Nuxt platform st
 - @nuxt/ui
 - Tailwind CSS v4
 - TypeScript
-- Stripe server endpoints for payment intent + webhook registration
+- Server checkout orchestration via `/api/v1/orders` + Stripe webhook registration
 
 ## Key Features
 

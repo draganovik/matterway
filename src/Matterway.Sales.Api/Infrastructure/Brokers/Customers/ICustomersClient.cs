@@ -9,7 +9,7 @@ public interface ICustomersClient
 public sealed record CustomersCreateOrderRequest
 {
     public Guid CustomerId { get; init; }
-    public Guid OrderId { get; init; }
+    public OrderId OrderId { get; init; }
     public CustomersDeliveryInfoRequest? DeliveryInfo { get; init; }
 }
 
@@ -25,7 +25,7 @@ public sealed record CustomersDeliveryInfoRequest
 
 public sealed record CustomersOrderResponse
 {
-    public Guid OrderId { get; init; }
+    public OrderId OrderId { get; init; }
     public Guid CustomerId { get; init; }
     public DateTime PlacedAt { get; init; }
     public decimal TotalAmount { get; init; }
@@ -45,7 +45,7 @@ public sealed record CustomersDeliveryInfoResponse
 
 public sealed record CustomersOrderItemResponse
 {
-    public Guid ArticleId { get; init; }
+    public ArticleCode ArticleCode { get; init; }
     public string? ArticleName { get; init; }
     public decimal? UnitPrice { get; init; }
     public int Quantity { get; init; }

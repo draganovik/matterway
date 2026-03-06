@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Matterway.ServiceDefaults.Identifiers;
+using Matterway.ServiceDefaults.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -10,18 +12,13 @@ public static class BuilderBootstrap
 {
     public static WebApplicationBuilder CreateBuilder(string[] args, bool? throwOnBadRequest = null)
     {
-        var contentRootPath = Directory.GetCurrentDirectory();
+        var builder = WebApplication.CreateBuilder(args);
 
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-        {
-            Args = args,
-            ContentRootPath = contentRootPath
-        });
+        builder.Configuration.AddJsonFile("Properties/appsettings.json", true, true);
+        builder.Configuration.AddEnvironmentVariables();
 
-        builder.Configuration
-            .SetBasePath(contentRootPath)
-            .AddJsonFile("Properties/appsettings.json", true, true)
-            .AddEnvironmentVariables();
+        if (args.Length > 0)
+            builder.Configuration.AddCommandLine(args);
 
         if (throwOnBadRequest is { } throwOnBadRequestValue)
             builder.Services.Configure<RouteHandlerOptions>(routeHandlerOptions =>
@@ -30,6 +27,12 @@ public static class BuilderBootstrap
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
         {
             jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        builder.Services.Configure<RouteOptions>(routeOptions =>
+        {
+            routeOptions.ConstraintMap[nameof(ArticleCode)] = typeof(ArticleCodeRouteConstraint);
+            routeOptions.ConstraintMap[nameof(OrderId)] = typeof(OrderIdRouteConstraint);
         });
 
         builder.Services.AddValidation();

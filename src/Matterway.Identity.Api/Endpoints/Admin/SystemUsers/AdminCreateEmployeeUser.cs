@@ -19,7 +19,7 @@ public class AdminCreateEmployeeUser : IEndpoint
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
-            .MapToApiVersion(new ApiVersion(1, 0));
+            .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<Results<Created<CreateUserResponse>, BadRequest<ProblemDetails>>> Handler(

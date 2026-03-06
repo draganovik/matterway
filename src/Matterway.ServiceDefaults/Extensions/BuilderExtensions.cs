@@ -108,14 +108,8 @@ public static class BuilderExtensions
 
     private static IReadOnlySet<string> ResolveInternalApiAuthorities(IConfiguration configuration)
     {
-        var knownApiServices = ApiDirectory.All
-            .Select(static api => api.ServiceName)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        var configuredAuthorities = configuration.GetSection("Apis:AccessOrigins")
-            .GetChildren()
-            .Where(section => knownApiServices.Contains(section.Key))
-            .Select(static section => section.Value)
+        var configuredAuthorities = ApiDirectory.All
+            .Select(api => configuration[api.AccessOriginConfigurationPath])
             .Where(static value => !string.IsNullOrWhiteSpace(value))
             .Select(static value =>
             {
@@ -127,7 +121,7 @@ public static class BuilderExtensions
             .Select(static authority => authority!);
 
         var serviceDiscoveryAuthorities = ApiDirectory.All
-            .Select(static api => $"{api.ServiceName}-api");
+            .Select(static api => api.AspireServiceName);
 
         return configuredAuthorities
             .Concat(serviceDiscoveryAuthorities)
