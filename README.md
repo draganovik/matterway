@@ -6,7 +6,7 @@
 Matterway is a full-stack commerce platform designed as a
 service-oriented backend with two modern Nuxt-based web applications:
 
--   **Storefront.Web** --- Customer-facing SSR shopping experience\
+-   **Storefront.Web** --- Customer-facing SSR shopping experience
 -   **Dashboard.Web** --- Internal SSR ERP / administration console
 
 The system follows strict service ownership boundaries (Catalog,
@@ -70,9 +70,9 @@ All APIs follow a consistent route format:
 
 Where scope is:
 
--   `public` --- Anonymous endpoints\
--   `self` --- Authenticated user accessing own resources\
--   `admin` --- Operator / employee workflows\
+-   `public` --- Anonymous endpoints
+-   `self` --- Authenticated user accessing own resources
+-   `admin` --- Operator / employee workflows
 -   `system` --- Trusted service-to-service endpoints
 
 Example:
