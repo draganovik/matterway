@@ -99,20 +99,18 @@ Example:
 
 ## Services and Ports (Default Development Setup)
 
-  Component          Port    Responsibility
-  ------------------ ------- ----------------------------------------------
-  Catalog.Api        2001    Articles, pricing, discounts, image metadata
-  Customers.Api      2002    Profiles, addresses, carts, order mirror
-  Identity.Api       2003    Authentication, token issuance, permissions
-  Sales.Api          2005    Order lifecycle, payments, status tracking
-  Storefront.Web     3001    Customer SSR app (Nuxt 4)
-  Dashboard.Web      3002    Admin SSR app (Nuxt 4)
-  PostgreSQL         15432   Relational datastore
-  MinIO API          19000   Object storage API
-  MinIO Console      19001   Storage admin console
-  Aspire Dashboard   18888   Local orchestration + telemetry
-
-------------------------------------------------------------------------
+| Component           | Port  | Responsibility                                     |
+|---------------------|-------|----------------------------------------------------|
+| Catalog.Api         | 2001  | Articles, pricing, discounts, image metadata       |
+| Customers.Api       | 2002  | Profiles, addresses, carts, order mirror           |
+| Identity.Api        | 2003  | Authentication, token issuance, permissions        |
+| Sales.Api           | 2005  | Order lifecycle, payments, status tracking         |
+| Storefront.Web      | 3001  | Customer SSR app (Nuxt 4)                          |
+| Dashboard.Web       | 3002  | Admin SSR app (Nuxt 4)                             |
+| PostgreSQL          | 15432 | Relational datastore                               |
+| MinIO API           | 19000 | Object storage API                                 |
+| MinIO Console       | 19001 | Storage admin console                              |
+| Aspire Dashboard    | 18888 | Local orchestration + telemetry                    |
 
 ## Repository Structure
 
