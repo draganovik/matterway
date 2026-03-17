@@ -75,7 +75,7 @@ function parseAddress(body: Record<string, unknown>): PaymentAddress {
     street: asRequiredString(body, "street", "Street is required."),
     city: asRequiredString(body, "city", "City is required."),
     zipCode: asRequiredString(body, "zipCode", "Zip code is required."),
-    country: asOptionalString(body, "country"),
+    country: "Serbia",
     contactPhone: asOptionalString(body, "contactPhone"),
     note: asOptionalString(body, "note"),
   }
@@ -92,7 +92,7 @@ function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
   return {
     type: "Ecommerce",
     deliveryInfo: {
-      country: asOptionalString(deliveryInfo, "country") || "Serbia",
+      country: "Serbia",
       city: asRequiredString(
         deliveryInfo,
         "city",

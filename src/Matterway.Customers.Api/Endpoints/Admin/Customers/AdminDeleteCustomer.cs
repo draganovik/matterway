@@ -24,7 +24,7 @@ public class AdminDeleteCustomer : IEndpoint
         CancellationToken cancellationToken)
     {
         var isDeleted = await customerRepository.Delete(systemUserId, cancellationToken);
-        if (!isDeleted) TypedResults.NotFound();
+        if (!isDeleted) return TypedResults.NotFound();
 
         return TypedResults.Ok(new DeleteCustomerResponse
         {

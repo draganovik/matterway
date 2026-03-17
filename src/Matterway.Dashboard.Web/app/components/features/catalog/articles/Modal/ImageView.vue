@@ -37,23 +37,13 @@ const isOpen = computed({
 })
 
 const file = ref<File | null>(null)
-const orderIndex = ref<number | string>(0)
+const orderIndex = ref<number | null>(0)
 const imageAlt = ref("")
 const validationError = ref("")
 
 const controlsDisabled = computed(
   () => !props.canEdit || props.loading || props.mode !== "add",
 )
-
-const orderIndexValue = computed({
-  get: () => {
-    const parsed = Number(orderIndex.value)
-    return Number.isFinite(parsed) ? parsed : null
-  },
-  set: (value: number | null | undefined) => {
-    orderIndex.value = value == null ? "" : Math.trunc(value)
-  },
-})
 
 watch(
   () => props.open,
@@ -66,7 +56,7 @@ watch(
       return
     }
     if (props.mode === "edit" && props.image) {
-      orderIndex.value = props.image.orderIndex ?? 0
+      orderIndex.value = Number(props.image.orderIndex ?? 0)
       imageAlt.value = props.image.imageAlt || ""
       file.value = null
     } else {
@@ -106,8 +96,8 @@ function clearSelection() {
 
 function submit() {
   validationError.value = ""
-  const parsedOrder = Number(orderIndex.value)
-  if (!Number.isFinite(parsedOrder) || parsedOrder < 0) {
+  const parsedOrder = orderIndex.value
+  if (parsedOrder == null || parsedOrder < 0) {
     validationError.value = "Order index must be a valid number."
     return
   }
@@ -184,7 +174,7 @@ function submit() {
 
         <UFormField label="Order Index" required>
           <UInputNumber
-            v-model="orderIndexValue"
+            v-model="orderIndex"
             orientation="vertical"
             :min="0"
             :step="1"

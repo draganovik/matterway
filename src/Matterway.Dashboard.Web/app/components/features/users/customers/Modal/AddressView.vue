@@ -8,7 +8,8 @@ import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseR
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 type AddressMode = "view" | "manage"
-type AddressForm = PutCustomerAddressRequest
+type AddressForm = Omit<PutCustomerAddressRequest, "country">
+const COUNTRY = "Serbia"
 
 const props = withDefaults(
   defineProps<{
@@ -37,7 +38,6 @@ const mode = ref<AddressMode>("view")
 const address = ref<CustomerAddressResponse | null>(null)
 const notFound = ref(false)
 const form = ref<AddressForm>({
-  country: "",
   city: "",
   zipCode: "",
   addressLine1: "",
@@ -51,7 +51,6 @@ const displayName = computed(
 
 function resetForm() {
   form.value = {
-    country: "",
     city: "",
     zipCode: "",
     addressLine1: "",
@@ -62,7 +61,6 @@ function resetForm() {
 
 function applyAddressToForm(value: CustomerAddressResponse | null) {
   form.value = {
-    country: value?.country || "",
     city: value?.city || "",
     zipCode: value?.zipCode || "",
     addressLine1: value?.addressLine1 || "",
@@ -147,7 +145,7 @@ async function saveAddress() {
   }
 
   const payload: PutCustomerAddressRequest = {
-    country: form.value.country.trim(),
+    country: COUNTRY,
     city: form.value.city.trim(),
     zipCode: form.value.zipCode.trim(),
     addressLine1: form.value.addressLine1.trim(),
@@ -156,7 +154,6 @@ async function saveAddress() {
   }
 
   if (
-    !payload.country ||
     !payload.city ||
     !payload.zipCode ||
     !payload.addressLine1 ||
@@ -276,11 +273,7 @@ useModalCloseReset({
       <div v-else class="space-y-4">
         <div class="grid gap-4 md:grid-cols-2">
           <UFormField label="Country" required>
-            <UInput
-              v-model="form.country"
-              placeholder="Serbia"
-              :disabled="saveState.loading || !canEdit"
-            />
+            <UInput :model-value="COUNTRY" disabled readonly />
           </UFormField>
 
           <UFormField label="City" required>

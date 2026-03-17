@@ -2,7 +2,7 @@
 type ArticleForm = {
   code: string
   title: string
-  basePrice: number | string
+  basePrice: number | null
   description: string
   isAvailable: boolean
 }
@@ -14,12 +14,9 @@ const { disabled = false } = defineProps<{
 const form = defineModel<ArticleForm>({ required: true })
 
 const basePriceValue = computed({
-  get: () => {
-    const parsed = Number(form.value.basePrice)
-    return Number.isFinite(parsed) ? parsed : null
-  },
+  get: () => form.value.basePrice,
   set: (value: number | null | undefined) => {
-    form.value.basePrice = value == null ? "" : value
+    form.value.basePrice = value == null ? null : value
   },
 })
 </script>

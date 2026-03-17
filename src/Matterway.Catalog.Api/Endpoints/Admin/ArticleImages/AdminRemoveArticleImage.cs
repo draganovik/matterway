@@ -14,18 +14,20 @@ public class AdminRemoveArticleImage : IEndpoint
             .WithTags(nameof(ArticleImage))
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<RemoveArticleImageResponse>, NotFound>> Handle(
+    private static async Task<Results<Ok<RemoveArticleImageResponse>, NotFound, ProblemHttpResult>> Handle(
         ArticleCode article,
         int orderIndex,
         IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         IImageStorageService imageStorageService,
+        ILogger<AdminRemoveArticleImage> logger,
         CancellationToken cancellationToken)
     {
         var articleEntity = await articleRepository.GetBy(article, cancellationToken);
@@ -36,10 +38,26 @@ public class AdminRemoveArticleImage : IEndpoint
         if (entity is null) return TypedResults.NotFound();
 
         var isDeleted = await articleImageRepository.Delete(article, orderIndex, cancellationToken);
+        if (!isDeleted)
+            return TypedResults.Problem(new ProblemDetails
+            {
+                Title = "Unable to delete article image",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "The image could not be removed."
+            });
 
-        if (!isDeleted) return TypedResults.NotFound();
+        try
+        {
+            await imageStorageService.DeleteAsync(entity.Id, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "Deleted article image '{ImageId}' for article '{ArticleCode}' but failed to delete its blob.",
+                entity.Id,
+                article);
+        }
 
-        await imageStorageService.DeleteAsync(entity.Id, cancellationToken);
         return TypedResults.Ok(MapToResponse(entity, article));
     }
 

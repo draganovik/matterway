@@ -28,7 +28,7 @@ const updateState = useRequestState()
 type ArticleForm = {
   code: string
   title: string
-  basePrice: number | string
+  basePrice: number | null
   description: string
   isAvailable: boolean
 }
@@ -36,7 +36,7 @@ type ArticleForm = {
 const form = ref<ArticleForm>({
   code: "",
   title: "",
-  basePrice: "",
+  basePrice: null,
   description: "",
   isAvailable: true,
 })
@@ -45,10 +45,11 @@ watch(
   () => props.article,
   (article) => {
     if (!article) return
+    const parsedBasePrice = Number(article.basePrice)
     form.value = {
       code: article.code || "",
       title: article.title || "",
-      basePrice: article.basePrice ?? "",
+      basePrice: Number.isFinite(parsedBasePrice) ? parsedBasePrice : null,
       description: article.description || "",
       isAvailable: article.isAvailable,
     }
@@ -71,7 +72,9 @@ async function saveArticle() {
   if (!props.article) return
   if (!props.canEdit) return
 
-  const code = String(form.value.code ?? "").trim().toUpperCase()
+  const code = String(form.value.code ?? "")
+    .trim()
+    .toUpperCase()
   const title = String(form.value.title ?? "").trim()
   const description = String(form.value.description ?? "").trim()
   if (!/^[A-Z0-9]{8}$/.test(code)) {
@@ -86,7 +89,7 @@ async function saveArticle() {
   const result = await api.updateArticle(props.article.code, {
     code,
     title: title || null,
-    basePrice: form.value.basePrice || null,
+    basePrice: form.value.basePrice,
     description: description || null,
     isAvailable: form.value.isAvailable,
   })

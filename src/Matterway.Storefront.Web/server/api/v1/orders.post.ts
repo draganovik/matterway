@@ -12,6 +12,43 @@ import { validateCheckoutOrderRequest } from "../../modules/checkout/validators/
 import { validateNoQueryParams } from "../../modules/checkout/validators/emptyQuery"
 import { getRequestTraceContext } from "../../modules/shared/requestContext"
 
+function normalizeCheckoutError(error: unknown) {
+  const candidate =
+    error && typeof error === "object"
+      ? (error as {
+          statusCode?: unknown
+          statusMessage?: unknown
+          message?: unknown
+        })
+      : {}
+
+  const statusCode =
+    typeof candidate.statusCode === "number" && candidate.statusCode >= 400
+      ? candidate.statusCode
+      : 500
+
+  const internalMessage =
+    (typeof candidate.statusMessage === "string" && candidate.statusMessage) ||
+    (typeof candidate.message === "string" && candidate.message) ||
+    "Checkout failed."
+
+  let publicMessage = internalMessage
+  if (statusCode >= 500) {
+    publicMessage = "Order could not be completed right now. Please try again."
+  } else if (statusCode === 401 || statusCode === 403) {
+    publicMessage = "Your session is no longer valid. Sign in again and retry."
+  } else if (statusCode === 404) {
+    publicMessage =
+      "Some checkout data could not be found. Refresh and try again."
+  }
+
+  return {
+    statusCode,
+    internalMessage,
+    publicMessage,
+  }
+}
+
 export default defineEventHandler(async (event) => {
   await getValidatedQuery(event, validateNoQueryParams)
   const orderRequest = await readValidatedBody(
@@ -83,13 +120,34 @@ export default defineEventHandler(async (event) => {
       order: createdOrder,
     }
   } catch (error) {
+    const normalizedError = normalizeCheckoutError(error)
+
     if (paymentIntentId) {
-      await cancelStripePaymentIntent(
-        paymentIntentId,
-        stripeSecretKey,
-        requestContext,
-      )
+      try {
+        await cancelStripePaymentIntent(
+          paymentIntentId,
+          stripeSecretKey,
+          requestContext,
+        )
+      } catch (cancelError) {
+        console.error("[checkout] failed to cancel payment intent", {
+          paymentIntentId,
+          error: cancelError,
+        })
+      }
     }
-    throw error
+
+    console.error("[checkout] order submission failed", {
+      statusCode: normalizedError.statusCode,
+      message: normalizedError.internalMessage,
+      error,
+    })
+
+    event.node.res.statusCode = normalizedError.statusCode
+    event.node.res.statusMessage = normalizedError.publicMessage
+
+    return {
+      message: normalizedError.publicMessage,
+    }
   }
 })

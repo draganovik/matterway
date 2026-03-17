@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
+using Matterway.Identity.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
@@ -27,9 +28,13 @@ public class AdminUpdateSystemUser : IEndpoint
         Guid id,
         UpdateSystemUserRequest request,
         HttpContext httpContext,
+        CancellationToken cancellationToken,
+        IdentityDbComposer identityDb,
         UserManager<SystemUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager)
     {
+        await using var transaction = await identityDb.Database.BeginTransactionAsync(cancellationToken);
+
         var user = await userManager.FindByIdAsync(id.ToString());
         if (user is null) return TypedResults.NotFound();
 
@@ -47,14 +52,21 @@ public class AdminUpdateSystemUser : IEndpoint
             user.NormalizedUserName = userManager.NormalizeName(request.Email);
         }
 
-        if (!string.IsNullOrWhiteSpace(request.Password))
-            await userManager.ResetPasswordAsync(user,
-                await userManager.GeneratePasswordResetTokenAsync(user), request.Password);
-
         var updateResult = await userManager.UpdateAsync(user);
         if (!updateResult.Succeeded)
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 updateResult.Errors.Select(error => error.Description))));
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var resetResult = await userManager.ResetPasswordAsync(user,
+                await userManager.GeneratePasswordResetTokenAsync(user), request.Password);
+            if (!resetResult.Succeeded)
+                return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                    resetResult.Errors.Select(error => error.Description))));
+        }
+
+        await transaction.CommitAsync(cancellationToken);
 
         return TypedResults.Ok(new UpdateSystemUserResponse
         {

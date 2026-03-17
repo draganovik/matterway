@@ -19,7 +19,7 @@ type DiscountListItem = {
 
 type DiscountForm = {
   code: string
-  percentage: number | string
+  percentage: number | null
   validFrom: string
   validTo: string
 }
@@ -47,7 +47,7 @@ export function useCatalogDiscountsPage() {
 
   const form = ref<DiscountForm>({
     code: "",
-    percentage: "",
+    percentage: null,
     validFrom: getDefaultDateTimeLocal(),
     validTo: "",
   })
@@ -102,7 +102,7 @@ export function useCatalogDiscountsPage() {
     selectedDiscount.value = null
     form.value = {
       code: "",
-      percentage: "",
+      percentage: null,
       validFrom: getDefaultDateTimeLocal(),
       validTo: "",
     }
@@ -115,7 +115,7 @@ export function useCatalogDiscountsPage() {
     selectedDiscount.value = discount
     form.value = {
       code: discount.code,
-      percentage: discount.percentage,
+      percentage: Number(discount.percentage),
       validFrom:
         toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
       validTo: toLocalDateTimeInput(discount.validTo),
@@ -131,7 +131,9 @@ export function useCatalogDiscountsPage() {
   }
 
   const filteredDiscounts = computed(() => {
-    const search = String(discountFilter.value ?? "").trim().toLowerCase()
+    const search = String(discountFilter.value ?? "")
+      .trim()
+      .toLowerCase()
     if (!search) return discounts.value
     return discounts.value.filter(
       (item) =>
@@ -292,7 +294,7 @@ export function useCatalogDiscountsPage() {
 
   function buildPayload() {
     const code = normalizeCode(form.value.code)
-    const percentage = Number(form.value.percentage)
+    const percentage = form.value.percentage
     const validFrom = toIsoDateTime(String(form.value.validFrom ?? ""))
     const validToInput = String(form.value.validTo ?? "").trim()
     const validTo = validToInput ? toIsoDateTime(validToInput) : null
@@ -301,7 +303,7 @@ export function useCatalogDiscountsPage() {
       submitState.error = "Code is required."
       return null
     }
-    if (!Number.isFinite(percentage) || percentage < 0.01 || percentage > 1) {
+    if (percentage == null || percentage < 0.01 || percentage > 1) {
       submitState.error = "Percentage must be between 0.01 and 1."
       return null
     }

@@ -18,7 +18,9 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
 <template>
   <div class="flex w-full items-end justify-between gap-3">
     <div class="min-w-0 space-y-1">
-      <p class="text-foreground break-all font-mono text-sm font-medium leading-snug">
+      <p
+        class="text-foreground font-mono text-sm leading-snug font-medium break-all"
+      >
         {{ item.id || "No ID" }}
       </p>
       <p class="text-muted truncate text-xs">

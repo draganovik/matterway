@@ -44,7 +44,7 @@ const definitionState = useRequestState()
 const searchTerm = ref("")
 const detailOptions = ref<QueryDetailResponse[]>([])
 const selectedKey = ref("")
-const valueInput = ref<string | number>("")
+const valueInput = ref("")
 const validationError = ref("")
 
 const isOpen = computed({

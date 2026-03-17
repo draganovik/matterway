@@ -107,8 +107,7 @@ public class SystemCreateOrder : IEndpoint
         [Required]
         public string AddressLine1 { get; init; } = string.Empty;
 
-        [Required]
-        public string AddressLine2 { get; init; } = string.Empty;
+        public string? AddressLine2 { get; init; }
 
         public string? ContactPhone { get; init; }
     }

@@ -32,16 +32,6 @@ const {
   saveDiscount,
   removeDiscount,
 } = useCatalogDiscountsPage()
-
-const percentageValue = computed({
-  get: () => {
-    const parsed = Number(form.value.percentage)
-    return Number.isFinite(parsed) ? parsed : null
-  },
-  set: (value: number | null | undefined) => {
-    form.value.percentage = value == null ? "" : value
-  },
-})
 </script>
 
 <template>
@@ -138,7 +128,7 @@ const percentageValue = computed({
                     help="Decimal range: 0.01 to 1."
                   >
                     <UInputNumber
-                      v-model="percentageValue"
+                      v-model="form.percentage"
                       orientation="vertical"
                       :min="0.01"
                       :max="1"

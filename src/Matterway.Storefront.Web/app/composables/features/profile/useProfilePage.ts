@@ -46,7 +46,7 @@ export function useProfilePage() {
   })
 
   const addressForm = reactive<PutSelfAddressRequest>({
-    country: "Srbija",
+    country: "Serbia",
     city: "",
     zipCode: "",
     addressLine1: "",
@@ -64,7 +64,7 @@ export function useProfilePage() {
   }
 
   function applyAddress(value: CustomerAddressResponse | null) {
-    addressForm.country = value?.country?.trim() || "Srbija"
+    addressForm.country = "Serbia"
     addressForm.city = value?.city?.trim() || ""
     addressForm.zipCode = value?.zipCode?.trim() || ""
     addressForm.addressLine1 = value?.addressLine1?.trim() || ""
@@ -177,7 +177,7 @@ export function useProfilePage() {
     addressSuccess.value = ""
 
     const payload: PutSelfAddressRequest = {
-      country: addressForm.country.trim(),
+      country: "Serbia",
       city: addressForm.city.trim(),
       zipCode: addressForm.zipCode.trim(),
       addressLine1: addressForm.addressLine1.trim(),
@@ -186,7 +186,6 @@ export function useProfilePage() {
     }
 
     if (
-      !payload.country ||
       !payload.city ||
       !payload.zipCode ||
       !payload.addressLine1 ||

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Matterway.Catalog.Api.Infrastructure.ImportExport;
 
 namespace Matterway.Catalog.Api.Endpoints.Admin.CatalogArchive;
@@ -57,6 +58,15 @@ public class AdminImportCatalogArchive : IEndpoint
             });
         }
         catch (InvalidDataException ex)
+        {
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Invalid archive content",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = ex.Message
+            });
+        }
+        catch (JsonException ex)
         {
             return TypedResults.BadRequest(new ProblemDetails
             {

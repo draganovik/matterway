@@ -40,6 +40,7 @@ static ApiAuthenticationOptions CreateAuthenticationOptions(
     return new ApiAuthenticationOptions
     {
         ValidIssuer = jwtOptions.Issuer,
+        ValidAudience = jwtOptions.Audience,
         ConfigureServices = hostBuilder =>
         {
             hostBuilder.Services.Configure<JwtTokenOptions>(jwtConfigurationSection);

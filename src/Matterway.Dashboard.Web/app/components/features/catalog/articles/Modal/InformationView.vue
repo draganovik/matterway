@@ -7,7 +7,7 @@ import { useResetOnModalOpen } from "~/composables/workflows/modal/useResetOnMod
 type ArticleBaseForm = {
   code: string
   title: string
-  basePrice: number | string
+  basePrice: number | null
   description: string
   isAvailable: boolean
 }
@@ -28,7 +28,7 @@ const createState = useRequestState()
 const form = ref<ArticleBaseForm>({
   code: "",
   title: "",
-  basePrice: "",
+  basePrice: null,
   description: "",
   isAvailable: true,
 })
@@ -37,7 +37,7 @@ function resetForm() {
   form.value = {
     code: "",
     title: "",
-    basePrice: "",
+    basePrice: null,
     description: "",
     isAvailable: true,
   }
@@ -51,11 +51,14 @@ async function createArticle() {
   if (!canEdit) return
 
   const payload = form.value
-  const code = String(payload.code ?? "").trim().toUpperCase()
+  const code = String(payload.code ?? "")
+    .trim()
+    .toUpperCase()
   const title = String(payload.title ?? "").trim()
   const description = String(payload.description ?? "").trim()
+  const basePrice = payload.basePrice
 
-  if (!code || !title || !payload.basePrice || !description) {
+  if (!code || !title || basePrice == null || !description) {
     createState.error =
       "Fill in all required fields before creating the article."
     return
@@ -72,7 +75,7 @@ async function createArticle() {
   const result = await api.createArticle({
     code,
     title,
-    basePrice: payload.basePrice,
+    basePrice,
     description,
     isAvailable: payload.isAvailable,
   })

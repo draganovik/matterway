@@ -31,7 +31,11 @@ export function useCheckoutPage() {
   const isCartEmpty = computed(() => totalItems.value === 0)
 
   async function initialize() {
-    await syncCustomerSession({ force: true })
+    const syncResult = await syncCustomerSession({ force: true })
+    if (!syncResult.ok) {
+      error.value = syncResult.error || "Osvežavanje korpe nije uspelo."
+      return
+    }
 
     if (isCartEmpty.value) {
       await nuxtApp.runWithContext(() => navigateTo("/cart"))

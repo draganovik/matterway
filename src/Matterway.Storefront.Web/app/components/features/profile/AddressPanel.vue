@@ -35,11 +35,10 @@ const emit = defineEmits<{
       <div class="grid gap-4 sm:grid-cols-2">
         <UFormField label="Država" required>
           <UInput
-            v-model="form.country"
-            placeholder="npr. Srbija"
+            :model-value="form.country"
             class="w-full"
-            :disabled="disabled || loading"
-            required
+            readonly
+            disabled
           />
         </UFormField>
 

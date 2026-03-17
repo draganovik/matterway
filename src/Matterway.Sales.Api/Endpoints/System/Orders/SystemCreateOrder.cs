@@ -21,6 +21,7 @@ public class SystemCreateOrder : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
             .ProducesValidationProblem()
             .RequireSystemAccessKey()
             .RequireAuthorization(policy => policy.RequireAssertion(context =>
@@ -28,7 +29,9 @@ public class SystemCreateOrder : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<OrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult>>
+    private static async Task<
+            Results<Created<OrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult,
+                ProblemHttpResult>>
         Handler(
             CreateOrderRequest request,
             HttpContext httpContext,
@@ -41,21 +44,62 @@ public class SystemCreateOrder : IEndpoint
         if (customerId is null) return TypedResults.Forbid();
         var effectiveCustomerId = customerId.Value;
 
-        var orderId = OrderId.New();
+        var pendingOrder = await orderRepository.GetPendingByCustomerId(effectiveCustomerId, cancellationToken);
+        if (pendingOrder is null)
+        {
+            var pending = new Order
+            {
+                Id = OrderId.New(),
+                CustomerId = effectiveCustomerId,
+                Type = request.Type.GetValueOrDefault(EOrderType.Ecommerce),
+                PlacedAt = DateTime.UtcNow
+            };
+            pending.StatusHistory.Add(new OrderStatus
+            {
+                OrderId = pending.Id,
+                Status = EOrderStatusType.Processing,
+                ChangedAt = pending.PlacedAt
+            });
+
+            pendingOrder = await orderRepository.Create(pending, cancellationToken);
+            if (pendingOrder is null)
+                return TypedResults.Problem(new ProblemDetails
+                {
+                    Title = "Order could not be created.",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Unable to reserve an order before checkout."
+                });
+        }
+
+        var orderId = pendingOrder.Id;
         var customersRequest = MapToCustomersRequest(effectiveCustomerId, orderId, request);
         var customersResult = await customersClient.CreateOrderAsync(
             customersRequest,
             cancellationToken);
 
         if (!customersResult.IsSuccess || customersResult.Data is null)
-            return customersResult.StatusCode switch
+        {
+            var statusCode = customersResult.StatusCode ?? HttpStatusCode.BadGateway;
+            var detail = customersResult.ErrorMessage ?? "Customer order could not be created.";
+
+            return statusCode switch
             {
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 HttpStatusCode.NotFound => TypedResults.NotFound(),
-                _ => BadRequestProblem(
-                    customersResult.ErrorMessage ?? "Unknown error.",
-                    "Customer order could not be created.")
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(new ProblemDetails
+                {
+                    Title = "Customer order could not be created.",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = detail
+                }),
+                _ => TypedResults.Problem(new ProblemDetails
+                {
+                    Title = "Customer order could not be created.",
+                    Status = (int)statusCode,
+                    Detail = detail
+                })
             };
+        }
 
         var customersOrder = customersResult.Data;
         if (customersOrder.OrderId != orderId)
@@ -77,13 +121,16 @@ public class SystemCreateOrder : IEndpoint
         if (customersOrder.Items.Any(item => string.IsNullOrWhiteSpace(item.ArticleName)))
             return BadRequestProblem("Order items must include article titles.");
 
-        var order = MapToEntity(request, customersOrder, effectiveCustomerId);
+        var order = MapToEntity(request, customersOrder, effectiveCustomerId, pendingOrder.PlacedAt);
 
-        var created = await orderRepository.Create(order, cancellationToken);
+        var created = await orderRepository.Update(order, cancellationToken);
         if (created is null)
-            return BadRequestProblem(
-                "Order could not be created.",
-                "Order could not be created.");
+            return TypedResults.Problem(new ProblemDetails
+            {
+                Title = "Order could not be updated.",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "The local order could not be finalized."
+            });
 
         var location = linkGenerator.GetUriByName(
             httpContext,
@@ -152,24 +199,28 @@ public class SystemCreateOrder : IEndpoint
                 ? null
                 : new CustomersDeliveryInfoRequest
                 {
-                    Country = ResolveCountry(request.DeliveryInfo.Country),
+                    Country = DefaultCountry,
                     City = request.DeliveryInfo.City,
                     ZipCode = request.DeliveryInfo.ZipCode,
                     AddressLine1 = request.DeliveryInfo.AddressLine1,
-                    AddressLine2 = request.DeliveryInfo.AddressLine2 ?? string.Empty,
+                    AddressLine2 = request.DeliveryInfo.AddressLine2,
                     ContactPhone = request.DeliveryInfo.ContactPhone
                 }
         };
     }
 
-    private static Order MapToEntity(CreateOrderRequest request, CustomersOrderResponse customerOrder, Guid customerId)
+    private static Order MapToEntity(
+        CreateOrderRequest request,
+        CustomersOrderResponse customerOrder,
+        Guid customerId,
+        DateTime placedAt)
     {
         var order = new Order
         {
             Id = customerOrder.OrderId,
             CustomerId = customerId,
             Type = request.Type.GetValueOrDefault(EOrderType.Ecommerce),
-            PlacedAt = customerOrder.PlacedAt
+            PlacedAt = placedAt
         };
 
         if (customerOrder.DeliveryInfo is not null)
@@ -179,17 +230,10 @@ public class SystemCreateOrder : IEndpoint
         {
             OrderId = order.Id,
             ArticleCode = item.ArticleCode.ToString(),
-            ArticleTitle = item.ArticleName?.Trim() ?? string.Empty,
+            ArticleTitle = item.ArticleName!.Trim(),
             UnitPrice = item.UnitPrice!.Value,
             Quantity = item.Quantity
         }));
-
-        order.StatusHistory.Add(new OrderStatus
-        {
-            OrderId = order.Id,
-            Status = EOrderStatusType.Processing,
-            ChangedAt = DateTime.UtcNow
-        });
 
         return order;
     }
@@ -199,7 +243,7 @@ public class SystemCreateOrder : IEndpoint
         return new OrderDeliveryInfo
         {
             OrderId = orderId,
-            Country = ResolveCountry(request.Country),
+            Country = DefaultCountry,
             City = request.City ?? string.Empty,
             ZipCode = request.ZipCode ?? string.Empty,
             AddressLine1 = request.AddressLine1 ?? string.Empty,
@@ -210,8 +254,7 @@ public class SystemCreateOrder : IEndpoint
 
     private static decimal CalculateTotal(IEnumerable<OrderItem> items)
     {
-        var total = items.Sum(item => item.UnitPrice * item.Quantity);
-        return Math.Round(total, 2, MidpointRounding.AwayFromZero);
+        return Math.Round(items.Sum(item => item.UnitPrice * item.Quantity), 2, MidpointRounding.AwayFromZero);
     }
 
     private static OrderResponse MapToResponse(Order entity)
@@ -224,10 +267,5 @@ public class SystemCreateOrder : IEndpoint
             TotalAmount = CalculateTotal(entity.Items),
             PlacedAt = entity.PlacedAt
         };
-    }
-
-    private static string ResolveCountry(string? country)
-    {
-        return string.IsNullOrWhiteSpace(country) ? DefaultCountry : country.Trim();
     }
 }

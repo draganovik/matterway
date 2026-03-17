@@ -117,14 +117,10 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
     return
   }
   updateState.loading = true
-  const result = await api.updateArticleImage(
-    props.code,
-    targetOrderIndex,
-    {
-      imageAlt: payload.imageAlt,
-      orderIndex: payload.orderIndex,
-    },
-  )
+  const result = await api.updateArticleImage(props.code, targetOrderIndex, {
+    imageAlt: payload.imageAlt,
+    orderIndex: payload.orderIndex,
+  })
   updateState.loading = false
   if (!result.ok) {
     updateState.error = result.error || "Unable to update image."

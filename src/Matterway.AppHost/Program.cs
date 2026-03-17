@@ -39,7 +39,7 @@ var databases = (
     Identity: postgres.AddDatabase("IdentityDb"),
     Sales: postgres.AddDatabase("SalesDb"));
 
-var minio = builder.AddContainer("minio", "minio/minio:latest")
+var minio = builder.AddContainer("minio", "minio/minio:RELEASE.2025-01-20T14-49-07Z")
     .WithVolume("matterway-minio-data", "/data")
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
@@ -52,13 +52,12 @@ var minio = builder.AddContainer("minio", "minio/minio:latest")
         service.Ports = [$"{PlatformPorts.MinioApi}:9000", $"{PlatformPorts.MinioConsole}:9001"];
     });
 
-builder.AddProject<Matterway_Migrations>("db-migrator")
+var dbMigrator = builder.AddProject<Matterway_Migrations>("db-migrator")
     .WithReference(databases.Catalog)
     .WithReference(databases.Customers)
     .WithReference(databases.Identity)
     .WithReference(databases.Sales)
     .WaitFor(postgres)
-    .WithExplicitStart()
     .PublishAsDockerComposeService((_, service) => { service.Restart = "no"; });
 
 var identityApi = AddApi<Matterway_Identity_Api>(
@@ -166,7 +165,7 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
             service.Ports = [$"{hostPort}:8080"];
         });
 
-    return configure(api);
+    return configure(api).WaitFor(dbMigrator);
 }
 
 void ConfigureWebTelemetryEnvironment(WebAppEnvironmentBuilder environment, string telemetryServiceName)

@@ -125,6 +125,8 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
             .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
             .AsNoTracking()
             .Include(x => x.ArticleImages).AsNoTracking()
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenBy(x => x.ArticleCode)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

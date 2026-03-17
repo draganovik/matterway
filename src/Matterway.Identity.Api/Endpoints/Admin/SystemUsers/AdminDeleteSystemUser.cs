@@ -25,10 +25,12 @@ public class AdminDeleteSystemUser : IEndpoint
     {
         var requesterId = RequestIdentity.GetIdentifier(httpContext.User);
         if (requesterId == id)
-            return TypedResults.Problem(
-                title: "Action forbidden",
-                detail: "Managers cannot delete their own account.",
-                statusCode: StatusCodes.Status403Forbidden);
+            return TypedResults.Problem(new ProblemDetails
+            {
+                Title = "Action forbidden",
+                Status = StatusCodes.Status403Forbidden,
+                Detail = "Managers cannot delete their own account."
+            });
 
         var user = await userManager.FindByIdAsync(id.ToString());
         if (user is null) return TypedResults.NotFound();

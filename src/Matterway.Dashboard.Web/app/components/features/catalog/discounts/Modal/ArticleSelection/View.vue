@@ -52,9 +52,7 @@ const safeTotal = computed(() =>
 const selectedOnPageCount = computed(
   () =>
     articles.value.filter(
-      (item) =>
-        item.code &&
-        selectedArticleCodes.value.includes(item.code),
+      (item) => item.code && selectedArticleCodes.value.includes(item.code),
     ).length,
 )
 const allCurrentPageSelected = computed(

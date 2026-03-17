@@ -51,7 +51,7 @@ public class AdminUpdateArticle : IEndpoint
         [MinLength(1, ErrorMessage = "Description cannot be empty if provided.")]
         public string? Description { get; init; }
 
-        public bool IsAvailable { get; init; }
+        public bool? IsAvailable { get; init; }
     }
 
     public record UpdateArticleResponse
@@ -69,7 +69,8 @@ public class AdminUpdateArticle : IEndpoint
     public static void MapUpdate(Article entity, UpdateArticleRequest request)
     {
         entity.UpdateDetails(request.Code, request.Title, request.Description);
-        entity.SetAvailability(request.IsAvailable);
+        if (request.IsAvailable.HasValue)
+            entity.SetAvailability(request.IsAvailable.Value);
 
         if (request.BasePrice is not null)
             entity.SetBasePrice(request.BasePrice.Value);

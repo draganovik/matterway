@@ -67,9 +67,10 @@ const address = defineModel<CheckoutAddress>({ required: true })
 
         <UFormField label="Država" class="sm:col-span-2">
           <UInput
-            v-model="address.country"
-            placeholder="npr. Srbija"
+            :model-value="address.country"
             class="w-full"
+            readonly
+            disabled
           />
         </UFormField>
       </div>

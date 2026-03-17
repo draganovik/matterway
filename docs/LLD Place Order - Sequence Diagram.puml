@@ -49,21 +49,26 @@ else Validation passes
     end note
     SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
     activate CustomersApi
-    CustomersApi -> CustomersDb : Create CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId,\ncopy articleCode/title/unitPrice into order mirror)
+    note over SalesApi, CustomersApi
+      Sales reserves or reuses a pending local order first.
+      Customers order creation is idempotent by shared `orderId`.
+      Checkout country is fixed to Serbia.
+    end note
+    CustomersApi -> CustomersDb : Create or return CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId,\ncopy articleCode/title/unitPrice into order mirror)
     activate CustomersDb
     CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
     deactivate CustomersDb
     CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
     deactivate CustomersApi
 
-    SalesApi -> SalesDb : Save Order + Items + DeliveryInfo\nAdd initial status=Processing
+    SalesApi -> SalesDb : Update pending Order + Items + DeliveryInfo\nkeep initial status=Processing
     activate SalesDb
     SalesDb --> SalesApi : Order created
     deactivate SalesDb
     SalesApi --> StorefrontServer : 201 Created {id, totalAmount, ...}
     deactivate SalesApi
 
-    alt Sales order creation fails
+    alt Customers or Sales finalization fails
       StorefrontServer -> Stripe : Cancel PaymentIntent
       Stripe --> StorefrontServer : 200 Canceled
       StorefrontServer --> Checkout : 500 Order creation failed
