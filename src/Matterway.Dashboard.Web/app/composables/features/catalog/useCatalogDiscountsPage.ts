@@ -19,7 +19,7 @@ type DiscountListItem = {
 
 type DiscountForm = {
   code: string
-  percentage: number | string
+  percentage: number | null
   validFrom: string
   validTo: string
 }
@@ -32,7 +32,7 @@ export function useCatalogDiscountsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "No discounts found." })
+  const listState = useRequestState({ empty: "Nema popusta." })
   const submitState = useRequestState()
   const deleteState = useRequestState()
 
@@ -47,7 +47,7 @@ export function useCatalogDiscountsPage() {
 
   const form = ref<DiscountForm>({
     code: "",
-    percentage: "",
+    percentage: null,
     validFrom: getDefaultDateTimeLocal(),
     validTo: "",
   })
@@ -102,7 +102,7 @@ export function useCatalogDiscountsPage() {
     selectedDiscount.value = null
     form.value = {
       code: "",
-      percentage: "",
+      percentage: null,
       validFrom: getDefaultDateTimeLocal(),
       validTo: "",
     }
@@ -115,7 +115,7 @@ export function useCatalogDiscountsPage() {
     selectedDiscount.value = discount
     form.value = {
       code: discount.code,
-      percentage: discount.percentage,
+      percentage: Number(discount.percentage),
       validFrom:
         toLocalDateTimeInput(discount.validFrom) || getDefaultDateTimeLocal(),
       validTo: toLocalDateTimeInput(discount.validTo),
@@ -131,7 +131,9 @@ export function useCatalogDiscountsPage() {
   }
 
   const filteredDiscounts = computed(() => {
-    const search = String(discountFilter.value ?? "").trim().toLowerCase()
+    const search = String(discountFilter.value ?? "")
+      .trim()
+      .toLowerCase()
     if (!search) return discounts.value
     return discounts.value.filter(
       (item) =>
@@ -184,7 +186,7 @@ export function useCatalogDiscountsPage() {
       const result = await api.queryArticles({ page, pageSize })
 
       if (!result.ok) {
-        listState.error = result.error || "Unable to load discounts."
+        listState.error = result.error || "Učitavanje popusta nije uspelo."
         return
       }
 
@@ -273,7 +275,7 @@ export function useCatalogDiscountsPage() {
       await loadDiscountsFromArticlesFallback()
       listState.loading = false
     } else {
-      listState.error = result.error || "Unable to load discounts."
+      listState.error = result.error || "Učitavanje popusta nije uspelo."
       discounts.value = []
       listState.loading = false
     }
@@ -292,36 +294,36 @@ export function useCatalogDiscountsPage() {
 
   function buildPayload() {
     const code = normalizeCode(form.value.code)
-    const percentage = Number(form.value.percentage)
+    const percentage = form.value.percentage
     const validFrom = toIsoDateTime(String(form.value.validFrom ?? ""))
     const validToInput = String(form.value.validTo ?? "").trim()
     const validTo = validToInput ? toIsoDateTime(validToInput) : null
 
     if (!code) {
-      submitState.error = "Code is required."
+      submitState.error = "Kod je obavezan."
       return null
     }
-    if (!Number.isFinite(percentage) || percentage < 0.01 || percentage > 1) {
-      submitState.error = "Percentage must be between 0.01 and 1."
+    if (percentage == null || percentage < 0.01 || percentage > 1) {
+      submitState.error = "Procenat mora biti između 0,01 i 1."
       return null
     }
     if (!validFrom) {
-      submitState.error = "Valid From must be a valid date-time."
+      submitState.error = "Polje „Važi od“ mora imati ispravan datum i vreme."
       return null
     }
     if (validToInput && !validTo) {
-      submitState.error = "Valid To must be a valid date-time."
+      submitState.error = "Polje „Važi do“ mora imati ispravan datum i vreme."
       return null
     }
     if (validTo && new Date(validTo) < new Date(validFrom)) {
       submitState.error =
-        "Valid To must be greater than or equal to Valid From."
+        "Polje „Važi do“ mora biti veće ili jednako polju „Važi od“."
       return null
     }
 
     const articleCodes = [...new Set(selectedArticleCodes.value)]
     if (!articleCodes.length) {
-      submitState.error = "Select at least one article."
+      submitState.error = "Izaberite bar jedan artikal."
       return null
     }
 
@@ -348,7 +350,7 @@ export function useCatalogDiscountsPage() {
     submitState.loading = false
 
     if (!result.ok) {
-      submitState.error = result.error || "Unable to save discount."
+      submitState.error = result.error || "Čuvanje popusta nije uspelo."
       return
     }
 
@@ -370,7 +372,7 @@ export function useCatalogDiscountsPage() {
     ])
 
     applyDiscountToEditor(next)
-    submitState.success = `Discount ${built.code} saved.`
+    submitState.success = `Popust ${built.code} je uspešno sačuvan.`
   }
 
   async function removeDiscount() {
@@ -380,7 +382,7 @@ export function useCatalogDiscountsPage() {
 
     const code = normalizeCode(form.value.code)
     if (!code) {
-      deleteState.error = "Provide a code to delete."
+      deleteState.error = "Unesite kod za brisanje."
       return
     }
 
@@ -389,7 +391,7 @@ export function useCatalogDiscountsPage() {
     deleteState.loading = false
 
     if (!result.ok) {
-      deleteState.error = result.error || "Unable to delete discount."
+      deleteState.error = result.error || "Brisanje popusta nije uspelo."
       return
     }
 
@@ -397,7 +399,8 @@ export function useCatalogDiscountsPage() {
       (item) => item.code !== code && item.key !== code,
     )
     beginCreate()
-    deleteState.success = result.data?.message || `Discount ${code} removed.`
+    deleteState.success =
+      result.data?.message || `Popust ${code} je uspešno uklonjen.`
   }
 
   onMounted(() => {

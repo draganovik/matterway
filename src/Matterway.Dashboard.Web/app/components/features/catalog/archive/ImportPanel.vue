@@ -73,16 +73,16 @@ watch(
   >
     <template #header>
       <div>
-        <h3 class="text-foreground text-sm font-semibold">Import Archive</h3>
+        <h3 class="text-foreground text-sm font-semibold">Uvoz arhive</h3>
         <p class="text-muted text-xs">
-          Upload a previously exported archive to replace current catalog data
-          and images.
+          Otpremite prethodno izvezenu arhivu da zamenite trenutne podatke
+          kataloga i slike.
         </p>
       </div>
     </template>
 
     <div class="space-y-4">
-      <UFormField label="Archive File (.zip)" required>
+      <UFormField label="Arhiva (.zip)" required>
         <UFileUpload
           :model-value="selectedFile"
           accept=".zip,application/zip"
@@ -98,8 +98,8 @@ watch(
             description: 'text-muted mt-0 text-xs',
             actions: 'hidden',
           }"
-          label="Drag and drop a .zip archive"
-          description="or click to browse"
+          label="Prevucite .zip arhivu ovde"
+          description="ili kliknite za izbor"
           @update:model-value="handleSelectedFileChange"
         >
           <template #leading>
@@ -110,8 +110,8 @@ watch(
         <p class="text-muted mt-2 text-xs">
           {{
             props.hasSelectedFile
-              ? `Selected: ${props.selectedFileName}`
-              : "No archive selected."
+              ? `Izabrano: ${props.selectedFileName}`
+              : "Arhiva nije izabrana."
           }}
         </p>
 
@@ -123,7 +123,7 @@ watch(
             :disabled="!props.canOperate || !props.hasSelectedFile"
             @click="emit('upload')"
           >
-            Upload And Import
+            {{ props.loading ? "Uvoz arhive" : "Otpremi i uvezi" }}
           </UButton>
 
           <UButton
@@ -135,13 +135,13 @@ watch(
             "
             @click="clearSelection"
           >
-            Clear
+            Očisti
           </UButton>
         </div>
       </UFormField>
 
       <StatusMessages
-        :loading="props.loading && 'Importing archive...'"
+        :loading="props.loading && 'Uvoz arhive u toku...'"
         :error="props.error"
         :success="props.success"
       />

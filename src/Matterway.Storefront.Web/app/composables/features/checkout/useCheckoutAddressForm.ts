@@ -8,7 +8,7 @@ function createInitialAddress(): CheckoutAddress {
     street: "",
     city: "",
     zipCode: "",
-    country: "Srbija",
+    country: "Serbia",
     contactPhone: "",
     note: "",
   }
@@ -45,9 +45,6 @@ export function useCheckoutAddressForm() {
     }
     if (!address.zipCode && response.data.zipCode) {
       address.zipCode = response.data.zipCode
-    }
-    if (!address.country && response.data.country) {
-      address.country = response.data.country
     }
     if (!address.contactPhone && response.data.contactPhone) {
       address.contactPhone = response.data.contactPhone

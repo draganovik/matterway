@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SalesOrder, SalesOrderStatus } from "~/types/sales/orders"
 import { formatDate, formatMoney } from "~/utils/formatters"
+import { formatOrderStatus } from "~/utils/labels"
 
 const { order } = defineProps<{
   order: SalesOrder
@@ -74,7 +75,7 @@ function revealItems() {
           variant="subtle"
           class="font-normal"
         >
-          {{ latestStatus?.status || "Nema statusa" }}
+          {{ formatOrderStatus(latestStatus?.status) }}
         </UBadge>
         <UButton
           variant="ghost"

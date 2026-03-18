@@ -1,16 +1,16 @@
 import { allFeatures } from "~/data/serviceDefinitions"
 
 export const permissionLevels = [
-  { label: "Observer", value: "observer" },
-  { label: "Operator", value: "operator" },
-  { label: "Manager", value: "manager" },
+  { label: "Pregled", value: "observer" },
+  { label: "Operater", value: "operator" },
+  { label: "Menadžer", value: "manager" },
 ] as const
 
 const serviceLabelMap: Record<string, string> = {
-  catalog: "Catalog",
-  customers: "Customers",
-  identity: "Identity",
-  sales: "Sales",
+  catalog: "Katalog",
+  customers: "Kupci",
+  identity: "Identitet",
+  sales: "Prodaja",
 }
 
 export const permissionServices = [

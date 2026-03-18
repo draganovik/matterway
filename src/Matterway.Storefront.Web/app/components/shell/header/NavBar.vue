@@ -12,20 +12,19 @@ const mobileMenuOpen = ref(false)
 const searchTerm = ref("")
 
 const navItems = [
-  { label: "Pregled", to: "/" },
+  { label: "Početna", to: "/" },
   { label: "Artikli", to: "/articles" },
 ]
 
 const cartCount = computed(() => cart.totalItems.value)
 
 const userLabel = computed(() => {
-  if (auth.customerId.value?.trim()) return auth.customerId.value.trim()
-
   const payload = auth.payload.value
   const candidates = [
-    getJwtStringClaim(payload, "email"),
-    getJwtStringClaim(payload, "preferred_username"),
     getJwtStringClaim(payload, "name"),
+    getJwtStringClaim(payload, "preferred_username"),
+    getJwtStringClaim(payload, "email"),
+    auth.customerId.value,
     getJwtStringClaim(payload, "sub"),
   ].filter(Boolean) as string[]
 

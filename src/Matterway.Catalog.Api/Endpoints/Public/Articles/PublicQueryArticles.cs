@@ -5,6 +5,8 @@ namespace Matterway.Catalog.Api.Endpoints.Public.Articles;
 
 public class PublicQueryArticles : IEndpoint
 {
+    private const string RouteName = nameof(PublicQueryArticles);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Public, "articles", Handle)
@@ -49,8 +51,13 @@ public class PublicQueryArticles : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "PublicQueryArticles",
+            RouteName,
             null);
+
+        if (!string.IsNullOrWhiteSpace(location) && !string.IsNullOrWhiteSpace(queryParameters.Filter))
+            location = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(location,
+                nameof(QueryArticlesParameters.Filter),
+                queryParameters.Filter);
 
         var results = entities.Select(MapToResponse).ToList();
 

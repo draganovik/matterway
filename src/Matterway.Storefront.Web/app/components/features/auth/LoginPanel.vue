@@ -18,11 +18,11 @@ const emit = defineEmits<{
 
 <template>
   <AuthShell
-    hero-title="Pristup za kupce"
-    hero-description="Prijavite se kupčevim nalogom da biste kreirali porudžbine i pratili istoriju kupovine."
+    hero-title="Prijava za kupce"
+    hero-description="Prijavite se da biste naručivali i pratili svoje porudžbine."
     card-eyebrow="Prijava"
     card-title="Dobro došli nazad"
-    card-description="Unesite podatke kupčevog naloga."
+    card-description="Unesite podatke za prijavu."
   >
     <form class="space-y-4" @submit.prevent="emit('submit')">
       <UFormField label="Imejl" required>
@@ -52,11 +52,11 @@ const emit = defineEmits<{
       <div
         class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
       >
-        <UButton type="submit" color="primary" :loading="props.loading"
-          >Prijavi se</UButton
-        >
+        <UButton type="submit" color="primary" :loading="props.loading">{{
+          props.loading ? "Prijava" : "Prijavi se"
+        }}</UButton>
         <NuxtLink to="/register" class="text-primary text-sm hover:underline"
-          >Kreiraj nalog</NuxtLink
+          >Registrujte se</NuxtLink
         >
       </div>
     </form>

@@ -33,8 +33,8 @@ const emit = defineEmits<{
 <template>
   <EntitiesListPanel
     class="details-list-panel"
-    title="Detail Definitions"
-    description="Search by title and select one to update or remove."
+    title="Definicije detalja"
+    description="Pretražite po nazivu i izaberite stavku za izmenu ili brisanje."
     :items="items"
     item-key="slug"
     item-title-key="title"
@@ -42,7 +42,7 @@ const emit = defineEmits<{
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
-    filter-placeholder="Search detail definitions by title (e.g. screen size)."
+    filter-placeholder="Pretražite definicije detalja po nazivu (npr. veličina ekrana)."
     :loading="loading"
     :error="error"
     :empty-message="emptyMessage"

@@ -44,7 +44,7 @@ await initialize()
           :loading="isLoading"
           @click="loadData"
         >
-          Osveži
+          {{ isLoading ? "Osvežavanje" : "Osveži" }}
         </UButton>
       </div>
     </UCard>

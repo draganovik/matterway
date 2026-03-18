@@ -26,7 +26,7 @@ const props = withDefaults(
       <p class="text-muted max-w-md text-sm">{{ props.heroDescription }}</p>
     </div>
 
-    <UCard class="border-default border shadow-lg">
+    <UCard class="border-default border !shadow-sm">
       <template #header>
         <div class="space-y-1">
           <p class="text-primary text-xs tracking-[0.3em] uppercase">

@@ -7,7 +7,7 @@ import { useResetOnModalOpen } from "~/composables/workflows/modal/useResetOnMod
 type ArticleBaseForm = {
   code: string
   title: string
-  basePrice: number | string
+  basePrice: number | null
   description: string
   isAvailable: boolean
 }
@@ -28,7 +28,7 @@ const createState = useRequestState()
 const form = ref<ArticleBaseForm>({
   code: "",
   title: "",
-  basePrice: "",
+  basePrice: null,
   description: "",
   isAvailable: true,
 })
@@ -37,7 +37,7 @@ function resetForm() {
   form.value = {
     code: "",
     title: "",
-    basePrice: "",
+    basePrice: null,
     description: "",
     isAvailable: true,
   }
@@ -51,18 +51,20 @@ async function createArticle() {
   if (!canEdit) return
 
   const payload = form.value
-  const code = String(payload.code ?? "").trim().toUpperCase()
+  const code = String(payload.code ?? "")
+    .trim()
+    .toUpperCase()
   const title = String(payload.title ?? "").trim()
   const description = String(payload.description ?? "").trim()
+  const basePrice = payload.basePrice
 
-  if (!code || !title || !payload.basePrice || !description) {
-    createState.error =
-      "Fill in all required fields before creating the article."
+  if (!code || !title || basePrice == null || !description) {
+    createState.error = "Popunite sva obavezna polja pre kreiranja artikla."
     return
   }
 
   if (!/^[A-Z0-9]{8}$/.test(code)) {
-    createState.error = "Article code must be exactly 8 letters or numbers."
+    createState.error = "Šifra artikla mora imati tačno 8 slova ili cifara."
     return
   }
 
@@ -72,14 +74,14 @@ async function createArticle() {
   const result = await api.createArticle({
     code,
     title,
-    basePrice: payload.basePrice,
+    basePrice,
     description,
     isAvailable: payload.isAvailable,
   })
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || "Unable to create article."
+    createState.error = result.error || "Kreiranje artikla nije uspelo."
     return
   }
 
@@ -92,11 +94,10 @@ async function createArticle() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Create New Article
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi artikal</h3>
         <p class="text-muted text-sm">
-          Save core article data, then continue editing it in the browse view.
+          Sačuvajte osnovne podatke artikla, pa nastavite uređivanje u glavnom
+          prikazu.
         </p>
       </div>
     </template>
@@ -118,7 +119,7 @@ async function createArticle() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -126,7 +127,7 @@ async function createArticle() {
           :disabled="!canEdit"
           @click="createArticle"
         >
-          Create Article
+          {{ createState.loading ? "Kreiranje artikla" : "Kreiraj artikal" }}
         </UButton>
       </div>
     </template>

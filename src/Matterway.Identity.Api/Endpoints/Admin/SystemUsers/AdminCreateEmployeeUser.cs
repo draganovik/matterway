@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
+using Matterway.Identity.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
@@ -26,9 +27,13 @@ public class AdminCreateEmployeeUser : IEndpoint
         CreateUserRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,
+        CancellationToken cancellationToken,
+        IdentityDbComposer identityDb,
         UserManager<SystemUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager)
     {
+        await using var transaction = await identityDb.Database.BeginTransactionAsync(cancellationToken);
+
         var systemUser = new SystemUser
         {
             Email = request.Email,
@@ -54,7 +59,9 @@ public class AdminCreateEmployeeUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 permissionResult.Errors.Select(error => error.Description))));
 
-        var location = linkGenerator.GetPathByName(httpContext, "AdminGetSystemUserById",
+        await transaction.CommitAsync(cancellationToken);
+
+        var location = linkGenerator.GetUriByName(httpContext, "AdminGetSystemUserById",
             new { id = systemUser.Id });
 
         return TypedResults.Created(location, new CreateUserResponse

@@ -45,7 +45,7 @@ async function createEmployee() {
   const password = form.value.password.trim()
 
   if (!email || !password) {
-    createState.error = "Email and password are required."
+    createState.error = "Imejl i lozinka su obavezni."
     return
   }
 
@@ -57,7 +57,7 @@ async function createEmployee() {
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || "Unable to create employee."
+    createState.error = result.error || "Kreiranje zaposlenog nije uspelo."
     return
   }
 
@@ -70,32 +70,31 @@ async function createEmployee() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Create Employee User
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi zaposleni</h3>
         <p class="text-muted text-sm">
-          Manager-only action. New user is created with Employee role.
+          Ovu radnju može da izvrši samo menadžer. Novi nalog se kreira sa
+          ulogom zaposlenog.
         </p>
       </div>
     </template>
 
     <template #body>
       <div class="grid gap-4">
-        <UFormField label="Email" required>
+        <UFormField label="Imejl" required>
           <UInput
             v-model="form.email"
             type="email"
-            placeholder="name@matterway.local"
+            placeholder="ime.prezime@domen.com"
             :disabled="!canManage || createState.loading"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Password" required>
+        <UFormField label="Lozinka" required>
           <UInput
             v-model="form.password"
             type="password"
-            placeholder="At least 6 characters"
+            placeholder="Najmanje 6 karaktera"
             :disabled="!canManage || createState.loading"
             class="w-full"
           />
@@ -112,7 +111,7 @@ async function createEmployee() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -120,7 +119,9 @@ async function createEmployee() {
           :disabled="!canManage"
           @click="createEmployee"
         >
-          Create Employee
+          {{
+            createState.loading ? "Kreiranje zaposlenog" : "Kreiraj zaposlenog"
+          }}
         </UButton>
       </div>
     </template>

@@ -64,7 +64,7 @@ async function createCustomer() {
     !payload.lastName ||
     !payload.birthDate
   ) {
-    createState.error = "Fill in all required fields before creating."
+    createState.error = "Popunite sva obavezna polja pre kreiranja."
     return
   }
 
@@ -73,7 +73,7 @@ async function createCustomer() {
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || "Unable to create customer."
+    createState.error = result.error || "Kreiranje kupca nije uspelo."
     return
   }
 
@@ -86,11 +86,9 @@ async function createCustomer() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Create New Customer
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi kupac</h3>
         <p class="text-muted text-sm">
-          Create a customer profile linked to an existing system user.
+          Kreirajte profil kupca povezan sa postojećim sistemskim korisnikom.
         </p>
       </div>
     </template>
@@ -112,7 +110,7 @@ async function createCustomer() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -120,7 +118,7 @@ async function createCustomer() {
           :disabled="!canEdit"
           @click="createCustomer"
         >
-          Create Customer
+          {{ createState.loading ? "Kreiranje kupca" : "Kreiraj kupca" }}
         </UButton>
       </div>
     </template>

@@ -45,9 +45,9 @@ const permissionPriority: Record<PermissionLevel, number> = {
 
 const sectionThemes: Record<string, OverviewSectionTheme> = {
   catalog: {
-    eyebrow: "Merchandising lane",
+    eyebrow: "Katalog",
     description:
-      "Shape articles, detail definitions, and discount rules without leaving the main workspace.",
+      "Upravljajte artiklima, detaljima i popustima na jednom mestu.",
     icon: "i-lucide-boxes",
     glowClass: "bg-amber-500/20 dark:bg-amber-400/20",
     iconClass:
@@ -55,9 +55,9 @@ const sectionThemes: Record<string, OverviewSectionTheme> = {
     dotClass: "bg-amber-500",
   },
   users: {
-    eyebrow: "Identity lane",
+    eyebrow: "Korisnici",
     description:
-      "Handle customer records, employee accounts, and permission-aware access paths from one place.",
+      "Vodite evidenciju kupaca, zaposlenih naloga i prava pristupa na jednom mestu.",
     icon: "i-lucide-users-round",
     glowClass: "bg-sky-500/20 dark:bg-sky-400/20",
     iconClass:
@@ -65,9 +65,9 @@ const sectionThemes: Record<string, OverviewSectionTheme> = {
     dotClass: "bg-sky-500",
   },
   sales: {
-    eyebrow: "Fulfillment lane",
+    eyebrow: "Prodaja",
     description:
-      "Track orders, inspect order details, and move through sales operations with fewer clicks.",
+      "Pratite porudžbine, proveravajte detalje i upravljajte prodajom uz manje koraka.",
     icon: "i-lucide-receipt-text",
     glowClass: "bg-emerald-500/20 dark:bg-emerald-400/20",
     iconClass:
@@ -77,8 +77,9 @@ const sectionThemes: Record<string, OverviewSectionTheme> = {
 }
 
 const defaultTheme: OverviewSectionTheme = {
-  eyebrow: "Service lane",
-  description: "Open the tools available for this authorized workspace.",
+  eyebrow: "Servis",
+  description:
+    "Otvorite alate koji su vam dostupni u ovom delu administracije.",
   icon: "i-lucide-layout-panel-top",
   glowClass: "bg-primary/20",
   iconClass: "bg-primary/12 text-primary",
@@ -86,8 +87,10 @@ const defaultTheme: OverviewSectionTheme = {
 }
 
 function formatPermissionLabel(level: PermissionLevel | null) {
-  if (!level) return "Scoped"
-  return `${level.slice(0, 1).toUpperCase()}${level.slice(1)}`
+  if (!level) return "Ograničeno"
+  if (level === "observer") return "Pregled"
+  if (level === "operator") return "Operater"
+  return "Menadžer"
 }
 
 function resolveHighestPermission(values: string[]) {
@@ -123,7 +126,7 @@ function resolveEmployeeLabel(payload: JwtPayload | null) {
     getJwtStringClaim(payload, "sub"),
   ].filter(Boolean) as string[]
 
-  const raw = candidates[0] || "Employee"
+  const raw = candidates[0] || "Zaposleni"
   return raw.includes("@") ? raw.split("@")[0] : raw
 }
 
@@ -171,19 +174,19 @@ export function useDashboardOverviewPage() {
 
   const heroStats = computed<OverviewStat[]>(() => [
     {
-      label: "Domains",
+      label: "Sekcije",
       value: String(sections.value.length),
-      note: "authorized service lanes",
+      note: "servisi kojima imate pristup",
     },
     {
-      label: "Features",
+      label: "Opcije",
       value: String(featureCount.value),
-      note: "available operational routes",
+      note: "dostupne stranice",
     },
     {
-      label: "Access",
+      label: "Pristup",
       value: formatPermissionLabel(highestPermission.value),
-      note: `${auth.permissions.value.length} granted permission scopes`,
+      note: `${auth.permissions.value.length} dodeljenih dozvola`,
     },
   ])
 

@@ -6,6 +6,8 @@ namespace Matterway.Customers.Api.Endpoints.Admin.Customers;
 
 public class AdminQueryCustomers : IEndpoint
 {
+    private const string RouteName = nameof(AdminQueryCustomers);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "customers", Handler)
@@ -30,7 +32,7 @@ public class AdminQueryCustomers : IEndpoint
     {
         var total = await customerRepository.Count(cancellationToken);
         var entities = await customerRepository.Query(pagingQuery.Page, pagingQuery.PageSize, cancellationToken);
-        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCustomers");
+        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName);
 
         var response = entities
             .Select(MapToResponse)
@@ -43,7 +45,7 @@ public class AdminQueryCustomers : IEndpoint
             pagingQuery.PageSize,
             baseUri);
 
-        if (entities.Count == 0) TypedResults.NoContent();
+        if (entities.Count == 0) return TypedResults.NoContent();
 
         return TypedResults.Ok(paginationResponse);
     }

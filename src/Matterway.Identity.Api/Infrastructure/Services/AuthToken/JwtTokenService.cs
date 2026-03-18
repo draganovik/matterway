@@ -145,6 +145,7 @@ public class JwtTokenService : ITokenService
             NotBefore = issuedAt,
             Expires = issuedAt.Add(lifetime),
             Issuer = _options.Issuer,
+            Audience = _options.Audience,
             SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256)
         };
 

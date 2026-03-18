@@ -15,17 +15,19 @@ public class PublicRegisterCustomer : IEndpoint
             .WithTags("Registration")
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
             .AllowAnonymous()
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<CustomerResponse>, BadRequest<ProblemDetails>>> Handler(
-        RegisterRequest request,
-        IIdentityClient identityClient,
-        ICustomerRepository customerRepository,
-        LinkGenerator linkGenerator,
-        HttpContext httpContext,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<CustomerResponse>, BadRequest<ProblemDetails>, ProblemHttpResult>>
+        Handler(
+            RegisterRequest request,
+            IIdentityClient identityClient,
+            ICustomerRepository customerRepository,
+            LinkGenerator linkGenerator,
+            HttpContext httpContext,
+            CancellationToken cancellationToken)
     {
         var identityResult = await identityClient.CreateCustomerUserAsync(new CreateCustomerUserRequest
         {
@@ -41,23 +43,31 @@ public class PublicRegisterCustomer : IEndpoint
                 Detail = identityResult.ErrorMessage ?? "Could not create identity user."
             });
 
-        var customer = new Customer
+        var created = await customerRepository.Create(new Customer
         {
             Id = identityResult.Data.Id,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            BirthDate = request.BirthDate,
-            DefaultAddressId = null
-        };
-
-        var created = await customerRepository.Create(customer, cancellationToken);
+            BirthDate = request.BirthDate
+        }, cancellationToken);
         if (created is null)
-            return TypedResults.BadRequest(new ProblemDetails
+        {
+            var cleanupResult = await identityClient.DeleteCustomerUserAsync(identityResult.Data.Id, cancellationToken);
+            if (!cleanupResult.IsSuccess)
+                return TypedResults.Problem(new ProblemDetails
+                {
+                    Title = "Registration failed",
+                    Status = StatusCodes.Status500InternalServerError,
+                    Detail = "Could not clean up the identity user."
+                });
+
+            return TypedResults.Problem(new ProblemDetails
             {
                 Title = "Registration failed",
-                Status = StatusCodes.Status400BadRequest,
+                Status = StatusCodes.Status500InternalServerError,
                 Detail = "Could not create customer profile."
             });
+        }
 
         var location = linkGenerator.GetUriByName(httpContext, "SelfGetProfile", null);
         return TypedResults.Created(location, new CustomerResponse

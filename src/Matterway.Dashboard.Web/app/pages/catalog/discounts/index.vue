@@ -2,7 +2,7 @@
 import { useCatalogDiscountsPage } from "~/composables/features/catalog/useCatalogDiscountsPage"
 
 definePageMeta({
-  title: "Discounts",
+  title: "Popusti",
   service: "catalog",
   permissions: ["observer", "operator", "manager"],
 })
@@ -32,16 +32,6 @@ const {
   saveDiscount,
   removeDiscount,
 } = useCatalogDiscountsPage()
-
-const percentageValue = computed({
-  get: () => {
-    const parsed = Number(form.value.percentage)
-    return Number.isFinite(parsed) ? parsed : null
-  },
-  set: (value: number | null | undefined) => {
-    form.value.percentage = value == null ? "" : value
-  },
-})
 </script>
 
 <template>
@@ -50,7 +40,7 @@ const percentageValue = computed({
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Discounts">
+      <UDashboardNavbar title="Popusti">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -65,11 +55,11 @@ const percentageValue = computed({
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Manage Discounts
+                Upravljanje popustima
               </h2>
               <p class="text-muted text-sm">
-                Pick an existing discount from the list or create a new code,
-                then update article links and validity.
+                Izaberite postojeći popust sa liste ili kreirajte novi kod, pa
+                zatim ažurirajte povezane artikle i period važenja.
               </p>
             </div>
             <UButton
@@ -77,7 +67,7 @@ const percentageValue = computed({
               :disabled="!canEdit || isCreateMode"
               @click="beginCreate"
             >
-              Create New
+              Novi popust
             </UButton>
           </div>
 
@@ -110,19 +100,19 @@ const percentageValue = computed({
               <div class="grid gap-5">
                 <div class="space-y-1">
                   <h3 class="text-foreground text-base font-semibold">
-                    {{ selectedDiscount ? "Edit Discount" : "Create Discount" }}
+                    {{ selectedDiscount ? "Izmena popusta" : "Novi popust" }}
                   </h3>
                   <p class="text-muted text-sm">
-                    PUT is used for save operations. Delete removes all rows by
-                    code.
+                    PUT metoda se koristi za čuvanje izmena. Brisanje uklanja
+                    sve redove za izabrani kod.
                   </p>
                 </div>
 
                 <div class="grid gap-4 md:grid-cols-2">
                   <UFormField
-                    label="Code"
+                    label="Kod"
                     required
-                    help="3-50 chars, uppercase letters, numbers, underscore, hyphen."
+                    help="3-50 karaktera, velika slova, cifre, donja crta ili crtica."
                   >
                     <UInput
                       v-model="form.code"
@@ -133,12 +123,12 @@ const percentageValue = computed({
                   </UFormField>
 
                   <UFormField
-                    label="Percentage"
+                    label="Procenat"
                     required
-                    help="Decimal range: 0.01 to 1."
+                    help="Opseg decimalne vrednosti: 0,01 do 1."
                   >
                     <UInputNumber
-                      v-model="percentageValue"
+                      v-model="form.percentage"
                       orientation="vertical"
                       :min="0.01"
                       :max="1"
@@ -151,7 +141,7 @@ const percentageValue = computed({
                     />
                   </UFormField>
 
-                  <UFormField label="Valid From" required>
+                  <UFormField label="Važi od" required>
                     <UInput
                       v-model="form.validFrom"
                       type="datetime-local"
@@ -161,7 +151,7 @@ const percentageValue = computed({
                     />
                   </UFormField>
 
-                  <UFormField label="Valid To">
+                  <UFormField label="Važi do">
                     <UInput
                       v-model="form.validTo"
                       type="datetime-local"
@@ -184,7 +174,9 @@ const percentageValue = computed({
                     :disabled="!canEdit"
                     @click="saveDiscount"
                   >
-                    Save Discount
+                    {{
+                      submitState.loading ? "Čuvanje popusta" : "Sačuvaj popust"
+                    }}
                   </UButton>
                   <UButton
                     color="error"
@@ -193,7 +185,9 @@ const percentageValue = computed({
                     :disabled="!canEdit"
                     @click="removeDiscount"
                   >
-                    Delete Discount
+                    {{
+                      deleteState.loading ? "Brisanje popusta" : "Obriši popust"
+                    }}
                   </UButton>
                 </div>
 

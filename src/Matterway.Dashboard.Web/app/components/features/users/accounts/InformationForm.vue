@@ -13,24 +13,24 @@ const form = defineModel<SystemUserForm>({ required: true })
 
 <template>
   <div class="grid gap-4">
-    <UFormField label="Email" help="Optional. Leave unchanged if empty.">
+    <UFormField label="Imejl" help="Opciono. Ostavite prazno ako ne menjate.">
       <UInput
         v-model="form.email"
         type="email"
-        placeholder="name@matterway.local"
+        placeholder="ime.prezime@domen.com"
         :disabled="disabled"
         class="w-full"
       />
     </UFormField>
 
     <UFormField
-      label="Password"
-      help="Optional. Must be at least 6 characters when provided."
+      label="Lozinka"
+      help="Opciono. Ako je unesete, mora imati najmanje 6 karaktera."
     >
       <UInput
         v-model="form.password"
         type="password"
-        placeholder="New password"
+        placeholder="Nova lozinka"
         :disabled="disabled"
         class="w-full"
       />

@@ -40,8 +40,8 @@ const emit = defineEmits<{
 <template>
   <EntitiesListPanel
     class="articles-list-panel"
-    title="Articles"
-    description="Use RSQL filters to locate articles by title, code, or attributes."
+    title="Artikli"
+    description="Koristite RSQL filtere da pronađete artikle po nazivu, šifri ili atributima."
     :items="items"
     item-key="code"
     item-title-key="title"

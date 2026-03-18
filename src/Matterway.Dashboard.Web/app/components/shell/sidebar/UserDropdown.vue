@@ -33,7 +33,7 @@ const userLabel = computed(() => {
     candidates.find((value) => value && !isUuid(value) && !isHexish(value)) ||
     ""
   const prefix = raw.split("@")[0] || ""
-  return prefix || auth.role.value || "Employee"
+  return prefix || auth.role.value || "Zaposleni"
 })
 
 const buttonLabel = computed(() => {
@@ -59,7 +59,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
-      label: "Log out",
+      label: "Odjava",
       icon: "i-lucide-log-out",
       onSelect: async () => {
         await auth.logout()

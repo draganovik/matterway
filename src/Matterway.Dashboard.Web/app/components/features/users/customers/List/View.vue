@@ -39,8 +39,8 @@ const emit = defineEmits<{
 
 <template>
   <EntitiesListPanel
-    title="Customers"
-    description="Use pagination or provide an exact System User ID to fetch one customer."
+    title="Kupci"
+    description="Koristite paginaciju ili unesite tačan ID sistemskog korisnika da biste prikazali samo tog kupca."
     :items="items"
     item-key="systemUserId"
     item-title-key="firstName"
@@ -48,7 +48,7 @@ const emit = defineEmits<{
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
-    filter-placeholder="Optional exact System User ID (GUID)."
+    filter-placeholder="Opciono: tačan ID sistemskog korisnika (GUID)."
     :loading="loading"
     :error="error"
     :empty-message="emptyMessage"

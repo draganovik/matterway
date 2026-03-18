@@ -44,13 +44,13 @@ const emit = defineEmits<{
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ customer ? "Edit Customer" : "Customer Editor" }}
+        {{ customer ? "Izmena kupca" : "Uređivanje kupca" }}
       </h3>
       <p class="text-muted text-sm">
         {{
           canEdit
-            ? "Operator permission is required for create, update, and delete."
-            : "Read-only mode: operator permission required for changes."
+            ? "Za kreiranje, izmenu i brisanje potrebna je dozvola operatera."
+            : "Režim samo za čitanje: za izmene je potrebna dozvola operatera."
         }}
       </p>
     </div>
@@ -59,13 +59,13 @@ const emit = defineEmits<{
 
     <EntitiesEmptyState
       v-else-if="!customer"
-      title="Nothing selected"
-      description="Select a customer from the list to start editing."
+      title="Ništa nije izabrano"
+      description="Izaberite kupca sa liste da biste započeli izmenu."
     />
 
     <div v-else class="grid gap-4">
       <div class="text-muted text-sm">
-        System User ID: {{ customer.systemUserId }}
+        ID sistemskog korisnika: {{ customer.systemUserId }}
       </div>
 
       <UsersCustomersInformationForm
@@ -81,7 +81,7 @@ const emit = defineEmits<{
           :disabled="!canEdit"
           @click="emit('save')"
         >
-          Update Customer
+          {{ saveLoading ? "Čuvanje kupca" : "Sačuvaj kupca" }}
         </UButton>
 
         <UButton
@@ -91,7 +91,7 @@ const emit = defineEmits<{
           :disabled="!canEdit"
           @click="emit('remove')"
         >
-          Delete Customer
+          {{ removeLoading ? "Brisanje kupca" : "Obriši kupca" }}
         </UButton>
       </div>
 
@@ -99,14 +99,14 @@ const emit = defineEmits<{
         class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Address</h4>
+          <h4 class="text-foreground text-sm font-semibold">Adresa</h4>
           <p class="text-muted text-sm">
-            Reveal and manage the selected customer's address.
+            Otvorite i upravljajte adresom izabranog kupca.
           </p>
         </div>
 
         <UButton variant="outline" @click="emit('revealAddress')">
-          Reveal Address
+          Otvori adresu
         </UButton>
       </div>
 

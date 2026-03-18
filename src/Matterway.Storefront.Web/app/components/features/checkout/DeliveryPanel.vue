@@ -7,7 +7,7 @@ const address = defineModel<CheckoutAddress>({ required: true })
 <template>
   <UCard class="border-default h-full border" :ui="{ body: 'h-full' }">
     <template #header>
-      <h2 class="text-lg font-semibold">Dostava</h2>
+      <h2 class="text-lg font-semibold">Podaci za dostavu</h2>
     </template>
 
     <div class="flex h-full flex-col gap-4">
@@ -29,7 +29,7 @@ const address = defineModel<CheckoutAddress>({ required: true })
           />
         </UFormField>
 
-        <UFormField label="Ulica" required>
+        <UFormField label="Ulica i broj" required>
           <UInput
             v-model="address.street"
             placeholder="npr. Bulevar oslobođenja 15"
@@ -38,7 +38,7 @@ const address = defineModel<CheckoutAddress>({ required: true })
           />
         </UFormField>
 
-        <UFormField label="Dodatak adrese" required>
+        <UFormField label="Stan, sprat ili dodatak" required>
           <UInput
             v-model="address.residence"
             placeholder="npr. Stan 12, 3. sprat"
@@ -67,14 +67,20 @@ const address = defineModel<CheckoutAddress>({ required: true })
 
         <UFormField label="Država" class="sm:col-span-2">
           <UInput
-            v-model="address.country"
-            placeholder="npr. Srbija"
+            :model-value="
+              address.country === 'Serbia' ? 'Srbija' : address.country
+            "
             class="w-full"
+            readonly
+            disabled
           />
         </UFormField>
       </div>
 
-      <UFormField label="Napomena" class="flex min-h-0 flex-1 flex-col">
+      <UFormField
+        label="Napomena za dostavu"
+        class="flex min-h-0 flex-1 flex-col"
+      >
         <UTextarea
           v-model="address.note"
           placeholder="Napomena za dostavu (opciono)"

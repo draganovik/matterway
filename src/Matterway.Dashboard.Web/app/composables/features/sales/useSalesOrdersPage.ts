@@ -11,7 +11,7 @@ export function useSalesOrdersPage() {
     auth.hasPermission("sales", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "No orders found." })
+  const listState = useRequestState({ empty: "Nema porudžbina." })
   const detailState = useRequestState()
 
   const orders = ref<OrderResponse[]>([])
@@ -58,7 +58,7 @@ export function useSalesOrdersPage() {
     listState.loading = false
 
     if (!result.ok) {
-      listState.error = result.error || "Unable to load orders."
+      listState.error = result.error || "Učitavanje porudžbina nije uspelo."
       orders.value = []
       resetTotals()
       clearSelection()
@@ -90,7 +90,8 @@ export function useSalesOrdersPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Unable to load order details."
+      detailState.error =
+        result.error || "Učitavanje detalja porudžbine nije uspelo."
       selectedOrder.value = null
       return
     }
@@ -146,7 +147,7 @@ export function useSalesOrdersPage() {
   }
 
   const selectedOrderLabel = computed(
-    () => selectedOrder.value?.id || "Selected order",
+    () => selectedOrder.value?.id || "Izabrana porudžbina",
   )
 
   watchPagination(loadOrders)

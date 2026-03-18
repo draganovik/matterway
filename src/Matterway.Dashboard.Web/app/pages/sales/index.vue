@@ -2,7 +2,7 @@
 import { serviceSections } from "~/data/serviceRegistry"
 
 definePageMeta({
-  title: "Sales",
+  title: "Prodaja",
   service: "sales",
   permissions: ["observer", "operator", "manager"],
 })

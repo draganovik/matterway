@@ -32,7 +32,7 @@ await initialize()
         <p class="text-primary text-xs tracking-[0.3em] uppercase">
           Porudžbine
         </p>
-        <h1 class="text-2xl font-semibold">Moje prethodne porudžbine</h1>
+        <h1 class="text-2xl font-semibold">Moje porudžbine</h1>
       </div>
     </UCard>
 
@@ -46,8 +46,8 @@ await initialize()
 
     <EmptyState
       v-else-if="!orders.length"
-      title="Još uvek nema porudžbina"
-      description="Ovde će se prikazati vaše završene porudžbine."
+      title="Još nemate porudžbine"
+      description="Kada napravite prvu porudžbinu, pojaviće se ovde."
       icon="i-lucide-package-open"
     />
 

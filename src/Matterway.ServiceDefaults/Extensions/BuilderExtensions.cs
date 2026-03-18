@@ -45,6 +45,13 @@ public static class BuilderExtensions
 
             options.ConfigureServices?.Invoke(builder);
 
+            var validIssuer = options.ValidIssuer ?? builder.Configuration["Jwt:Issuer"];
+            var validAudience = options.ValidAudience ?? builder.Configuration["Jwt:Audience"];
+            if (string.IsNullOrWhiteSpace(validIssuer))
+                throw new InvalidOperationException("JWT issuer not configured.");
+            if (string.IsNullOrWhiteSpace(validAudience))
+                throw new InvalidOperationException("JWT audience not configured.");
+
             builder.Services.AddAuthentication(authenticationOptions =>
                 {
                     authenticationOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -58,10 +65,10 @@ public static class BuilderExtensions
 
                     var tokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = !string.IsNullOrWhiteSpace(options.ValidIssuer),
-                        ValidateAudience = !string.IsNullOrWhiteSpace(options.ValidAudience),
-                        ValidIssuer = options.ValidIssuer,
-                        ValidAudience = options.ValidAudience,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = validIssuer,
+                        ValidAudience = validAudience,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))

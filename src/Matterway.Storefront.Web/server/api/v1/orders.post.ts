@@ -12,6 +12,45 @@ import { validateCheckoutOrderRequest } from "../../modules/checkout/validators/
 import { validateNoQueryParams } from "../../modules/checkout/validators/emptyQuery"
 import { getRequestTraceContext } from "../../modules/shared/requestContext"
 
+function normalizeCheckoutError(error: unknown) {
+  const candidate =
+    error && typeof error === "object"
+      ? (error as {
+          statusCode?: unknown
+          statusMessage?: unknown
+          message?: unknown
+        })
+      : {}
+
+  const statusCode =
+    typeof candidate.statusCode === "number" && candidate.statusCode >= 400
+      ? candidate.statusCode
+      : 500
+
+  const internalMessage =
+    (typeof candidate.statusMessage === "string" && candidate.statusMessage) ||
+    (typeof candidate.message === "string" && candidate.message) ||
+    "Poručivanje nije uspelo."
+
+  let publicMessage = internalMessage
+  if (statusCode >= 500) {
+    publicMessage =
+      "Porudžbina trenutno ne može da se završi. Pokušajte ponovo."
+  } else if (statusCode === 401 || statusCode === 403) {
+    publicMessage =
+      "Vaša sesija više nije važeća. Prijavite se ponovo i pokušajte još jednom."
+  } else if (statusCode === 404) {
+    publicMessage =
+      "Neke podatke za poručivanje nije moguće pronaći. Osvežite stranicu i pokušajte ponovo."
+  }
+
+  return {
+    statusCode,
+    internalMessage,
+    publicMessage,
+  }
+}
+
 export default defineEventHandler(async (event) => {
   await getValidatedQuery(event, validateNoQueryParams)
   const orderRequest = await readValidatedBody(
@@ -23,7 +62,7 @@ export default defineEventHandler(async (event) => {
   if (!authorization) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Missing Authorization header.",
+      statusMessage: "Nedostaje Authorization zaglavlje.",
     })
   }
 
@@ -54,7 +93,7 @@ export default defineEventHandler(async (event) => {
     if (!createdOrder.id) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Order response did not include an order ID.",
+        statusMessage: "Odgovor porudžbine ne sadrži ID porudžbine.",
       })
     }
 
@@ -67,7 +106,7 @@ export default defineEventHandler(async (event) => {
       if (amountMismatch) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Payment amount does not match order total.",
+          statusMessage: "Iznos uplate se ne poklapa sa iznosom porudžbine.",
         })
       }
     }
@@ -83,13 +122,34 @@ export default defineEventHandler(async (event) => {
       order: createdOrder,
     }
   } catch (error) {
+    const normalizedError = normalizeCheckoutError(error)
+
     if (paymentIntentId) {
-      await cancelStripePaymentIntent(
-        paymentIntentId,
-        stripeSecretKey,
-        requestContext,
-      )
+      try {
+        await cancelStripePaymentIntent(
+          paymentIntentId,
+          stripeSecretKey,
+          requestContext,
+        )
+      } catch (cancelError) {
+        console.error("[checkout] failed to cancel payment intent", {
+          paymentIntentId,
+          error: cancelError,
+        })
+      }
     }
-    throw error
+
+    console.error("[checkout] order submission failed", {
+      statusCode: normalizedError.statusCode,
+      message: normalizedError.internalMessage,
+      error,
+    })
+
+    event.node.res.statusCode = normalizedError.statusCode
+    event.node.res.statusMessage = normalizedError.publicMessage
+
+    return {
+      message: normalizedError.publicMessage,
+    }
   }
 })

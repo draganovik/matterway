@@ -16,7 +16,7 @@ export function useCatalogArticlesPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "No articles found." })
+  const listState = useRequestState({ empty: "Nema artikala." })
   const articles = ref<QueryArticleResponse[]>([])
   const filter = ref("")
   const {
@@ -48,7 +48,7 @@ export function useCatalogArticlesPage() {
     listState.loading = false
 
     if (!result.ok) {
-      listState.error = result.error || "Unable to load articles."
+      listState.error = result.error || "Učitavanje artikala nije uspelo."
       articles.value = []
       return
     }
@@ -81,7 +81,7 @@ export function useCatalogArticlesPage() {
     articleState.loading = false
 
     if (!result.ok) {
-      articleState.error = result.error || "Unable to load article."
+      articleState.error = result.error || "Učitavanje artikla nije uspelo."
       selectedArticle.value = null
       return
     }

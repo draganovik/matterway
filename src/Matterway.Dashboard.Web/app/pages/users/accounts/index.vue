@@ -2,7 +2,7 @@
 import { useUsersAccountsPage } from "~/composables/features/users/useUsersAccountsPage"
 
 definePageMeta({
-  title: "Accounts",
+  title: "Nalozi",
   service: "identity",
   permissions: ["operator", "manager"],
 })
@@ -43,7 +43,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Accounts">
+      <UDashboardNavbar title="Nalozi">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -58,11 +58,11 @@ const {
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Manage Accounts
+                Upravljanje nalozima
               </h2>
               <p class="text-muted text-sm">
-                Browse users, update credentials, and manage service
-                permissions.
+                Pregledajte korisnike, ažurirajte podatke za prijavu i
+                upravljajte dozvolama po servisima.
               </p>
             </div>
 
@@ -74,7 +74,7 @@ const {
                 :disabled="!canManage"
                 @click="createModalOpen = true"
               >
-                Create new Employee Account
+                Novi nalog zaposlenog
               </UButton>
             </div>
           </div>

@@ -22,6 +22,62 @@ type AuthRuntimeState = {
   initPromise: Promise<void> | null
 }
 
+function translateAuthMessage(message: string) {
+  const normalized = message.trim()
+
+  if (!normalized) return normalized
+  if (normalized === "Email is required.") return "Imejl adresa je obavezna."
+  if (normalized === "Invalid email format.") {
+    return "Imejl adresa nije u ispravnom formatu."
+  }
+  if (normalized === "Password is required.") return "Lozinka je obavezna."
+  if (normalized === "One or more validation errors occurred.") {
+    return "Proverite unesene podatke."
+  }
+
+  return normalized
+}
+
+function extractAuthError(payload: unknown) {
+  if (!payload || typeof payload !== "object") return null
+
+  const candidate = payload as {
+    title?: unknown
+    detail?: unknown
+    message?: unknown
+    errors?: unknown
+  }
+
+  if (candidate.errors && typeof candidate.errors === "object") {
+    const entries = Object.entries(candidate.errors as Record<string, unknown>)
+    const messages = entries
+      .flatMap(([field, value]) => {
+        if (!Array.isArray(value)) return []
+        const label =
+          field === "Email" ? "Imejl" : field === "Password" ? "Lozinka" : field
+        return value
+          .filter(
+            (item): item is string =>
+              typeof item === "string" && item.trim().length > 0,
+          )
+          .map((item) => `${label}: ${translateAuthMessage(item)}`)
+      })
+      .filter(Boolean)
+
+    if (messages.length) {
+      return `${translateAuthMessage("One or more validation errors occurred.")} ${messages.join(" | ")}`
+    }
+  }
+
+  const directMessage =
+    (typeof candidate.detail === "string" && candidate.detail) ||
+    (typeof candidate.title === "string" && candidate.title) ||
+    (typeof candidate.message === "string" && candidate.message) ||
+    ""
+
+  return directMessage ? translateAuthMessage(directMessage) : null
+}
+
 function useAuthRuntimeState() {
   const nuxtApp = useNuxtApp() as ReturnType<typeof useNuxtApp> & {
     _mwStorefrontAuthRuntime?: AuthRuntimeState
@@ -204,8 +260,11 @@ export function useAuthSessionStore() {
     const response = await authJsonPost("login", credentials)
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Imejl adresa ili lozinka nisu ispravni.")
+      }
       const payload = await response.json().catch(() => null)
-      throw new Error(payload?.title || "Prijava nije uspela.")
+      throw new Error(extractAuthError(payload) || "Prijava nije uspela.")
     }
 
     const data = (await response.json()) as LoginResponse

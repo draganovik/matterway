@@ -123,7 +123,9 @@ export function useCartStore() {
     hydrate()
     const articleCode = normalizeArticleCode(article.code)
     if (!articleCode) return
-    const existing = items.value.find((item) => item.articleCode === articleCode)
+    const existing = items.value.find(
+      (item) => item.articleCode === articleCode,
+    )
     if (existing) {
       existing.quantity += 1
       await syncItem(existing.articleCode, existing.quantity)
@@ -137,7 +139,9 @@ export function useCartStore() {
 
   async function increase(articleCode: string) {
     hydrate()
-    const existing = items.value.find((item) => item.articleCode === articleCode)
+    const existing = items.value.find(
+      (item) => item.articleCode === articleCode,
+    )
     if (!existing) return
 
     existing.quantity += 1
@@ -146,7 +150,9 @@ export function useCartStore() {
 
   async function decrease(articleCode: string) {
     hydrate()
-    const existing = items.value.find((item) => item.articleCode === articleCode)
+    const existing = items.value.find(
+      (item) => item.articleCode === articleCode,
+    )
     if (!existing) return
 
     if (existing.quantity <= 1) {
@@ -160,7 +166,9 @@ export function useCartStore() {
 
   async function setQuantity(articleCode: string, quantity: number) {
     hydrate()
-    const existing = items.value.find((item) => item.articleCode === articleCode)
+    const existing = items.value.find(
+      (item) => item.articleCode === articleCode,
+    )
     if (!existing) return
 
     const normalized = Math.max(1, Math.trunc(normalizeNumber(quantity, 1)))
@@ -183,7 +191,9 @@ export function useCartStore() {
       new Set(remote.items.map((item) => item.articleCode).filter(Boolean)),
     ) as string[]
 
-    await Promise.all(uniqueIds.map((articleCode) => removeRemoteItem(articleCode)))
+    await Promise.all(
+      uniqueIds.map((articleCode) => removeRemoteItem(articleCode)),
+    )
   }
 
   async function clear() {
@@ -215,7 +225,9 @@ export function useCartStore() {
     const remoteQuantities = new Map(
       remote.items
         .map((item) => [item.articleCode, normalizeNumber(item.quantity, 1)])
-        .filter(([articleCode]) => Boolean(articleCode)) as Array<[string, number]>,
+        .filter(([articleCode]) => Boolean(articleCode)) as Array<
+        [string, number]
+      >,
     )
 
     const results = await Promise.all(
@@ -290,7 +302,8 @@ export function useCartStore() {
 
   function quantityFor(articleCode: string) {
     return (
-      items.value.find((item) => item.articleCode === articleCode)?.quantity ?? 0
+      items.value.find((item) => item.articleCode === articleCode)?.quantity ??
+      0
     )
   }
 

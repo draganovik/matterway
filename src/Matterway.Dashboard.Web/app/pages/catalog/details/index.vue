@@ -2,7 +2,7 @@
 import { useCatalogDetailsPage } from "~/composables/features/catalog/useCatalogDetailsPage"
 
 definePageMeta({
-  title: "Details",
+  title: "Detalji",
   service: "catalog",
   permissions: ["observer", "operator", "manager"],
 })
@@ -36,7 +36,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Details">
+      <UDashboardNavbar title="Detalji">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -51,16 +51,16 @@ const {
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Manage Details
+                Upravljanje detaljima
               </h2>
               <p class="text-muted text-sm">
-                Create and maintain detail definitions used across article
-                detail values.
+                Kreirajte i održavajte definicije detalja koje se koriste u
+                vrednostima detalja artikala.
               </p>
             </div>
 
             <UButton color="primary" :disabled="!canEdit" @click="beginCreate">
-              Create New
+              Novi detalj
             </UButton>
           </div>
 

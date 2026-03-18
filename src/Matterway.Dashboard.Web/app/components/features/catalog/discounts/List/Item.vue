@@ -10,10 +10,10 @@ const { item } = defineProps<{
 }>()
 
 function formatDateTime(value?: string | null) {
-  if (!value) return "Open-ended"
+  if (!value) return "Bez datuma završetka"
   const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) return value
-  return parsed.toLocaleString()
+  return parsed.toLocaleString("sr-RS")
 }
 </script>
 
@@ -21,10 +21,10 @@ function formatDateTime(value?: string | null) {
   <div class="grid gap-2">
     <div class="flex items-start justify-between gap-2">
       <p class="text-foreground text-base font-medium">
-        {{ item.code || "Missing Code" }}
+        {{ item.code || "Nedostaje kod" }}
       </p>
       <UBadge color="neutral" variant="subtle">
-        {{ item.articleCodes.length }} articles
+        {{ item.articleCodes.length }} artikala
       </UBadge>
     </div>
 
