@@ -42,7 +42,7 @@ const secondaryItems = computed<NavigationMenuItem[]>(() => [
   {
     label: "GitHub repozitorijum",
     icon: "i-lucide-github",
-    to: "https://github.com/draganovik/aspire-matterway",
+    to: "https://github.com/draganovik/matterway",
     target: "_blank",
   },
 ])
