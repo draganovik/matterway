@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SalesOrder } from "~/types/sales/orders"
 import { formatDateTime } from "~/utils/formatters"
+import { formatOrderStatus } from "~/utils/labels"
 
 const props = withDefaults(
   defineProps<{
@@ -58,7 +59,7 @@ const statusHistory = computed(() => {
     <template #body>
       <div v-if="displayOrder" class="space-y-4">
         <div class="flex items-center justify-between gap-3">
-          <h4 class="text-sm font-semibold">Vremenska linija</h4>
+          <h4 class="text-sm font-semibold">Promene statusa</h4>
           <UBadge color="neutral" variant="subtle" class="font-normal">
             {{ statusHistory.length }} unosa
           </UBadge>
@@ -78,7 +79,9 @@ const statusHistory = computed(() => {
             class="border-default/70 rounded-md border px-3 py-2"
           >
             <div class="flex items-start justify-between gap-2">
-              <p class="text-sm font-medium">{{ entry.status || "-" }}</p>
+              <p class="text-sm font-medium">
+                {{ formatOrderStatus(entry.status) }}
+              </p>
               <p class="text-muted text-xs">
                 #{{ statusHistory.length - index }}
               </p>

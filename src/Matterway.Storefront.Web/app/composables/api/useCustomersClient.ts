@@ -21,7 +21,7 @@ export function useCustomersClient() {
 
   function getRequiredCustomerId() {
     const customerId = auth.customerId.value
-    if (!customerId) throw new Error("Missing customer ID in session.")
+    if (!customerId) throw new Error("Sesija je istekla. Prijavite se ponovo.")
     return customerId
   }
 

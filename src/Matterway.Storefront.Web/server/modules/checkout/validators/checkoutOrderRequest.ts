@@ -27,32 +27,32 @@ function parseCardPayment(body: Record<string, unknown>): CardPaymentInput {
   const cardNumber = asRequiredString(
     body,
     "cardNumber",
-    "Card number is required.",
+    "Broj kartice je obavezan.",
   ).replace(/\D/g, "")
   if (!/^\d{13,19}$/.test(cardNumber)) {
-    throw new Error("Card number is invalid.")
+    throw new Error("Broj kartice nije ispravan.")
   }
 
   const expMonth = Math.trunc(
-    asNumber(body, "expMonth", "Expiration month is invalid."),
+    asNumber(body, "expMonth", "Mesec isteka nije ispravan."),
   )
   if (expMonth < 1 || expMonth > 12) {
-    throw new Error("Expiration month is invalid.")
+    throw new Error("Mesec isteka nije ispravan.")
   }
 
   const expYear = Math.trunc(
-    asNumber(body, "expYear", "Expiration year is invalid."),
+    asNumber(body, "expYear", "Godina isteka nije ispravna."),
   )
   if (expYear < 2000) {
-    throw new Error("Expiration year is invalid.")
+    throw new Error("Godina isteka nije ispravna.")
   }
 
-  const cvc = asRequiredString(body, "cvc", "CVC is required.").replace(
+  const cvc = asRequiredString(body, "cvc", "CVC je obavezan.").replace(
     /\D/g,
     "",
   )
   if (!/^\d{3,4}$/.test(cvc)) {
-    throw new Error("CVC is invalid.")
+    throw new Error("CVC nije ispravan.")
   }
 
   return {
@@ -60,7 +60,7 @@ function parseCardPayment(body: Record<string, unknown>): CardPaymentInput {
     expMonth,
     expYear,
     cvc,
-    amount: asPositiveNumber(body, "amount", "Payment amount is invalid."),
+    amount: asPositiveNumber(body, "amount", "Iznos uplate nije ispravan."),
   }
 }
 
@@ -69,12 +69,12 @@ function parseAddress(body: Record<string, unknown>): PaymentAddress {
     receiverName: asRequiredString(
       body,
       "receiverName",
-      "Receiver name is required.",
+      "Ime primaoca je obavezno.",
     ),
-    residence: asRequiredString(body, "residence", "Residence is required."),
-    street: asRequiredString(body, "street", "Street is required."),
-    city: asRequiredString(body, "city", "City is required."),
-    zipCode: asRequiredString(body, "zipCode", "Zip code is required."),
+    residence: asRequiredString(body, "residence", "Adresa je obavezna."),
+    street: asRequiredString(body, "street", "Ulica i broj su obavezni."),
+    city: asRequiredString(body, "city", "Grad je obavezan."),
+    zipCode: asRequiredString(body, "zipCode", "Poštanski broj je obavezan."),
     country: "Serbia",
     contactPhone: asOptionalString(body, "contactPhone"),
     note: asOptionalString(body, "note"),
@@ -82,12 +82,15 @@ function parseAddress(body: Record<string, unknown>): PaymentAddress {
 }
 
 function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
-  const type = asRequiredString(body, "type", "Order type is required.")
+  const type = asRequiredString(body, "type", "Tip porudžbine je obavezan.")
   if (type.toLowerCase() !== "ecommerce") {
-    throw new Error("Order type is invalid.")
+    throw new Error("Tip porudžbine nije ispravan.")
   }
 
-  const deliveryInfo = asObject(body.deliveryInfo, "Delivery info is required.")
+  const deliveryInfo = asObject(
+    body.deliveryInfo,
+    "Podaci za dostavu su obavezni.",
+  )
 
   return {
     type: "Ecommerce",
@@ -96,17 +99,17 @@ function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
       city: asRequiredString(
         deliveryInfo,
         "city",
-        "Delivery city is required.",
+        "Grad za dostavu je obavezan.",
       ),
       zipCode: asRequiredString(
         deliveryInfo,
         "zipCode",
-        "Delivery zip code is required.",
+        "Poštanski broj za dostavu je obavezan.",
       ),
       addressLine1: asRequiredString(
         deliveryInfo,
         "addressLine1",
-        "Delivery address line 1 is required.",
+        "Adresa za dostavu je obavezna.",
       ),
       addressLine2: asOptionalString(deliveryInfo, "addressLine2"),
       contactPhone: asOptionalString(deliveryInfo, "contactPhone"),
@@ -117,30 +120,26 @@ function parseOrder(body: Record<string, unknown>): CheckoutOrderInput {
 export function validateCheckoutOrderRequest(
   data: unknown,
 ): CheckoutOrderRequest {
-  const body = asObject(data, "Invalid request body.")
-  const orderBody = asObject(body.order, "Order payload is required.")
-  const paymentBody = asObject(body.payment, "Payment payload is required.")
-  const addressBody = asObject(body.address, "Address payload is required.")
+  const body = asObject(data, "Telo zahteva nije ispravno.")
+  const orderBody = asObject(body.order, "Podaci o porudžbini su obavezni.")
+  const paymentBody = asObject(body.payment, "Podaci o plaćanju su obavezni.")
+  const addressBody = asObject(body.address, "Podaci o adresi su obavezni.")
   const cardPaymentBody = asObject(
     paymentBody.cardPayment,
-    "Card payment payload is required.",
+    "Podaci o kartici su obavezni.",
   )
 
   const paymentType = asRequiredString(
     paymentBody,
     "type",
-    "Payment type is required.",
+    "Tip plaćanja je obavezan.",
   )
   if (paymentType.toLowerCase() !== "stripe") {
-    throw new Error("Payment type is not supported.")
+    throw new Error("Izabrani tip plaćanja nije podržan.")
   }
 
   return {
-    customerId: asRequiredString(
-      body,
-      "customerId",
-      "Customer ID is required.",
-    ),
+    customerId: asRequiredString(body, "customerId", "ID kupca je obavezan."),
     order: parseOrder(orderBody),
     payment: {
       type: "stripe",

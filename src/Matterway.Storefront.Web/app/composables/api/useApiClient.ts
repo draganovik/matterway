@@ -3,6 +3,22 @@ import type { ApiResult, ApiService } from "~/types/common/api"
 import type { RuntimeConfig } from "nuxt/schema"
 
 const validEndpointKinds = new Set(["self", "admin", "public", "system"])
+const fieldLabels: Record<string, string> = {
+  Email: "Imejl",
+  Password: "Lozinka",
+  FirstName: "Ime",
+  LastName: "Prezime",
+  BirthDate: "Datum rođenja",
+  Country: "Država",
+  City: "Grad",
+  ZipCode: "Poštanski broj",
+  AddressLine1: "Ulica i broj",
+  AddressLine2: "Stan, sprat ili dodatak",
+  ContactPhone: "Kontakt telefon",
+  Quantity: "Količina",
+  SystemUserId: "ID korisnika",
+  CustomerId: "ID kupca",
+}
 
 function getBaseUrl(service: ApiService, config: RuntimeConfig) {
   if (service === "catalog") return config.public.catalogApiBaseUrl
@@ -25,8 +41,47 @@ function getValidationErrors(
 function formatValidationErrors(errors?: Record<string, string[]>) {
   if (!errors) return ""
   return Object.entries(errors)
-    .map(([field, messages]) => `${field}: ${messages.join(" ")}`)
+    .map(
+      ([field, messages]) =>
+        `${fieldLabels[field] || field}: ${messages
+          .map((message) => translateMessage(message))
+          .join(" ")}`,
+    )
     .join(" | ")
+}
+
+function translateMessage(message: string) {
+  const normalized = message.trim()
+
+  if (!normalized) return normalized
+  if (normalized === "One or more validation errors occurred.") {
+    return "Proverite unesene podatke."
+  }
+  if (normalized === "Registration failed") return "Registracija nije uspela."
+  if (normalized === "Could not create identity user.") {
+    return "Nalog trenutno nije moguće kreirati."
+  }
+  if (normalized === "Could not clean up the identity user.") {
+    return "Registracija trenutno nije uspela. Pokušajte ponovo."
+  }
+  if (normalized === "Could not create customer profile.") {
+    return "Profil kupca trenutno nije moguće kreirati."
+  }
+  if (normalized === "Bad Request") return "Neispravan zahtev."
+  if (normalized === "Cannot upsert address.") {
+    return "Adresu trenutno nije moguće sačuvati."
+  }
+  if (normalized === "Cannot update customer default address.") {
+    return "Podrazumevanu adresu nije moguće ažurirati."
+  }
+  if (normalized === "Unable to retrieve article.") {
+    return "Artikal trenutno nije moguće učitati."
+  }
+  if (normalized === "Article price is unavailable.") {
+    return "Cena artikla trenutno nije dostupna."
+  }
+
+  return normalized
 }
 
 function getErrorMessage(payload: unknown) {
@@ -77,7 +132,7 @@ export function useApiClient() {
       return {
         ok: false,
         status: 0,
-        error: `Missing API base URL for service: ${service}.`,
+        error: "Usluga trenutno nije dostupna. Pokušajte ponovo kasnije.",
       }
     }
 
@@ -87,14 +142,14 @@ export function useApiClient() {
       return {
         ok: false,
         status: 0,
-        error: "API path must start with one of: self, admin, public, system.",
+        error: "Zahtev nije ispravan.",
       }
     }
     if (resourcePath.length === 0) {
       return {
         ok: false,
         status: 0,
-        error: "API path must include a resource after the first segment.",
+        error: "Zahtev nije ispravan.",
       }
     }
     const url = `${baseUrl}/api/${endpointKind}/v1/${resourcePath.join("/")}`
@@ -139,7 +194,9 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const baseError = getErrorMessage(payload) || "Request failed."
+    const baseError = translateMessage(
+      getErrorMessage(payload) || "Zahtev nije uspeo.",
+    )
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,

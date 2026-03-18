@@ -37,14 +37,14 @@ function extractErrorMessage(payload: unknown, fallback: string) {
 function getPublicOrderErrorMessage(statusCode: number) {
   switch (statusCode) {
     case 400:
-      return "Order could not be created. Review your cart and delivery details and try again."
+      return "Porudžbina ne može da se kreira. Proverite korpu i podatke za dostavu pa pokušajte ponovo."
     case 401:
     case 403:
-      return "Your session is no longer valid. Sign in again and retry."
+      return "Vaša sesija više nije važeća. Prijavite se ponovo i pokušajte još jednom."
     case 404:
-      return "Some checkout data could not be found. Refresh and try again."
+      return "Neke podatke za poručivanje nije moguće pronaći. Osvežite stranicu i pokušajte ponovo."
     default:
-      return "Order could not be completed right now. Please try again."
+      return "Porudžbina trenutno ne može da se završi. Pokušajte ponovo."
   }
 }
 
@@ -91,7 +91,7 @@ export async function createSalesOrder(
   if (!response.ok) {
     const internalMessage = extractErrorMessage(
       payload,
-      "Order creation failed.",
+      "Kreiranje porudžbine nije uspelo.",
     )
     console.error("[checkout] sales order request failed", {
       statusCode: response.status,

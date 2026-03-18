@@ -30,16 +30,18 @@ function normalizeCheckoutError(error: unknown) {
   const internalMessage =
     (typeof candidate.statusMessage === "string" && candidate.statusMessage) ||
     (typeof candidate.message === "string" && candidate.message) ||
-    "Checkout failed."
+    "Poručivanje nije uspelo."
 
   let publicMessage = internalMessage
   if (statusCode >= 500) {
-    publicMessage = "Order could not be completed right now. Please try again."
+    publicMessage =
+      "Porudžbina trenutno ne može da se završi. Pokušajte ponovo."
   } else if (statusCode === 401 || statusCode === 403) {
-    publicMessage = "Your session is no longer valid. Sign in again and retry."
+    publicMessage =
+      "Vaša sesija više nije važeća. Prijavite se ponovo i pokušajte još jednom."
   } else if (statusCode === 404) {
     publicMessage =
-      "Some checkout data could not be found. Refresh and try again."
+      "Neke podatke za poručivanje nije moguće pronaći. Osvežite stranicu i pokušajte ponovo."
   }
 
   return {
@@ -60,7 +62,7 @@ export default defineEventHandler(async (event) => {
   if (!authorization) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Missing Authorization header.",
+      statusMessage: "Nedostaje Authorization zaglavlje.",
     })
   }
 
@@ -91,7 +93,7 @@ export default defineEventHandler(async (event) => {
     if (!createdOrder.id) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Order response did not include an order ID.",
+        statusMessage: "Odgovor porudžbine ne sadrži ID porudžbine.",
       })
     }
 
@@ -104,7 +106,7 @@ export default defineEventHandler(async (event) => {
       if (amountMismatch) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Payment amount does not match order total.",
+          statusMessage: "Iznos uplate se ne poklapa sa iznosom porudžbine.",
         })
       }
     }

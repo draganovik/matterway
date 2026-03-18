@@ -11,6 +11,8 @@ type RegisterForm = {
   confirmPassword: string
 }
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function getDefaultBirthDate() {
   const date = new Date()
   date.setFullYear(date.getFullYear() - 18)
@@ -39,8 +41,49 @@ export function useAuthRegisterPage() {
 
   async function submit() {
     error.value = ""
+    const firstName = model.firstName.trim()
+    const lastName = model.lastName.trim()
+    const birthDate = model.birthDate.trim()
+    const email = model.email.trim()
+    const password = model.password
+    const confirmPassword = model.confirmPassword
 
-    if (model.password !== model.confirmPassword) {
+    if (!firstName) {
+      error.value = "Unesite ime."
+      return
+    }
+
+    if (!lastName) {
+      error.value = "Unesite prezime."
+      return
+    }
+
+    if (!birthDate) {
+      error.value = "Unesite datum rođenja."
+      return
+    }
+
+    if (!email) {
+      error.value = "Unesite imejl adresu."
+      return
+    }
+
+    if (!emailPattern.test(email)) {
+      error.value = "Imejl adresa nije u ispravnom formatu."
+      return
+    }
+
+    if (!password) {
+      error.value = "Unesite lozinku."
+      return
+    }
+
+    if (password.length < 6) {
+      error.value = "Lozinka mora da ima najmanje 6 karaktera."
+      return
+    }
+
+    if (password !== confirmPassword) {
       error.value = "Lozinke se ne podudaraju."
       return
     }
@@ -48,11 +91,11 @@ export function useAuthRegisterPage() {
     loading.value = true
     try {
       await registerCustomer.registerAndSignIn({
-        firstName: model.firstName,
-        lastName: model.lastName,
-        birthDate: model.birthDate,
-        email: model.email,
-        password: model.password,
+        firstName,
+        lastName,
+        birthDate,
+        email,
+        password,
       })
 
       await cart.mergeGuestItemsIntoRemote().catch(() => null)

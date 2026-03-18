@@ -53,7 +53,7 @@ function readErrorMessage(payload: unknown): string | undefined {
 function noSessionResult(): CheckoutOrderResult {
   return {
     ok: false,
-    error: "User session is unavailable.",
+    error: "Sesija je istekla. Prijavite se ponovo.",
   }
 }
 

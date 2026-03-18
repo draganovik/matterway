@@ -205,7 +205,7 @@ export async function createStripePaymentIntent(
       paymentIntentId: paymentIntent.id,
     }
   } catch (error) {
-    throw wrapStripeError(error, "Stripe payment initialization failed.")
+    throw wrapStripeError(error, "Pokretanje plaćanja nije uspelo.")
   }
 }
 
@@ -253,14 +253,14 @@ export async function confirmStripePaymentIntent(
     ) {
       throw createError({
         statusCode: 402,
-        statusMessage: "Stripe payment confirmation failed.",
+        statusMessage: "Potvrda plaćanja nije uspela.",
       })
     }
   } catch (error) {
     if (error && typeof error === "object" && "statusCode" in error) {
       throw error
     }
-    throw wrapStripeError(error, "Stripe payment confirmation failed.")
+    throw wrapStripeError(error, "Potvrda plaćanja nije uspela.")
   }
 }
 

@@ -86,7 +86,7 @@ const {
       <EmptyState
         v-else-if="!items.length"
         title="Nema odgovarajućih artikala"
-        description="Prilagodite filtere ili ih poništite za pregled celog kataloga."
+        description="Prilagodite filtere ili ih poništite da biste videli ceo katalog."
         icon="i-lucide-search-x"
       >
         <UButton color="neutral" variant="soft" @click="resetFilters"

@@ -33,7 +33,7 @@ export function useCheckoutPage() {
   async function initialize() {
     const syncResult = await syncCustomerSession({ force: true })
     if (!syncResult.ok) {
-      error.value = syncResult.error || "Osvežavanje korpe nije uspelo."
+      error.value = syncResult.error || "Učitavanje korpe nije uspelo."
       return
     }
 
@@ -50,7 +50,7 @@ export function useCheckoutPage() {
     error.value = ""
 
     if (!auth.customerId.value) {
-      error.value = "Korisnička sesija nije dostupna."
+      error.value = "Sesija je istekla. Prijavite se ponovo."
       return
     }
 
@@ -88,7 +88,7 @@ export function useCheckoutPage() {
       })
 
       if (!orderResponse.ok || !orderResponse.data?.id) {
-        error.value = orderResponse.error || "Kreiranje porudžbine nije uspelo."
+        error.value = orderResponse.error || "Slanje porudžbine nije uspelo."
         return
       }
 

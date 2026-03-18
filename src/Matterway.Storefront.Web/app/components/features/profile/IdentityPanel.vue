@@ -30,7 +30,7 @@ const emit = defineEmits<{
 <template>
   <UCard class="border-default border">
     <template #header>
-      <h2 class="text-base font-semibold">Korisnički podaci</h2>
+      <h2 class="text-base font-semibold">Lični podaci</h2>
     </template>
 
     <form class="space-y-4" @submit.prevent="emit('save')">
@@ -77,7 +77,7 @@ const emit = defineEmits<{
         :loading="loading"
         :disabled="disabled"
       >
-        Sačuvaj korisničke podatke
+        {{ loading ? "Čuvanje podataka" : "Sačuvaj podatke" }}
       </UButton>
     </form>
   </UCard>
