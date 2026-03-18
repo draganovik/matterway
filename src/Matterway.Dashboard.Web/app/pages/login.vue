@@ -22,9 +22,7 @@ await initialize()
           <p class="text-sm tracking-[0.4em] text-orange-600 uppercase">
             Matterway
           </p>
-          <h1 class="text-foreground text-4xl font-semibold">
-            Administracija
-          </h1>
+          <h1 class="text-foreground text-4xl font-semibold">Administracija</h1>
           <p class="text-muted max-w-md text-sm">
             Bezbedan pristup administrativnim tokovima za katalog, korisnike i
             prodaju. Prijavite se nalogom zaposlenog da nastavite.

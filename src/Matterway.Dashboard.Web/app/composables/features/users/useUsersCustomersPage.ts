@@ -155,7 +155,8 @@ export function useUsersCustomersPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Učitavanje detalja kupca nije uspelo."
+      detailState.error =
+        result.error || "Učitavanje detalja kupca nije uspelo."
       selectedCustomer.value = null
       applyCustomerToForm(null)
       return

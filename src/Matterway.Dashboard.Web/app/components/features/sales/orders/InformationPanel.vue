@@ -99,7 +99,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
         class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Detalji porudžbine</h4>
+          <h4 class="text-foreground text-sm font-semibold">
+            Detalji porudžbine
+          </h4>
           <p class="text-muted text-sm">
             Pogledajte osnovne podatke i adresu za dostavu.
           </p>
@@ -112,7 +114,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
 
       <div class="border-default/70 space-y-2 rounded-lg border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Istorija statusa</h4>
+          <h4 class="text-foreground text-sm font-semibold">
+            Istorija statusa
+          </h4>
 
           <div class="flex items-center gap-2">
             <UBadge color="neutral" variant="subtle" class="font-normal">
@@ -164,7 +168,11 @@ const quantitySum = computed(() => quantitySumOf(props.order))
               variant="subtle"
               class="font-normal"
             >
-              {{ paymentBalanced ? "Iznosi se poklapaju" : "Iznosi se ne poklapaju" }}
+              {{
+                paymentBalanced
+                  ? "Iznosi se poklapaju"
+                  : "Iznosi se ne poklapaju"
+              }}
             </UBadge>
             <UButton size="xs" variant="ghost" @click="emit('revealPayments')">
               Otvori uplate

@@ -220,7 +220,9 @@ function submitSelection() {
             :disabled="!articles.length"
             @click="togglePageSelection"
           >
-            {{ allCurrentPageSelected ? "Ukloni prikazane" : "Izaberi prikazane" }}
+            {{
+              allCurrentPageSelected ? "Ukloni prikazane" : "Izaberi prikazane"
+            }}
           </UButton>
           <UButton
             variant="ghost"
@@ -244,8 +246,8 @@ function submitSelection() {
           class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
         >
           <div class="text-muted text-sm">
-            Strana {{ pagination.page }} od {{ pagination.totalPages }} -
-            ukupno {{ pagination.totalCount }}
+            Strana {{ pagination.page }} od {{ pagination.totalPages }} - ukupno
+            {{ pagination.totalCount }}
           </div>
           <div class="flex items-center gap-2">
             <UPagination

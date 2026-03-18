@@ -52,9 +52,7 @@ const form = ref<PermissionForm>({
   level: "Operator",
 })
 
-const displayLabel = computed(
-  () => props.userLabel.trim() || "Izabrani nalog",
-)
+const displayLabel = computed(() => props.userLabel.trim() || "Izabrani nalog")
 
 function permissionKey(permission: SystemUserPermResponse) {
   return permission.service.toLowerCase()
@@ -242,9 +240,7 @@ useModalCloseReset({
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Dozvole naloga
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Dozvole naloga</h3>
         <p class="text-muted text-sm">
           Pregled dozvola za nalog {{ displayLabel }}.
         </p>

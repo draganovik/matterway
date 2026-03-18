@@ -50,8 +50,8 @@ const {
                 Pregled artikala
               </h2>
               <p class="text-muted text-sm">
-                Pretražite postojeće artikle i dopunite izabrani artikal
-                slikama i detaljima.
+                Pretražite postojeće artikle i dopunite izabrani artikal slikama
+                i detaljima.
               </p>
             </div>
 

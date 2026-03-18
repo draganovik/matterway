@@ -56,14 +56,14 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 
         <template v-else-if="order">
           <div class="space-y-2">
-            <h4 class="text-foreground text-sm font-semibold">
-              Usklađenost
-            </h4>
+            <h4 class="text-foreground text-sm font-semibold">Usklađenost</h4>
 
             <div class="border-default/70 rounded-md border px-3 py-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="text-sm">
-                  <p class="text-muted text-xs">Iznos porudžbine i zbir uplata</p>
+                  <p class="text-muted text-xs">
+                    Iznos porudžbine i zbir uplata
+                  </p>
                   <p class="text-foreground font-medium">
                     {{ formatMoney(order.totalAmount) }} naspram
                     {{ formatMoney(paymentSum) }}

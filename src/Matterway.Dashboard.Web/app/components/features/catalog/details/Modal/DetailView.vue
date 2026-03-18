@@ -80,9 +80,7 @@ async function createDetail() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Novi detalj
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi detalj</h3>
         <p class="text-muted text-sm">
           Kreirajte definiciju detalja, a zatim je uređujte iz panela za izmenu.
         </p>

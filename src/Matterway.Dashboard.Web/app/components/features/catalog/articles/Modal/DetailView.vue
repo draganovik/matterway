@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
+import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import type {
   ArticleDetailProperty,
   QueryDetailResponse,
@@ -106,30 +107,28 @@ const isNumeric = computed(() => {
   return Boolean(selectedOption.value?.unit)
 })
 
-watch(
-  () => props.open,
-  (open) => {
-    if (!open) {
-      searchTerm.value = ""
-      detailOptions.value = []
-      selectedKey.value = ""
-      valueInput.value = ""
-      validationError.value = ""
-      definitionState.error = ""
-      definitionState.success = ""
-      return
-    }
-    if (props.mode === "edit" && props.detail?.detailSlug) {
-      selectedKey.value = props.detail.detailSlug
-      valueInput.value =
-        props.detail.textValue ?? props.detail.numericValue?.toString() ?? ""
-    } else {
-      selectedKey.value = ""
-      valueInput.value = ""
-      void loadDefinitions()
-    }
-  },
-)
+function resetModalState() {
+  searchTerm.value = ""
+  detailOptions.value = []
+  selectedKey.value = ""
+  valueInput.value = ""
+  validationError.value = ""
+  definitionState.error = ""
+  definitionState.success = ""
+}
+
+async function initializeModal() {
+  resetModalState()
+
+  if (props.mode === "edit" && props.detail?.detailSlug) {
+    selectedKey.value = props.detail.detailSlug
+    valueInput.value =
+      props.detail.textValue ?? props.detail.numericValue?.toString() ?? ""
+    return
+  }
+
+  await loadDefinitions()
+}
 
 async function loadDefinitions() {
   definitionState.error = ""
@@ -183,6 +182,13 @@ function submit() {
     numericValue: null,
   })
 }
+
+useModalCloseReset({
+  isOpen,
+  onCloseReset: resetModalState,
+  onOpen: initializeModal,
+  delayMs: 300,
+})
 </script>
 
 <template>

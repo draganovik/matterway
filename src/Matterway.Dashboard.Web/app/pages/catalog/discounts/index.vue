@@ -58,8 +58,8 @@ const {
                 Upravljanje popustima
               </h2>
               <p class="text-muted text-sm">
-                Izaberite postojeći popust sa liste ili kreirajte novi kod,
-                pa zatim ažurirajte povezane artikle i period važenja.
+                Izaberite postojeći popust sa liste ili kreirajte novi kod, pa
+                zatim ažurirajte povezane artikle i period važenja.
               </p>
             </div>
             <UButton
@@ -175,9 +175,7 @@ const {
                     @click="saveDiscount"
                   >
                     {{
-                      submitState.loading
-                        ? "Čuvanje popusta"
-                        : "Sačuvaj popust"
+                      submitState.loading ? "Čuvanje popusta" : "Sačuvaj popust"
                     }}
                   </UButton>
                   <UButton
@@ -188,9 +186,7 @@ const {
                     @click="removeDiscount"
                   >
                     {{
-                      deleteState.loading
-                        ? "Brisanje popusta"
-                        : "Obriši popust"
+                      deleteState.loading ? "Brisanje popusta" : "Obriši popust"
                     }}
                   </UButton>
                 </div>

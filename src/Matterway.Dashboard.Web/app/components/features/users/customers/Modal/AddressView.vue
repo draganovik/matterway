@@ -329,7 +329,7 @@ useModalCloseReset({
           :disabled="!canEdit || loadState.loading"
           @click="beginManage"
         >
-              Uredi adresu
+          Uredi adresu
         </UButton>
         <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
       </div>

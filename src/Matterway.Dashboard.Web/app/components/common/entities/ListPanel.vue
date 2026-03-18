@@ -30,7 +30,8 @@ const props = withDefaults(
     error: "",
     emptyMessage: "Nema rezultata.",
     filterInputType: "textarea",
-    filterPlaceholder: "Pretraga uz RSQL filtere (npr. title==chair; available==true).",
+    filterPlaceholder:
+      "Pretraga uz RSQL filtere (npr. title==chair; available==true).",
     page: 1,
     pageSize: 20,
     totalCount: 0,

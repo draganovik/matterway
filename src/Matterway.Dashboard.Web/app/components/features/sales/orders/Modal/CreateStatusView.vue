@@ -37,7 +37,8 @@ const status = ref<OrderStatusType | "">("")
 const note = ref("")
 
 const displayLabel = computed(
-  () => props.orderLabel?.trim() || props.orderId?.trim() || "Izabrana porudžbina",
+  () =>
+    props.orderLabel?.trim() || props.orderId?.trim() || "Izabrana porudžbina",
 )
 
 const canSubmit = computed(

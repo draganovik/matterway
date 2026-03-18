@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import type { ArticleImageProperty } from "~/types/catalog"
 
 type ImageSubmitPayload = {
@@ -45,27 +46,21 @@ const controlsDisabled = computed(
   () => !props.canEdit || props.loading || props.mode !== "add",
 )
 
-watch(
-  () => props.open,
-  (open) => {
-    if (!open) {
-      file.value = null
-      orderIndex.value = 0
-      imageAlt.value = ""
-      validationError.value = ""
-      return
-    }
-    if (props.mode === "edit" && props.image) {
-      orderIndex.value = Number(props.image.orderIndex ?? 0)
-      imageAlt.value = props.image.imageAlt || ""
-      file.value = null
-    } else {
-      orderIndex.value = 0
-      imageAlt.value = ""
-      file.value = null
-    }
-  },
-)
+function resetModalState() {
+  file.value = null
+  orderIndex.value = 0
+  imageAlt.value = ""
+  validationError.value = ""
+}
+
+function initializeModal() {
+  resetModalState()
+
+  if (props.mode === "edit" && props.image) {
+    orderIndex.value = Number(props.image.orderIndex ?? 0)
+    imageAlt.value = props.image.imageAlt || ""
+  }
+}
 
 function setSelectedFile(next: File | null) {
   validationError.value = ""
@@ -111,6 +106,13 @@ function submit() {
     file: file.value,
   })
 }
+
+useModalCloseReset({
+  isOpen,
+  onCloseReset: resetModalState,
+  onOpen: initializeModal,
+  delayMs: 300,
+})
 </script>
 
 <template>

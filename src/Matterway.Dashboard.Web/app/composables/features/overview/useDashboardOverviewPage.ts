@@ -78,7 +78,8 @@ const sectionThemes: Record<string, OverviewSectionTheme> = {
 
 const defaultTheme: OverviewSectionTheme = {
   eyebrow: "Servis",
-  description: "Otvorite alate koji su vam dostupni u ovom delu administracije.",
+  description:
+    "Otvorite alate koji su vam dostupni u ovom delu administracije.",
   icon: "i-lucide-layout-panel-top",
   glowClass: "bg-primary/20",
   iconClass: "bg-primary/12 text-primary",

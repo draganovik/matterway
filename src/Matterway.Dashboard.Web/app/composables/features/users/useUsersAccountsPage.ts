@@ -153,7 +153,8 @@ export function useUsersAccountsPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Učitavanje detalja naloga nije uspelo."
+      detailState.error =
+        result.error || "Učitavanje detalja naloga nije uspelo."
       selectedSystemUser.value = null
       applySystemUserToForm(null)
       return

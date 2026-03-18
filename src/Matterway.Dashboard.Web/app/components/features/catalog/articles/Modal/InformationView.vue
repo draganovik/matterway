@@ -59,8 +59,7 @@ async function createArticle() {
   const basePrice = payload.basePrice
 
   if (!code || !title || basePrice == null || !description) {
-    createState.error =
-      "Popunite sva obavezna polja pre kreiranja artikla."
+    createState.error = "Popunite sva obavezna polja pre kreiranja artikla."
     return
   }
 
@@ -95,9 +94,7 @@ async function createArticle() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Novi artikal
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi artikal</h3>
         <p class="text-muted text-sm">
           Sačuvajte osnovne podatke artikla, pa nastavite uređivanje u glavnom
           prikazu.

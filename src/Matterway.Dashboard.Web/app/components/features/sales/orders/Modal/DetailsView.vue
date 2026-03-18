@@ -28,7 +28,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-4xl' }">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Detalji porudžbine</h3>
+        <h3 class="text-foreground text-base font-semibold">
+          Detalji porudžbine
+        </h3>
         <p class="text-muted text-sm">
           Osnovni podaci i dostava za porudžbinu {{ displayLabel }}.
         </p>
@@ -39,7 +41,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
       <div class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Učitavanje detalja porudžbine.' : false"
+          :loading="
+            loadState.loading ? 'Učitavanje detalja porudžbine.' : false
+          "
           :error="loadState.error"
         />
 
@@ -97,7 +101,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
           </div>
 
           <div class="space-y-2">
-            <h4 class="text-foreground text-sm font-semibold">Podaci za dostavu</h4>
+            <h4 class="text-foreground text-sm font-semibold">
+              Podaci za dostavu
+            </h4>
             <dl v-if="order.deliveryInfo" class="grid gap-3 sm:grid-cols-2">
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Država</dt>

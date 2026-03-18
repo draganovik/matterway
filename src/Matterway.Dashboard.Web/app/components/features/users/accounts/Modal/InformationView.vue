@@ -70,9 +70,7 @@ async function createEmployee() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Novi zaposleni
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Novi zaposleni</h3>
         <p class="text-muted text-sm">
           Ovu radnju može da izvrši samo menadžer. Novi nalog se kreira sa
           ulogom zaposlenog.
@@ -121,7 +119,9 @@ async function createEmployee() {
           :disabled="!canManage"
           @click="createEmployee"
         >
-          {{ createState.loading ? "Kreiranje zaposlenog" : "Kreiraj zaposlenog" }}
+          {{
+            createState.loading ? "Kreiranje zaposlenog" : "Kreiraj zaposlenog"
+          }}
         </UButton>
       </div>
     </template>

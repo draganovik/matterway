@@ -28,7 +28,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-3xl' }">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Istorija statusa</h3>
+        <h3 class="text-foreground text-base font-semibold">
+          Istorija statusa
+        </h3>
         <p class="text-muted text-sm">
           Pregled promena statusa za porudžbinu {{ displayLabel }}.
         </p>
@@ -51,7 +53,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
 
         <template v-else-if="order">
           <div class="flex items-center justify-between gap-3">
-            <h4 class="text-foreground text-sm font-semibold">Promene statusa</h4>
+            <h4 class="text-foreground text-sm font-semibold">
+              Promene statusa
+            </h4>
             <UBadge color="neutral" variant="subtle" class="font-normal">
               {{ order.statusHistory?.length || 0 }} unosa
             </UBadge>

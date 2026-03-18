@@ -90,7 +90,8 @@ export function useSalesOrdersPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Učitavanje detalja porudžbine nije uspelo."
+      detailState.error =
+        result.error || "Učitavanje detalja porudžbine nije uspelo."
       selectedOrder.value = null
       return
     }
