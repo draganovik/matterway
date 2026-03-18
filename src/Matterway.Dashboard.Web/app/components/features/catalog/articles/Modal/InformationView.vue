@@ -60,12 +60,12 @@ async function createArticle() {
 
   if (!code || !title || basePrice == null || !description) {
     createState.error =
-      "Fill in all required fields before creating the article."
+      "Popunite sva obavezna polja pre kreiranja artikla."
     return
   }
 
   if (!/^[A-Z0-9]{8}$/.test(code)) {
-    createState.error = "Article code must be exactly 8 letters or numbers."
+    createState.error = "Šifra artikla mora imati tačno 8 slova ili cifara."
     return
   }
 
@@ -82,7 +82,7 @@ async function createArticle() {
   createState.loading = false
 
   if (!result.ok || !result.data) {
-    createState.error = result.error || "Unable to create article."
+    createState.error = result.error || "Kreiranje artikla nije uspelo."
     return
   }
 
@@ -96,10 +96,11 @@ async function createArticle() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          Create New Article
+          Novi artikal
         </h3>
         <p class="text-muted text-sm">
-          Save core article data, then continue editing it in the browse view.
+          Sačuvajte osnovne podatke artikla, pa nastavite uređivanje u glavnom
+          prikazu.
         </p>
       </div>
     </template>
@@ -121,7 +122,7 @@ async function createArticle() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -129,7 +130,7 @@ async function createArticle() {
           :disabled="!canEdit"
           @click="createArticle"
         >
-          Create Article
+          {{ createState.loading ? "Kreiranje artikla" : "Kreiraj artikal" }}
         </UButton>
       </div>
     </template>

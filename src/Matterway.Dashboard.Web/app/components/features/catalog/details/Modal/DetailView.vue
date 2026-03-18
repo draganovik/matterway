@@ -50,7 +50,7 @@ async function createDetail() {
   const unit = String(form.value.unit ?? "").trim()
 
   if (!slug || !title) {
-    createState.error = "Slug and title are required."
+    createState.error = "Slug i naziv su obavezni."
     return
   }
 
@@ -62,7 +62,7 @@ async function createDetail() {
   createState.loading = false
 
   if (!result.ok) {
-    createState.error = result.error || "Unable to create detail."
+    createState.error = result.error || "Kreiranje detalja nije uspelo."
     return
   }
 
@@ -81,10 +81,10 @@ async function createDetail() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          Create New Detail
+          Novi detalj
         </h3>
         <p class="text-muted text-sm">
-          Create a detail definition, then manage it from the editor panel.
+          Kreirajte definiciju detalja, a zatim je uređujte iz panela za izmenu.
         </p>
       </div>
     </template>
@@ -94,7 +94,7 @@ async function createDetail() {
         <UFormField
           label="Slug"
           required
-          help="Lowercase key used in article details."
+          help="Ključ malim slovima koji se koristi u detaljima artikla."
         >
           <UInput
             v-model="form.slug"
@@ -104,22 +104,22 @@ async function createDetail() {
           />
         </UFormField>
 
-        <UFormField label="Title" required>
+        <UFormField label="Naziv" required>
           <UInput
             v-model="form.title"
-            placeholder="Screen Size"
+            placeholder="Veličina ekrana"
             :disabled="!canEdit || createState.loading"
             class="w-full"
           />
         </UFormField>
 
         <UFormField
-          label="Unit"
-          help="Optional unit for numeric values (e.g. cm, kg)."
+          label="Jedinica"
+          help="Opciona jedinica za numeričke vrednosti (npr. cm, kg)."
         >
           <UInput
             v-model="form.unit"
-            placeholder="inch"
+            placeholder="inč"
             :disabled="!canEdit || createState.loading"
             class="w-full"
           />
@@ -136,7 +136,7 @@ async function createDetail() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -144,7 +144,7 @@ async function createDetail() {
           :disabled="!canEdit"
           @click="createDetail"
         >
-          Create Detail
+          {{ createState.loading ? "Kreiranje detalja" : "Kreiraj detalj" }}
         </UButton>
       </div>
     </template>

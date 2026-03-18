@@ -77,7 +77,7 @@ function setSelectedFile(next: File | null) {
   const isImage = !next.type || next.type.startsWith("image/")
   if (!isImage) {
     file.value = null
-    validationError.value = "Only image files are supported."
+    validationError.value = "Podržane su samo slikovne datoteke."
     return
   }
 
@@ -98,11 +98,11 @@ function submit() {
   validationError.value = ""
   const parsedOrder = orderIndex.value
   if (parsedOrder == null || parsedOrder < 0) {
-    validationError.value = "Order index must be a valid number."
+    validationError.value = "Redosled mora biti ispravan broj."
     return
   }
   if (props.mode === "add" && !file.value) {
-    validationError.value = "Select an image file to upload."
+    validationError.value = "Izaberite sliku za otpremanje."
     return
   }
   emit("submit", {
@@ -118,13 +118,13 @@ function submit() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          {{ mode === "edit" ? "Edit Image" : "Add Image" }}
+          {{ mode === "edit" ? "Izmena slike" : "Dodavanje slike" }}
         </h3>
         <p class="text-muted text-sm">
           {{
             mode === "edit"
-              ? "Update image metadata and order."
-              : "Upload a new image for the article."
+              ? "Ažurirajte metapodatke slike i redosled prikaza."
+              : "Otpremite novu sliku za artikal."
           }}
         </p>
       </div>
@@ -132,7 +132,7 @@ function submit() {
 
     <template #body>
       <div class="grid gap-4">
-        <UFormField v-if="mode === 'add'" label="File" required>
+        <UFormField v-if="mode === 'add'" label="Datoteka" required>
           <UFileUpload
             :model-value="file"
             accept="image/*"
@@ -148,8 +148,8 @@ function submit() {
               description: 'text-muted mt-0 text-xs',
               actions: 'hidden',
             }"
-            label="Drag and drop an image"
-            description="or click to browse"
+            label="Prevucite sliku ovde"
+            description="ili kliknite za izbor"
             @update:model-value="handleSelectedFileChange"
           >
             <template #leading>
@@ -157,7 +157,7 @@ function submit() {
             </template>
           </UFileUpload>
           <p class="text-muted mt-2 text-xs">
-            {{ file ? `Selected: ${file.name}` : "No image selected." }}
+            {{ file ? `Izabrano: ${file.name}` : "Slika nije izabrana." }}
           </p>
           <div class="mt-3 flex flex-wrap items-center gap-2">
             <UButton
@@ -167,12 +167,12 @@ function submit() {
               :disabled="controlsDisabled || !file"
               @click="clearSelection"
             >
-              Clear
+              Ukloni izbor
             </UButton>
           </div>
         </UFormField>
 
-        <UFormField label="Order Index" required>
+        <UFormField label="Redosled" required>
           <UInputNumber
             v-model="orderIndex"
             orientation="vertical"
@@ -187,10 +187,10 @@ function submit() {
           />
         </UFormField>
 
-        <UFormField label="Image Alt">
+        <UFormField label="Alt tekst slike">
           <UInput
             v-model="imageAlt"
-            placeholder="Front view of article"
+            placeholder="Prednji prikaz artikla"
             :disabled="!canEdit"
           />
         </UFormField>
@@ -202,7 +202,7 @@ function submit() {
     <template #footer>
       <div class="flex w-full justify-between">
         <UButton variant="ghost" :disabled="loading" @click="isOpen = false">
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -210,7 +210,15 @@ function submit() {
           :disabled="!canEdit"
           @click="submit"
         >
-          {{ mode === "edit" ? "Save Changes" : "Upload Image" }}
+          {{
+            loading
+              ? mode === "edit"
+                ? "Čuvanje izmena"
+                : "Otpremanje slike"
+              : mode === "edit"
+                ? "Sačuvaj izmene"
+                : "Otpremi sliku"
+          }}
         </UButton>
       </div>
     </template>

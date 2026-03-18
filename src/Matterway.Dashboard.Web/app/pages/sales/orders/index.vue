@@ -2,7 +2,7 @@
 import { useSalesOrdersPage } from "~/composables/features/sales/useSalesOrdersPage"
 
 definePageMeta({
-  title: "Orders",
+  title: "Porudžbine",
   service: "sales",
   permissions: ["observer", "operator", "manager"],
 })
@@ -41,7 +41,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Orders">
+      <UDashboardNavbar title="Porudžbine">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -56,11 +56,11 @@ const {
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Manage Orders
+                Upravljanje porudžbinama
               </h2>
               <p class="text-muted text-sm">
-                Browse orders and reveal details, status history, payments, or
-                items by order ID.
+                Pregledajte porudžbine i otvarajte detalje, istoriju statusa,
+                uplate i stavke za izabranu porudžbinu.
               </p>
             </div>
           </div>

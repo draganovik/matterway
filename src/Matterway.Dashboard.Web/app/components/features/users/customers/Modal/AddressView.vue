@@ -9,7 +9,7 @@ import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 type AddressMode = "view" | "manage"
 type AddressForm = Omit<PutCustomerAddressRequest, "country">
-const COUNTRY = "Serbia"
+const COUNTRY = "Srbija"
 
 const props = withDefaults(
   defineProps<{
@@ -46,7 +46,7 @@ const form = ref<AddressForm>({
 })
 
 const displayName = computed(
-  () => props.customerName.trim() || "Selected customer",
+  () => props.customerName.trim() || "Izabrani kupac",
 )
 
 function resetForm() {
@@ -84,7 +84,7 @@ function resetModalState() {
 async function loadAddress() {
   const customerId = props.customerId?.trim()
   if (!customerId) {
-    loadState.error = "Select a customer first."
+    loadState.error = "Najpre izaberite kupca."
     address.value = null
     notFound.value = false
     return
@@ -106,7 +106,7 @@ async function loadAddress() {
       return
     }
 
-    loadState.error = result.error || "Unable to reveal customer address."
+    loadState.error = result.error || "Učitavanje adrese kupca nije uspelo."
     return
   }
 
@@ -140,7 +140,7 @@ async function saveAddress() {
 
   const customerId = props.customerId?.trim()
   if (!customerId) {
-    saveState.error = "Select a customer first."
+    saveState.error = "Najpre izaberite kupca."
     return
   }
 
@@ -160,7 +160,7 @@ async function saveAddress() {
     !payload.addressLine2 ||
     !payload.contactPhone
   ) {
-    saveState.error = "All address fields are required."
+    saveState.error = "Sva polja adrese su obavezna."
     return
   }
 
@@ -169,7 +169,7 @@ async function saveAddress() {
   saveState.loading = false
 
   if (!result.ok || !result.data) {
-    saveState.error = result.error || "Unable to save customer address."
+    saveState.error = result.error || "Čuvanje adrese kupca nije uspelo."
     return
   }
 
@@ -195,13 +195,13 @@ useModalCloseReset({
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          {{ mode === "manage" ? "Manage Address" : "Customer Address" }}
+          {{ mode === "manage" ? "Uređivanje adrese" : "Adresa kupca" }}
         </h3>
         <p class="text-muted text-sm">
           {{
             mode === "manage"
-              ? `Update address details for ${displayName}.`
-              : `Revealed address details for ${displayName}.`
+              ? `Ažurirajte adresu za kupca ${displayName}.`
+              : `Pregled adrese za kupca ${displayName}.`
           }}
         </p>
       </div>
@@ -211,40 +211,40 @@ useModalCloseReset({
       <div v-if="mode === 'view'" class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Revealing customer address.' : false"
+          :loading="loadState.loading ? 'Učitavanje adrese kupca.' : false"
           :error="loadState.error"
         />
 
         <EntitiesEmptyState
           v-else-if="notFound"
-          title="Address not found"
-          description="This customer does not have a saved address yet."
+          title="Adresa nije pronađena"
+          description="Ovaj kupac još nema sačuvanu adresu."
         />
 
         <dl v-else-if="address" class="grid gap-3 sm:grid-cols-2">
           <div class="border-default/70 rounded-md border px-3 py-2">
-            <dt class="text-muted text-xs">Country</dt>
+            <dt class="text-muted text-xs">Država</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.country || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
-            <dt class="text-muted text-xs">City</dt>
+            <dt class="text-muted text-xs">Grad</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.city || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
-            <dt class="text-muted text-xs">Zip Code</dt>
+            <dt class="text-muted text-xs">Poštanski broj</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.zipCode || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
-            <dt class="text-muted text-xs">Contact Phone</dt>
+            <dt class="text-muted text-xs">Kontakt telefon</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.contactPhone || "-" }}
             </dd>
@@ -253,7 +253,7 @@ useModalCloseReset({
           <div
             class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
           >
-            <dt class="text-muted text-xs">Address Line 1</dt>
+            <dt class="text-muted text-xs">Adresa 1</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.addressLine1 || "-" }}
             </dd>
@@ -262,7 +262,7 @@ useModalCloseReset({
           <div
             class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
           >
-            <dt class="text-muted text-xs">Address Line 2</dt>
+            <dt class="text-muted text-xs">Adresa 2</dt>
             <dd class="text-foreground mt-1 text-sm font-medium">
               {{ address.addressLine2 || "-" }}
             </dd>
@@ -272,19 +272,19 @@ useModalCloseReset({
 
       <div v-else class="space-y-4">
         <div class="grid gap-4 md:grid-cols-2">
-          <UFormField label="Country" required>
+          <UFormField label="Država" required>
             <UInput :model-value="COUNTRY" disabled readonly />
           </UFormField>
 
-          <UFormField label="City" required>
+          <UFormField label="Grad" required>
             <UInput
               v-model="form.city"
-              placeholder="Belgrade"
+              placeholder="Beograd"
               :disabled="saveState.loading || !canEdit"
             />
           </UFormField>
 
-          <UFormField label="Zip Code" required>
+          <UFormField label="Poštanski broj" required>
             <UInput
               v-model="form.zipCode"
               placeholder="11000"
@@ -292,7 +292,7 @@ useModalCloseReset({
             />
           </UFormField>
 
-          <UFormField label="Contact Phone" required>
+          <UFormField label="Kontakt telefon" required>
             <UInput
               v-model="form.contactPhone"
               placeholder="+381641234567"
@@ -301,7 +301,7 @@ useModalCloseReset({
           </UFormField>
         </div>
 
-        <UFormField label="Address Line 1" required>
+        <UFormField label="Adresa 1" required>
           <UInput
             v-model="form.addressLine1"
             placeholder="Bulevar oslobodjenja 15"
@@ -309,10 +309,10 @@ useModalCloseReset({
           />
         </UFormField>
 
-        <UFormField label="Address Line 2" required>
+        <UFormField label="Adresa 2" required>
           <UInput
             v-model="form.addressLine2"
-            placeholder="Apartment 12"
+            placeholder="Stan 12"
             :disabled="saveState.loading || !canEdit"
           />
         </UFormField>
@@ -329,9 +329,9 @@ useModalCloseReset({
           :disabled="!canEdit || loadState.loading"
           @click="beginManage"
         >
-          Manage Address
+              Uredi adresu
         </UButton>
-        <UButton variant="ghost" @click="isOpen = false">Close</UButton>
+        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
       </div>
 
       <div v-else class="flex w-full justify-between gap-2">
@@ -341,7 +341,7 @@ useModalCloseReset({
           :disabled="saveState.loading"
           @click="backToView"
         >
-          Back
+          Nazad
         </UButton>
 
         <div class="flex items-center gap-2">
@@ -350,7 +350,7 @@ useModalCloseReset({
             :disabled="saveState.loading"
             @click="isOpen = false"
           >
-            Cancel
+            Otkaži
           </UButton>
           <UButton
             color="primary"
@@ -358,7 +358,7 @@ useModalCloseReset({
             :disabled="!canEdit"
             @click="saveAddress"
           >
-            Save Address
+            {{ saveState.loading ? "Čuvanje adrese" : "Sačuvaj adresu" }}
           </UButton>
         </div>
       </div>

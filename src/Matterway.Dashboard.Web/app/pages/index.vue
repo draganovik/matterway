@@ -2,7 +2,7 @@
 import { useDashboardOverviewPage } from "~/composables/features/overview/useDashboardOverviewPage"
 
 definePageMeta({
-  title: "Overview",
+  title: "Pregled",
 })
 
 const { sections } = useDashboardOverviewPage()
@@ -11,7 +11,7 @@ const { sections } = useDashboardOverviewPage()
 <template>
   <UDashboardPanel id="home">
     <template #header>
-      <UDashboardNavbar title="Overview" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Pregled" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -55,7 +55,7 @@ const { sections } = useDashboardOverviewPage()
                 </div>
 
                 <UBadge color="neutral" variant="soft">
-                  {{ section.featureCount }} tools
+                  {{ section.featureCount }} opcija
                 </UBadge>
               </div>
 
@@ -80,7 +80,7 @@ const { sections } = useDashboardOverviewPage()
                         {{ feature.label }}
                       </p>
                       <p class="text-muted text-xs">
-                        {{ section.label }} service
+                        Modul: {{ section.label }}
                       </p>
                     </div>
                   </div>
@@ -102,11 +102,11 @@ const { sections } = useDashboardOverviewPage()
         >
           <div class="space-y-2">
             <p class="text-foreground text-lg font-semibold">
-              No authorized domains available
+              Nema dostupnih sekcija
             </p>
             <p class="text-muted text-sm">
-              Your current employee scope does not expose any dashboard sections
-              yet. Update permissions, then refresh this page.
+              Trenutni nivo pristupa ovog naloga ne uključuje nijedan deo
+              administracije. Ažurirajte dozvole pa osvežite stranicu.
             </p>
           </div>
         </UCard>

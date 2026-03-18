@@ -43,8 +43,8 @@ function asOrderItem(item: Record<string, unknown>) {
 
 <template>
   <EntitiesListPanel
-    title="Orders"
-    description="Use pagination and optionally filter by exact Customer ID."
+    title="Porudžbine"
+    description="Koristite paginaciju i po želji filtrirajte po tačnom ID-ju kupca."
     :items="items"
     item-key="id"
     item-title-key="id"
@@ -52,7 +52,7 @@ function asOrderItem(item: Record<string, unknown>) {
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
-    filter-placeholder="Optional exact Customer ID (GUID)."
+    filter-placeholder="Opciono: tačan ID kupca (GUID)."
     :loading="loading"
     :error="error"
     :empty-message="emptyMessage"

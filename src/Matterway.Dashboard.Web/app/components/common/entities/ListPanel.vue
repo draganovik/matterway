@@ -28,10 +28,9 @@ const props = withDefaults(
     filter: "",
     loading: false,
     error: "",
-    emptyMessage: "No results found.",
+    emptyMessage: "Nema rezultata.",
     filterInputType: "textarea",
-    filterPlaceholder:
-      "Search, use RSQL filters (e.g. title==chair; available==true).",
+    filterPlaceholder: "Pretraga uz RSQL filtere (npr. title==chair; available==true).",
     page: 1,
     pageSize: 20,
     totalCount: 0,
@@ -55,7 +54,7 @@ watch(
 )
 
 const pageSizes = [10, 20, 50, 100].map((value) => ({
-  label: `${value} / page`,
+  label: `${value} / strana`,
   value,
 }))
 
@@ -69,9 +68,8 @@ const safeTotalPages = computed(() =>
 
 const normalizedFilterPlaceholder = computed(() => {
   const placeholder = (props.filterPlaceholder || "").trim()
-  if (!placeholder) return "Search"
-  if (/search/i.test(placeholder)) return placeholder
-  return `Search ${placeholder.charAt(0).toLowerCase()}${placeholder.slice(1)}`
+  if (!placeholder) return "Pretraga"
+  return placeholder
 })
 
 function applySearch() {
@@ -119,13 +117,13 @@ function updatePageSize(value: number) {
 
       <div class="flex flex-wrap items-end gap-3 [&>*]:min-w-0 [&>*]:flex-1">
         <slot name="search-controls" />
-        <UFormField label="Page Size" class="w-full">
+        <UFormField label="Po stranici" class="w-full">
           <USelectMenu
             :items="pageSizes"
             :model-value="pageSize"
             value-key="value"
             label-key="label"
-            placeholder="Select size"
+            placeholder="Izaberi broj"
             class="w-full"
             @update:model-value="updatePageSize"
           />
@@ -139,7 +137,7 @@ function updatePageSize(value: number) {
           class="w-full justify-center"
           @click="applySearch"
         >
-          Search
+          {{ loading ? "Pretraga" : "Pretraži" }}
         </UButton>
       </div>
     </div>
@@ -148,7 +146,7 @@ function updatePageSize(value: number) {
       <StatusMessages
         v-if="error || loading || !items.length"
         :error="error"
-        :loading="loading ? 'Loading results.' : false"
+        :loading="loading ? 'Učitavanje rezultata.' : false"
         :empty="!loading && !error && !items.length ? emptyMessage : false"
       />
       <div v-else class="flex flex-col gap-2">
@@ -165,7 +163,7 @@ function updatePageSize(value: number) {
             :selected="selectedId === String(item[itemKey])"
           >
             <div class="text-foreground text-base font-medium">
-              {{ item[itemTitleKey] || "Untitled" }}
+              {{ item[itemTitleKey] || "Bez naslova" }}
             </div>
             <div
               v-if="itemSubtitleKey && item[itemSubtitleKey]"

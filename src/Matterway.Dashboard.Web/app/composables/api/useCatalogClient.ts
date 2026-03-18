@@ -381,7 +381,7 @@ export function useCatalogClient() {
       return {
         ok: false,
         status: 0,
-        error: "Missing catalog API base URL.",
+        error: "Nedostaje osnovni URL kataloškog API-ja.",
       }
     }
 
@@ -416,7 +416,7 @@ export function useCatalogClient() {
         payload?.title ||
         payload?.detail ||
         (typeof payload === "string" ? payload : null) ||
-        "Unable to export catalog archive."
+        "Izvoz arhive kataloga nije uspeo."
 
       return { ok: false, status: response.status, error }
     }

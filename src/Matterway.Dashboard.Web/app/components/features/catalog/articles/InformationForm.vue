@@ -23,10 +23,10 @@ const basePriceValue = computed({
 
 <template>
   <div class="grid gap-4">
-    <UFormField label="Title" required class="md:col-span-3">
+    <UFormField label="Naziv" required class="md:col-span-3">
       <UInput
         v-model="form.title"
-        placeholder="Article title"
+        placeholder="Naziv artikla"
         :disabled="disabled"
         size="xl"
         class="w-full"
@@ -34,9 +34,9 @@ const basePriceValue = computed({
     </UFormField>
 
     <UFormField
-      label="Article Code"
+      label="Šifra artikla"
       required
-      help="Exactly 8 uppercase letters or numbers"
+      help="Tačno 8 velikih slova ili cifara"
     >
       <UInput
         v-model="form.code"
@@ -47,7 +47,7 @@ const basePriceValue = computed({
       />
     </UFormField>
 
-    <UFormField label="Base Price" required>
+    <UFormField label="Osnovna cena" required>
       <UInputNumber
         v-model="basePriceValue"
         orientation="vertical"
@@ -61,7 +61,7 @@ const basePriceValue = computed({
       />
     </UFormField>
 
-    <UFormField label="Available">
+    <UFormField label="Dostupan">
       <USwitch
         v-model="form.isAvailable"
         :disabled="disabled"
@@ -70,11 +70,11 @@ const basePriceValue = computed({
       />
     </UFormField>
 
-    <UFormField label="Description" required class="md:col-span-3">
+    <UFormField label="Opis" required class="md:col-span-3">
       <UTextarea
         v-model="form.description"
         :rows="5"
-        placeholder="Describe the article"
+        placeholder="Opišite artikal"
         size="xl"
         :disabled="disabled"
         class="w-full"

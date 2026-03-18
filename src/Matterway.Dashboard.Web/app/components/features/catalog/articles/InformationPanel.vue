@@ -78,7 +78,7 @@ async function saveArticle() {
   const title = String(form.value.title ?? "").trim()
   const description = String(form.value.description ?? "").trim()
   if (!/^[A-Z0-9]{8}$/.test(code)) {
-    updateState.error = "Article code must be exactly 8 letters or numbers."
+    updateState.error = "Šifra artikla mora imati tačno 8 slova ili cifara."
     return
   }
 
@@ -95,7 +95,7 @@ async function saveArticle() {
   })
   updateState.loading = false
   if (!result.ok) {
-    updateState.error = result.error || "Unable to update article."
+    updateState.error = result.error || "Ažuriranje artikla nije uspelo."
     return
   }
   updateArticleData({
@@ -106,7 +106,7 @@ async function saveArticle() {
     isAvailable: result.data?.isAvailable ?? form.value.isAvailable,
     updatedAt: result.data?.updatedAt ?? props.article.updatedAt,
   })
-  updateState.success = "Article updated."
+  updateState.success = "Artikal je uspešno ažuriran."
 }
 
 function updateDetails(details: GetArticleResponse["details"]) {
@@ -124,19 +124,21 @@ function updateImages(images: GetArticleResponse["images"]) {
 
     <div v-else-if="!article" class="space-y-4">
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Article Editor</h3>
+        <h3 class="text-foreground text-base font-semibold">
+          Uređivanje artikla
+        </h3>
         <p class="text-muted text-sm">
           {{
             canEdit
-              ? "Operator permission is required for create, update, and delete."
-              : "Read-only mode: operator permission required for changes."
+              ? "Za kreiranje, izmenu i brisanje potrebna je dozvola operatera."
+              : "Režim samo za čitanje: za izmene je potrebna dozvola operatera."
           }}
         </p>
       </div>
 
       <EntitiesEmptyState
-        title="Nothing selected"
-        description="Select an item from the list to start editing."
+        title="Ništa nije izabrano"
+        description="Izaberite stavku sa liste da biste započeli izmenu."
       />
     </div>
 
@@ -145,14 +147,14 @@ function updateImages(images: GetArticleResponse["images"]) {
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 class="text-foreground text-base font-semibold">
-              Article Fields
+              Podaci artikla
             </h3>
             <p class="text-muted text-sm">
-              Update primary details and availability.
+              Ažurirajte osnovne podatke i dostupnost.
             </p>
           </div>
           <div class="text-muted text-sm">
-            Article Code: {{ article?.code }}
+            Šifra artikla: {{ article?.code }}
           </div>
         </div>
 
@@ -168,7 +170,7 @@ function updateImages(images: GetArticleResponse["images"]) {
             :disabled="!canEdit"
             @click="saveArticle"
           >
-            Save Changes
+            {{ updateState.loading ? "Čuvanje izmena" : "Sačuvaj izmene" }}
           </UButton>
           <StatusMessages
             :error="updateState.error"

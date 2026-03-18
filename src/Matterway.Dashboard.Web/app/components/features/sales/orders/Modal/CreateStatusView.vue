@@ -26,18 +26,18 @@ const api = useSalesClient()
 const createState = useRequestState()
 
 const statusOptions: Array<{ label: string; value: OrderStatusType }> = [
-  { label: "Processing", value: "Processing" },
-  { label: "Reserved", value: "Reserved" },
-  { label: "Delivery", value: "Delivery" },
-  { label: "Completed", value: "Completed" },
-  { label: "Cancelled", value: "Cancelled" },
+  { label: "Obrada", value: "Processing" },
+  { label: "Rezervisano", value: "Reserved" },
+  { label: "Dostava", value: "Delivery" },
+  { label: "Završeno", value: "Completed" },
+  { label: "Otkazano", value: "Cancelled" },
 ]
 
 const status = ref<OrderStatusType | "">("")
 const note = ref("")
 
 const displayLabel = computed(
-  () => props.orderLabel?.trim() || props.orderId?.trim() || "Selected order",
+  () => props.orderLabel?.trim() || props.orderId?.trim() || "Izabrana porudžbina",
 )
 
 const canSubmit = computed(
@@ -63,13 +63,13 @@ async function createStatus() {
 
   const orderId = props.orderId?.trim()
   if (!orderId) {
-    createState.error = "Select an order first."
+    createState.error = "Najpre izaberite porudžbinu."
     return
   }
 
   const statusValue = String(status.value).trim()
   if (!statusValue) {
-    createState.error = "Status is required."
+    createState.error = "Status je obavezan."
     return
   }
 
@@ -83,7 +83,7 @@ async function createStatus() {
   createState.loading = false
 
   if (!result.ok) {
-    createState.error = result.error || "Unable to create status entry."
+    createState.error = result.error || "Kreiranje statusa nije uspelo."
     return
   }
 
@@ -96,9 +96,9 @@ async function createStatus() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Create Status</h3>
+        <h3 class="text-foreground text-base font-semibold">Novi status</h3>
         <p class="text-muted text-sm">
-          Add a new status transition for {{ displayLabel }}.
+          Dodajte novu promenu statusa za porudžbinu {{ displayLabel }}.
         </p>
       </div>
     </template>
@@ -112,16 +112,16 @@ async function createStatus() {
             value-key="value"
             label-key="label"
             :disabled="!canEdit || createState.loading"
-            placeholder="Select status"
+            placeholder="Izaberite status"
             class="w-full"
           />
         </UFormField>
 
-        <UFormField label="Note">
+        <UFormField label="Napomena">
           <UTextarea
             v-model="note"
             :rows="3"
-            placeholder="Optional note for this transition."
+            placeholder="Opciona napomena za ovu promenu statusa."
             :disabled="!canEdit || createState.loading"
             class="w-full"
           />
@@ -138,7 +138,7 @@ async function createStatus() {
           :disabled="createState.loading"
           @click="isOpen = false"
         >
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -146,7 +146,7 @@ async function createStatus() {
           :disabled="!canSubmit"
           @click="createStatus"
         >
-          Create Status
+          {{ createState.loading ? "Kreiranje statusa" : "Kreiraj status" }}
         </UButton>
       </div>
     </template>

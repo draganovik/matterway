@@ -24,9 +24,9 @@ const emit = defineEmits<{
   >
     <template #header>
       <div>
-        <h3 class="text-foreground text-sm font-semibold">Export Archive</h3>
+        <h3 class="text-foreground text-sm font-semibold">Izvoz arhive</h3>
         <p class="text-muted text-xs">
-          Download a full snapshot of catalog data and image binaries.
+          Preuzmite kompletan snimak podataka kataloga i binarnih fajlova slika.
         </p>
       </div>
     </template>
@@ -39,11 +39,11 @@ const emit = defineEmits<{
         :disabled="!props.canOperate"
         @click="emit('download')"
       >
-        Download Archive
+        {{ props.loading ? "Priprema arhive" : "Preuzmi arhivu" }}
       </UButton>
 
       <StatusMessages
-        :loading="props.loading && 'Preparing archive...'"
+        :loading="props.loading && 'Priprema arhive...'"
         :error="props.error"
       />
     </div>

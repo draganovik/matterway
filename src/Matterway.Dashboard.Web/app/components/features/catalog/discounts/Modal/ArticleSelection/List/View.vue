@@ -14,7 +14,7 @@ const props = withDefaults(
     selectedIds: () => [],
     loading: false,
     error: "",
-    emptyMessage: "No articles found.",
+    emptyMessage: "Nema artikala.",
   },
 )
 
@@ -37,7 +37,7 @@ function isSelected(article: QueryArticleResponse) {
     <StatusMessages
       v-if="props.error || props.loading || !props.items.length"
       :error="props.error"
-      :loading="props.loading ? 'Loading articles.' : false"
+      :loading="props.loading ? 'Učitavanje artikala.' : false"
       :empty="
         !props.loading && !props.error && !props.items.length
           ? props.emptyMessage

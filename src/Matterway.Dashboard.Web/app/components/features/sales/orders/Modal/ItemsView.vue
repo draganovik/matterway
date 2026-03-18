@@ -20,7 +20,7 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   isOpen,
   orderId: toRef(props, "orderId"),
   orderLabel: toRef(props, "orderLabel"),
-  revealErrorMessage: "Unable to reveal order items.",
+  revealErrorMessage: "Učitavanje stavki porudžbine nije uspelo.",
 })
 
 const itemCount = computed(() => order.value?.items?.length || 0)
@@ -32,9 +32,9 @@ const quantitySum = computed(() => quantitySumOf(order.value))
   <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-4xl' }">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Order Items</h3>
+        <h3 class="text-foreground text-base font-semibold">Stavke porudžbine</h3>
         <p class="text-muted text-sm">
-          Revealed order items for {{ displayLabel }}.
+          Pregled stavki za porudžbinu {{ displayLabel }}.
         </p>
       </div>
     </template>
@@ -43,27 +43,27 @@ const quantitySum = computed(() => quantitySumOf(order.value))
       <div class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Revealing order items.' : false"
+          :loading="loadState.loading ? 'Učitavanje stavki porudžbine.' : false"
           :error="loadState.error"
         />
 
         <EntitiesEmptyState
           v-else-if="notFound"
-          title="Order not found"
-          description="The selected order could not be loaded."
+          title="Porudžbina nije pronađena"
+          description="Izabranu porudžbinu nije moguće učitati."
         />
 
         <template v-else-if="order">
           <div class="grid gap-3 sm:grid-cols-2">
             <div class="border-default/70 rounded-md border px-3 py-2">
-              <p class="text-muted text-xs">Item Rows</p>
+              <p class="text-muted text-xs">Broj stavki</p>
               <p class="text-foreground mt-1 text-sm font-semibold">
                 {{ itemCount }}
               </p>
             </div>
 
             <div class="border-default/70 rounded-md border px-3 py-2">
-              <p class="text-muted text-xs">Total Quantity</p>
+              <p class="text-muted text-xs">Ukupna količina</p>
               <p class="text-foreground mt-1 text-sm font-semibold">
                 {{ quantitySum }}
               </p>
@@ -74,7 +74,7 @@ const quantitySum = computed(() => quantitySumOf(order.value))
             v-if="!order.items?.length"
             class="border-default/70 bg-background text-muted rounded-md border px-3 py-3 text-sm"
           >
-            No items in this order.
+            Ova porudžbina nema stavke.
           </div>
 
           <div v-else class="space-y-2">
@@ -92,35 +92,35 @@ const quantitySum = computed(() => quantitySumOf(order.value))
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Article Code</dt>
+                  <dt class="text-muted text-xs">Šifra artikla</dt>
                   <dd class="text-foreground mt-1 font-mono text-sm break-all">
                     {{ item.articleCode }}
                   </dd>
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Article Title</dt>
+                  <dt class="text-muted text-xs">Naziv artikla</dt>
                   <dd class="text-foreground mt-1 text-sm">
                     {{ item.articleTitle || "-" }}
                   </dd>
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Quantity</dt>
+                  <dt class="text-muted text-xs">Količina</dt>
                   <dd class="text-foreground mt-1 text-sm">
                     {{ item.quantity }}
                   </dd>
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Unit Price</dt>
+                  <dt class="text-muted text-xs">Jedinična cena</dt>
                   <dd class="text-foreground mt-1 text-sm">
                     {{ formatMoney(item.unitPrice) }}
                   </dd>
                 </div>
 
                 <div>
-                  <dt class="text-muted text-xs">Line Total</dt>
+                  <dt class="text-muted text-xs">Ukupno po stavci</dt>
                   <dd class="text-foreground mt-1 text-sm font-medium">
                     {{ formatMoney(lineTotalOf(item)) }}
                   </dd>
@@ -134,7 +134,7 @@ const quantitySum = computed(() => quantitySumOf(order.value))
 
     <template #footer>
       <div class="flex w-full justify-end">
-        <UButton variant="ghost" @click="isOpen = false">Close</UButton>
+        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
       </div>
     </template>
   </UModal>

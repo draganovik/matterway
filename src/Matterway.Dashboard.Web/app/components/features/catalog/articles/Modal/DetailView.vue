@@ -138,7 +138,7 @@ async function loadDefinitions() {
   const result = await api.queryDetails({ limit: 200 })
   definitionState.loading = false
   if (!result.ok) {
-    definitionState.error = result.error || "Unable to load definitions."
+    definitionState.error = result.error || "Učitavanje definicija nije uspelo."
     return
   }
   detailOptions.value = result.data || []
@@ -152,18 +152,18 @@ function submit() {
   const slug =
     props.mode === "edit" ? (props.detail?.detailSlug ?? "") : selectedKey.value
   if (!slug) {
-    validationError.value = "Select a detail."
+    validationError.value = "Izaberite detalj."
     return
   }
   const rawValue = String(valueInput.value ?? "").trim()
   if (!rawValue) {
-    validationError.value = "Provide a value."
+    validationError.value = "Unesite vrednost."
     return
   }
   if (isNumeric.value) {
     const numericValue = Number(rawValue)
     if (!Number.isFinite(numericValue)) {
-      validationError.value = "Numeric value is invalid."
+      validationError.value = "Numerička vrednost nije ispravna."
       return
     }
     emit("submit", {
@@ -190,13 +190,13 @@ function submit() {
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">
-          {{ mode === "edit" ? "Edit Detail" : "Add Detail" }}
+          {{ mode === "edit" ? "Izmena detalja" : "Dodavanje detalja" }}
         </h3>
         <p class="text-muted text-sm">
           {{
             mode === "edit"
-              ? "Update the selected detail value."
-              : "Attach a new detail to the article."
+              ? "Ažurirajte vrednost izabranog detalja."
+              : "Dodajte novi detalj artiklu."
           }}
         </p>
       </div>
@@ -205,7 +205,7 @@ function submit() {
     <template #body>
       <div class="grid gap-4">
         <div class="grid gap-3">
-          <UFormField label="Detail" required class="w-full">
+          <UFormField label="Detalj" required class="w-full">
             <USelectMenu
               v-model="selectedKey"
               v-model:search-term="searchTerm"
@@ -215,7 +215,7 @@ function submit() {
               :search-input="true"
               :disabled="!canEdit || mode === 'edit'"
               size="md"
-              placeholder="Select detail"
+              placeholder="Izaberite detalj"
               class="w-full"
               :ui="{ base: 'w-full' }"
             />
@@ -223,14 +223,14 @@ function submit() {
         </div>
 
         <UFormField
-          :label="isNumeric ? 'Numeric Value' : 'Value'"
+          :label="isNumeric ? 'Numerička vrednost' : 'Vrednost'"
           required
           class="w-full"
         >
           <UInput
             v-model="valueInput"
             :type="isNumeric ? 'number' : 'text'"
-            :placeholder="isNumeric ? 'e.g. 42' : 'Enter value'"
+            :placeholder="isNumeric ? 'npr. 42' : 'Unesite vrednost'"
             :disabled="!canEdit"
             size="md"
             class="w-full"
@@ -247,7 +247,7 @@ function submit() {
     <template #footer>
       <div class="flex w-full justify-between">
         <UButton variant="ghost" :disabled="loading" @click="isOpen = false">
-          Cancel
+          Otkaži
         </UButton>
         <UButton
           color="primary"
@@ -255,7 +255,15 @@ function submit() {
           :disabled="!canEdit"
           @click="submit"
         >
-          {{ mode === "edit" ? "Save Changes" : "Add Detail" }}
+          {{
+            loading
+              ? mode === "edit"
+                ? "Čuvanje izmena"
+                : "Dodavanje detalja"
+              : mode === "edit"
+                ? "Sačuvaj izmene"
+                : "Dodaj detalj"
+          }}
         </UButton>
       </div>
     </template>

@@ -24,7 +24,7 @@ export function useOrderRevealModal(options: UseOrderRevealOptions) {
     () =>
       options.orderLabel?.value?.trim() ||
       options.orderId.value?.trim() ||
-      "Selected order",
+      "Izabrana porudžbina",
   )
 
   function resetModalState() {
@@ -38,7 +38,7 @@ export function useOrderRevealModal(options: UseOrderRevealOptions) {
     const orderId = options.orderId.value?.trim()
 
     if (!orderId) {
-      loadState.error = "Select an order first."
+      loadState.error = "Najpre izaberite porudžbinu."
       order.value = null
       notFound.value = false
       return

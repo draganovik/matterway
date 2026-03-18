@@ -21,7 +21,7 @@ export function useUsersAccountsPage() {
   const canManage = computed(() => auth.hasPermission("identity", ["manager"]))
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState({ empty: "No accounts found." })
+  const listState = useRequestState({ empty: "Nema naloga." })
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
@@ -41,9 +41,9 @@ export function useUsersAccountsPage() {
   } = usePaginationState({ pageSize: 20 })
 
   const roleFilterOptions = [
-    { label: "All", value: "all" as const },
-    { label: "Customers", value: "customers" as const },
-    { label: "Employees", value: "employees" as const },
+    { label: "Svi", value: "all" as const },
+    { label: "Kupci", value: "customers" as const },
+    { label: "Zaposleni", value: "employees" as const },
   ]
 
   const selectedId = ref<string | null>(null)
@@ -96,7 +96,7 @@ export function useUsersAccountsPage() {
       listState.loading = false
 
       if (!result.ok || !result.data) {
-        listState.error = result.error || "Unable to load account."
+        listState.error = result.error || "Učitavanje naloga nije uspelo."
         systemUsers.value = []
         setSinglePageTotal(0)
         clearSelection()
@@ -121,7 +121,7 @@ export function useUsersAccountsPage() {
     listState.loading = false
 
     if (!result.ok) {
-      listState.error = result.error || "Unable to load accounts."
+      listState.error = result.error || "Učitavanje naloga nije uspelo."
       systemUsers.value = []
       resetTotals()
       clearSelection()
@@ -153,7 +153,7 @@ export function useUsersAccountsPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Unable to load account details."
+      detailState.error = result.error || "Učitavanje detalja naloga nije uspelo."
       selectedSystemUser.value = null
       applySystemUserToForm(null)
       return
@@ -182,7 +182,7 @@ export function useUsersAccountsPage() {
   }
 
   const selectedUserLabel = computed(() => {
-    if (!selectedSystemUser.value) return "Selected account"
+    if (!selectedSystemUser.value) return "Izabrani nalog"
     return selectedSystemUser.value.email?.trim() || selectedSystemUser.value.id
   })
 
@@ -234,12 +234,12 @@ export function useUsersAccountsPage() {
     const password = form.value.password.trim()
 
     if (!systemUserId) {
-      saveState.error = "Select an account to update."
+      saveState.error = "Izaberite nalog za ažuriranje."
       return
     }
 
     if (!email && !password) {
-      saveState.error = "Provide email and/or password to update."
+      saveState.error = "Unesite imejl i/ili lozinku za ažuriranje."
       return
     }
 
@@ -251,7 +251,7 @@ export function useUsersAccountsPage() {
     saveState.loading = false
 
     if (!result.ok || !result.data) {
-      saveState.error = result.error || "Unable to update account."
+      saveState.error = result.error || "Ažuriranje naloga nije uspelo."
       return
     }
 
@@ -265,7 +265,7 @@ export function useUsersAccountsPage() {
       item.id === updated.id ? updated : item,
     )
 
-    saveState.success = "Account updated."
+    saveState.success = "Nalog je uspešno ažuriran."
   }
 
   async function removeSystemUser() {
@@ -275,7 +275,7 @@ export function useUsersAccountsPage() {
 
     const systemUserId = selectedId.value
     if (!systemUserId) {
-      removeState.error = "Select an account to delete."
+      removeState.error = "Izaberite nalog za brisanje."
       return
     }
 
@@ -284,7 +284,7 @@ export function useUsersAccountsPage() {
     removeState.loading = false
 
     if (!result.ok) {
-      removeState.error = result.error || "Unable to delete account."
+      removeState.error = result.error || "Brisanje naloga nije uspelo."
       return
     }
 
@@ -307,7 +307,7 @@ export function useUsersAccountsPage() {
     selectedSystemUser.value = null
     applySystemUserToForm(null)
 
-    removeState.success = "Account deleted."
+    removeState.success = "Nalog je uspešno obrisan."
   }
 
   watchPagination(loadSystemUsers, () => !filter.value.trim())

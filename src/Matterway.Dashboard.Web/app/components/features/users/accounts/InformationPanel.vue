@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SystemUserResponse } from "~/types/identity"
 import { formatDateTime } from "~/utils/formatters"
+import { formatIdentityRole } from "~/utils/labels"
 
 type SystemUserForm = {
   email: string
@@ -47,13 +48,13 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ systemUser ? "Edit Account" : "Account Editor" }}
+        {{ systemUser ? "Izmena naloga" : "Uređivanje naloga" }}
       </h3>
       <p class="text-muted text-sm">
         {{
           canOperate
-            ? "Operator permission is required for updates. Manager permission is required for permission changes and delete."
-            : "Read-only mode: operator permission required for updates."
+            ? "Za izmene je potrebna dozvola operatera. Za promenu dozvola i brisanje potrebna je dozvola menadžera."
+            : "Režim samo za čitanje: za izmene je potrebna dozvola operatera."
         }}
       </p>
     </div>
@@ -62,15 +63,17 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
 
     <EntitiesEmptyState
       v-else-if="!systemUser"
-      title="Nothing selected"
-      description="Select an account from the list to start editing."
+      title="Ništa nije izabrano"
+      description="Izaberite nalog sa liste da biste započeli izmenu."
     />
 
     <div v-else class="grid gap-4">
       <div class="grid gap-2 text-sm">
-        <div class="text-muted">Account ID: {{ systemUser.id }}</div>
-        <div class="text-muted">Primary Role: {{ systemUser.role }}</div>
-        <div class="text-muted">Created: {{ createdLabel }}</div>
+        <div class="text-muted">ID naloga: {{ systemUser.id }}</div>
+        <div class="text-muted">
+          Primarna uloga: {{ formatIdentityRole(systemUser.role) }}
+        </div>
+        <div class="text-muted">Kreiran: {{ createdLabel }}</div>
       </div>
 
       <UsersAccountsInformationForm v-model="form" :disabled="!canOperate" />
@@ -82,7 +85,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
           :disabled="!canOperate"
           @click="emit('save')"
         >
-          Update Account
+          {{ saveLoading ? "Čuvanje naloga" : "Sačuvaj nalog" }}
         </UButton>
 
         <UButton
@@ -92,7 +95,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
           :disabled="!canManage"
           @click="emit('remove')"
         >
-          Delete Account
+          {{ removeLoading ? "Brisanje naloga" : "Obriši nalog" }}
         </UButton>
       </div>
 
@@ -100,14 +103,15 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
         class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Permissions</h4>
+          <h4 class="text-foreground text-sm font-semibold">Dozvole</h4>
           <p class="text-muted text-sm">
-            Reveal assigned service permissions and manage them as manager.
+            Pregledajte dodeljene dozvole po servisima i upravljajte njima ako
+            ste menadžer.
           </p>
         </div>
 
         <UButton variant="outline" @click="emit('revealRoles')">
-          Reveal Permissions
+          Otvori dozvole
         </UButton>
       </div>
 

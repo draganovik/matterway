@@ -54,7 +54,7 @@ function openAddImagesModal() {
   addState.error = ""
   addState.success = ""
   if (!props.code) {
-    addState.error = "Create the article before adding images."
+    addState.error = "Najpre sačuvajte artikal da biste dodali slike."
     return
   }
   imageModalMode.value = "add"
@@ -78,11 +78,11 @@ async function addImage(payload: {
   addState.error = ""
   addState.success = ""
   if (!props.code) {
-    addState.error = "Create the article before adding images."
+    addState.error = "Najpre sačuvajte artikal da biste dodali slike."
     return
   }
   if (!payload.file) {
-    addState.error = "Select an image file to upload."
+    addState.error = "Izaberite sliku za otpremanje."
     return
   }
   addState.loading = true
@@ -93,13 +93,13 @@ async function addImage(payload: {
   })
   addState.loading = false
   if (!result.ok) {
-    addState.error = result.error || "Unable to add image."
+    addState.error = result.error || "Dodavanje slike nije uspelo."
     return
   }
   const next = [...images.value]
   if (result.data) next.push(result.data)
   updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
-  addState.success = "Image added."
+  addState.success = "Slika je uspešno dodata."
   imageModalOpen.value = false
 }
 
@@ -108,12 +108,12 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   updateState.success = ""
   if (!props.code) return
   if (!activeImage.value) {
-    updateState.error = "Select an image to edit."
+    updateState.error = "Izaberite sliku za izmenu."
     return
   }
   const targetOrderIndex = activeImage.value.orderIndex
   if (targetOrderIndex === undefined || targetOrderIndex === null) {
-    updateState.error = "Selected image is missing an order index."
+    updateState.error = "Izabrana slika nema definisan redosled."
     return
   }
   updateState.loading = true
@@ -123,7 +123,7 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   })
   updateState.loading = false
   if (!result.ok) {
-    updateState.error = result.error || "Unable to update image."
+    updateState.error = result.error || "Ažuriranje slike nije uspelo."
     return
   }
   const next = images.value.map((item) => {
@@ -137,7 +137,7 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
     return item
   })
   updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
-  updateState.success = "Image updated."
+  updateState.success = "Slika je uspešno ažurirana."
   imageModalOpen.value = false
 }
 
@@ -149,11 +149,11 @@ async function removeImage(image: ArticleImageProperty) {
   const result = await api.removeArticleImage(props.code, image.orderIndex)
   removeState.loading = false
   if (!result.ok) {
-    removeState.error = result.error || "Unable to remove image."
+    removeState.error = result.error || "Uklanjanje slike nije uspelo."
     return
   }
   updateImages(images.value.filter((item) => item.id !== image.id))
-  removeState.success = "Image removed."
+  removeState.success = "Slika je uspešno uklonjena."
 }
 
 async function handleImageSubmit(payload: {
@@ -172,14 +172,14 @@ async function handleImageSubmit(payload: {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-foreground text-base font-semibold">Images</h3>
+      <h3 class="text-foreground text-base font-semibold">Slike</h3>
       <UButton
         color="primary"
         variant="outline"
         :disabled="!canEdit || !code"
         @click="openAddImagesModal"
       >
-        Add Image
+        Dodaj sliku
       </UButton>
     </div>
 
@@ -187,7 +187,7 @@ async function handleImageSubmit(payload: {
       v-if="!code"
       class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
-      Create the article first to attach images.
+      Najpre sačuvajte artikal da biste dodali slike.
     </div>
 
     <div v-else class="@container grid gap-4">
@@ -215,7 +215,7 @@ async function handleImageSubmit(payload: {
                 class="justify-center"
                 @click="openEditImagesModal(image)"
               >
-                Edit
+                Izmeni
               </UButton>
               <UButton
                 color="error"
@@ -224,7 +224,7 @@ async function handleImageSubmit(payload: {
                 class="justify-center"
                 @click="removeImage(image)"
               >
-                Remove
+                Ukloni
               </UButton>
             </div>
           </div>

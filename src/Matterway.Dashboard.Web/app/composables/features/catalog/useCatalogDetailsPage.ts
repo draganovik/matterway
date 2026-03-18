@@ -18,7 +18,7 @@ export function useCatalogDetailsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "No detail definitions found." })
+  const listState = useRequestState({ empty: "Nema definicija detalja." })
   const saveState = useRequestState()
   const removeState = useRequestState()
 
@@ -82,7 +82,8 @@ export function useCatalogDetailsPage() {
     listState.loading = false
 
     if (!result.ok) {
-      listState.error = result.error || "Unable to load detail definitions."
+      listState.error =
+        result.error || "Učitavanje definicija detalja nije uspelo."
       details.value = []
       return
     }
@@ -138,11 +139,11 @@ export function useCatalogDetailsPage() {
     const unit = String(form.value.unit ?? "").trim()
 
     if (!slug) {
-      saveState.error = "Select a detail to update."
+      saveState.error = "Izaberite detalj za ažuriranje."
       return
     }
     if (!title) {
-      saveState.error = "Title is required."
+      saveState.error = "Naziv je obavezan."
       return
     }
 
@@ -156,7 +157,7 @@ export function useCatalogDetailsPage() {
     saveState.loading = false
 
     if (!result.ok) {
-      saveState.error = result.error || "Unable to save detail."
+      saveState.error = result.error || "Čuvanje detalja nije uspelo."
       return
     }
 
@@ -175,7 +176,7 @@ export function useCatalogDetailsPage() {
     selectedDetail.value = nextDetail
     applyDetailToForm(nextDetail)
 
-    saveState.success = "Detail updated."
+    saveState.success = "Detalj je uspešno ažuriran."
   }
 
   async function removeDetail() {
@@ -185,7 +186,7 @@ export function useCatalogDetailsPage() {
 
     const slug = selectedSlug.value || normalizeSlug(form.value.slug)
     if (!slug) {
-      removeState.error = "Select a detail to delete."
+      removeState.error = "Izaberite detalj za brisanje."
       return
     }
 
@@ -194,7 +195,7 @@ export function useCatalogDetailsPage() {
     removeState.loading = false
 
     if (!result.ok) {
-      removeState.error = result.error || "Unable to delete detail."
+      removeState.error = result.error || "Brisanje detalja nije uspelo."
       return
     }
 
@@ -203,7 +204,7 @@ export function useCatalogDetailsPage() {
     selectedDetail.value = null
     applyDetailToForm(null)
 
-    removeState.success = result.data?.message || "Detail removed."
+    removeState.success = result.data?.message || "Detalj je uspešno uklonjen."
   }
 
   function handleDetailCreated(detail: QueryDetailResponse) {

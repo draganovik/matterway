@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useOrderRevealModal } from "~/composables/features/sales/useOrderRevealModal"
 import { formatDateTime } from "~/utils/formatters"
+import { formatOrderStatus } from "~/utils/labels"
 
 const props = withDefaults(
   defineProps<{
@@ -19,7 +20,7 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   isOpen,
   orderId: toRef(props, "orderId"),
   orderLabel: toRef(props, "orderLabel"),
-  revealErrorMessage: "Unable to reveal status history.",
+  revealErrorMessage: "Učitavanje istorije statusa nije uspelo.",
 })
 </script>
 
@@ -27,9 +28,9 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
   <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-3xl' }">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Status History</h3>
+        <h3 class="text-foreground text-base font-semibold">Istorija statusa</h3>
         <p class="text-muted text-sm">
-          Revealed status history for {{ displayLabel }}.
+          Pregled promena statusa za porudžbinu {{ displayLabel }}.
         </p>
       </div>
     </template>
@@ -38,28 +39,28 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
       <div class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Revealing status history.' : false"
+          :loading="loadState.loading ? 'Učitavanje istorije statusa.' : false"
           :error="loadState.error"
         />
 
         <EntitiesEmptyState
           v-else-if="notFound"
-          title="Order not found"
-          description="The selected order could not be loaded."
+          title="Porudžbina nije pronađena"
+          description="Izabranu porudžbinu nije moguće učitati."
         />
 
         <template v-else-if="order">
           <div class="flex items-center justify-between gap-3">
-            <h4 class="text-foreground text-sm font-semibold">Timeline</h4>
+            <h4 class="text-foreground text-sm font-semibold">Promene statusa</h4>
             <UBadge color="neutral" variant="subtle" class="font-normal">
-              {{ order.statusHistory?.length || 0 }} entries
+              {{ order.statusHistory?.length || 0 }} unosa
             </UBadge>
           </div>
 
           <EntitiesEmptyState
             v-if="!order.statusHistory?.length"
-            title="No status history"
-            description="No status transitions have been registered for this order."
+            title="Nema istorije statusa"
+            description="Za ovu porudžbinu nisu zabeležene promene statusa."
           />
 
           <div v-else class="space-y-2">
@@ -70,16 +71,16 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
             >
               <div class="flex items-start justify-between gap-2">
                 <p class="text-foreground text-sm font-medium">
-                  {{ entry.status }}
+                  {{ formatOrderStatus(entry.status) }}
                 </p>
-                <p class="text-muted text-xs">Entry {{ index + 1 }}</p>
+                <p class="text-muted text-xs">Unos {{ index + 1 }}</p>
               </div>
 
               <p class="text-muted mt-1 text-xs">
-                Changed: {{ formatDateTime(entry.changedAt) }}
+                Izmenjeno: {{ formatDateTime(entry.changedAt) }}
               </p>
               <p class="text-muted mt-1 text-xs">
-                Note: {{ entry.note || "-" }}
+                Napomena: {{ entry.note || "-" }}
               </p>
             </div>
           </div>
@@ -89,7 +90,7 @@ const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
 
     <template #footer>
       <div class="flex w-full justify-end">
-        <UButton variant="ghost" @click="isOpen = false">Close</UButton>
+        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
       </div>
     </template>
   </UModal>

@@ -75,7 +75,7 @@ export function useApiClient() {
       return {
         ok: false,
         status: 0,
-        error: `Missing API base URL for ${service}. Check runtimeConfig.public.${service}ApiBaseUrl.`,
+        error: `Nedostaje osnovni API URL za servis ${service}. Proverite runtimeConfig.public.${service}ApiBaseUrl.`,
       }
     }
     const normalizedPath = path.replace(/^\/+/, "")
@@ -85,14 +85,14 @@ export function useApiClient() {
         ok: false,
         status: 0,
         error:
-          "API path must start with endpoint kind: self, admin, public, or system.",
+          "API putanja mora da počne vrstom endpointa: self, admin, public ili system.",
       }
     }
     if (resourcePath.length === 0) {
       return {
         ok: false,
         status: 0,
-        error: "API path must include a resource path after endpoint kind.",
+        error: "API putanja mora da sadrži resurs nakon vrste endpointa.",
       }
     }
     const url = `${baseUrl}/api/${endpointKind}/v1/${resourcePath.join("/")}`
@@ -137,7 +137,7 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const baseError = getErrorMessage(payload) || "Request failed."
+    const baseError = getErrorMessage(payload) || "Zahtev nije uspeo."
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,

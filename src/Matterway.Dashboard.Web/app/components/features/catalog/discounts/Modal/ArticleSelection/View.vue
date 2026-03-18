@@ -28,7 +28,7 @@ const isOpen = computed({
 })
 
 const api = useCatalogClient()
-const listState = useRequestState({ empty: "No articles found." })
+const listState = useRequestState({ empty: "Nema artikala." })
 
 const articles = ref<QueryArticleResponse[]>([])
 const filter = ref("")
@@ -41,7 +41,7 @@ const pagination = reactive({
 })
 
 const pageSizes = [10, 20, 50, 100].map((value) => ({
-  label: `${value} / page`,
+  label: `${value} / strana`,
   value,
 }))
 
@@ -89,7 +89,7 @@ async function loadArticles() {
   listState.loading = false
 
   if (!result.ok) {
-    listState.error = result.error || "Unable to load articles."
+    listState.error = result.error || "Učitavanje artikala nije uspelo."
     articles.value = []
     pagination.totalCount = 0
     pagination.totalPages = 1
@@ -189,19 +189,19 @@ function submitSelection() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Select Articles</h3>
+        <h3 class="text-foreground text-base font-semibold">Izbor artikala</h3>
         <p class="text-muted text-sm">
-          Search and select the articles attached to this discount.
+          Pretražite i izaberite artikle povezane sa ovim popustom.
         </p>
       </div>
     </template>
 
     <template #body>
       <div class="grid gap-4">
-        <UFormField label="Search">
+        <UFormField label="Pretraga">
           <UTextarea
             v-model="filter"
-            placeholder="Search with RSQL filters (e.g. title==chair;available==true)."
+            placeholder="Pretraga pomoću RSQL filtera (npr. title==chair;available==true)."
             :rows="3"
             class="w-full"
           />
@@ -213,21 +213,21 @@ function submitSelection() {
             :loading="listState.loading"
             @click="searchArticles"
           >
-            Search
+            {{ listState.loading ? "Pretraga" : "Pretraži" }}
           </UButton>
           <UButton
             variant="outline"
             :disabled="!articles.length"
             @click="togglePageSelection"
           >
-            {{ allCurrentPageSelected ? "Unselect Page" : "Select Page" }}
+            {{ allCurrentPageSelected ? "Ukloni prikazane" : "Izaberi prikazane" }}
           </UButton>
           <UButton
             variant="ghost"
             :disabled="!selectedArticleCodes.length"
             @click="clearSelection"
           >
-            Clear
+            Očisti
           </UButton>
         </div>
 
@@ -244,8 +244,8 @@ function submitSelection() {
           class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
         >
           <div class="text-muted text-sm">
-            Page {{ pagination.page }} of {{ pagination.totalPages }} -
-            {{ pagination.totalCount }} total
+            Strana {{ pagination.page }} od {{ pagination.totalPages }} -
+            ukupno {{ pagination.totalCount }}
           </div>
           <div class="flex items-center gap-2">
             <UPagination
@@ -256,13 +256,13 @@ function submitSelection() {
               show-controls
               @update:page="changePage"
             />
-            <UFormField label="Page Size">
+            <UFormField label="Po stranici">
               <USelectMenu
                 :items="pageSizes"
                 :model-value="pagination.pageSize"
                 value-key="value"
                 label-key="label"
-                placeholder="Select size"
+                placeholder="Izaberi broj"
                 class="min-w-34"
                 @update:model-value="changePageSize"
               />
@@ -274,9 +274,9 @@ function submitSelection() {
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton variant="ghost" @click="isOpen = false"> Cancel </UButton>
+        <UButton variant="ghost" @click="isOpen = false"> Otkaži </UButton>
         <UButton color="primary" :disabled="!canEdit" @click="submitSelection">
-          Save Selection ({{ selectedArticleCodes.length }})
+          Sačuvaj izbor ({{ selectedArticleCodes.length }})
         </UButton>
       </div>
     </template>

@@ -40,7 +40,7 @@ const navItems = computed<NavigationMenuItem[]>(() => {
 
 const secondaryItems = computed<NavigationMenuItem[]>(() => [
   {
-    label: "Solution Repository",
+    label: "GitHub repozitorijum",
     icon: "i-lucide-github",
     to: "https://github.com/draganovik/aspire-matterway",
     target: "_blank",
@@ -50,7 +50,7 @@ const secondaryItems = computed<NavigationMenuItem[]>(() => [
 const searchGroups = computed(() => [
   {
     id: "services",
-    label: "Navigation",
+    label: "Navigacija",
     items: navItems.value.flatMap((section) =>
       (section.children || []).map((child: NavigationMenuItem) => ({
         id: `${section.label}-${child.label}`,

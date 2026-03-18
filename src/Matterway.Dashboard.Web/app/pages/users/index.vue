@@ -3,7 +3,7 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { serviceSections } from "~/data/serviceRegistry"
 
 definePageMeta({
-  title: "Users",
+  title: "Korisnici",
 })
 
 const auth = useAuthSessionStore()

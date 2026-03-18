@@ -46,8 +46,8 @@ const emit = defineEmits<{
 
 <template>
   <EntitiesListPanel
-    title="Accounts"
-    description="Filter by role, use pagination, or provide an exact Account ID to fetch one account."
+    title="Nalozi"
+    description="Filtrirajte po ulozi, koristite paginaciju ili unesite tačan ID naloga da biste prikazali samo taj nalog."
     :items="items"
     item-key="id"
     item-title-key="email"
@@ -55,7 +55,7 @@ const emit = defineEmits<{
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
-    filter-placeholder="Optional exact Account ID (GUID)."
+    filter-placeholder="Opciono: tačan ID naloga (GUID)."
     :loading="loading"
     :error="error"
     :empty-message="emptyMessage"
@@ -70,13 +70,13 @@ const emit = defineEmits<{
     @select="emit('select', $event)"
   >
     <template #search-controls>
-      <UFormField label="Role" class="w-full">
+      <UFormField label="Uloga" class="w-full">
         <USelectMenu
           :items="roleFilterOptions"
           :model-value="roleFilter"
           value-key="value"
           label-key="label"
-          placeholder="All roles"
+          placeholder="Sve uloge"
           class="w-full"
           @update:model-value="emit('update:role-filter', $event)"
         />

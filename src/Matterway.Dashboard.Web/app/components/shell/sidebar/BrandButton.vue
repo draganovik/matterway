@@ -16,7 +16,7 @@ defineProps<{
     <span class="flex w-full min-w-0 items-center gap-2">
       <SidebarAppLogo />
       <span v-if="!collapsed" class="min-w-0 truncate text-sm font-semibold"
-        >Matterway Dashboard</span
+        >Matterway Administracija</span
       >
     </span>
   </UButton>

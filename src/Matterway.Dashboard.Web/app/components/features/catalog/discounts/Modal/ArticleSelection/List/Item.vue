@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatMoney } from "~/utils/formatters"
+
 const { item, selected = false } = defineProps<{
   item: {
     title?: string | null
@@ -15,10 +17,10 @@ const { item, selected = false } = defineProps<{
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
       <p class="text-foreground truncate text-base font-medium">
-        {{ item.title || "Untitled Article" }}
+        {{ item.title || "Artikal bez naziva" }}
       </p>
       <p class="text-muted truncate text-sm">
-        {{ item.code || "No code" }}
+        {{ item.code || "Bez šifre" }}
       </p>
     </div>
 
@@ -27,14 +29,14 @@ const { item, selected = false } = defineProps<{
       variant="subtle"
       class="shrink-0"
     >
-      {{ selected ? "Selected" : "Pick" }}
+      {{ selected ? "Izabrano" : "Izaberi" }}
     </UBadge>
   </div>
 
   <div class="text-muted mt-2 flex items-center justify-between text-sm">
     <UBadge :color="item.isAvailable ? 'success' : 'neutral'" variant="soft">
-      {{ item.isAvailable ? "Available" : "Unavailable" }}
+      {{ item.isAvailable ? "Dostupan" : "Nije dostupan" }}
     </UBadge>
-    <span>Price: {{ item.price ?? item.basePrice ?? "N/A" }}</span>
+    <span>Cena: {{ formatMoney(item.price ?? item.basePrice ?? null) }}</span>
   </div>
 </template>

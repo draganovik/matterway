@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatDateTime } from "~/utils/formatters"
+import { formatIdentityRole } from "~/utils/labels"
 
 const { item } = defineProps<{
   item: {
@@ -10,7 +11,7 @@ const { item } = defineProps<{
   }
 }>()
 
-const displayEmail = computed(() => item.email?.trim() || "No email")
+const displayEmail = computed(() => item.email?.trim() || "Bez imejla")
 </script>
 
 <template>
@@ -20,10 +21,10 @@ const displayEmail = computed(() => item.email?.trim() || "No email")
         {{ displayEmail }}
       </p>
       <p class="text-muted truncate font-mono text-xs">
-        {{ item.id || "No ID" }}
+        {{ item.id || "Bez ID-ja" }}
       </p>
       <p class="text-muted text-xs">
-        Created: {{ formatDateTime(item.created) }}
+        Kreiran: {{ formatDateTime(item.created) }}
       </p>
     </div>
 
@@ -32,7 +33,7 @@ const displayEmail = computed(() => item.email?.trim() || "No email")
       variant="subtle"
       class="shrink-0 font-normal whitespace-nowrap"
     >
-      {{ item.role || "Unknown role" }}
+      {{ formatIdentityRole(item.role) }}
     </UBadge>
   </div>
 </template>
