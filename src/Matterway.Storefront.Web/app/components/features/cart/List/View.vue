@@ -20,9 +20,9 @@ const emit = defineEmits<{
         <thead class="storefront-subtle-surface text-muted">
           <tr>
             <th class="px-3 py-2 font-medium">Artikal</th>
-            <th class="px-3 py-2 font-medium">Sifra</th>
+            <th class="px-3 py-2 font-medium">Šifra</th>
             <th class="px-3 py-2 text-right font-medium">Cena</th>
-            <th class="px-3 py-2 text-center font-medium">Kolicina</th>
+            <th class="px-3 py-2 text-center font-medium">Količina</th>
             <th class="px-3 py-2 text-right font-medium">Ukupno</th>
           </tr>
         </thead>

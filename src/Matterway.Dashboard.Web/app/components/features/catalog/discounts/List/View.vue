@@ -47,15 +47,15 @@ function asDiscountItem(item: Record<string, unknown>) {
 
 <template>
   <EntitiesListPanel
-    title="Discounts"
-    description="Search existing discounts by code, date, or percentage."
+    title="Popusti"
+    description="Pretražite postojeće popuste po kodu, datumu ili procentu."
     :items="items"
     item-key="key"
     item-title-key="code"
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
-    filter-placeholder="Search existing discounts by code or value."
+    filter-placeholder="Pretražite postojeće popuste po kodu ili vrednosti."
     :loading="loading"
     :error="error"
     :empty-message="emptyMessage"

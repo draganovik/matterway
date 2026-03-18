@@ -10,15 +10,15 @@ const props = defineProps<{
   <UCard class="border-default border">
     <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
       <div class="space-y-4">
-        <p class="text-primary text-xs tracking-[0.3em] uppercase">Pregled</p>
-        <h1 class="text-3xl font-semibold">Prodavnica za kupce</h1>
+        <p class="text-primary text-xs tracking-[0.3em] uppercase">Početna</p>
+        <h1 class="text-3xl font-semibold">Matterway oprema za pametan dom</h1>
         <p class="text-muted max-w-2xl text-sm">
-          Pregledajte proizvode za pametan dom, koristite korpu kao gost ili kao
-          prijavljen korisnik i završite kupovinu u jednom toku.
+          Pogledajte opremu za pametan dom, dodajte artikle u korpu kao gost ili
+          prijavljen korisnik i završite kupovinu na jednom mestu.
         </p>
         <div class="flex flex-wrap gap-2">
           <UButton to="/articles" color="primary" icon="i-lucide-arrow-right">
-            Pregledaj artikle
+            Pogledaj artikle
           </UButton>
           <UButton
             to="/cart"
@@ -34,7 +34,7 @@ const props = defineProps<{
       <div class="grid grid-cols-2 gap-3">
         <div class="border-default bg-elevated/50 rounded-lg border px-4 py-3">
           <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Stavke u katalogu
+            Artikala u katalogu
           </p>
           <p class="mt-1 text-2xl leading-none font-semibold">
             {{ props.totalCount }}
@@ -43,7 +43,7 @@ const props = defineProps<{
 
         <div class="border-default bg-elevated/50 rounded-lg border px-4 py-3">
           <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Trenutno izdvojeni
+            Izdvojeni artikli
           </p>
           <p class="mt-1 text-2xl leading-none font-semibold">
             {{ props.featuredCount }}

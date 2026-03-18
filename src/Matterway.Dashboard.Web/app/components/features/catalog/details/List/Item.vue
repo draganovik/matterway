@@ -12,10 +12,10 @@ const { item } = defineProps<{
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
       <p class="text-foreground truncate leading-tight font-medium">
-        {{ item.title || item.slug || "Untitled detail" }}
+        {{ item.title || item.slug || "Detalj bez naziva" }}
       </p>
       <p class="text-muted truncate text-sm leading-tight">
-        {{ item.slug || "No slug" }}
+        {{ item.slug || "Bez slug vrednosti" }}
       </p>
     </div>
 

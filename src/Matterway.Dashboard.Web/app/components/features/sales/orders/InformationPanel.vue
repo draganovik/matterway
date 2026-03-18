@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { OrderResponse, OrderStatusResponse } from "~/types/sales"
 import { formatDateTime, formatMoney } from "~/utils/formatters"
+import { formatOrderStatus, formatOrderType } from "~/utils/labels"
 import {
   paymentSumOf,
   paymentsBalanced,
@@ -50,11 +51,11 @@ const quantitySum = computed(() => quantitySumOf(props.order))
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ order ? "Order Summary" : "Order Viewer" }}
+        {{ order ? "Pregled porudžbine" : "Porudžbine" }}
       </h3>
       <p class="text-muted text-sm">
-        Reveal loads a fresh snapshot from the Sales API for each selected
-        section.
+        Svako otvaranje učitava najnovije podatke iz Sales API-ja za izabrani
+        prikaz.
       </p>
     </div>
 
@@ -62,32 +63,32 @@ const quantitySum = computed(() => quantitySumOf(props.order))
 
     <EntitiesEmptyState
       v-else-if="!order"
-      title="Nothing selected"
-      description="Select an order from the list to inspect details."
+      title="Ništa nije izabrano"
+      description="Izaberite porudžbinu sa liste da biste pregledali detalje."
     />
 
     <div v-else class="space-y-4">
       <div class="text-muted font-mono text-sm break-all">
-        Order ID: {{ order.id }}
+        ID porudžbine: {{ order.id }}
       </div>
 
       <div class="grid gap-3 sm:grid-cols-3">
         <div class="border-default/70 rounded-lg border px-3 py-2">
-          <p class="text-muted text-xs">Type</p>
+          <p class="text-muted text-xs">Tip</p>
           <p class="text-foreground mt-1 text-sm font-medium">
-            {{ order.type }}
+            {{ formatOrderType(order.type) }}
           </p>
         </div>
 
         <div class="border-default/70 rounded-lg border px-3 py-2">
-          <p class="text-muted text-xs">Placed At</p>
+          <p class="text-muted text-xs">Kreirano</p>
           <p class="text-foreground mt-1 text-sm font-medium">
             {{ formatDateTime(order.placedAt) }}
           </p>
         </div>
 
         <div class="border-default/70 rounded-lg border px-3 py-2">
-          <p class="text-muted text-xs">Total Amount</p>
+          <p class="text-muted text-xs">Ukupan iznos</p>
           <p class="text-foreground mt-1 text-sm font-semibold">
             {{ formatMoney(order.totalAmount) }}
           </p>
@@ -98,31 +99,35 @@ const quantitySum = computed(() => quantitySumOf(props.order))
         class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Order Details</h4>
+          <h4 class="text-foreground text-sm font-semibold">
+            Detalji porudžbine
+          </h4>
           <p class="text-muted text-sm">
-            Reveal overview and delivery fields from get-order-by-id.
+            Pogledajte osnovne podatke i adresu za dostavu.
           </p>
         </div>
 
         <UButton variant="outline" @click="emit('revealDetails')">
-          Reveal Details
+          Otvori detalje
         </UButton>
       </div>
 
       <div class="border-default/70 space-y-2 rounded-lg border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Status History</h4>
+          <h4 class="text-foreground text-sm font-semibold">
+            Istorija statusa
+          </h4>
 
           <div class="flex items-center gap-2">
             <UBadge color="neutral" variant="subtle" class="font-normal">
-              {{ order.statusHistory?.length || 0 }} entries
+              {{ order.statusHistory?.length || 0 }} unosa
             </UBadge>
             <UButton
               size="xs"
               variant="ghost"
               @click="emit('revealStatusHistory')"
             >
-              Reveal Status History
+              Otvori istoriju statusa
             </UButton>
             <UButton
               color="primary"
@@ -130,7 +135,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
               :disabled="!canManageStatuses"
               @click="emit('createStatus')"
             >
-              Update Status
+              Novi status
             </UButton>
           </div>
         </div>
@@ -140,22 +145,22 @@ const quantitySum = computed(() => quantitySumOf(props.order))
           class="bg-background border-default/60 rounded-md border px-3 py-2"
         >
           <p class="text-foreground text-sm font-medium">
-            {{ latestStatus.status }}
+            {{ formatOrderStatus(latestStatus.status) }}
           </p>
           <p class="text-muted mt-1 text-xs">
-            Changed: {{ formatDateTime(latestStatus.changedAt) }}
+            Izmenjeno: {{ formatDateTime(latestStatus.changedAt) }}
           </p>
           <p class="text-muted mt-1 text-xs">
-            Note: {{ latestStatus.note || "-" }}
+            Napomena: {{ latestStatus.note || "-" }}
           </p>
         </div>
 
-        <p v-else class="text-muted text-sm">No status history available.</p>
+        <p v-else class="text-muted text-sm">Istorija statusa nije dostupna.</p>
       </div>
 
       <div class="border-default/70 space-y-2 rounded-lg border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Payments</h4>
+          <h4 class="text-foreground text-sm font-semibold">Uplate</h4>
 
           <div class="flex items-center gap-2">
             <UBadge
@@ -163,33 +168,37 @@ const quantitySum = computed(() => quantitySumOf(props.order))
               variant="subtle"
               class="font-normal"
             >
-              {{ paymentBalanced ? "Amounts Match" : "Amounts Do Not Match" }}
+              {{
+                paymentBalanced
+                  ? "Iznosi se poklapaju"
+                  : "Iznosi se ne poklapaju"
+              }}
             </UBadge>
             <UButton size="xs" variant="ghost" @click="emit('revealPayments')">
-              Reveal Payments
+              Otvori uplate
             </UButton>
           </div>
         </div>
 
         <p class="text-muted text-sm">
-          Total: {{ formatMoney(order.totalAmount) }}
+          Ukupno: {{ formatMoney(order.totalAmount) }}
         </p>
         <p class="text-muted text-sm">
-          Sum of payments: {{ formatMoney(paymentSum) }}
+          Zbir uplata: {{ formatMoney(paymentSum) }}
         </p>
       </div>
 
       <div class="border-default/70 space-y-2 rounded-lg border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Items</h4>
+          <h4 class="text-foreground text-sm font-semibold">Stavke</h4>
 
           <UButton size="xs" variant="ghost" @click="emit('revealItems')">
-            Reveal Items
+            Otvori stavke
           </UButton>
         </div>
 
-        <p class="text-muted text-sm">Item rows: {{ itemCount }}</p>
-        <p class="text-muted text-sm">Total quantity: {{ quantitySum }}</p>
+        <p class="text-muted text-sm">Broj stavki: {{ itemCount }}</p>
+        <p class="text-muted text-sm">Ukupna količina: {{ quantitySum }}</p>
       </div>
     </div>
   </div>

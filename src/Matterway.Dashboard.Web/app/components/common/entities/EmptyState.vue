@@ -5,8 +5,8 @@ withDefaults(
     description?: string
   }>(),
   {
-    title: "Nothing selected",
-    description: "Select an item from the list to start editing.",
+    title: "Ništa nije izabrano",
+    description: "Izaberite stavku sa liste da biste započeli izmenu.",
   },
 )
 </script>

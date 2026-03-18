@@ -4,7 +4,7 @@ import { useAuthLoginPage } from "~/composables/features/auth/useAuthLoginPage"
 definePageMeta({
   layout: false,
   public: true,
-  title: "Sign In",
+  title: "Prijava",
 })
 
 const { model, error, loading, initialize, submit } = useAuthLoginPage()
@@ -22,38 +22,38 @@ await initialize()
           <p class="text-sm tracking-[0.4em] text-orange-600 uppercase">
             Matterway
           </p>
-          <h1 class="text-foreground text-4xl font-semibold">
-            Management Plane
-          </h1>
+          <h1 class="text-foreground text-4xl font-semibold">Administracija</h1>
           <p class="text-muted max-w-md text-sm">
-            Secure operational access for Catalog workflows. Sign in with an
-            Employee account to continue.
+            Bezbedan pristup administrativnim tokovima za katalog, korisnike i
+            prodaju. Prijavite se nalogom zaposlenog da nastavite.
           </p>
         </div>
         <UCard class="!border-default !bg-elevated/75 !border !shadow-sm">
           <template #header>
             <div class="space-y-1">
               <p class="text-sm tracking-[0.3em] text-orange-600 uppercase">
-                Operator Access
+                Pristup za zaposlene
               </p>
-              <h2 class="text-foreground text-2xl font-semibold">Sign in</h2>
-              <p class="text-muted text-sm">Use your employee credentials.</p>
+              <h2 class="text-foreground text-2xl font-semibold">Prijava</h2>
+              <p class="text-muted text-sm">
+                Koristite podatke za prijavu zaposlenog naloga.
+              </p>
             </div>
           </template>
 
           <form class="space-y-4" @submit.prevent="submit">
-            <UFormField label="Email" required>
+            <UFormField label="Imejl" required>
               <UInput
                 v-model="model.email"
                 type="email"
-                placeholder="name@matterway.local"
+                placeholder="ime.prezime@domen.com"
                 autocomplete="email"
                 class="w-full"
                 required
               />
             </UFormField>
 
-            <UFormField label="Password" required>
+            <UFormField label="Lozinka" required>
               <UInput
                 v-model="model.password"
                 type="password"
@@ -67,7 +67,7 @@ await initialize()
             <StatusMessages v-if="error" :error="error" />
 
             <UButton type="submit" color="primary" :loading="loading">
-              Sign in
+              {{ loading ? "Prijava" : "Prijavi se" }}
             </UButton>
           </form>
         </UCard>

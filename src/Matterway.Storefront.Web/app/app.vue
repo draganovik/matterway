@@ -4,7 +4,7 @@ const color = computed(() =>
   colorMode.value === "dark" ? "#020617" : "#f1f5f9",
 )
 const route = useRoute()
-const appTitle = "Matterway prodavnica"
+const appTitle = "Matterway Prodavnica"
 const pageTitle = computed(() => {
   const title = route.meta?.title
   return typeof title === "string" && title.trim().length ? title : undefined

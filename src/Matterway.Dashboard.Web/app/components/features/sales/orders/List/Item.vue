@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { OrderResponse } from "~/types/sales"
 import { formatDateTime, formatMoney } from "~/utils/formatters"
+import { formatOrderStatus } from "~/utils/labels"
 import { paymentsBalanced } from "~/utils/salesOrderMetrics"
 
 const { item } = defineProps<{
@@ -18,11 +19,13 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
 <template>
   <div class="flex w-full items-end justify-between gap-3">
     <div class="min-w-0 space-y-1">
-      <p class="text-foreground break-all font-mono text-sm font-medium leading-snug">
-        {{ item.id || "No ID" }}
+      <p
+        class="text-foreground font-mono text-sm leading-snug font-medium break-all"
+      >
+        {{ item.id || "Bez ID-ja" }}
       </p>
       <p class="text-muted truncate text-xs">
-        Placed: {{ formatDateTime(item.placedAt) }}
+        Kreirano: {{ formatDateTime(item.placedAt) }}
       </p>
       <UBadge color="neutral" variant="subtle" class="w-fit font-normal">
         {{ formatMoney(item.totalAmount) }}
@@ -35,7 +38,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
         variant="subtle"
         class="font-normal"
       >
-        {{ isPaymentBalanced ? "Paid" : "Unpaid" }}
+        {{ isPaymentBalanced ? "Plaćeno" : "Nije plaćeno" }}
       </UBadge>
       <UBadge
         v-if="latestStatus"
@@ -43,7 +46,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
         variant="subtle"
         class="font-normal"
       >
-        {{ latestStatus.status }}
+        {{ formatOrderStatus(latestStatus.status) }}
       </UBadge>
     </div>
   </div>

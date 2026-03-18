@@ -8,13 +8,12 @@ const auth = useAuthSessionStore()
 const cart = useCartStore()
 
 const userLabel = computed(() => {
-  if (auth.customerId.value?.trim()) return auth.customerId.value.trim()
-
   const payload = auth.payload.value
   const candidates = [
-    getJwtStringClaim(payload, "email"),
-    getJwtStringClaim(payload, "preferred_username"),
     getJwtStringClaim(payload, "name"),
+    getJwtStringClaim(payload, "preferred_username"),
+    getJwtStringClaim(payload, "email"),
+    auth.customerId.value,
     getJwtStringClaim(payload, "sub"),
   ].filter(Boolean) as string[]
 

@@ -10,13 +10,13 @@ const managerAllowed: PermissionLevel[] = ["manager"]
 export const serviceSections: ServiceSection[] = [
   {
     key: "catalog",
-    label: "Catalog",
+    label: "Katalog",
     service: "catalog",
     allowed: [...readAllowed],
     features: [
       {
         key: "articles",
-        label: "Articles",
+        label: "Artikli",
         route: "/catalog/articles",
         service: "catalog",
         allowed: [...readAllowed],
@@ -24,7 +24,7 @@ export const serviceSections: ServiceSection[] = [
       },
       {
         key: "details",
-        label: "Details",
+        label: "Detalji",
         route: "/catalog/details",
         service: "catalog",
         allowed: [...readAllowed],
@@ -32,7 +32,7 @@ export const serviceSections: ServiceSection[] = [
       },
       {
         key: "discounts",
-        label: "Discounts",
+        label: "Popusti",
         route: "/catalog/discounts",
         service: "catalog",
         allowed: [...readAllowed],
@@ -40,7 +40,7 @@ export const serviceSections: ServiceSection[] = [
       },
       {
         key: "archive",
-        label: "Catalog Data",
+        label: "Arhiva kataloga",
         route: "/catalog/archive",
         service: "catalog",
         allowed: [...managerAllowed],
@@ -50,13 +50,13 @@ export const serviceSections: ServiceSection[] = [
   },
   {
     key: "users",
-    label: "Users",
+    label: "Korisnici",
     service: "customers",
     allowed: [...readAllowed],
     features: [
       {
         key: "customers",
-        label: "Customers",
+        label: "Kupci",
         route: "/users/customers",
         service: "customers",
         allowed: [...readAllowed],
@@ -64,7 +64,7 @@ export const serviceSections: ServiceSection[] = [
       },
       {
         key: "accounts",
-        label: "Accounts",
+        label: "Nalozi",
         route: "/users/accounts",
         service: "identity",
         allowed: [...operateAllowed],
@@ -74,13 +74,13 @@ export const serviceSections: ServiceSection[] = [
   },
   {
     key: "sales",
-    label: "Sales",
+    label: "Prodaja",
     service: "sales",
     allowed: [...readAllowed],
     features: [
       {
         key: "orders",
-        label: "Orders",
+        label: "Porudžbine",
         route: "/sales/orders",
         service: "sales",
         allowed: [...readAllowed],

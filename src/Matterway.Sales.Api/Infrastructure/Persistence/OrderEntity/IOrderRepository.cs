@@ -6,7 +6,11 @@ public interface IOrderRepository
 {
     Task<Order?> Create(Order requestModel, CancellationToken cancellationToken = default);
 
+    Task<Order?> Update(Order requestModel, CancellationToken cancellationToken = default);
+
     Task<Order?> GetById(OrderId id, CancellationToken cancellationToken = default);
+
+    Task<Order?> GetPendingByCustomerId(Guid customerId, CancellationToken cancellationToken = default);
 
     Task<ICollection<Order>> Query(int pageIndex, int pageSize, Guid? customerId,
         CancellationToken cancellationToken = default);

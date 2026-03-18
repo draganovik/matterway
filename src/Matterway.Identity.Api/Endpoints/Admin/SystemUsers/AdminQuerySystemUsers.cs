@@ -8,6 +8,8 @@ namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
 public class AdminQuerySystemUsers : IEndpoint
 {
+    private const string RouteName = nameof(AdminQuerySystemUsers);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "system-users", Handler)
@@ -48,7 +50,7 @@ public class AdminQuerySystemUsers : IEndpoint
             roleFilter,
             cancellationToken);
 
-        var baseUri = linkGenerator.GetPathByName(httpContext, "AdminQuerySystemUsers");
+        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName);
         if (string.IsNullOrWhiteSpace(baseUri))
             return TypedResults.BadRequest(new ProblemDetails
             {

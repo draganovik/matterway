@@ -23,7 +23,7 @@ export function useUsersCustomersPage() {
   )
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState({ empty: "No customers found." })
+  const listState = useRequestState({ empty: "Nema kupaca." })
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
@@ -97,7 +97,7 @@ export function useUsersCustomersPage() {
       listState.loading = false
 
       if (!result.ok || !result.data) {
-        listState.error = result.error || "Unable to load customer."
+        listState.error = result.error || "Učitavanje kupca nije uspelo."
         customers.value = []
         setSinglePageTotal(0)
         clearSelection()
@@ -121,7 +121,7 @@ export function useUsersCustomersPage() {
     listState.loading = false
 
     if (!result.ok) {
-      listState.error = result.error || "Unable to load customers."
+      listState.error = result.error || "Učitavanje kupaca nije uspelo."
       customers.value = []
       resetTotals()
       clearSelection()
@@ -155,7 +155,8 @@ export function useUsersCustomersPage() {
     detailState.loading = false
 
     if (!result.ok || !result.data) {
-      detailState.error = result.error || "Unable to load customer details."
+      detailState.error =
+        result.error || "Učitavanje detalja kupca nije uspelo."
       selectedCustomer.value = null
       applyCustomerToForm(null)
       return
@@ -187,7 +188,7 @@ export function useUsersCustomersPage() {
     const first = selectedCustomer.value?.firstName?.trim() || ""
     const last = selectedCustomer.value?.lastName?.trim() || ""
     const fullName = `${first} ${last}`.trim()
-    return fullName || "Selected customer"
+    return fullName || "Izabrani kupac"
   })
 
   function revealAddress() {
@@ -224,13 +225,13 @@ export function useUsersCustomersPage() {
     const defaultAddressId = form.value.defaultAddressId.trim() || null
 
     if (!customerId) {
-      saveState.error = "Select a customer to update."
+      saveState.error = "Izaberite kupca za ažuriranje."
       return
     }
 
     if (!firstName || !lastName || !birthDate) {
       saveState.error =
-        "First name, last name, and birth date are required for updates."
+        "Ime, prezime i datum rođenja su obavezni za ažuriranje."
       return
     }
 
@@ -245,7 +246,7 @@ export function useUsersCustomersPage() {
     saveState.loading = false
 
     if (!result.ok) {
-      saveState.error = result.error || "Unable to update customer."
+      saveState.error = result.error || "Ažuriranje kupca nije uspelo."
       return
     }
 
@@ -265,7 +266,7 @@ export function useUsersCustomersPage() {
       item.systemUserId === updated.systemUserId ? updated : item,
     )
 
-    saveState.success = "Customer updated."
+    saveState.success = "Kupac je uspešno ažuriran."
   }
 
   async function removeCustomer() {
@@ -275,7 +276,7 @@ export function useUsersCustomersPage() {
 
     const customerId = selectedId.value
     if (!customerId) {
-      removeState.error = "Select a customer to delete."
+      removeState.error = "Izaberite kupca za brisanje."
       return
     }
 
@@ -284,7 +285,7 @@ export function useUsersCustomersPage() {
     removeState.loading = false
 
     if (!result.ok) {
-      removeState.error = result.error || "Unable to delete customer."
+      removeState.error = result.error || "Brisanje kupca nije uspelo."
       return
     }
 
@@ -307,7 +308,7 @@ export function useUsersCustomersPage() {
     selectedCustomer.value = null
     applyCustomerToForm(null)
 
-    removeState.success = result.data?.message || "Customer removed."
+    removeState.success = result.data?.message || "Kupac je uspešno uklonjen."
   }
 
   function handleCustomerCreated(customer: CustomerResponse) {

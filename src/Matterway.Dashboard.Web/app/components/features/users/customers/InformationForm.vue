@@ -19,9 +19,9 @@ const form = defineModel<CustomerForm>({ required: true })
   <div class="grid gap-4">
     <UFormField
       v-if="showSystemUserId"
-      label="System User ID"
+      label="ID sistemskog korisnika"
       required
-      help="Existing Identity user ID."
+      help="Postojeći ID korisnika iz Identity servisa."
     >
       <UInput
         v-model="form.systemUserId"
@@ -32,7 +32,7 @@ const form = defineModel<CustomerForm>({ required: true })
     </UFormField>
 
     <div class="grid gap-4 md:grid-cols-2">
-      <UFormField label="First Name" required>
+      <UFormField label="Ime" required>
         <UInput
           v-model="form.firstName"
           placeholder="Ana"
@@ -41,7 +41,7 @@ const form = defineModel<CustomerForm>({ required: true })
         />
       </UFormField>
 
-      <UFormField label="Last Name" required>
+      <UFormField label="Prezime" required>
         <UInput
           v-model="form.lastName"
           placeholder="Jovanovic"
@@ -51,7 +51,7 @@ const form = defineModel<CustomerForm>({ required: true })
       </UFormField>
     </div>
 
-    <UFormField label="Birth Date" required>
+    <UFormField label="Datum rođenja" required>
       <UInput
         v-model="form.birthDate"
         type="date"

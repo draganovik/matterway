@@ -41,7 +41,7 @@ export function useAuthLoginPage() {
     error.value = ""
 
     if (!email || !password.trim()) {
-      error.value = "Email and password are required."
+      error.value = "Imejl i lozinka su obavezni."
       return
     }
 
@@ -50,7 +50,7 @@ export function useAuthLoginPage() {
       await auth.login(email, password)
       await nuxtApp.runWithContext(() => navigateTo(getFirstRoute()))
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Login failed."
+      error.value = err instanceof Error ? err.message : "Prijava nije uspela."
     } finally {
       loading.value = false
     }

@@ -23,16 +23,16 @@ const showSuccess = computed(() => hasState(props.success))
 const showEmpty = computed(() => hasState(props.empty))
 
 const loadingMessage = computed(() =>
-  resolveMessage(props.loading, "Loading..."),
+  resolveMessage(props.loading, "Učitavanje..."),
 )
 const errorMessage = computed(() =>
-  resolveMessage(props.error, "Something went wrong."),
+  resolveMessage(props.error, "Došlo je do greške."),
 )
 const successMessage = computed(() =>
-  resolveMessage(props.success, "Operation completed successfully."),
+  resolveMessage(props.success, "Operacija je uspešno završena."),
 )
 const emptyMessage = computed(() =>
-  resolveMessage(props.empty, "No data available."),
+  resolveMessage(props.empty, "Nema dostupnih podataka."),
 )
 </script>
 

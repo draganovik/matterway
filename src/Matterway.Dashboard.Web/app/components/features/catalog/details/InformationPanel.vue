@@ -38,28 +38,28 @@ const emit = defineEmits<{
   <div class="space-y-4">
     <div class="space-y-1">
       <h3 class="text-foreground text-base font-semibold">
-        {{ detail ? "Edit Detail" : "Detail Editor" }}
+        {{ detail ? "Izmena detalja" : "Uređivanje detalja" }}
       </h3>
       <p class="text-muted text-sm">
         {{
           canEdit
-            ? "Operator permission is required for create, update, and delete."
-            : "Read-only mode: operator permission required for changes."
+            ? "Za kreiranje, izmenu i brisanje potrebna je dozvola operatera."
+            : "Režim samo za čitanje: za izmene je potrebna dozvola operatera."
         }}
       </p>
     </div>
 
     <EntitiesEmptyState
       v-if="!detail"
-      title="Nothing selected"
-      description="Select an item from the list to start editing."
+      title="Ništa nije izabrano"
+      description="Izaberite stavku sa liste da biste započeli izmenu."
     />
 
     <div v-else class="grid gap-4">
       <UFormField
         label="Slug"
         required
-        help="Lowercase key used in article details."
+        help="Ključ malim slovima koji se koristi u detaljima artikla."
       >
         <UInput
           :model-value="slug"
@@ -70,10 +70,10 @@ const emit = defineEmits<{
         />
       </UFormField>
 
-      <UFormField label="Title" required>
+      <UFormField label="Naziv" required>
         <UInput
           :model-value="title"
-          placeholder="Screen Size"
+          placeholder="Veličina ekrana"
           :disabled="!canEdit"
           class="w-full"
           @update:model-value="emit('update:title', $event)"
@@ -81,12 +81,12 @@ const emit = defineEmits<{
       </UFormField>
 
       <UFormField
-        label="Unit"
-        help="Optional unit for numeric values (e.g. cm, kg)."
+        label="Jedinica"
+        help="Opciona jedinica za numeričke vrednosti (npr. cm, kg)."
       >
         <UInput
           :model-value="unit"
-          placeholder="inch"
+          placeholder="inč"
           :disabled="!canEdit"
           class="w-full"
           @update:model-value="emit('update:unit', $event)"
@@ -100,7 +100,7 @@ const emit = defineEmits<{
           :disabled="!canEdit"
           @click="emit('save')"
         >
-          Update Detail
+          {{ saveLoading ? "Čuvanje detalja" : "Sačuvaj detalj" }}
         </UButton>
 
         <UButton
@@ -111,7 +111,7 @@ const emit = defineEmits<{
           :disabled="!canEdit"
           @click="emit('remove')"
         >
-          Delete Detail
+          {{ removeLoading ? "Brisanje detalja" : "Obriši detalj" }}
         </UButton>
       </div>
 

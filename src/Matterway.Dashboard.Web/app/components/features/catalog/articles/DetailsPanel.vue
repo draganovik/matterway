@@ -50,20 +50,20 @@ async function removeDetail(detail: ArticleDetailProperty) {
   const result = await api.removeArticleDetail(props.code, detail.detailSlug)
   removeState.loading = false
   if (!result.ok) {
-    removeState.error = result.error || "Unable to remove detail."
+    removeState.error = result.error || "Uklanjanje detalja nije uspelo."
     return
   }
   updateDetails(
     detailList.value.filter((item) => item.detailSlug !== detail.detailSlug),
   )
-  removeState.success = "Detail removed."
+  removeState.success = "Detalj je uspešno uklonjen."
 }
 
 function openAddDetailsModal() {
   mutateState.error = ""
   mutateState.success = ""
   if (!props.code) {
-    mutateState.error = "Create the article before adding details."
+    mutateState.error = "Najpre sačuvajte artikal da biste dodali detalje."
     return
   }
   detailModalMode.value = "add"
@@ -89,7 +89,7 @@ async function handleDetailSubmit(payload: {
   mutateState.error = ""
   mutateState.success = ""
   if (!props.code) {
-    mutateState.error = "Create the article before adding details."
+    mutateState.error = "Najpre sačuvajte artikal da biste dodali detalje."
     return
   }
 
@@ -105,7 +105,7 @@ async function handleDetailSubmit(payload: {
     })
     mutateState.loading = false
     if (!result.ok) {
-      mutateState.error = result.error || "Unable to update detail."
+      mutateState.error = result.error || "Ažuriranje detalja nije uspelo."
       return
     }
     updateDetails(
@@ -119,14 +119,14 @@ async function handleDetailSubmit(payload: {
           : item,
       ),
     )
-    mutateState.success = "Detail updated."
+    mutateState.success = "Detalj je uspešno ažuriran."
     detailModalOpen.value = false
     return
   }
 
   if (existing) {
     mutateState.loading = false
-    mutateState.error = "Detail already exists."
+    mutateState.error = "Detalj već postoji."
     return
   }
   const addResult = await api.addArticleDetail(props.code, {
@@ -136,7 +136,7 @@ async function handleDetailSubmit(payload: {
   })
   mutateState.loading = false
   if (!addResult.ok) {
-    mutateState.error = addResult.error || "Unable to add detail."
+    mutateState.error = addResult.error || "Dodavanje detalja nije uspelo."
     return
   }
   updateDetails([
@@ -149,7 +149,7 @@ async function handleDetailSubmit(payload: {
       numericValue: payload.numericValue ?? null,
     },
   ])
-  mutateState.success = "Detail added."
+  mutateState.success = "Detalj je uspešno dodat."
   detailModalOpen.value = false
 }
 </script>
@@ -157,14 +157,14 @@ async function handleDetailSubmit(payload: {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-foreground text-base font-semibold">Details</h3>
+      <h3 class="text-foreground text-base font-semibold">Detalji</h3>
       <UButton
         color="primary"
         variant="outline"
         :disabled="!canEdit || !code"
         @click="openAddDetailsModal"
       >
-        Add Detail
+        Dodaj detalj
       </UButton>
     </div>
 
@@ -172,13 +172,13 @@ async function handleDetailSubmit(payload: {
       v-if="!code"
       class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
-      Create the article first to attach details.
+      Najpre sačuvajte artikal da biste dodali detalje.
     </div>
 
     <div v-else class="grid gap-4">
       <section class="space-y-2">
         <div v-if="!detailList.length" class="text-muted text-sm">
-          No details attached.
+          Nema dodatih detalja.
         </div>
         <div v-else class="border-default/40 rounded-md border">
           <div
@@ -191,7 +191,7 @@ async function handleDetailSubmit(payload: {
                 {{ detail.title || detail.detailSlug }}
               </div>
               <div class="text-muted text-xs">
-                {{ detail.textValue ?? detail.numericValue ?? "No value" }}
+                {{ detail.textValue ?? detail.numericValue ?? "Bez vrednosti" }}
                 {{ detail.unit || "" }}
               </div>
             </div>
@@ -201,7 +201,7 @@ async function handleDetailSubmit(payload: {
                 :disabled="!canEdit"
                 @click="openEditDetailsModal(detail)"
               >
-                Edit
+                Izmeni
               </UButton>
               <UButton
                 color="error"
@@ -209,7 +209,7 @@ async function handleDetailSubmit(payload: {
                 :disabled="!canEdit"
                 @click="removeDetail(detail)"
               >
-                Remove
+                Ukloni
               </UButton>
             </div>
           </div>

@@ -46,7 +46,7 @@ export function useProfilePage() {
   })
 
   const addressForm = reactive<PutSelfAddressRequest>({
-    country: "Srbija",
+    country: "Serbia",
     city: "",
     zipCode: "",
     addressLine1: "",
@@ -64,7 +64,7 @@ export function useProfilePage() {
   }
 
   function applyAddress(value: CustomerAddressResponse | null) {
-    addressForm.country = value?.country?.trim() || "Srbija"
+    addressForm.country = "Serbia"
     addressForm.city = value?.city?.trim() || ""
     addressForm.zipCode = value?.zipCode?.trim() || ""
     addressForm.addressLine1 = value?.addressLine1?.trim() || ""
@@ -84,7 +84,7 @@ export function useProfilePage() {
     if (!response.ok || !response.data) {
       profileLoaded.value = false
       profileError.value =
-        response.error || "Podaci o kupcu trenutno nisu dostupni."
+        response.error || "Podaci o profilu trenutno nisu dostupni."
       if (!profileForm.systemUserId.trim()) {
         profileForm.systemUserId = auth.customerId.value || ""
       }
@@ -101,7 +101,7 @@ export function useProfilePage() {
     if (!response.ok) {
       if (response.status === 404) {
         addressInfo.value =
-          "Nemate sačuvanu adresu. Popunite formu i sačuvajte je."
+          "Nemate sačuvanu adresu. Popunite polja i sačuvajte adresu."
         applyAddress(null)
         return
       }
@@ -134,7 +134,7 @@ export function useProfilePage() {
 
     if (!profileLoaded.value) {
       profileError.value =
-        "Prvo osvežite stranicu da učitamo postojeće korisničke podatke."
+        "Najpre osvežite stranicu da bismo učitali postojeće podatke."
       return
     }
 
@@ -144,7 +144,7 @@ export function useProfilePage() {
     const birthDate = normalizeDate(profileForm.birthDate)
 
     if (!systemUserId || !firstName || !lastName || !birthDate) {
-      profileError.value = "Popunite sva obavezna polja u korisničkim podacima."
+      profileError.value = "Popunite sva obavezna polja u ličnim podacima."
       return
     }
 
@@ -162,12 +162,12 @@ export function useProfilePage() {
 
     if (!response.ok || !response.data) {
       profileError.value =
-        response.error || "Čuvanje korisničkih podataka nije uspelo."
+        response.error || "Čuvanje ličnih podataka nije uspelo."
       return
     }
 
     applyProfile(response.data)
-    profileSuccess.value = "Korisnički podaci su sačuvani."
+    profileSuccess.value = "Lični podaci su sačuvani."
   }
 
   async function saveAddress() {
@@ -177,7 +177,7 @@ export function useProfilePage() {
     addressSuccess.value = ""
 
     const payload: PutSelfAddressRequest = {
-      country: addressForm.country.trim(),
+      country: "Serbia",
       city: addressForm.city.trim(),
       zipCode: addressForm.zipCode.trim(),
       addressLine1: addressForm.addressLine1.trim(),
@@ -186,14 +186,13 @@ export function useProfilePage() {
     }
 
     if (
-      !payload.country ||
       !payload.city ||
       !payload.zipCode ||
       !payload.addressLine1 ||
       !payload.addressLine2 ||
       !payload.contactPhone
     ) {
-      addressError.value = "Popunite sva obavezna polja u adresi."
+      addressError.value = "Popunite sva obavezna polja za adresu."
       return
     }
 

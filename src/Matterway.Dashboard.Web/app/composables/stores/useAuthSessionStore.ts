@@ -203,14 +203,14 @@ export function useAuthSessionStore() {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => null)
-      throw new Error(payload?.title || "Login failed.")
+      throw new Error(payload?.title || "Prijava nije uspela.")
     }
 
     const data = (await response.json()) as LoginResponse
     setSession(data)
     if (!isEmployee.value) {
       clearSession()
-      throw new Error("Employee role required for dashboard access.")
+      throw new Error("Za pristup administraciji potrebna je uloga zaposlenog.")
     }
   }
 

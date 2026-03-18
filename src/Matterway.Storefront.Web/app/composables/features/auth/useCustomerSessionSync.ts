@@ -39,6 +39,9 @@ export function useCustomerSessionSync() {
 
     const customerId = auth.customerId.value?.trim() || null
     if (!auth.isLoggedIn.value || !auth.isCustomer.value || !customerId) {
+      if (syncedCustomerId.value) {
+        await cart.clear().catch(() => null)
+      }
       syncedCustomerId.value = null
       return { ok: true as const, skipped: true as const }
     }

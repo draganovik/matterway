@@ -27,14 +27,14 @@ function applySelection(next: string[]) {
 <template>
   <div class="grid gap-4">
     <div class="flex items-center justify-between gap-3">
-      <h3 class="text-foreground text-base font-semibold">Articles</h3>
+      <h3 class="text-foreground text-base font-semibold">Artikli</h3>
       <UButton
         color="primary"
         variant="outline"
         :disabled="!canEdit"
         @click="articleModalOpen = true"
       >
-        Select Articles
+        Izaberi artikle
       </UButton>
     </div>
 
@@ -42,7 +42,7 @@ function applySelection(next: string[]) {
       v-if="!selectedIds.length"
       class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
     >
-      No articles selected.
+      Nema izabranih artikala.
     </div>
 
     <div
@@ -50,7 +50,7 @@ function applySelection(next: string[]) {
       class="border-default bg-background rounded-lg border px-4 py-3"
     >
       <div class="text-foreground text-sm font-medium">
-        Selected Article IDs ({{ selectedIds.length }})
+        Izabrani artikli ({{ selectedIds.length }})
       </div>
       <div class="mt-2 flex flex-wrap gap-2">
         <UBadge
@@ -66,7 +66,7 @@ function applySelection(next: string[]) {
         v-if="selectedIds.length > previewIds.length"
         class="text-muted mt-2 text-xs"
       >
-        +{{ selectedIds.length - previewIds.length }} more
+        +{{ selectedIds.length - previewIds.length }} još
       </p>
     </div>
   </div>

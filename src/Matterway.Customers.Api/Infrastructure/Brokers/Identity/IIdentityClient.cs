@@ -7,6 +7,8 @@ public interface IIdentityClient
     Task<BrokerResponse<CreateCustomerUserResponse>> CreateCustomerUserAsync(
         CreateCustomerUserRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<BrokerResponse<bool>> DeleteCustomerUserAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
 public sealed record CreateCustomerUserRequest

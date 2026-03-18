@@ -58,7 +58,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
         />
       </div>
 
-      <UFormField label="Naziv">
+      <UFormField label="Pretraga">
         <UInput
           :model-value="filters.search"
           placeholder="npr. Philips Hue"
@@ -69,7 +69,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
       </UFormField>
 
       <div class="grid grid-cols-2 gap-3">
-        <UFormField label="Min cena">
+        <UFormField label="Minimalna cena">
           <UInputNumber
             :model-value="filters.minPrice ?? null"
             orientation="vertical"
@@ -84,7 +84,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             "
           />
         </UFormField>
-        <UFormField label="Max cena">
+        <UFormField label="Maksimalna cena">
           <UInputNumber
             :model-value="filters.maxPrice ?? null"
             orientation="vertical"
@@ -107,14 +107,14 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           <UButton
             type="button"
             color="neutral"
-            variant="soft"
+            variant="outline"
             icon="i-lucide-plus"
             :disabled="
               props.detailDefinitionsLoading || !props.detailDefinitions.length
             "
             @click="emit('addDetailFilter')"
           >
-            Dodaj
+            Dodaj filter
           </UButton>
         </div>
 

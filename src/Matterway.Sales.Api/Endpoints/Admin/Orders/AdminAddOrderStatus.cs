@@ -35,10 +35,18 @@ public class AdminAddOrderStatus : IEndpoint
         if (!await orderRepository.Exists(orderId, cancellationToken))
             return TypedResults.NotFound();
 
+        if (request.Status is null)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Order status could not be created.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Status is required."
+            });
+
         var status = new OrderStatus
         {
             OrderId = orderId,
-            Status = request.Status,
+            Status = request.Status.Value,
             Note = request.Note,
             ChangedAt = DateTime.UtcNow
         };
@@ -62,7 +70,7 @@ public class AdminAddOrderStatus : IEndpoint
     public record AddOrderStatusRequest
     {
         [Required]
-        public EOrderStatusType Status { get; init; }
+        public EOrderStatusType? Status { get; init; }
 
         public string? Note { get; init; }
     }

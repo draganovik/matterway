@@ -180,6 +180,14 @@ package "Customers" {
     +placedAt: DateTime
   }
 
+  note right of Customer
+    Public registration creates the
+    Identity user first, then the
+    Customer row. If the Customer
+    write fails, the Identity user
+    is deleted as cleanup.
+  end note
+
   CustomerOrder "0..*" -- "1" Customer : customerId
   Customer "1" -- "0..1" Address : customerId
   CustomerArticle "0..*" -- "1" Customer : customerId
@@ -225,9 +233,11 @@ package "Sales" {
     1) Storefront -> Storefront Server: POST /api/v1/orders
     2) Storefront Server -> Stripe: initialize payment intent
     3) Storefront Server -> Sales: POST /api/system/v1/orders (+ customer JWT + system key)
-    4) Sales generates OrderId and mirrors cart items in Customers
-    5) Storefront Server -> Stripe: attach metadata(order_id) + confirm payment intent
-    6) Stripe webhook -> Sales system/payment registration
+    4) Sales reserves or reuses a pending OrderId, then mirrors cart items in Customers
+    5) Sales updates the pending Order with items, delivery info, and Processing status
+    6) Storefront Server -> Stripe: attach metadata(order_id) + confirm payment intent
+    7) Stripe webhook -> Sales system/payment registration
+    Checkout delivery country is fixed to Serbia.
   end note
 
   enum EOrderType {

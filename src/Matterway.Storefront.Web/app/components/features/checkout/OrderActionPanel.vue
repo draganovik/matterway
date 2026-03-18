@@ -51,7 +51,7 @@ const expYearValue = computed({
     :ui="{ root: 'flex h-full flex-col', body: 'flex-1' }"
   >
     <template #header>
-      <h2 class="text-base font-semibold">Plaćanje i pregled porudžbine</h2>
+      <h2 class="text-base font-semibold">Plaćanje i potvrda porudžbine</h2>
     </template>
 
     <div class="space-y-6">
@@ -85,7 +85,7 @@ const expYearValue = computed({
         >
           <UIcon name="i-lucide-shield-check" class="text-primary h-4 w-4" />
           <span class="text-muted">
-            Bezbedna SSL naplata. Podaci o kartici se ne čuvaju.
+            Bezbedno plaćanje putem SSL zaštite. Podaci sa kartice se ne čuvaju.
           </span>
         </div>
 
@@ -104,7 +104,7 @@ const expYearValue = computed({
             />
           </UFormField>
 
-          <UFormField label="Mesec" required>
+          <UFormField label="Mesec isteka" required>
             <UInputNumber
               v-model="expMonthValue"
               orientation="vertical"
@@ -123,7 +123,7 @@ const expYearValue = computed({
             />
           </UFormField>
 
-          <UFormField label="Godina" required>
+          <UFormField label="Godina isteka" required>
             <UInputNumber
               v-model="expYearValue"
               orientation="vertical"
@@ -165,7 +165,7 @@ const expYearValue = computed({
         :loading="props.loading"
         @click="emit('submit')"
       >
-        {{ props.loading ? "Obrada..." : "Plati i poruči" }}
+        {{ props.loading ? "Obrada plaćanja" : "Plati i poruči" }}
       </UButton>
     </template>
   </UCard>

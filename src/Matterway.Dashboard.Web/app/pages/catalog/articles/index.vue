@@ -2,7 +2,7 @@
 import { useCatalogArticlesPage } from "~/composables/features/catalog/useCatalogArticlesPage"
 
 definePageMeta({
-  title: "Articles",
+  title: "Artikli",
   service: "catalog",
   permissions: ["observer", "operator", "manager"],
 })
@@ -32,7 +32,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Articles">
+      <UDashboardNavbar title="Artikli">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -47,11 +47,11 @@ const {
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Browse Articles
+                Pregled artikala
               </h2>
               <p class="text-muted text-sm">
-                Search existing articles and enrich a selected article with
-                images and details.
+                Pretražite postojeće artikle i dopunite izabrani artikal slikama
+                i detaljima.
               </p>
             </div>
 
@@ -60,7 +60,7 @@ const {
               :disabled="!canEdit"
               @click="createModalOpen = true"
             >
-              Create New
+              Novi artikal
             </UButton>
           </div>
 

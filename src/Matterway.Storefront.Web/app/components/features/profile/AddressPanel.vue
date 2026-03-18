@@ -28,18 +28,17 @@ const emit = defineEmits<{
 <template>
   <UCard class="border-default border">
     <template #header>
-      <h2 class="text-base font-semibold">Adresa</h2>
+      <h2 class="text-base font-semibold">Adresa za isporuku</h2>
     </template>
 
     <form class="space-y-4" @submit.prevent="emit('save')">
       <div class="grid gap-4 sm:grid-cols-2">
         <UFormField label="Država" required>
           <UInput
-            v-model="form.country"
-            placeholder="npr. Srbija"
+            :model-value="form.country === 'Serbia' ? 'Srbija' : form.country"
             class="w-full"
-            :disabled="disabled || loading"
-            required
+            readonly
+            disabled
           />
         </UFormField>
 
@@ -63,7 +62,7 @@ const emit = defineEmits<{
           />
         </UFormField>
 
-        <UFormField label="Telefon" required>
+        <UFormField label="Kontakt telefon" required>
           <UInput
             v-model="form.contactPhone"
             placeholder="npr. +381 64 123 4567"
@@ -84,7 +83,7 @@ const emit = defineEmits<{
         />
       </UFormField>
 
-      <UFormField label="Stan, sprat i dodatak" required>
+      <UFormField label="Stan, sprat ili dodatak" required>
         <UInput
           v-model="form.addressLine2"
           placeholder="npr. Stan 12, 3. sprat"
@@ -102,7 +101,7 @@ const emit = defineEmits<{
         :loading="loading"
         :disabled="disabled"
       >
-        Sačuvaj adresu
+        {{ loading ? "Čuvanje adrese" : "Sačuvaj adresu" }}
       </UButton>
     </form>
   </UCard>

@@ -9,8 +9,10 @@ public class EfPgCustomerOrderRepository(CustomersDbComposer context) : ICustome
         CancellationToken cancellationToken = default)
     {
         var existing = await context.CustomerOrder
-            .AnyAsync(order => order.OrderId == orderId, cancellationToken);
-        if (existing) return null;
+            .Include(order => order.Items)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(order => order.OrderId == orderId, cancellationToken);
+        if (existing is not null) return existing;
 
         var cartItems = await context.CustomerArticle
             .Where(article => article.CustomerId == customerId && article.OrderId == null)

@@ -41,7 +41,7 @@ export function useCatalogArchivePage() {
 
     if (!file.name.toLowerCase().endsWith(".zip")) {
       importFile.value = null
-      importState.error = "Only .zip archives are supported."
+      importState.error = "Podržane su samo .zip arhive."
       return
     }
 
@@ -52,7 +52,7 @@ export function useCatalogArchivePage() {
     resetExportMessages()
 
     if (!canOperate.value) {
-      exportState.error = "Manager permission is required."
+      exportState.error = "Potrebna je dozvola menadžera."
       return
     }
 
@@ -61,7 +61,7 @@ export function useCatalogArchivePage() {
     exportState.loading = false
 
     if (!result.ok || !result.data) {
-      exportState.error = result.error || "Unable to export archive."
+      exportState.error = result.error || "Izvoz arhive nije uspeo."
       return
     }
 
@@ -74,19 +74,19 @@ export function useCatalogArchivePage() {
     link.remove()
     URL.revokeObjectURL(downloadUrl)
 
-    exportState.success = `Archive exported: ${link.download}`
+    exportState.success = `Arhiva je uspešno izvezena: ${link.download}`
   }
 
   async function importArchive() {
     resetImportMessages()
 
     if (!canOperate.value) {
-      importState.error = "Manager permission is required."
+      importState.error = "Potrebna je dozvola menadžera."
       return
     }
 
     if (!importFile.value) {
-      importState.error = "Select a .zip archive file first."
+      importState.error = "Najpre izaberite .zip arhivu."
       return
     }
 
@@ -95,7 +95,7 @@ export function useCatalogArchivePage() {
     importState.loading = false
 
     if (!result.ok || !result.data) {
-      importState.error = result.error || "Unable to import archive."
+      importState.error = result.error || "Uvoz arhive nije uspeo."
       return
     }
 
@@ -103,7 +103,7 @@ export function useCatalogArchivePage() {
   }
 
   function formatImportSummary(summary: ImportCatalogArchiveResponse) {
-    return `Imported successfully. Articles: ${summary.articleCount}, Details: ${summary.detailCount}, Discounts: ${summary.discountCount}, Text details: ${summary.articleDetailTextCount}, Numeric details: ${summary.articleDetailNumericCount}, Images: ${summary.articleImageCount}.`
+    return `Uvoz je uspešno završen. Artikli: ${summary.articleCount}, detalji: ${summary.detailCount}, popusti: ${summary.discountCount}, tekstualni detalji: ${summary.articleDetailTextCount}, numerički detalji: ${summary.articleDetailNumericCount}, slike: ${summary.articleImageCount}.`
   }
 
   return {

@@ -2,7 +2,7 @@
 import { useUsersCustomersPage } from "~/composables/features/users/useUsersCustomersPage"
 
 definePageMeta({
-  title: "Customers",
+  title: "Kupci",
   service: "customers",
   permissions: ["observer", "operator", "manager"],
 })
@@ -40,7 +40,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Customers">
+      <UDashboardNavbar title="Kupci">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -55,11 +55,11 @@ const {
           >
             <div>
               <h2 class="text-foreground text-base font-semibold">
-                Manage Customers
+                Upravljanje kupcima
               </h2>
               <p class="text-muted text-sm">
-                Browse customer profiles, edit selected records, and remove
-                invalid entries.
+                Pregledajte profile kupaca, uređujte izabrane zapise i
+                uklanjajte neispravne unose.
               </p>
             </div>
 
@@ -68,7 +68,7 @@ const {
               :disabled="!canEdit"
               @click="createModalOpen = true"
             >
-              Create New
+              Novi kupac
             </UButton>
           </div>
 

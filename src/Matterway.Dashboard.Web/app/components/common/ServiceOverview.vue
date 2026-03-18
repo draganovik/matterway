@@ -20,7 +20,7 @@ defineProps<{
       <UButton
         v-if="features[0]"
         :to="features[0].route"
-        label="Open first feature"
+        label="Otvori prvu opciju"
         color="neutral"
         class="w-fit lg:ms-auto"
       />
@@ -36,8 +36,8 @@ defineProps<{
     >
       <template #header>
         <div class="flex items-center justify-between">
-          <p class="text-foreground text-sm font-medium">Available features</p>
-          <span class="text-muted text-xs">{{ features.length }} total</span>
+          <p class="text-foreground text-sm font-medium">Dostupne opcije</p>
+          <span class="text-muted text-xs">Ukupno: {{ features.length }}</span>
         </div>
       </template>
 
@@ -52,7 +52,7 @@ defineProps<{
             <span class="bg-primary/70 h-2 w-2 rounded-full" />
             <span class="text-foreground font-medium">{{ feature.label }}</span>
           </div>
-          <span class="text-muted text-xs">Open</span>
+          <span class="text-muted text-xs">Otvori</span>
         </NuxtLink>
       </div>
     </UPageCard>

@@ -26,7 +26,7 @@ watch(
 )
 
 const displayOrder = computed(() =>
-  isOpen.value ? props.order : props.order ?? cachedOrder.value,
+  isOpen.value ? props.order : (props.order ?? cachedOrder.value),
 )
 
 const items = computed(() => displayOrder.value?.items ?? [])

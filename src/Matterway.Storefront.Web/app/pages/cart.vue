@@ -34,10 +34,10 @@ await initialize()
     <EmptyState
       v-if="isEmpty"
       title="Korpa je prazna"
-      description="Dodajte artikle iz kataloga da nastavite."
+      description="Dodajte artikle iz kataloga da biste nastavili kupovinu."
       icon="i-lucide-shopping-cart"
     >
-      <UButton to="/articles" color="primary">Pregledaj artikle</UButton>
+      <UButton to="/articles" color="primary">Pogledaj artikle</UButton>
     </EmptyState>
 
     <div v-else class="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">

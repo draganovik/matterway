@@ -7,6 +7,8 @@ type LoginForm = {
   password: string
 }
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export function useAuthLoginPage() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
@@ -29,11 +31,29 @@ export function useAuthLoginPage() {
 
   async function submit() {
     error.value = ""
+    const email = model.email.trim()
+    const password = model.password
+
+    if (!email) {
+      error.value = "Unesite imejl adresu."
+      return
+    }
+
+    if (!emailPattern.test(email)) {
+      error.value = "Imejl adresa nije u ispravnom formatu."
+      return
+    }
+
+    if (!password.trim()) {
+      error.value = "Unesite lozinku."
+      return
+    }
+
     loading.value = true
     try {
       await auth.login({
-        email: model.email,
-        password: model.password,
+        email,
+        password,
       })
 
       await cart.mergeGuestItemsIntoRemote().catch(() => null)

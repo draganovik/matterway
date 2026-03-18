@@ -8,6 +8,7 @@ import type { ServiceSection } from "~/types/services/definitions"
 import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { permissionServices } from "~/data/serviceRegistry"
+import { formatPermissionLevel, formatServiceName } from "~/utils/labels"
 
 type PermissionForm = {
   service: ServiceSection["service"]
@@ -41,8 +42,8 @@ const resettingService = ref<string | null>(null)
 const serviceOptions = permissionServices
 
 const setLevelOptions: Array<{ label: string; value: SystemUserPermLevel }> = [
-  { label: "Operator", value: "Operator" },
-  { label: "Manager", value: "Manager" },
+  { label: "Operater", value: "Operator" },
+  { label: "Menadžer", value: "Manager" },
 ]
 
 const form = ref<PermissionForm>({
@@ -51,9 +52,7 @@ const form = ref<PermissionForm>({
   level: "Operator",
 })
 
-const displayLabel = computed(
-  () => props.userLabel.trim() || "Selected account",
-)
+const displayLabel = computed(() => props.userLabel.trim() || "Izabrani nalog")
 
 function permissionKey(permission: SystemUserPermResponse) {
   return permission.service.toLowerCase()
@@ -116,7 +115,7 @@ function resetModalState() {
 async function loadPermissions() {
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    loadState.error = "Select an account first."
+    loadState.error = "Najpre izaberite nalog."
     permissions.value = []
     notFound.value = false
     return
@@ -137,7 +136,7 @@ async function loadPermissions() {
       return
     }
 
-    loadState.error = result.error || "Unable to reveal permissions."
+    loadState.error = result.error || "Učitavanje dozvola nije uspelo."
     return
   }
 
@@ -161,7 +160,7 @@ async function setPermission() {
 
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    saveState.error = "Select an account first."
+    saveState.error = "Najpre izaberite nalog."
     return
   }
 
@@ -171,7 +170,7 @@ async function setPermission() {
   }
 
   if (!payload.service) {
-    saveState.error = "Select a service."
+    saveState.error = "Izaberite servis."
     return
   }
 
@@ -180,7 +179,7 @@ async function setPermission() {
   saveState.loading = false
 
   if (!result.ok) {
-    saveState.error = result.error || "Unable to set permission."
+    saveState.error = result.error || "Čuvanje dozvole nije uspelo."
     return
   }
 
@@ -189,7 +188,7 @@ async function setPermission() {
     : permissions.value
   if (!result.data) applyLocalPermission(payload.service, payload.level)
 
-  saveState.success = "Permission updated."
+  saveState.success = "Dozvola je uspešno ažurirana."
 }
 
 async function resetPermission(permission: SystemUserPermResponse) {
@@ -199,7 +198,7 @@ async function resetPermission(permission: SystemUserPermResponse) {
 
   const systemUserId = props.systemUserId?.trim()
   if (!systemUserId) {
-    resetState.error = "Select an account first."
+    resetState.error = "Najpre izaberite nalog."
     return
   }
 
@@ -215,7 +214,7 @@ async function resetPermission(permission: SystemUserPermResponse) {
   resettingService.value = null
 
   if (!result.ok) {
-    resetState.error = result.error || "Unable to reset permission."
+    resetState.error = result.error || "Resetovanje dozvole nije uspelo."
     return
   }
 
@@ -224,7 +223,7 @@ async function resetPermission(permission: SystemUserPermResponse) {
     : permissions.value
   if (!result.data) applyLocalPermission(permission.service, "Observer")
 
-  resetState.success = "Permission reset to Observer."
+  resetState.success = "Dozvola je vraćena na nivo pregleda."
 }
 
 useModalCloseReset({
@@ -241,11 +240,9 @@ useModalCloseReset({
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
-          Account Permissions
-        </h3>
+        <h3 class="text-foreground text-base font-semibold">Dozvole naloga</h3>
         <p class="text-muted text-sm">
-          Revealed permissions for {{ displayLabel }}.
+          Pregled dozvola za nalog {{ displayLabel }}.
         </p>
       </div>
     </template>
@@ -254,21 +251,21 @@ useModalCloseReset({
       <div class="space-y-4">
         <StatusMessages
           v-if="loadState.loading || loadState.error"
-          :loading="loadState.loading ? 'Revealing permissions.' : false"
+          :loading="loadState.loading ? 'Učitavanje dozvola.' : false"
           :error="loadState.error"
         />
 
         <EntitiesEmptyState
           v-else-if="notFound"
-          title="Account not found"
-          description="The selected account could not be loaded."
+          title="Nalog nije pronađen"
+          description="Izabrani nalog nije moguće učitati."
         />
 
         <template v-else>
           <EntitiesEmptyState
             v-if="!permissions.length"
-            title="No permissions found"
-            description="This user has no employee service permissions."
+            title="Nema dozvola"
+            description="Ovaj korisnik nema dodeljene dozvole po servisima."
           />
 
           <div v-else class="space-y-2">
@@ -279,10 +276,10 @@ useModalCloseReset({
             >
               <div>
                 <p class="text-foreground text-sm font-medium">
-                  {{ permission.service }}
+                  {{ formatServiceName(permission.service) }}
                 </p>
                 <p class="text-muted text-xs">
-                  {{ permission.level }}
+                  {{ formatPermissionLevel(permission.level) }}
                 </p>
               </div>
 
@@ -297,7 +294,12 @@ useModalCloseReset({
                 "
                 @click="resetPermission(permission)"
               >
-                Reset to Observer
+                {{
+                  resetState.loading &&
+                  resettingService === permission.service.toLowerCase()
+                    ? "Vraćanje na pregled"
+                    : "Vrati na pregled"
+                }}
               </UButton>
             </div>
           </div>
@@ -307,29 +309,29 @@ useModalCloseReset({
             class="border-default/70 space-y-3 rounded-lg border p-3"
           >
             <h4 class="text-foreground text-sm font-semibold">
-              Set Permission
+              Podesi dozvolu
             </h4>
 
             <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
-              <UFormField label="Service" required>
+              <UFormField label="Servis" required>
                 <USelectMenu
                   v-model="form.service"
                   :items="serviceOptions"
                   value-key="value"
                   label-key="label"
-                  placeholder="Select service"
+                  placeholder="Izaberite servis"
                   class="w-full"
                   :disabled="saveState.loading"
                 />
               </UFormField>
 
-              <UFormField label="Permission" required>
+              <UFormField label="Dozvola" required>
                 <USelectMenu
                   v-model="form.level"
                   :items="setLevelOptions"
                   value-key="value"
                   label-key="label"
-                  placeholder="Select permission"
+                  placeholder="Izaberite dozvolu"
                   class="w-full"
                   :disabled="saveState.loading"
                 />
@@ -341,7 +343,7 @@ useModalCloseReset({
                 class="md:mb-0.5"
                 @click="setPermission"
               >
-                Save
+                {{ saveState.loading ? "Čuvanje dozvole" : "Sačuvaj dozvolu" }}
               </UButton>
             </div>
 
@@ -352,7 +354,7 @@ useModalCloseReset({
           </div>
 
           <p v-else class="text-muted text-sm">
-            Manager permission is required to change permissions.
+            Za izmenu dozvola potrebna je dozvola menadžera.
           </p>
         </template>
       </div>
@@ -360,7 +362,7 @@ useModalCloseReset({
 
     <template #footer>
       <div class="flex w-full justify-end">
-        <UButton variant="ghost" @click="isOpen = false">Close</UButton>
+        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
       </div>
     </template>
   </UModal>

@@ -6,6 +6,8 @@ namespace Matterway.Customers.Api.Endpoints.Self.CartItems;
 
 public class SelfQueryCartItems : IEndpoint
 {
+    private const string RouteName = nameof(SelfQueryCartItems);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "cart/items", Handler)
@@ -33,7 +35,7 @@ public class SelfQueryCartItems : IEndpoint
         var entities = await cartItemRepository.QueryCart(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize);
 
-        var baseUri = linkGenerator.GetUriByName(httpContext, "QueryCartItems", null);
+        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName, null);
         var response = entities.Select(MapToResponse).ToList();
 
         var paginationResponse = PaginationResponse<CartItemResponse>.Create(

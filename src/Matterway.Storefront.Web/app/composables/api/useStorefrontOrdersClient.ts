@@ -53,7 +53,7 @@ function readErrorMessage(payload: unknown): string | undefined {
 function noSessionResult(): CheckoutOrderResult {
   return {
     ok: false,
-    error: "User session is unavailable.",
+    error: "Sesija je istekla. Prijavite se ponovo.",
   }
 }
 
@@ -63,7 +63,7 @@ function buildCreateOrderPayload(payload: CreateCheckoutOrderRequest) {
     order: {
       type: "Ecommerce" as const,
       deliveryInfo: {
-        country: payload.address.country || "Serbia",
+        country: "Serbia",
         city: payload.address.city,
         zipCode: payload.address.zipCode,
         addressLine1: payload.address.street,
@@ -87,7 +87,7 @@ function buildCreateOrderPayload(payload: CreateCheckoutOrderRequest) {
       street: payload.address.street,
       city: payload.address.city,
       zipCode: payload.address.zipCode,
-      country: payload.address.country || undefined,
+      country: "Serbia",
       contactPhone: payload.address.contactPhone || undefined,
       note: payload.address.note || undefined,
     },

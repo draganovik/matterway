@@ -2,7 +2,7 @@
 import { useCatalogArchivePage } from "~/composables/features/catalog/useCatalogArchivePage"
 
 definePageMeta({
-  title: "Catalog Data",
+  title: "Arhiva kataloga",
   service: "catalog",
   permissions: ["operator", "manager"],
 })
@@ -26,7 +26,7 @@ const {
     :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
   >
     <template #header>
-      <UDashboardNavbar title="Catalog Data">
+      <UDashboardNavbar title="Arhiva kataloga">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -38,11 +38,11 @@ const {
         <div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto">
           <div>
             <h2 class="text-foreground text-base font-semibold">
-              Catalog Data
+              Arhiva kataloga
             </h2>
             <p class="text-muted text-sm">
-              Export or import catalog records and article images as a zip
-              archive.
+              Izvezite ili uvezite podatke kataloga i slike artikala kao ZIP
+              arhivu.
             </p>
           </div>
 

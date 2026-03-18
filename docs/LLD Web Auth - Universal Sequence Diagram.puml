@@ -22,6 +22,8 @@ Storefront variant:
 - Unauthenticated redirect: /login?next=...
 - After auth restore, a customer-session hook syncs the remote cart once;
   cart and checkout also force a sync on entry.
+- Guest cart is merged after successful login/register.
+- Cart is cleared when storefront auth is lost.
 
 Dashboard variant:
 - Required role: employee
@@ -55,7 +57,7 @@ alt Login succeeds and role matches app policy
     deactivate Registry
     Page --> User : 1.6.1.6 Navigate to first authorized route
   else Storefront
-    Page -> Page : 1.6.1.4 optional post-login cleanup (for example cart clear)
+    Page -> Page : 1.6.1.4 merge guest cart into remote cart
     Page --> User : 1.6.1.5 Navigate to next route (or "/")
   end
 else Login fails
@@ -203,7 +205,8 @@ deactivate IdentityApi
 AuthStore -> AuthStore : 4.5 clearSession() + remove refresh cookie
 AuthStore --> Page : 4.6 return logout completed
 deactivate AuthStore
-Page --> User : 4.7 Navigate to app logout target
+Page -> Page : 4.7 clear cart on auth loss
+Page --> User : 4.8 Navigate to app logout target
 deactivate Page
 
 @enduml

@@ -16,7 +16,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      titleTemplate: "%s - Matterway prodavnica",
+      titleTemplate: "%s - Matterway Prodavnica",
       link: [{ rel: "icon", href: "/favicon.svg" }],
     },
   },

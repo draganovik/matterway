@@ -2,7 +2,7 @@
 import { useOverviewPage } from "~/composables/features/overview/useOverviewPage"
 
 definePageMeta({
-  title: "Pregled",
+  title: "Početna",
   public: true,
 })
 
@@ -38,7 +38,7 @@ await initialize()
           variant="ghost"
           trailing-icon="i-lucide-arrow-right"
         >
-          Prikaži sve
+          Svi artikli
         </UButton>
       </div>
 

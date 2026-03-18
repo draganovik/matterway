@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
+using Matterway.Identity.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 namespace Matterway.Identity.Api.Endpoints.System.Users;
@@ -25,9 +26,13 @@ public class SystemCreateCustomerUser : IEndpoint
             CreateUserRequest request,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
+            CancellationToken cancellationToken,
+            IdentityDbComposer identityDb,
             UserManager<SystemUser> userManager,
             RoleManager<IdentityRole<Guid>> roleManager)
     {
+        await using var transaction = await identityDb.Database.BeginTransactionAsync(cancellationToken);
+
         var systemUser = new SystemUser
         {
             Email = request.Email,
@@ -45,7 +50,9 @@ public class SystemCreateCustomerUser : IEndpoint
             return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
                 roleResult.Errors.Select(error => error.Description))));
 
-        var location = linkGenerator.GetPathByName(httpContext, "SystemCreateCustomerUser",
+        await transaction.CommitAsync(cancellationToken);
+
+        var location = linkGenerator.GetUriByName(httpContext, "AdminGetSystemUserById",
             new { id = systemUser.Id });
 
         return TypedResults.Created(location, new CreateUserResponse

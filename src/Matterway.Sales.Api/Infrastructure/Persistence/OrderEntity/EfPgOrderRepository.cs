@@ -16,11 +16,58 @@ public sealed class EfPgOrderRepository(SalesDbComposer context) : IOrderReposit
         return null;
     }
 
+    public async Task<Order?> Update(Order requestModel, CancellationToken cancellationToken = default)
+    {
+        var existing = await QueryWithDetails()
+            .FirstOrDefaultAsync(order => order.Id == requestModel.Id, cancellationToken);
+        if (existing is null) return null;
+
+        existing.CustomerId = requestModel.CustomerId;
+        existing.Type = requestModel.Type;
+
+        if (existing.DeliveryInfo is not null)
+        {
+            context.OrderDeliveryInfo.Remove(existing.DeliveryInfo);
+            existing.DeliveryInfo = null;
+        }
+
+        if (existing.Items.Count > 0)
+        {
+            context.OrderItem.RemoveRange(existing.Items);
+            existing.Items.Clear();
+        }
+
+        if (requestModel.DeliveryInfo is not null)
+            context.OrderDeliveryInfo.Add(requestModel.DeliveryInfo);
+
+        if (requestModel.Items.Count > 0)
+            context.OrderItem.AddRange(requestModel.Items);
+
+        var affected = await context.SaveChangesAsync(cancellationToken);
+        if (affected > 0)
+            return await QueryWithDetails()
+                .FirstOrDefaultAsync(order => order.Id == requestModel.Id, cancellationToken);
+
+        return null;
+    }
+
     public async Task<Order?> GetById(OrderId id, CancellationToken cancellationToken = default)
     {
         return await QueryWithDetails()
             .AsNoTracking()
             .FirstOrDefaultAsync(order => order.Id == id, cancellationToken);
+    }
+
+    public async Task<Order?> GetPendingByCustomerId(Guid customerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Order
+            .AsNoTracking()
+            .Where(order => order.CustomerId == customerId &&
+                            !order.Items.Any() &&
+                            !order.Payments.Any())
+            .OrderByDescending(order => order.PlacedAt)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<ICollection<Order>> Query(int pageIndex, int pageSize, Guid? customerId,

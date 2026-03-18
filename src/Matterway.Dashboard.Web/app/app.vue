@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const appTitle = "Matterway Dashboard"
+const appTitle = "Matterway Administracija"
 const route = useRoute()
 const pageTitle = computed(() => {
   const title = route.meta?.title
@@ -28,7 +28,7 @@ useHead({
   ],
   link: [{ rel: "icon", href: "/favicon.svg" }],
   htmlAttrs: {
-    lang: "en",
+    lang: "sr",
   },
 })
 </script>
