@@ -34,12 +34,17 @@ public class AdminDeleteArticle : IEndpoint
 
         var isDeleted = await articleRepository.Delete(code, cancellationToken);
         if (!isDeleted)
+        {
+            var existingArticle = await articleRepository.GetBy(code, cancellationToken);
+            if (existingArticle is null) return TypedResults.NotFound();
+
             return TypedResults.Problem(new ProblemDetails
             {
                 Title = "Unable to delete article",
                 Status = StatusCodes.Status500InternalServerError,
                 Detail = "The article could not be deleted."
             });
+        }
 
         foreach (var imageId in imageIds)
             try

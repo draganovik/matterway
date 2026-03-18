@@ -39,12 +39,17 @@ public class AdminRemoveArticleImage : IEndpoint
 
         var isDeleted = await articleImageRepository.Delete(article, orderIndex, cancellationToken);
         if (!isDeleted)
+        {
+            var existingImage = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
+            if (existingImage is null) return TypedResults.NotFound();
+
             return TypedResults.Problem(new ProblemDetails
             {
                 Title = "Unable to delete article image",
                 Status = StatusCodes.Status500InternalServerError,
                 Detail = "The image could not be removed."
             });
+        }
 
         try
         {

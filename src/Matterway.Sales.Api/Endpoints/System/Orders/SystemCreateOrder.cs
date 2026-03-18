@@ -21,6 +21,8 @@ public class SystemCreateOrder : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status502BadGateway)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
             .ProducesValidationProblem()
             .RequireSystemAccessKey()
@@ -92,10 +94,16 @@ public class SystemCreateOrder : IEndpoint
                     Status = StatusCodes.Status400BadRequest,
                     Detail = detail
                 }),
+                HttpStatusCode.ServiceUnavailable => TypedResults.Problem(new ProblemDetails
+                {
+                    Title = "Customer order could not be created.",
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    Detail = detail
+                }),
                 _ => TypedResults.Problem(new ProblemDetails
                 {
                     Title = "Customer order could not be created.",
-                    Status = (int)statusCode,
+                    Status = StatusCodes.Status502BadGateway,
                     Detail = detail
                 })
             };
