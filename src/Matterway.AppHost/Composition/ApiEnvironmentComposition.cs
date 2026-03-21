@@ -13,18 +13,16 @@ internal static class ApiEnvironmentComposition
         IEnumerable<string>? fallbackCorsOrigins = null)
     {
         var corsAllowedOrigins = configuration
-                                     .GetSection("Cors:AllowedOrigins")
-                                     .Get<string[]>()?
-                                     .Where(origin => !string.IsNullOrWhiteSpace(origin))
-                                     .ToArray();
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>()?
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .ToArray();
 
         if (corsAllowedOrigins is null or { Length: 0 })
-        {
             corsAllowedOrigins = fallbackCorsOrigins?
                                      .Where(origin => !string.IsNullOrWhiteSpace(origin))
                                      .ToArray()
                                  ?? [];
-        }
 
         foreach (var api in apis)
         {
