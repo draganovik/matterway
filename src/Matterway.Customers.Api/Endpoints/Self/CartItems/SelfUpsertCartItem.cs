@@ -67,10 +67,8 @@ public class SelfUpsertCartItem : IEndpoint
             UnitPrice = resolvedPrice
         };
 
-        var stored = await cartItemRepository.UpsertCartItem(entity, cancellationToken);
-        return stored is not null
-            ? TypedResults.Ok(MapToResponse(stored))
-            : TypedResults.NotFound();
+        var stored = (await cartItemRepository.UpsertCartItem(entity, cancellationToken))!;
+        return TypedResults.Ok(MapToResponse(stored));
     }
 
     public record CartItemResponse

@@ -9,8 +9,7 @@ public class EfPgCustomerRepository(CustomersDbComposer context) : ICustomerRepo
     {
         context.Customer.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1) return await context.Customer.FindAsync([requestModel.Id], cancellationToken);
-        return null;
+        return affected == 1 ? requestModel : null;
     }
 
     public async Task<ICollection<Customer>> Query(int pageIndex, int pageSize,
@@ -26,8 +25,7 @@ public class EfPgCustomerRepository(CustomersDbComposer context) : ICustomerRepo
     {
         context.Customer.Update(entity);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected == 1) return await context.Customer.FindAsync([entity.Id], cancellationToken);
-        return null;
+        return affected == 1 ? entity : null;
     }
 
     public async Task<bool> Delete(Guid id, CancellationToken cancellationToken = default)
@@ -45,8 +43,9 @@ public class EfPgCustomerRepository(CustomersDbComposer context) : ICustomerRepo
 
     public async Task<Customer?> GetBySuid(Guid systemUserId, CancellationToken cancellationToken = default)
     {
-        return await context.Customer.FirstOrDefaultAsync(model => model.Id == systemUserId,
-            cancellationToken);
+        return await context.Customer.AsNoTracking()
+            .FirstOrDefaultAsync(model => model.Id == systemUserId,
+                cancellationToken);
     }
 
     public Task<int> Count(CancellationToken cancellationToken = default)

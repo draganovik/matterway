@@ -26,6 +26,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Runtime values are injected from container env at startup.
     stripeSecretKey: "",
+    serverIdentityApiBaseUrl: "",
+    serverCatalogApiBaseUrl: "",
+    serverCustomersApiBaseUrl: "",
     serverSalesApiBaseUrl: "",
     systemAccessKey: "",
     public: {

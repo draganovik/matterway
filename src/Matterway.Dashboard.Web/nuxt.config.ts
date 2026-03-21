@@ -32,6 +32,10 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Runtime values are injected from container env at startup.
+    serverIdentityApiBaseUrl: "",
+    serverCatalogApiBaseUrl: "",
+    serverCustomersApiBaseUrl: "",
+    serverSalesApiBaseUrl: "",
     public: {
       identityApiBaseUrl: "",
       catalogApiBaseUrl: "",

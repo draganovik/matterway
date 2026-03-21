@@ -11,17 +11,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
     {
         context.Article.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected > 0)
-            return await context.Article
-                .Include(x => x.Discounts)
-                .Include(x => x.ArticleDetailTexts!)
-                .ThenInclude(pd => pd!.Detail)
-                .Include(x => x.ArticleDetailNumerics!)
-                .ThenInclude(pd => pd!.Detail)
-                .Include(x => x.ArticleImages)
-                .FirstOrDefaultAsync(x => x.ArticleCode == requestModel.ArticleCode, cancellationToken);
-
-        return null;
+        return affected > 0 ? requestModel : null;
     }
 
     public async Task<bool> Delete(ArticleCode code, CancellationToken cancellationToken = default)
@@ -122,9 +112,9 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         var articleQuery = context.Article.AsQueryable().ApplyArticleRsql(filter);
         var now = DateTime.UtcNow;
         return await articleQuery
-            .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
             .AsNoTracking()
-            .Include(x => x.ArticleImages).AsNoTracking()
+            .Include(x => x.Discounts.Where(d => d.ValidFrom <= now && (d.ValidTo == null || d.ValidTo >= now)))
+            .Include(x => x.ArticleImages)
             .OrderByDescending(x => x.CreatedAt)
             .ThenBy(x => x.ArticleCode)
             .Skip((pageIndex - 1) * pageSize)

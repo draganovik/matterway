@@ -43,14 +43,7 @@ public class AdminPutAddressByCustomer : IEndpoint
         if (!isCreate)
             ApplyUpdates(entity, request);
 
-        var saved = await addressRepository.Upsert(entity, cancellationToken);
-        if (saved is null)
-            return TypedResults.BadRequest(new ProblemDetails
-            {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Cannot upsert address."
-            });
+        var saved = (await addressRepository.Upsert(entity, cancellationToken))!;
 
         if (customer.DefaultAddressId != saved.Id)
         {

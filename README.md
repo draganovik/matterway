@@ -158,10 +158,15 @@ npm install --prefix src/Matterway.Dashboard.Web
 
 This section is for local development.
 
-AppHost currently includes shared defaults in `src/Matterway.AppHost/appsettings.json`.
-You can add optional environment-specific overrides in the same folder (for example
-`appsettings.Development.json`, `appsettings.Production.json`, or other
-`appsettings.{Environment}.json` files) for non-secret values.
+AppHost loads non-secret environment settings from:
+- `src/Matterway.AppHost/appsettings.json`
+- `src/Matterway.AppHost/appsettings.{Environment}.json`
+
+For local runs, defaults are provided in:
+- `src/Matterway.AppHost/appsettings.Development.json`
+
+For production-like setup, copy and customize:
+- `src/Matterway.AppHost/appsettings.Production.json`
 
 Set required secret parameters via user-secrets:
 
@@ -177,8 +182,24 @@ dotnet user-secrets set "Parameters:StripeSecretKey" "<value>" --project src/Mat
 For deployed environments, prefer environment variables or your platform's secret
 store for sensitive values.
 
-Optional non-secret configuration:
-- `Apis:AccessOrigins:*`
+Required non-secret topology keys (in AppHost appsettings):
+- `Services:AspireDashboard:*`
+- `Services:Postgres:*`
+- `Services:Minio:*`
+- `Services:Identity:*`
+- `Services:Catalog:*`
+- `Services:Customers:*`
+- `Services:Sales:*`
+- `Services:Storefront:*`
+- `Services:Dashboard:*`
+
+Required shared security key in each API appsettings:
+- `Security:SystemAccessKey`
+
+The same key is also present in each service project's `Properties/appsettings*.json`
+for standalone API runs.
+
+Optional browser CORS allowlist (used outside Development):
 - `Cors:AllowedOrigins`
 
 ------------------------------------------------------------------------

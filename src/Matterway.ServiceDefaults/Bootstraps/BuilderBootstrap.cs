@@ -13,8 +13,10 @@ public static class BuilderBootstrap
     public static WebApplicationBuilder CreateBuilder(string[] args, bool? throwOnBadRequest = null)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var environmentName = builder.Environment.EnvironmentName;
 
         builder.Configuration.AddJsonFile("Properties/appsettings.json", true, true);
+        builder.Configuration.AddJsonFile($"Properties/appsettings.{environmentName}.json", true, true);
         builder.Configuration.AddEnvironmentVariables();
 
         if (args.Length > 0)

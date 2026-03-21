@@ -6,6 +6,7 @@ import {
 } from "~/utils/jwt"
 import type { AuthSession, LoginResponse } from "~/types/auth/session"
 import type { PermissionLevel } from "~/types/services/definitions"
+import type { RuntimeConfig } from "nuxt/schema"
 
 const refreshCookieName = "mw_refresh"
 const authPath = "/api/public/v1/auth"
@@ -15,6 +16,10 @@ const authJsonHeaders = {
 } as const
 
 const allPermissions: PermissionLevel[] = ["observer", "operator", "manager"]
+
+type DashboardRuntimeConfig = RuntimeConfig & {
+  serverIdentityApiBaseUrl?: string
+}
 
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
@@ -72,7 +77,7 @@ function normalizePermissionLevel(raw: string): PermissionLevel | null {
 }
 
 export function useAuthSessionStore() {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig() as DashboardRuntimeConfig
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
@@ -108,7 +113,15 @@ export function useAuthSessionStore() {
   )
 
   function getAuthBaseUrl() {
-    return `${config.public.identityApiBaseUrl}${authPath}`
+    const baseUrl = import.meta.server
+      ? config.serverIdentityApiBaseUrl
+      : config.public.identityApiBaseUrl
+
+    if (!baseUrl) {
+      throw new Error("Missing identity API base URL configuration.")
+    }
+
+    return `${baseUrl}${authPath}`
   }
 
   function authFetch(
