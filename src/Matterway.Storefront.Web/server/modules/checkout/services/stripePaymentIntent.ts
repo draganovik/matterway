@@ -53,7 +53,7 @@ async function recordStripeSpan<T>(
   fn: () => Promise<T>,
 ) {
   const tracer = trace.getTracer(
-    process.env.OTEL_SERVICE_NAME || "storefront-web",
+    process.env.OTEL_SERVICE_NAME || "mtw-storefront-web",
   )
   const span = tracer.startSpan(
     `Stripe ${options.operation}`,

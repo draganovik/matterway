@@ -83,7 +83,7 @@ function createExporter(endpoint: string, protocol: "grpc" | "http") {
 
 function createInstrumentation(): NuxtOtelProvider | null {
   const protocol = normalizeOtlpProtocol()
-  const serviceName = process.env.OTEL_SERVICE_NAME || "storefront-web"
+  const serviceName = process.env.OTEL_SERVICE_NAME || "mtw-storefront-web"
 
   const tracesEndpoint =
     normalizeOtlpTraceEndpoint(

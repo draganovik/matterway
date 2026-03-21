@@ -53,7 +53,7 @@ var minio = builder.AddContainer("minio", "minio/minio:RELEASE.2025-01-20T14-49-
         service.Ports = [$"{services.Minio.Port}:9000", $"{services.Minio.ConsolePort}:9001"];
     });
 
-var dbMigrator = builder.AddProject<Matterway_Migrations>("db-migrator")
+var dbMigrator = builder.AddProject<Matterway_Migrations>("mtw-db-migrator")
     .WithReference(databases.Catalog)
     .WithReference(databases.Customers)
     .WithReference(databases.Identity)
@@ -118,14 +118,14 @@ WebAppComposition.AddWebApp(
     builder,
     new WebAppCompositionOptions
     {
-        ServiceName = "storefront-web",
+        ServiceName = "mtw-storefront-web",
         RelativePath = "../Matterway.Storefront.Web",
         HostPort = services.Storefront.Port,
         Dependencies = [catalogApi, salesApi],
         ConfigureEnvironment = environment =>
         {
             ConfigureCommonWebEnvironment(environment);
-            ConfigureWebTelemetryEnvironment(environment, "storefront-web");
+            ConfigureWebTelemetryEnvironment(environment, "mtw-storefront-web");
             environment.WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey);
             environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
         }
@@ -135,7 +135,7 @@ WebAppComposition.AddWebApp(
     builder,
     new WebAppCompositionOptions
     {
-        ServiceName = "dashboard-web",
+        ServiceName = "mtw-dashboard-web",
         RelativePath = "../Matterway.Dashboard.Web",
         HostPort = services.Dashboard.Port,
         Dependencies = [identityApi, catalogApi, customersApi, salesApi],
