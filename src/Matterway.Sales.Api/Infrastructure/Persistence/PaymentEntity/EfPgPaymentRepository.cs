@@ -9,12 +9,7 @@ public sealed class EfPgPaymentRepository(SalesDbComposer context) : IPaymentRep
     {
         context.Payment.Add(requestModel);
         var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected > 0)
-            return await context.Payment
-                .AsNoTracking()
-                .FirstOrDefaultAsync(payment => payment.Id == requestModel.Id, cancellationToken);
-
-        return null;
+        return affected > 0 ? requestModel : null;
     }
 
     public async Task<Payment?> GetById(Guid id, CancellationToken cancellationToken = default)

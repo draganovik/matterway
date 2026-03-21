@@ -16,7 +16,6 @@ namespace Matterway.ServiceDefaults.Extensions;
 public static class BuilderExtensions
 {
     private const string CorsAllowedOriginsConfigurationPath = "Cors:AllowedOrigins";
-    private const string CorsDiscoveryServiceNamesConfigurationPath = "Cors:DiscoveryServiceNames";
 
     extension(IHostApplicationBuilder builder)
     {
@@ -116,16 +115,8 @@ public static class BuilderExtensions
     private static IReadOnlySet<string> ResolveInternalApiAuthorities(IConfiguration configuration)
     {
         var configuredAuthorities = ApiDirectory.All
-            .Select(api => configuration[api.AccessOriginConfigurationPath])
-            .Where(static value => !string.IsNullOrWhiteSpace(value))
-            .Select(static value =>
-            {
-                return Uri.TryCreate(value, UriKind.Absolute, out var uri)
-                    ? uri.Authority
-                    : null;
-            })
-            .Where(static authority => !string.IsNullOrWhiteSpace(authority))
-            .Select(static authority => authority!);
+            .Select(api => configuration.ResolveServiceUri(api))
+            .Select(static uri => uri.Authority);
 
         var serviceDiscoveryAuthorities = ApiDirectory.All
             .Select(static api => api.AspireServiceName);
@@ -140,25 +131,6 @@ public static class BuilderExtensions
         IHostApplicationBuilder builder,
         Action<CorsPolicyBuilder>? configureCorsPolicy)
     {
-        var configuredOrigins = builder.Configuration
-                                    .GetSection(CorsAllowedOriginsConfigurationPath)
-                                    .Get<string[]>()
-                                ?? [];
-
-        var discoveryServiceNames = builder.Configuration
-                                        .GetSection(CorsDiscoveryServiceNamesConfigurationPath)
-                                        .Get<string[]>()
-                                    ?? [];
-
-        var discoveredOrigins = discoveryServiceNames
-            .Select(serviceName => builder.Configuration.ResolveServiceUri(serviceName)
-                .GetLeftPart(UriPartial.Authority));
-
-        var allowedOrigins = configuredOrigins
-            .Concat(discoveredOrigins)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
         builder.Services.AddCors(corsOptions =>
         {
             corsOptions.AddDefaultPolicy(policy =>
@@ -169,10 +141,23 @@ public static class BuilderExtensions
                     return;
                 }
 
-                if (allowedOrigins.Length == 0)
+                if (builder.Environment.IsDevelopment())
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                    return;
+                }
+
+                var configuredOrigins = builder.Configuration
+                                            .GetSection(CorsAllowedOriginsConfigurationPath)
+                                            .Get<string[]>()
+                                        ?? [];
+
+                if (configuredOrigins.Length == 0)
                     return;
 
-                policy.WithOrigins(allowedOrigins)
+                policy.WithOrigins(configuredOrigins.Distinct(StringComparer.OrdinalIgnoreCase).ToArray())
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

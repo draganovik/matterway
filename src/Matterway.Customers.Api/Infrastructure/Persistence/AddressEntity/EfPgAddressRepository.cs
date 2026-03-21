@@ -25,9 +25,7 @@ public class EfPgAddressRepository(CustomersDbComposer context) : IAddressReposi
         else
             context.Address.Entry(existing).CurrentValues.SetValues(entity);
 
-        var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected < 1) return null;
-
+        await context.SaveChangesAsync(cancellationToken);
         return existing ?? entity;
     }
 

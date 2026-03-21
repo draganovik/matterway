@@ -44,14 +44,7 @@ public class SelfPutAddress : IEndpoint
         else
             ApplyUpdates(address, request);
 
-        var saved = await addressRepository.Upsert(address, cancellationToken);
-        if (saved is null)
-            return TypedResults.BadRequest(new ProblemDetails
-            {
-                Title = "Bad Request",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Cannot upsert address."
-            });
+        var saved = (await addressRepository.Upsert(address, cancellationToken))!;
 
         if (customer.DefaultAddressId != saved.Id)
         {

@@ -5,7 +5,7 @@ namespace Matterway.ServiceDefaults;
 public sealed record ApiDefinition(string ServiceName, IReadOnlyCollection<ApiVersion> SupportedApiVersions)
 {
     public string AspireServiceName => $"{ServiceName}-api";
-    public string AccessOriginConfigurationPath => $"Apis:AccessOrigins:{ToPascalCase(ServiceName)}";
+    public string ServiceConfigurationPath => $"Services:{ToPascalCase(ServiceName)}";
 
     private static string ToPascalCase(string value)
     {

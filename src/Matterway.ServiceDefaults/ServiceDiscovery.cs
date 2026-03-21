@@ -11,58 +11,35 @@ public static class ServiceDiscovery
             ArgumentNullException.ThrowIfNull(configuration);
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
-            return configuration.ResolveServiceUri(
-                apiDefinition.AspireServiceName,
-                apiDefinition.AccessOriginConfigurationPath);
+            var aspireServiceName = apiDefinition.AspireServiceName;
+            var configurationPath = apiDefinition.ServiceConfigurationPath;
+            var serviceSection = configuration.GetSection(configurationPath);
+
+            if (!serviceSection.Exists())
+                return new Uri($"http://{aspireServiceName}", UriKind.Absolute);
+
+            var domain = serviceSection["Domain"];
+            var portText = serviceSection["Port"];
+            if (string.IsNullOrWhiteSpace(domain))
+                throw new InvalidOperationException(
+                    $"Configuration value '{configurationPath}:Domain' is required.");
+            if (string.IsNullOrWhiteSpace(portText))
+                throw new InvalidOperationException(
+                    $"Configuration value '{configurationPath}:Port' is required.");
+
+            if (!int.TryParse(portText, out var port) || port <= 0)
+                throw new InvalidOperationException(
+                    $"Configuration value '{configurationPath}:Port' must be a positive integer.");
+
+            var scheme = serviceSection["Scheme"];
+            if (string.IsNullOrWhiteSpace(scheme))
+                scheme = Uri.UriSchemeHttp;
+
+            if (!Uri.CheckSchemeName(scheme))
+                throw new InvalidOperationException(
+                    $"Configuration value '{configurationPath}:Scheme' is not a valid URI scheme.");
+
+            return new UriBuilder(scheme, domain.Trim(), port).Uri;
         }
-
-        public Uri ResolveServiceUri(string aspireServiceName,
-            string? configurationKey = null)
-        {
-            ArgumentNullException.ThrowIfNull(configuration);
-
-            if (string.IsNullOrWhiteSpace(aspireServiceName))
-                throw new ArgumentException("Service name must be provided.", nameof(aspireServiceName));
-
-            var effectiveConfigurationKey = configurationKey ??
-                                            $"Apis:AccessOrigins:{ToAccessOriginKeySegment(aspireServiceName)}";
-            var configuredValue = configuration[effectiveConfigurationKey];
-            if (!string.IsNullOrWhiteSpace(configuredValue))
-                return CreateUri(configuredValue, effectiveConfigurationKey);
-
-            return new Uri($"http://{aspireServiceName}", UriKind.Absolute);
-        }
-    }
-
-    private static Uri CreateUri(string value, string key)
-    {
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
-            throw new InvalidOperationException(
-                $"Configuration value '{value}' for '{key}' is not a valid absolute URI.");
-
-        return uri;
-    }
-
-    private static string ToAccessOriginKeySegment(string aspireServiceName)
-    {
-        var normalizedServiceName = aspireServiceName.EndsWith("-api", StringComparison.OrdinalIgnoreCase)
-            ? aspireServiceName[..^4]
-            : aspireServiceName;
-
-        return ToPascalCase(normalizedServiceName);
-    }
-
-    private static string ToPascalCase(string value)
-    {
-        var parts = value.Split(['-', '_'], StringSplitOptions.RemoveEmptyEntries);
-        return string.Concat(parts.Select(static part =>
-        {
-            return part.Length switch
-            {
-                0 => string.Empty,
-                1 => part.ToUpperInvariant(),
-                _ => char.ToUpperInvariant(part[0]) + part[1..].ToLowerInvariant()
-            };
-        }));
     }
 }

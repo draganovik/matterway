@@ -4,6 +4,7 @@ using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
@@ -32,45 +33,60 @@ public class AdminCreateEmployeeUser : IEndpoint
         UserManager<SystemUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager)
     {
-        await using var transaction = await identityDb.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = identityDb.Database.CreateExecutionStrategy();
+        return await ExecutionStrategyExtensions
+            .ExecuteAsync<Results<Created<CreateUserResponse>, BadRequest<ProblemDetails>>>(
+                strategy,
+                async () =>
+                {
+                    await using var transaction = await identityDb.Database.BeginTransactionAsync(cancellationToken);
+                    try
+                    {
+                        var systemUser = new SystemUser
+                        {
+                            Email = request.Email,
+                            UserName = request.Email
+                        };
 
-        var systemUser = new SystemUser
-        {
-            Email = request.Email,
-            UserName = request.Email
-        };
+                        var createResult = await userManager.CreateAsync(systemUser, request.Password);
+                        if (!createResult.Succeeded)
+                            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                                createResult.Errors.Select(error => error.Description))));
 
-        var createResult = await userManager.CreateAsync(systemUser, request.Password);
-        if (!createResult.Succeeded)
-            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
-                createResult.Errors.Select(error => error.Description))));
+                        var roleResult = await IdentityRoleAdapter.SetPrimaryRoleAsync(userManager, roleManager,
+                            systemUser,
+                            EIdentityRole.Employee);
+                        if (!roleResult.Succeeded)
+                            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                                roleResult.Errors.Select(error => error.Description))));
 
-        var roleResult = await IdentityRoleAdapter.SetPrimaryRoleAsync(userManager, roleManager, systemUser,
-            EIdentityRole.Employee);
-        if (!roleResult.Succeeded)
-            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
-                roleResult.Errors.Select(error => error.Description))));
+                        var permissionResult = await IdentityPermissionAdapter.EnsureEmployeeObserverDefaultsAsync(
+                            userManager,
+                            systemUser);
 
-        var permissionResult = await IdentityPermissionAdapter.EnsureEmployeeObserverDefaultsAsync(
-            userManager,
-            systemUser);
+                        if (!permissionResult.Succeeded)
+                            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
+                                permissionResult.Errors.Select(error => error.Description))));
 
-        if (!permissionResult.Succeeded)
-            return TypedResults.BadRequest(CreateProblemDetails(string.Join("; ",
-                permissionResult.Errors.Select(error => error.Description))));
+                        await transaction.CommitAsync(cancellationToken);
 
-        await transaction.CommitAsync(cancellationToken);
+                        var location = linkGenerator.GetUriByName(httpContext, "AdminGetSystemUserById",
+                            new { id = systemUser.Id });
 
-        var location = linkGenerator.GetUriByName(httpContext, "AdminGetSystemUserById",
-            new { id = systemUser.Id });
-
-        return TypedResults.Created(location, new CreateUserResponse
-        {
-            Id = systemUser.Id,
-            Email = systemUser.Email,
-            Created = systemUser.Created,
-            Role = EIdentityRole.Employee
-        });
+                        return TypedResults.Created(location, new CreateUserResponse
+                        {
+                            Id = systemUser.Id,
+                            Email = systemUser.Email,
+                            Created = systemUser.Created,
+                            Role = EIdentityRole.Employee
+                        });
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync(cancellationToken);
+                        throw;
+                    }
+                });
     }
 
     private static ProblemDetails CreateProblemDetails(string detail)

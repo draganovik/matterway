@@ -21,6 +21,7 @@ public sealed class EfPgDiscountRepository(CatalogDbComposer context) : IDiscoun
         var normalizedCode = code.Trim().ToUpperInvariant();
         return await context.Discount
             .Include(d => d.Article)
+            .AsNoTracking()
             .Where(d => d.Code == normalizedCode)
             .ToListAsync(cancellationToken);
     }

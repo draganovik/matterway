@@ -21,9 +21,9 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
         }
 
         return await query
+            .AsNoTracking()
             .OrderBy(d => d.Title)
             .Take(normalizedLimit)
-            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
@@ -73,14 +73,10 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
 
             existing.Title = requestModel.Title;
             existing.Unit = requestModel.Unit;
-            context.Detail.Update(existing);
         }
 
-        var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected <= 0) return null;
-
-        return await context.Detail.AsNoTracking()
-            .FirstOrDefaultAsync(d => d.Slug == requestModel.Slug, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+        return existing ?? requestModel;
     }
 
     public async Task<bool> Delete(string slug, CancellationToken cancellationToken = default)

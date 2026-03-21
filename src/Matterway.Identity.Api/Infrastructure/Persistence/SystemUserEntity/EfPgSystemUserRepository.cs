@@ -60,11 +60,11 @@ public sealed class EfPgSystemUserRepository(IdentityDbComposer context) : ISyst
 
         var normalizedRole = roleFilter.Value.ToString().ToUpperInvariant();
 
-        return from user in users
+        return (from user in users
             join userRole in context.UserRoles on user.Id equals userRole.UserId
             join role in context.Roles on userRole.RoleId equals role.Id
             where role.NormalizedName != null && role.NormalizedName == normalizedRole
-            select user;
+            select user).Distinct();
     }
 
     private async Task<EIdentityRole> ResolveRoleByUserId(Guid userId, CancellationToken cancellationToken)

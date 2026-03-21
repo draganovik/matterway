@@ -5,6 +5,7 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 const string composeEnvironmentName = "matterway-platform";
+var services = ServicesSettings.Bind(builder.Configuration);
 
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var systemAccessKey = builder.AddParameter("SystemAccessKey", true);
@@ -16,21 +17,21 @@ var stripeSecretKey = builder.AddParameter("StripeSecretKey", true);
 builder.AddDockerComposeEnvironment(composeEnvironmentName)
     .WithDashboard(dashboard =>
     {
-        dashboard.WithHostPort(PlatformPorts.AspireDashboard);
+        dashboard.WithHostPort(services.AspireDashboard.Port);
         dashboard.WithContainerName("aspire-dashboard");
     })
     .ConfigureComposeFile(compose => compose.Name = "matterway-platform");
 
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("18")
-    .WithHostPort(PlatformPorts.Postgres)
+    .WithHostPort(services.Postgres.Port)
     .WithPassword(postgresPassword)
     .WithVolume("matterway-postgres-data", "/var/lib/postgresql")
     .WithBindMount("../../data", "/seed-data", true)
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = [$"{PlatformPorts.Postgres}:5432"];
+        service.Ports = [$"{services.Postgres.Port}:5432"];
     });
 
 var databases = (
@@ -44,12 +45,12 @@ var minio = builder.AddContainer("minio", "minio/minio:RELEASE.2025-01-20T14-49-
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
     .WithArgs("server", "/data", "--console-address", ":9001")
-    .WithHttpEndpoint(PlatformPorts.MinioApi, 9000, "http")
-    .WithHttpEndpoint(PlatformPorts.MinioConsole, 9001, "console")
+    .WithHttpEndpoint(services.Minio.Port, 9000, "http")
+    .WithHttpEndpoint(services.Minio.ConsolePort, 9001, "console")
     .PublishAsDockerComposeService((_, service) =>
     {
         service.Restart = "unless-stopped";
-        service.Ports = [$"{PlatformPorts.MinioApi}:9000", $"{PlatformPorts.MinioConsole}:9001"];
+        service.Ports = [$"{services.Minio.Port}:9000", $"{services.Minio.ConsolePort}:9001"];
     });
 
 var dbMigrator = builder.AddProject<Matterway_Migrations>("db-migrator")
@@ -62,17 +63,17 @@ var dbMigrator = builder.AddProject<Matterway_Migrations>("db-migrator")
 
 var identityApi = AddApi<Matterway_Identity_Api>(
     ApiDirectory.Identity,
-    PlatformPorts.IdentityApi,
+    services.Identity.Port,
     api => api.WithReference(databases.Identity));
 
 var catalogApi = AddApi<Matterway_Catalog_Api>(
     ApiDirectory.Catalog,
-    PlatformPorts.CatalogApi,
+    services.Catalog.Port,
     api => api.WithReference(databases.Catalog));
 
 var customersApi = AddApi<Matterway_Customers_Api>(
     ApiDirectory.Customers,
-    PlatformPorts.CustomersApi,
+    services.Customers.Port,
     api => api
         .WithReference(databases.Customers)
         .WithReference(identityApi.GetEndpoint("http"))
@@ -80,7 +81,7 @@ var customersApi = AddApi<Matterway_Customers_Api>(
 
 var salesApi = AddApi<Matterway_Sales_Api>(
     ApiDirectory.Sales,
-    PlatformPorts.SalesApi,
+    services.Sales.Port,
     api => api.WithReference(databases.Sales)
         .WithReference(customersApi.GetEndpoint("http")));
 
@@ -89,16 +90,18 @@ var catalogApiHttp = catalogApi.GetEndpoint("http");
 var customersApiHttp = customersApi.GetEndpoint("http");
 var salesApiHttp = salesApi.GetEndpoint("http");
 var minioHttpEndpoint = minio.GetEndpoint("http");
-var minioPublicBaseUrl = builder.Configuration["Apis:AccessOrigins:Minio"];
-if (string.IsNullOrWhiteSpace(minioPublicBaseUrl))
-    minioPublicBaseUrl = $"http://localhost:{PlatformPorts.MinioApi}";
+var minioPublicBaseUrl = services.Minio.ToBaseUrl();
+var identityPublicBaseUrl = services.Identity.ToBaseUrl();
+var catalogPublicBaseUrl = services.Catalog.ToBaseUrl();
+var customersPublicBaseUrl = services.Customers.ToBaseUrl();
+var salesPublicBaseUrl = services.Sales.ToBaseUrl();
 
 catalogApi
     .WaitFor(minio)
     .WithReference(minioHttpEndpoint)
     .WithEnvironment("ImageStorage__Bucket", "article-images")
     .WithEnvironment("ImageStorage__Endpoint", minioHttpEndpoint)
-    .WithEnvironment("ImageStorage__PublicBaseUrl", minioPublicBaseUrl.TrimEnd('/'))
+    .WithEnvironment("ImageStorage__PublicBaseUrl", minioPublicBaseUrl)
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
     .WithEnvironment("ImageStorage__SecretKey", minioPassword)
     .WithEnvironment("ImageStorage__AllowPublicRead", "true");
@@ -117,7 +120,7 @@ WebAppComposition.AddWebApp(
     {
         ServiceName = "storefront-web",
         RelativePath = "../Matterway.Storefront.Web",
-        HostPort = PlatformPorts.StorefrontWeb,
+        HostPort = services.Storefront.Port,
         Dependencies = [catalogApi, salesApi],
         ConfigureEnvironment = environment =>
         {
@@ -134,7 +137,7 @@ WebAppComposition.AddWebApp(
     {
         ServiceName = "dashboard-web",
         RelativePath = "../Matterway.Dashboard.Web",
-        HostPort = PlatformPorts.DashboardWeb,
+        HostPort = services.Dashboard.Port,
         Dependencies = [identityApi, catalogApi, customersApi, salesApi],
         ConfigureEnvironment = ConfigureCommonWebEnvironment
     });
@@ -203,7 +206,7 @@ void ConfigureWebTelemetryEnvironment(WebAppEnvironmentBuilder environment, stri
     }
 
     var publishDefaultEndpoint = builder.ExecutionContext.IsPublishMode
-        ? $"http://{composeEnvironmentName}-dashboard:18889"
+        ? $"http://{composeEnvironmentName}-dashboard:{services.AspireDashboard.OtlpPort}"
         : null;
 
     var tracesEndpoint = ToTraceEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"])
@@ -243,12 +246,8 @@ void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
         .WithEnvironment("CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
         .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
-        .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL",
-            builder.Configuration[ApiDirectory.Identity.AccessOriginConfigurationPath])
-        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL",
-            builder.Configuration[ApiDirectory.Catalog.AccessOriginConfigurationPath])
-        .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL",
-            builder.Configuration[ApiDirectory.Customers.AccessOriginConfigurationPath])
-        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL",
-            builder.Configuration[ApiDirectory.Sales.AccessOriginConfigurationPath]);
+        .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL", identityPublicBaseUrl)
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", catalogPublicBaseUrl)
+        .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL", customersPublicBaseUrl)
+        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", salesPublicBaseUrl);
 }

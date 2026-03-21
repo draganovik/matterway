@@ -24,7 +24,7 @@ internal static class ApiEnvironmentComposition
                 .WithEnvironment("Jwt__Key", jwtSigningKey)
                 .WithEnvironment("Jwt__Issuer", identityApiHttpEndpoint)
                 .WithEnvironment("Jwt__Audience", identityApiHttpEndpoint)
-                .WithEnvironment("Apis__SystemAccessKey", systemAccessKey);
+                .WithEnvironment("Security__SystemAccessKey", systemAccessKey);
 
             for (var i = 0; i < corsAllowedOrigins.Length; i++)
                 api.WithEnvironment($"Cors__AllowedOrigins__{i}", corsAllowedOrigins[i]);
