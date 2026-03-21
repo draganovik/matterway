@@ -166,7 +166,7 @@ For local runs, defaults are provided in:
 - `src/Matterway.AppHost/appsettings.Development.json`
 
 For production-like setup, copy and customize:
-- `src/Matterway.AppHost/appsettings.Production.example.json`
+- `src/Matterway.AppHost/appsettings.Production.json`
 
 Set required secret parameters via user-secrets:
 
