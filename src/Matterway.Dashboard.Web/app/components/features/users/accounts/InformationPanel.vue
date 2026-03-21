@@ -17,11 +17,8 @@ const props = withDefaults(
     canOperate?: boolean
     canManage?: boolean
     saveLoading?: boolean
-    removeLoading?: boolean
     saveError?: string
-    removeError?: string
     saveSuccess?: string
-    removeSuccess?: string
   }>(),
   {
     systemUser: null,
@@ -29,11 +26,8 @@ const props = withDefaults(
     canOperate: false,
     canManage: false,
     saveLoading: false,
-    removeLoading: false,
     saveError: "",
-    removeError: "",
     saveSuccess: "",
-    removeSuccess: "",
   },
 )
 
@@ -91,11 +85,10 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
         <UButton
           color="error"
           variant="ghost"
-          :loading="removeLoading"
           :disabled="!canManage"
           @click="emit('remove')"
         >
-          {{ removeLoading ? "Brisanje naloga" : "Obriši nalog" }}
+          Obriši nalog
         </UButton>
       </div>
 
@@ -115,10 +108,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
         </UButton>
       </div>
 
-      <StatusMessages
-        :error="saveError || removeError"
-        :success="saveSuccess || removeSuccess"
-      />
+      <StatusMessages :error="saveError" :success="saveSuccess" />
     </div>
   </div>
 </template>

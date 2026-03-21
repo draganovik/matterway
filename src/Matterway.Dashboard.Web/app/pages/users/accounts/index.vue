@@ -23,6 +23,7 @@ const {
   selectedSystemUser,
   rolesModalOpen,
   createModalOpen,
+  deleteConfirmOpen,
   form,
   selectedUserLabel,
   changePage,
@@ -34,6 +35,7 @@ const {
   handleEmployeeCreated,
   saveSystemUser,
   removeSystemUser,
+  requestRemoveSystemUser,
 } = useUsersAccountsPage()
 </script>
 
@@ -116,13 +118,10 @@ const {
                 :can-operate="canOperate"
                 :can-manage="canManage"
                 :save-loading="saveState.loading"
-                :remove-loading="removeState.loading"
                 :save-error="saveState.error"
-                :remove-error="removeState.error"
                 :save-success="saveState.success"
-                :remove-success="removeState.success"
                 @save="saveSystemUser"
-                @remove="removeSystemUser"
+                @remove="requestRemoveSystemUser"
                 @reveal-roles="revealRoles"
               />
             </template>
@@ -140,6 +139,21 @@ const {
           :system-user-id="selectedSystemUser?.id || null"
           :user-label="selectedUserLabel"
           :can-manage="canManage"
+        />
+
+        <ConfirmDeleteModal
+          v-model:open="deleteConfirmOpen"
+          title="Obriši nalog"
+          description="Nalog će biti trajno uklonjen iz identiteta i više neće moći da se koristi za prijavu."
+          :subject="
+            selectedSystemUser
+              ? `${selectedUserLabel} · ${selectedSystemUser.id}`
+              : ''
+          "
+          confirm-label="Obriši nalog"
+          :loading="removeState.loading"
+          :error="removeState.error"
+          @confirm="removeSystemUser"
         />
       </div>
     </template>

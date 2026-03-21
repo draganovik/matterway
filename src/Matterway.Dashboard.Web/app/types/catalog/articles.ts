@@ -78,6 +78,11 @@ export type UpdateArticleResponse = {
   isAvailable: boolean
 }
 
+export type DeleteArticleResponse = {
+  code: string
+  message?: string | null
+}
+
 export type AddArticleImageRequest = {
   orderIndex: NumberInput
   file: File

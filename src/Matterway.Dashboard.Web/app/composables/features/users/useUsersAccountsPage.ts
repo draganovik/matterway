@@ -25,6 +25,7 @@ export function useUsersAccountsPage() {
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
+  const deleteConfirmOpen = ref(false)
 
   const systemUsers = ref<SystemUserResponse[]>([])
   const filter = ref("")
@@ -84,6 +85,20 @@ export function useUsersAccountsPage() {
     saveState.success = ""
     removeState.error = ""
     removeState.success = ""
+  }
+
+  function requestRemoveSystemUser() {
+    resetMessages()
+
+    if (!canManage.value) return
+
+    const systemUserId = selectedId.value
+    if (!systemUserId) {
+      removeState.error = "Izaberite nalog za brisanje."
+      return
+    }
+
+    deleteConfirmOpen.value = true
   }
 
   async function loadSystemUsers() {
@@ -307,6 +322,7 @@ export function useUsersAccountsPage() {
     selectedId.value = null
     selectedSystemUser.value = null
     applySystemUserToForm(null)
+    deleteConfirmOpen.value = false
 
     removeState.success = "Nalog je uspešno obrisan."
   }
@@ -331,6 +347,7 @@ export function useUsersAccountsPage() {
     pagination,
     selectedId,
     selectedSystemUser,
+    deleteConfirmOpen,
     rolesModalOpen,
     createModalOpen,
     form,
@@ -344,5 +361,6 @@ export function useUsersAccountsPage() {
     handleEmployeeCreated,
     saveSystemUser,
     removeSystemUser,
+    requestRemoveSystemUser,
   }
 }

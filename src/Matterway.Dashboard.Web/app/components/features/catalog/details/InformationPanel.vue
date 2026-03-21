@@ -10,7 +10,6 @@ withDefaults(
     title?: string
     unit?: string
     saveLoading?: boolean
-    removeLoading?: boolean
     error?: string
     success?: string
   }>(),
@@ -22,7 +21,6 @@ withDefaults(
     title: "",
     unit: "",
     saveLoading: false,
-    removeLoading: false,
     error: "",
     success: "",
   },
@@ -107,11 +105,10 @@ const emit = defineEmits<{
           v-if="canDelete"
           color="error"
           variant="ghost"
-          :loading="removeLoading"
           :disabled="!canEdit"
           @click="emit('remove')"
         >
-          {{ removeLoading ? "Brisanje detalja" : "Obriši detalj" }}
+          Obriši detalj
         </UButton>
       </div>
 

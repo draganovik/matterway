@@ -12,6 +12,7 @@ const {
   listState,
   submitState,
   deleteState,
+  deleteConfirmOpen,
   discountFilter,
   listPage,
   listPageSize,
@@ -31,6 +32,7 @@ const {
   selectDiscount,
   saveDiscount,
   removeDiscount,
+  requestRemoveDiscount,
 } = useCatalogDiscountsPage()
 </script>
 
@@ -183,7 +185,7 @@ const {
                     variant="outline"
                     :loading="deleteState.loading"
                     :disabled="!canEdit"
-                    @click="removeDiscount"
+                    @click="requestRemoveDiscount"
                   >
                     {{
                       deleteState.loading ? "Brisanje popusta" : "Obriši popust"
@@ -192,7 +194,10 @@ const {
                 </div>
 
                 <StatusMessages
-                  :error="submitState.error || deleteState.error"
+                  :error="
+                    submitState.error ||
+                    (!deleteConfirmOpen ? deleteState.error : '')
+                  "
                   :success="submitState.success || deleteState.success"
                 />
               </div>
@@ -200,6 +205,21 @@ const {
           </EntitiesSplitView>
         </div>
       </div>
+
+      <ConfirmDeleteModal
+        v-model:open="deleteConfirmOpen"
+        title="Obriši popust"
+        description="Brisanje uklanja sve zapise za ovaj kod popusta."
+        :subject="`Kod popusta: ${
+          String(form.code || '')
+            .trim()
+            .toUpperCase() || 'nije unet'
+        }`"
+        confirm-label="Obriši popust"
+        :loading="deleteState.loading"
+        :error="deleteState.error"
+        @confirm="removeDiscount"
+      />
     </template>
   </UDashboardPanel>
 </template>

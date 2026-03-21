@@ -27,6 +27,7 @@ export function useUsersCustomersPage() {
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
+  const deleteConfirmOpen = ref(false)
 
   const customers = ref<CustomerResponse[]>([])
   const filter = ref("")
@@ -85,6 +86,20 @@ export function useUsersCustomersPage() {
     saveState.success = ""
     removeState.error = ""
     removeState.success = ""
+  }
+
+  function requestRemoveCustomer() {
+    resetMessages()
+
+    if (!canEdit.value) return
+
+    const customerId = selectedId.value
+    if (!customerId) {
+      removeState.error = "Izaberite kupca za brisanje."
+      return
+    }
+
+    deleteConfirmOpen.value = true
   }
 
   async function loadCustomers() {
@@ -307,6 +322,7 @@ export function useUsersCustomersPage() {
     selectedId.value = null
     selectedCustomer.value = null
     applyCustomerToForm(null)
+    deleteConfirmOpen.value = false
 
     removeState.success = result.data?.message || "Kupac je uspešno uklonjen."
   }
@@ -353,6 +369,7 @@ export function useUsersCustomersPage() {
     pagination,
     selectedId,
     selectedCustomer,
+    deleteConfirmOpen,
     createModalOpen,
     addressModalOpen,
     form,
@@ -365,6 +382,7 @@ export function useUsersCustomersPage() {
     handleAddressSaved,
     saveCustomer,
     removeCustomer,
+    requestRemoveCustomer,
     handleCustomerCreated,
   }
 }

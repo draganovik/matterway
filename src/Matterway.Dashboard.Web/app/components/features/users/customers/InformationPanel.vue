@@ -16,22 +16,16 @@ withDefaults(
     error?: string
     canEdit?: boolean
     saveLoading?: boolean
-    removeLoading?: boolean
     saveError?: string
-    removeError?: string
     saveSuccess?: string
-    removeSuccess?: string
   }>(),
   {
     customer: null,
     error: "",
     canEdit: false,
     saveLoading: false,
-    removeLoading: false,
     saveError: "",
-    removeError: "",
     saveSuccess: "",
-    removeSuccess: "",
   },
 )
 
@@ -87,11 +81,10 @@ const emit = defineEmits<{
         <UButton
           color="error"
           variant="ghost"
-          :loading="removeLoading"
           :disabled="!canEdit"
           @click="emit('remove')"
         >
-          {{ removeLoading ? "Brisanje kupca" : "Obriši kupca" }}
+          Obriši kupca
         </UButton>
       </div>
 
@@ -110,10 +103,7 @@ const emit = defineEmits<{
         </UButton>
       </div>
 
-      <StatusMessages
-        :error="saveError || removeError"
-        :success="saveSuccess || removeSuccess"
-      />
+      <StatusMessages :error="saveError" :success="saveSuccess" />
     </div>
   </div>
 </template>
