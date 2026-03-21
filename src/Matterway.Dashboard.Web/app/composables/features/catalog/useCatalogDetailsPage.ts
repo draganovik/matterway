@@ -21,6 +21,7 @@ export function useCatalogDetailsPage() {
   const listState = useRequestState({ empty: "Nema definicija detalja." })
   const saveState = useRequestState()
   const removeState = useRequestState()
+  const deleteConfirmOpen = ref(false)
 
   const details = ref<QueryDetailResponse[]>([])
   const filter = ref("")
@@ -106,6 +107,20 @@ export function useCatalogDetailsPage() {
   function beginCreate() {
     resetMessages()
     createModalOpen.value = true
+  }
+
+  function requestRemoveDetail() {
+    resetMessages()
+
+    if (!canEdit.value) return
+
+    const slug = selectedSlug.value || normalizeSlug(form.value.slug)
+    if (!slug) {
+      removeState.error = "Izaberite detalj za brisanje."
+      return
+    }
+
+    deleteConfirmOpen.value = true
   }
 
   function selectDetail(slug: string) {
@@ -203,6 +218,7 @@ export function useCatalogDetailsPage() {
     selectedSlug.value = null
     selectedDetail.value = null
     applyDetailToForm(null)
+    deleteConfirmOpen.value = false
 
     removeState.success = result.data?.message || "Detalj je uspešno uklonjen."
   }
@@ -234,9 +250,11 @@ export function useCatalogDetailsPage() {
     selectedSlug,
     selectedDetail,
     createModalOpen,
+    deleteConfirmOpen,
     form,
     canDelete,
     beginCreate,
+    requestRemoveDetail,
     selectDetail,
     searchDetails,
     updateLimit,

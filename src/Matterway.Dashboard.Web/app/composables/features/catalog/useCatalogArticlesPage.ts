@@ -32,6 +32,8 @@ export function useCatalogArticlesPage() {
   const selectedCode = ref<string | null>(null)
   const selectedArticle = ref<GetArticleResponse | null>(null)
   const articleState = useRequestState()
+  const removeState = useRequestState()
+  const deleteConfirmOpen = ref(false)
 
   const createModalOpen = ref(false)
 
@@ -96,10 +98,16 @@ export function useCatalogArticlesPage() {
 
   function updateSelectedArticle(article: GetArticleResponse | null) {
     selectedArticle.value = article
-    if (!article) return
+    if (!article) {
+      selectedCode.value = null
+      return
+    }
+
+    const previousCode = selectedCode.value || article.code
+    selectedCode.value = article.code
 
     articles.value = articles.value.map((item) =>
-      item.code === article.code
+      item.code === previousCode
         ? {
             ...item,
             title: article.title,
@@ -111,6 +119,53 @@ export function useCatalogArticlesPage() {
           }
         : item,
     )
+  }
+
+  function requestRemoveArticle() {
+    removeState.error = ""
+    removeState.success = ""
+    if (!canEdit.value) return
+    if (!selectedArticle.value?.code) {
+      removeState.error = "Izaberite artikal za brisanje."
+      return
+    }
+    deleteConfirmOpen.value = true
+  }
+
+  async function removeArticle() {
+    removeState.error = ""
+    removeState.success = ""
+
+    if (!canEdit.value) return
+
+    const code = selectedArticle.value?.code || selectedCode.value
+    if (!code) {
+      removeState.error = "Izaberite artikal za brisanje."
+      return
+    }
+
+    removeState.loading = true
+    const result = await api.deleteArticle(code)
+    removeState.loading = false
+
+    if (!result.ok) {
+      removeState.error = result.error || "Brisanje artikla nije uspelo."
+      return
+    }
+
+    articles.value = articles.value.filter((item) => item.code !== code)
+    selectedCode.value = null
+    selectedArticle.value = null
+    articleState.error = ""
+    deleteConfirmOpen.value = false
+
+    if (articles.value.length === 0 && pagination.page > 1) {
+      pagination.page -= 1
+    } else {
+      void loadArticles()
+    }
+
+    removeState.success = result.data?.message || "Artikal je uspešno obrisan."
   }
 
   function handleArticleCreated(created: CreateArticleResponse) {
@@ -154,9 +209,13 @@ export function useCatalogArticlesPage() {
     selectedCode,
     selectedArticle,
     articleState,
+    removeState,
+    deleteConfirmOpen,
     createModalOpen,
     selectArticle,
     updateSelectedArticle,
+    requestRemoveArticle,
+    removeArticle,
     handleArticleCreated,
     searchArticles,
   }

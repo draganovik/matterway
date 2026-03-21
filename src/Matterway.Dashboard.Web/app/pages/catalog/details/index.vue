@@ -18,9 +18,11 @@ const {
   selectedSlug,
   selectedDetail,
   createModalOpen,
+  deleteConfirmOpen,
   form,
   canDelete,
   beginCreate,
+  requestRemoveDetail,
   selectDetail,
   searchDetails,
   updateLimit,
@@ -94,14 +96,13 @@ const {
                 :title="form.title"
                 :unit="form.unit"
                 :save-loading="saveState.loading"
-                :remove-loading="removeState.loading"
-                :error="saveState.error || removeState.error"
-                :success="saveState.success || removeState.success"
+                :error="saveState.error"
+                :success="saveState.success"
                 @update:slug="(value) => (form.slug = value)"
                 @update:title="(value) => (form.title = value)"
                 @update:unit="(value) => (form.unit = value)"
                 @save="saveDetail"
-                @remove="removeDetail"
+                @remove="requestRemoveDetail"
               />
             </template>
           </EntitiesSplitView>
@@ -111,6 +112,21 @@ const {
           v-model:open="createModalOpen"
           :can-edit="canEdit"
           @created="handleDetailCreated"
+        />
+
+        <ConfirmDeleteModal
+          v-model:open="deleteConfirmOpen"
+          title="Obriši detalj"
+          description="Definicija detalja će biti trajno uklonjena."
+          :subject="
+            selectedDetail
+              ? `${selectedDetail.title || 'Detalj bez naziva'} · ${selectedDetail.slug || ''}`
+              : ''
+          "
+          confirm-label="Obriši detalj"
+          :loading="removeState.loading"
+          :error="removeState.error"
+          @confirm="removeDetail"
         />
       </div>
     </template>

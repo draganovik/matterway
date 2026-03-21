@@ -19,6 +19,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: "update:article", value: GetArticleResponse | null): void
   (event: "updated", value: GetArticleResponse): void
+  (event: "remove"): void
 }>()
 
 const api = useCatalogClient()
@@ -171,6 +172,14 @@ function updateImages(images: GetArticleResponse["images"]) {
             @click="saveArticle"
           >
             {{ updateState.loading ? "Čuvanje izmena" : "Sačuvaj izmene" }}
+          </UButton>
+          <UButton
+            color="error"
+            variant="ghost"
+            :disabled="!canEdit"
+            @click="emit('remove')"
+          >
+            Obriši artikal
           </UButton>
           <StatusMessages
             :error="updateState.error"

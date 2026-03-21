@@ -10,6 +10,7 @@ import type {
   CreateArticleResponse,
   CreateDiscountRequest,
   CreatedDiscountResponse,
+  DeleteArticleResponse,
   DeleteDetailResponse,
   DeleteDiscountResponse,
   ExportCatalogArchiveResponse,
@@ -200,9 +201,13 @@ export function useCatalogClient() {
   }
 
   async function deleteArticle(code: string) {
-    return api.request("catalog", `${ADMIN_ARTICLES_PATH}/${code}`, {
-      method: "DELETE",
-    })
+    return api.request<DeleteArticleResponse>(
+      "catalog",
+      `${ADMIN_ARTICLES_PATH}/${code}`,
+      {
+        method: "DELETE",
+      },
+    )
   }
 
   async function addArticleImage(

@@ -18,9 +18,13 @@ const {
   selectedCode,
   selectedArticle,
   articleState,
+  removeState,
   createModalOpen,
+  deleteConfirmOpen,
   selectArticle,
   updateSelectedArticle,
+  requestRemoveArticle,
+  removeArticle,
   handleArticleCreated,
   searchArticles,
 } = useCatalogArticlesPage()
@@ -96,6 +100,7 @@ const {
                 :error="articleState.error"
                 :can-edit="canEdit"
                 @update:article="updateSelectedArticle"
+                @remove="requestRemoveArticle"
               />
             </template>
           </EntitiesSplitView>
@@ -105,6 +110,21 @@ const {
           v-model:open="createModalOpen"
           :can-edit="canEdit"
           @created="handleArticleCreated"
+        />
+
+        <ConfirmDeleteModal
+          v-model:open="deleteConfirmOpen"
+          title="Obriši artikal"
+          description="Artikal će biti trajno obrisan zajedno sa povezanim slikama."
+          :subject="
+            selectedArticle
+              ? `${selectedArticle.title || 'Artikal bez naziva'} · ${selectedArticle.code}`
+              : ''
+          "
+          confirm-label="Obriši artikal"
+          :loading="removeState.loading"
+          :error="removeState.error"
+          @confirm="removeArticle"
         />
       </div>
     </template>

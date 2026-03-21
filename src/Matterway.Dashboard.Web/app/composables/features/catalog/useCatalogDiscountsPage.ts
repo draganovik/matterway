@@ -35,6 +35,7 @@ export function useCatalogDiscountsPage() {
   const listState = useRequestState({ empty: "Nema popusta." })
   const submitState = useRequestState()
   const deleteState = useRequestState()
+  const deleteConfirmOpen = ref(false)
 
   const discounts = ref<DiscountListItem[]>([])
   const discountFilter = ref("")
@@ -108,6 +109,21 @@ export function useCatalogDiscountsPage() {
     }
     selectedArticleCodes.value = []
     resetMessages()
+  }
+
+  function requestRemoveDiscount() {
+    deleteState.error = ""
+    deleteState.success = ""
+
+    if (!canEdit.value) return
+
+    const code = normalizeCode(form.value.code)
+    if (!code) {
+      deleteState.error = "Unesite kod za brisanje."
+      return
+    }
+
+    deleteConfirmOpen.value = true
   }
 
   function applyDiscountToEditor(discount: DiscountListItem) {
@@ -399,6 +415,7 @@ export function useCatalogDiscountsPage() {
       (item) => item.code !== code && item.key !== code,
     )
     beginCreate()
+    deleteConfirmOpen.value = false
     deleteState.success =
       result.data?.message || `Popust ${code} je uspešno uklonjen.`
   }
@@ -433,5 +450,7 @@ export function useCatalogDiscountsPage() {
     selectDiscount,
     saveDiscount,
     removeDiscount,
+    deleteConfirmOpen,
+    requestRemoveDiscount,
   }
 }

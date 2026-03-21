@@ -19,6 +19,7 @@ const {
   selectedId,
   selectedCustomer,
   createModalOpen,
+  deleteConfirmOpen,
   addressModalOpen,
   form,
   selectedCustomerName,
@@ -30,6 +31,7 @@ const {
   handleAddressSaved,
   saveCustomer,
   removeCustomer,
+  requestRemoveCustomer,
   handleCustomerCreated,
 } = useUsersCustomersPage()
 </script>
@@ -105,13 +107,10 @@ const {
                 :error="detailState.error"
                 :can-edit="canEdit"
                 :save-loading="saveState.loading"
-                :remove-loading="removeState.loading"
                 :save-error="saveState.error"
-                :remove-error="removeState.error"
                 :save-success="saveState.success"
-                :remove-success="removeState.success"
                 @save="saveCustomer"
-                @remove="removeCustomer"
+                @remove="requestRemoveCustomer"
                 @reveal-address="revealAddress"
               />
             </template>
@@ -130,6 +129,21 @@ const {
           :customer-name="selectedCustomerName"
           :can-edit="canEdit"
           @saved="handleAddressSaved"
+        />
+
+        <ConfirmDeleteModal
+          v-model:open="deleteConfirmOpen"
+          title="Obriši kupca"
+          description="Kupac i njegova podrazumevana adresa će biti trajno uklonjeni."
+          :subject="
+            selectedCustomer
+              ? `${selectedCustomerName} · ${selectedCustomer.systemUserId}`
+              : ''
+          "
+          confirm-label="Obriši kupca"
+          :loading="removeState.loading"
+          :error="removeState.error"
+          @confirm="removeCustomer"
         />
       </div>
     </template>
