@@ -9,6 +9,7 @@ import type {
   LoginPayload,
   LoginResponse,
 } from "~/types/auth/session"
+import type { RuntimeConfig } from "nuxt/schema"
 
 const refreshCookieName = "mw_storefront_refresh"
 const authPath = "/api/public/v1/auth"
@@ -16,6 +17,10 @@ const authJsonHeaders = {
   "Content-Type": "application/json",
   accept: "application/json",
 } as const
+
+type StorefrontRuntimeConfig = RuntimeConfig & {
+  serverIdentityApiBaseUrl?: string
+}
 
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
@@ -121,7 +126,7 @@ function getCookieOptions() {
 }
 
 export function useAuthSessionStore() {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig() as StorefrontRuntimeConfig
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
@@ -166,7 +171,15 @@ export function useAuthSessionStore() {
   )
 
   function getAuthBaseUrl() {
-    return `${config.public.identityApiBaseUrl}${authPath}`
+    const baseUrl = import.meta.server
+      ? config.serverIdentityApiBaseUrl
+      : config.public.identityApiBaseUrl
+
+    if (!baseUrl) {
+      throw new Error("Missing identity API base URL configuration.")
+    }
+
+    return `${baseUrl}${authPath}`
   }
 
   function authFetch(

@@ -385,7 +385,7 @@ export function useCatalogClient() {
       }
     }
 
-    const endpoint = `${baseUrl.replace(/\/+$/, "")}/api/admin/v1/catalog/archive/export`
+    const endpoint = `${baseUrl}/api/admin/v1/catalog/archive/export`
     const token = auth.getAccessToken()
     const headers = new Headers({ Accept: "application/zip" })
     if (token) headers.set("Authorization", token)

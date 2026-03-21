@@ -9,14 +9,22 @@ internal static class ApiEnvironmentComposition
         EndpointReference identityApiHttpEndpoint,
         IResourceBuilder<ParameterResource> jwtSigningKey,
         IResourceBuilder<ParameterResource> systemAccessKey,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IEnumerable<string>? fallbackCorsOrigins = null)
     {
         var corsAllowedOrigins = configuration
                                      .GetSection("Cors:AllowedOrigins")
                                      .Get<string[]>()?
                                      .Where(origin => !string.IsNullOrWhiteSpace(origin))
+                                     .ToArray();
+
+        if (corsAllowedOrigins is null or { Length: 0 })
+        {
+            corsAllowedOrigins = fallbackCorsOrigins?
+                                     .Where(origin => !string.IsNullOrWhiteSpace(origin))
                                      .ToArray()
                                  ?? [];
+        }
 
         foreach (var api in apis)
         {

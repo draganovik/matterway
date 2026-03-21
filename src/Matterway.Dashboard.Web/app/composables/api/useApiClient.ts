@@ -2,12 +2,32 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import type { ApiResult, ApiService } from "~/types/common/api"
 import type { RuntimeConfig } from "nuxt/schema"
 
+type DashboardRuntimeConfig = RuntimeConfig & {
+  serverIdentityApiBaseUrl?: string
+  serverCatalogApiBaseUrl?: string
+  serverCustomersApiBaseUrl?: string
+  serverSalesApiBaseUrl?: string
+}
+
+type ApiBaseUrls = Record<ApiService, string | undefined>
+
 function getBaseUrl(service: ApiService, config: RuntimeConfig) {
-  if (service === "catalog") return config.public.catalogApiBaseUrl
-  if (service === "customers") return config.public.customersApiBaseUrl
-  if (service === "identity") return config.public.identityApiBaseUrl
-  if (service === "sales") return config.public.salesApiBaseUrl
-  return null
+  const runtimeConfig = config as DashboardRuntimeConfig
+  const serverBaseUrls: ApiBaseUrls = {
+    catalog: runtimeConfig.serverCatalogApiBaseUrl,
+    customers: runtimeConfig.serverCustomersApiBaseUrl,
+    identity: runtimeConfig.serverIdentityApiBaseUrl,
+    sales: runtimeConfig.serverSalesApiBaseUrl,
+  }
+  const browserBaseUrls: ApiBaseUrls = {
+    catalog: runtimeConfig.public.catalogApiBaseUrl,
+    customers: runtimeConfig.public.customersApiBaseUrl,
+    identity: runtimeConfig.public.identityApiBaseUrl,
+    sales: runtimeConfig.public.salesApiBaseUrl,
+  }
+
+  const baseUrls = import.meta.server ? serverBaseUrls : browserBaseUrls
+  return baseUrls[service] ?? null
 }
 
 function getValidationErrors(

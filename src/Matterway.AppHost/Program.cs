@@ -150,7 +150,8 @@ ApiEnvironmentComposition.ConfigureApiEnvironment(
     identityApiHttp,
     jwtSigningKey,
     systemAccessKey,
-    builder.Configuration);
+    builder.Configuration,
+    [services.Storefront.ToBaseUrl(), services.Dashboard.ToBaseUrl()]);
 
 builder.Build().Run();
 
@@ -246,8 +247,8 @@ void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
         .WithEnvironment("CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
         .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
-        .WithTrimmedEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL", identityPublicBaseUrl)
-        .WithTrimmedEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", catalogPublicBaseUrl)
-        .WithTrimmedEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL", customersPublicBaseUrl)
-        .WithTrimmedEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", salesPublicBaseUrl);
+        .WithEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL", identityPublicBaseUrl)
+        .WithEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", catalogPublicBaseUrl)
+        .WithEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL", customersPublicBaseUrl)
+        .WithEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", salesPublicBaseUrl);
 }
