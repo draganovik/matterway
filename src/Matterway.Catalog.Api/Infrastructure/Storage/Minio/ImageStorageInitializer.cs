@@ -18,9 +18,6 @@ public sealed class ImageStorageInitializer(
         {
             var client = clientFactory.CreateClient();
             await EnsureBucketAsync(client, cancellationToken).ConfigureAwait(false);
-
-            if (_options.AllowPublicRead)
-                await EnsurePublicAccessPolicyAsync(client, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -45,31 +42,6 @@ public sealed class ImageStorageInitializer(
         logger.LogInformation("Creating image storage bucket '{Bucket}'.", _options.Bucket);
         await client.MakeBucketAsync(
             new MakeBucketArgs().WithBucket(_options.Bucket),
-            cancellationToken).ConfigureAwait(false);
-    }
-
-    private async Task EnsurePublicAccessPolicyAsync(IMinioClient client, CancellationToken cancellationToken)
-    {
-        var policy =
-            $$"""
-              {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "*"},
-                    "Action": ["s3:GetObject"],
-                    "Resource": ["arn:aws:s3:::{{_options.Bucket}}/*"]
-                  }
-                ]
-              }
-              """;
-
-        logger.LogInformation("Applying public read policy to bucket '{Bucket}'.", _options.Bucket);
-        await client.SetPolicyAsync(
-            new SetPolicyArgs()
-                .WithBucket(_options.Bucket)
-                .WithPolicy(policy),
             cancellationToken).ConfigureAwait(false);
     }
 }

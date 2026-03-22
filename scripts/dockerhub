@@ -12,15 +12,19 @@ SERVICES=(
   "mtw-storefront-web"
 )
 
+SCRIPT_NAME="${BASH_SOURCE[0]##*/}"
+
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 Usage:
-  push_matterway_images_to_dockerhub.sh <source-tag> [dest-tag] [namespace]
+  ${SCRIPT_NAME} push <source-tag> [dest-tag] [namespace]
+  ${SCRIPT_NAME} help|-h|--help
+  ${SCRIPT_NAME} push help|-h|--help
 
 Examples:
-  push_matterway_images_to_dockerhub.sh aspire-deploy-20260321165222
-  push_matterway_images_to_dockerhub.sh aspire-deploy-20260321165222 latest draganovik
-  push_matterway_images_to_dockerhub.sh aspire-deploy-20260321165222 v1.0.0 your-org
+  ${SCRIPT_NAME} push aspire-deploy-20260321165222
+  ${SCRIPT_NAME} push aspire-deploy-20260321165222 latest draganovik
+  ${SCRIPT_NAME} push aspire-deploy-20260321165222 v1.0.0 your-org
 
 Defaults:
   dest-tag = latest
@@ -33,6 +37,27 @@ and pushes them to:
   <namespace>/mtw-catalog-api:<dest-tag>
 EOF
 }
+
+case "${1:-}" in
+  help|-h|--help)
+    usage
+    exit 0
+    ;;
+  push)
+    shift
+    ;;
+  *)
+    usage >&2
+    exit 1
+    ;;
+esac
+
+case "${1:-}" in
+  help|-h|--help)
+    usage
+    exit 0
+    ;;
+esac
 
 SOURCE_TAG="${1:-}"
 DEST_TAG="${2:-latest}"

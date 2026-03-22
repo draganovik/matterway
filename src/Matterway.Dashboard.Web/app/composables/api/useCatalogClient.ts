@@ -1,6 +1,7 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/api/useApiClient"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { buildServiceApiPath } from "~/utils/apiProxy"
 import type { ApiResult } from "~/types/common/api"
 import type {
   AddArticleDetailRequest,
@@ -119,7 +120,6 @@ function mapArticleMutationResponse(
 export function useCatalogClient() {
   const api = useApiClient()
   const auth = useAuthSessionStore()
-  const config = useRuntimeConfig()
 
   async function queryArticles(params: QueryArticlesParams) {
     const query = buildQuery({
@@ -381,52 +381,66 @@ export function useCatalogClient() {
     ApiResult<ExportCatalogArchiveResponse>
   > {
     await auth.initialize()
-    const baseUrl = config.public.catalogApiBaseUrl
-    if (!baseUrl) {
-      return {
-        ok: false,
-        status: 0,
-        error: "Nedostaje osnovni URL kataloškog API-ja.",
-      }
-    }
-
-    const endpoint = `${baseUrl}/api/admin/v1/catalog/archive/export`
+    const endpoint = buildServiceApiPath(
+      "catalog",
+      "admin",
+      "catalog/archive/export",
+    )
     const token = auth.getAccessToken()
     const headers = new Headers({ Accept: "application/zip" })
     if (token) headers.set("Authorization", token)
 
     const runFetch = () =>
-      fetch(endpoint, {
+      $fetch.raw<ArrayBuffer>(endpoint, {
         method: "GET",
         headers,
+        responseType: "arrayBuffer",
+        ignoreResponseError: true,
       })
 
-    let response = await runFetch()
+    let response
+    try {
+      response = await runFetch()
+    } catch {
+      return {
+        ok: false,
+        status: 0,
+        error: "Izvoz arhive kataloga trenutno nije dostupan.",
+      }
+    }
 
     if (response.status === 401) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
       if (refreshedToken) {
         headers.set("Authorization", refreshedToken)
-        response = await runFetch()
+        try {
+          response = await runFetch()
+        } catch {
+          return {
+            ok: false,
+            status: 0,
+            error: "Izvoz arhive kataloga trenutno nije dostupan.",
+          }
+        }
       }
     }
 
     if (!response.ok) {
       const contentType = response.headers.get("content-type") || ""
-      const payload = contentType.includes("application/json")
-        ? await response.json().catch(() => null)
-        : await response.text().catch(() => null)
+      const payload = decodeDownloadErrorPayload(
+        response._data as ArrayBuffer | undefined,
+        contentType,
+      )
       const error =
-        payload?.title ||
-        payload?.detail ||
-        (typeof payload === "string" ? payload : null) ||
-        "Izvoz arhive kataloga nije uspeo."
+        getErrorMessage(payload) || "Izvoz arhive kataloga nije uspeo."
 
       return { ok: false, status: response.status, error }
     }
 
-    const blob = await response.blob()
+    const blob = new Blob([response._data ?? new ArrayBuffer(0)], {
+      type: response.headers.get("content-type") || "application/zip",
+    })
     const contentDisposition = response.headers.get("content-disposition") || ""
     const fileName = resolveDownloadFileName(contentDisposition)
 
@@ -512,4 +526,53 @@ function formatArchiveTimestamp(date: Date) {
   const minute = String(date.getMinutes()).padStart(2, "0")
   const second = String(date.getSeconds()).padStart(2, "0")
   return `${year}${month}${day}-${hour}${minute}${second}`
+}
+
+function decodeDownloadErrorPayload(
+  payload: ArrayBuffer | undefined,
+  contentType: string,
+) {
+  if (!payload) return null
+
+  const text = new TextDecoder().decode(payload)
+  if (!text.trim()) return null
+
+  if (contentType.includes("json")) {
+    try {
+      return JSON.parse(text) as unknown
+    } catch {
+      return text
+    }
+  }
+
+  return text
+}
+
+function getErrorMessage(payload: unknown) {
+  if (typeof payload === "string") {
+    const message = payload.trim()
+    return message || null
+  }
+
+  if (!payload || typeof payload !== "object") return null
+
+  const candidate = payload as {
+    title?: unknown
+    detail?: unknown
+    message?: unknown
+  }
+
+  if (typeof candidate.detail === "string" && candidate.detail.trim()) {
+    return candidate.detail.trim()
+  }
+
+  if (typeof candidate.title === "string" && candidate.title.trim()) {
+    return candidate.title.trim()
+  }
+
+  if (typeof candidate.message === "string" && candidate.message.trim()) {
+    return candidate.message.trim()
+  }
+
+  return null
 }

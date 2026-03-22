@@ -1,0 +1,80 @@
+#!/bin/bash
+
+set -u
+
+SCRIPT_NAME="${BASH_SOURCE[0]##*/}"
+
+show_usage() {
+  cat <<EOF
+Usage:
+  ${SCRIPT_NAME} <update|drop>
+  ${SCRIPT_NAME} help|-h|--help
+
+Description:
+  Updates or drops databases for all API projects in the src directory.
+
+Examples:
+  ${SCRIPT_NAME} update
+  ${SCRIPT_NAME} drop
+  ${SCRIPT_NAME} help
+EOF
+}
+
+run_for_projects() {
+  local summary_verb="$1"
+  local failure_verb="$2"
+  local runner="$3"
+  local done_message="$4"
+  local failed_projects=()
+
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+  API_ROOT="${ROOT_DIR}/src"
+
+  echo "${summary_verb} databases for all API projects..."
+
+  shopt -s nullglob
+  for project_dir in "${API_ROOT}"/*.Api; do
+    if [[ -d "${project_dir}" ]]; then
+      project_name="$(basename "${project_dir}")"
+      echo "${summary_verb} database for project: ${project_name}"
+      if ! (cd "${project_dir}" && "${runner}"); then
+        echo "Failed to ${failure_verb} database for project: ${project_name}" >&2
+        failed_projects+=("${project_name}")
+      fi
+    fi
+  done
+  shopt -u nullglob
+
+  if ((${#failed_projects[@]})); then
+    echo "Completed with errors for: ${failed_projects[*]}" >&2
+    exit 1
+  fi
+
+  echo "${done_message}"
+}
+
+run_update() {
+  dotnet ef database update
+}
+
+run_drop() {
+  dotnet ef database drop --force
+}
+
+case "${1:-}" in
+  help|-h|--help)
+    show_usage
+    exit 0
+    ;;
+  update)
+    run_for_projects "Updating" "update" run_update "All databases updated."
+    ;;
+  drop)
+    run_for_projects "Dropping" "drop" run_drop "All databases dropped."
+    ;;
+  *)
+    show_usage >&2
+    exit 1
+    ;;
+esac

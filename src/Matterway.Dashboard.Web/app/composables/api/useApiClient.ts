@@ -1,34 +1,6 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { buildServiceApiPathFromRequestPath } from "~/utils/apiProxy"
 import type { ApiResult, ApiService } from "~/types/common/api"
-import type { RuntimeConfig } from "nuxt/schema"
-
-type DashboardRuntimeConfig = RuntimeConfig & {
-  serverIdentityApiBaseUrl?: string
-  serverCatalogApiBaseUrl?: string
-  serverCustomersApiBaseUrl?: string
-  serverSalesApiBaseUrl?: string
-}
-
-type ApiBaseUrls = Record<ApiService, string | undefined>
-
-function getBaseUrl(service: ApiService, config: RuntimeConfig) {
-  const runtimeConfig = config as DashboardRuntimeConfig
-  const serverBaseUrls: ApiBaseUrls = {
-    catalog: runtimeConfig.serverCatalogApiBaseUrl,
-    customers: runtimeConfig.serverCustomersApiBaseUrl,
-    identity: runtimeConfig.serverIdentityApiBaseUrl,
-    sales: runtimeConfig.serverSalesApiBaseUrl,
-  }
-  const browserBaseUrls: ApiBaseUrls = {
-    catalog: runtimeConfig.public.catalogApiBaseUrl,
-    customers: runtimeConfig.public.customersApiBaseUrl,
-    identity: runtimeConfig.public.identityApiBaseUrl,
-    sales: runtimeConfig.public.salesApiBaseUrl,
-  }
-
-  const baseUrls = import.meta.server ? serverBaseUrls : browserBaseUrls
-  return baseUrls[service] ?? null
-}
 
 function getValidationErrors(
   payload: unknown,
@@ -78,8 +50,8 @@ function getErrorMessage(payload: unknown) {
 
 export function useApiClient() {
   const auth = useAuthSessionStore()
-  const config = useRuntimeConfig()
-  const validEndpointKinds = new Set(["self", "admin", "public", "system"])
+  const serviceUnavailableMessage =
+    "Usluga trenutno nije dostupna. Pokušajte ponovo kasnije."
 
   async function request<T>(
     service: ApiService,
@@ -90,17 +62,9 @@ export function useApiClient() {
     if (!auth.isInitialized.value) {
       await auth.initialize()
     }
-    const baseUrl = getBaseUrl(service, config)
-    if (!baseUrl) {
-      return {
-        ok: false,
-        status: 0,
-        error: `Nedostaje osnovni API URL za servis ${service}. Proverite runtimeConfig.public.${service}ApiBaseUrl.`,
-      }
-    }
-    const normalizedPath = path.replace(/^\/+/, "")
-    const [endpointKind, ...resourcePath] = normalizedPath.split("/")
-    if (!endpointKind || !validEndpointKinds.has(endpointKind)) {
+
+    const requestPath = buildServiceApiPathFromRequestPath(service, path)
+    if (!requestPath) {
       return {
         ok: false,
         status: 0,
@@ -108,17 +72,13 @@ export function useApiClient() {
           "API putanja mora da počne vrstom endpointa: self, admin, public ili system.",
       }
     }
-    if (resourcePath.length === 0) {
-      return {
-        ok: false,
-        status: 0,
-        error: "API putanja mora da sadrži resurs nakon vrste endpointa.",
-      }
-    }
-    const url = `${baseUrl}/api/${endpointKind}/v1/${resourcePath.join("/")}`
     const headers = new Headers(options.headers || {})
     if (!headers.has("Accept")) headers.set("Accept", "application/json")
-    if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+    if (
+      options.body !== undefined &&
+      !headers.has("Content-Type") &&
+      !(options.body instanceof FormData)
+    ) {
       headers.set("Content-Type", "application/json")
     }
 
@@ -126,19 +86,37 @@ export function useApiClient() {
     if (accessToken) headers.set("Authorization", accessToken)
 
     const runFetch = async () =>
-      fetch(url, {
+      $fetch.raw<T>(requestPath, {
         ...options,
         headers,
-      })
+        ignoreResponseError: true,
+      } as Parameters<typeof $fetch.raw>[1])
 
-    let response = await runFetch()
+    let response
+    try {
+      response = await runFetch()
+    } catch {
+      return {
+        ok: false,
+        status: 0,
+        error: serviceUnavailableMessage,
+      }
+    }
 
     if (response.status === 401 && !allowUnauthorized) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
       if (refreshedToken) {
         headers.set("Authorization", refreshedToken)
-        response = await runFetch()
+        try {
+          response = await runFetch()
+        } catch {
+          return {
+            ok: false,
+            status: 0,
+            error: serviceUnavailableMessage,
+          }
+        }
       }
     }
 
@@ -146,11 +124,7 @@ export function useApiClient() {
       return { ok: true, status: response.status }
     }
 
-    const contentType = response.headers.get("content-type") || ""
-    const isJson = contentType.includes("json")
-    const payload = isJson
-      ? await response.json().catch(() => null)
-      : await response.text().catch(() => null)
+    const payload = response._data as unknown
 
     if (response.ok) {
       return { ok: true, status: response.status, data: payload as T }

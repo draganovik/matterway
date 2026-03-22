@@ -46,10 +46,9 @@ public class AdminAddArticleImage : IEndpoint
             });
 
         var imageId = Guid.CreateVersion7();
-        ImageStorageUploadResult uploadResult;
         try
         {
-            uploadResult = await imageStorageService.UploadAsync(imageId, request.File, cancellationToken);
+            await imageStorageService.UploadAsync(imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -61,7 +60,14 @@ public class AdminAddArticleImage : IEndpoint
             });
         }
 
-        var entity = MapToEntity(article, request, uploadResult);
+        var entity = new ArticleImage
+        {
+            Id = imageId,
+            ArticleCode = article.ToString(),
+            OrderIndex = request.OrderIndex,
+            ImageUrl = CatalogImagePaths.BuildPublicUrl(imageId),
+            ImageAlt = request.ImageAlt ?? string.Empty
+        };
         ArticleImage? created;
 
         try
@@ -74,9 +80,7 @@ public class AdminAddArticleImage : IEndpoint
             throw;
         }
 
-        var articleImageModel = MapToResponse(created, article, articleEntity.Title);
-
-        if (articleImageModel is null)
+        if (created is null)
         {
             await imageStorageService.DeleteAsync(imageId, cancellationToken);
             var problemDetails = new ProblemDetails
@@ -88,8 +92,17 @@ public class AdminAddArticleImage : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
-        return TypedResults.Created(articleImageModel.ImageUrl,
-            articleImageModel);
+        var articleImageModel = new AddArticleImageResponse
+        {
+            Id = created.Id,
+            OrderIndex = created.OrderIndex,
+            ArticleCode = article,
+            ArticleName = articleEntity.Title,
+            ImageUrl = CatalogImagePaths.BuildPublicUrl(created.Id),
+            ImageAlt = created.ImageAlt
+        };
+
+        return TypedResults.Created(articleImageModel.ImageUrl, articleImageModel);
     }
 
     public record AddArticleImageRequest
@@ -112,33 +125,5 @@ public class AdminAddArticleImage : IEndpoint
         public string? ArticleName { get; init; }
         public string? ImageUrl { get; init; }
         public string? ImageAlt { get; init; }
-    }
-
-    public static ArticleImage MapToEntity(ArticleCode article, AddArticleImageRequest request,
-        ImageStorageUploadResult uploadResult)
-    {
-        return new ArticleImage
-        {
-            Id = uploadResult.ImageId,
-            ArticleCode = article.ToString(),
-            OrderIndex = request.OrderIndex,
-            ImageUrl = uploadResult.ImageUrl,
-            ImageAlt = request.ImageAlt ?? string.Empty
-        };
-    }
-
-    public static AddArticleImageResponse? MapToResponse(ArticleImage? entity, ArticleCode article, string articleName)
-    {
-        return entity is null
-            ? null
-            : new AddArticleImageResponse
-            {
-                Id = entity.Id,
-                OrderIndex = entity.OrderIndex,
-                ArticleCode = article,
-                ArticleName = articleName,
-                ImageUrl = entity.ImageUrl,
-                ImageAlt = entity.ImageAlt
-            };
     }
 }

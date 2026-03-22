@@ -3,7 +3,6 @@ using Asp.Versioning;
 using Matterway.ServiceDefaults.Authorization;
 using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,15 +14,12 @@ namespace Matterway.ServiceDefaults.Extensions;
 
 public static class BuilderExtensions
 {
-    private const string CorsAllowedOriginsConfigurationPath = "Cors:AllowedOrigins";
-
     extension(IHostApplicationBuilder builder)
     {
         public IHostApplicationBuilder ConfigureApi(
             ApiDefinition apiDefinition,
             bool customizeBadHttpRequestProblemDetails = true,
-            Action<ProblemDetailsContext>? customizeProblemDetails = null,
-            Action<CorsPolicyBuilder>? configureCorsPolicy = null)
+            Action<ProblemDetailsContext>? customizeProblemDetails = null)
         {
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
@@ -32,7 +28,6 @@ public static class BuilderExtensions
             ConfigureProblemDetails(builder, customizeBadHttpRequestProblemDetails, customizeProblemDetails);
             ConfigureApiVersioning(builder, apiDefinition.SupportedApiVersions);
             ConfigureOpenApi(builder, apiDefinition.SupportedApiVersions);
-            ConfigureCors(builder, configureCorsPolicy);
 
             return builder;
         }
@@ -125,44 +120,6 @@ public static class BuilderExtensions
             .Concat(serviceDiscoveryAuthorities)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-    }
-
-    private static void ConfigureCors(
-        IHostApplicationBuilder builder,
-        Action<CorsPolicyBuilder>? configureCorsPolicy)
-    {
-        builder.Services.AddCors(corsOptions =>
-        {
-            corsOptions.AddDefaultPolicy(policy =>
-            {
-                if (configureCorsPolicy is not null)
-                {
-                    configureCorsPolicy(policy);
-                    return;
-                }
-
-                if (builder.Environment.IsDevelopment())
-                {
-                    policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
-                    return;
-                }
-
-                var configuredOrigins = builder.Configuration
-                                            .GetSection(CorsAllowedOriginsConfigurationPath)
-                                            .Get<string[]>()
-                                        ?? [];
-
-                if (configuredOrigins.Length == 0)
-                    return;
-
-                policy.WithOrigins(configuredOrigins.Distinct(StringComparer.OrdinalIgnoreCase).ToArray())
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
-            });
-        });
     }
 
     private static void ConfigureProblemDetails(

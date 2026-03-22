@@ -36,12 +36,6 @@ export default defineNuxtConfig({
     serverCatalogApiBaseUrl: "",
     serverCustomersApiBaseUrl: "",
     serverSalesApiBaseUrl: "",
-    public: {
-      identityApiBaseUrl: "",
-      catalogApiBaseUrl: "",
-      customersApiBaseUrl: "",
-      salesApiBaseUrl: "",
-    },
   },
 
   compatibilityDate: "2025-01-15",

@@ -7,10 +7,6 @@ internal sealed class ServicesSettings
     public required AspireDashboardServiceEndpoint AspireDashboard { get; init; }
     public required ServiceEndpoint Postgres { get; init; }
     public required MinioServiceEndpoint Minio { get; init; }
-    public required ServiceEndpoint Identity { get; init; }
-    public required ServiceEndpoint Catalog { get; init; }
-    public required ServiceEndpoint Customers { get; init; }
-    public required ServiceEndpoint Sales { get; init; }
     public required ServiceEndpoint Storefront { get; init; }
     public required ServiceEndpoint Dashboard { get; init; }
 
@@ -36,10 +32,6 @@ internal sealed class ServicesSettings
                     if (endpoint.ConsolePort <= 0)
                         throw new InvalidOperationException("Services:Minio:ConsolePort must be greater than zero.");
                 }),
-            Identity = BindEndpoint<ServiceEndpoint>(servicesSection, "Identity"),
-            Catalog = BindEndpoint<ServiceEndpoint>(servicesSection, "Catalog"),
-            Customers = BindEndpoint<ServiceEndpoint>(servicesSection, "Customers"),
-            Sales = BindEndpoint<ServiceEndpoint>(servicesSection, "Sales"),
             Storefront = BindEndpoint<ServiceEndpoint>(servicesSection, "Storefront"),
             Dashboard = BindEndpoint<ServiceEndpoint>(servicesSection, "Dashboard")
         };
@@ -67,34 +59,15 @@ internal sealed class ServicesSettings
 
     private static void ValidateEndpoint(ServiceEndpoint endpoint, string path)
     {
-        if (string.IsNullOrWhiteSpace(endpoint.Domain))
-            throw new InvalidOperationException($"Services configuration value '{path}:Domain' is missing.");
-
         if (endpoint.Port <= 0)
             throw new InvalidOperationException(
                 $"Services configuration value '{path}:Port' must be greater than zero.");
-
-        if (!string.IsNullOrWhiteSpace(endpoint.Scheme) && !Uri.CheckSchemeName(endpoint.Scheme))
-            throw new InvalidOperationException(
-                $"Services configuration value '{path}:Scheme' is not a valid URI scheme.");
     }
 }
 
 internal class ServiceEndpoint
 {
-    public string Domain { get; init; } = string.Empty;
     public int Port { get; init; }
-    public string Scheme { get; init; } = "http";
-
-    public Uri ToUri()
-    {
-        return new UriBuilder(string.IsNullOrWhiteSpace(Scheme) ? Uri.UriSchemeHttp : Scheme, Domain, Port).Uri;
-    }
-
-    public string ToBaseUrl()
-    {
-        return ToUri().GetLeftPart(UriPartial.Authority);
-    }
 }
 
 internal sealed class MinioServiceEndpoint : ServiceEndpoint

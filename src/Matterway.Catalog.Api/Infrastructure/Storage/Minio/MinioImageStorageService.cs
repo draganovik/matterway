@@ -11,14 +11,14 @@ public sealed class MinioImageStorageService(
 {
     private readonly ImageStorageOptions _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-    public async Task<ImageStorageUploadResult> UploadAsync(Guid imageId, IFormFile file,
+    public async Task UploadAsync(Guid imageId, IFormFile file,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(file);
 
         if (file.Length == 0) throw new InvalidOperationException("Cannot upload an empty file.");
 
-        var objectName = BuildObjectName(imageId);
+        var objectName = CatalogImagePaths.BuildObjectName(imageId);
 
         await using var stream = file.OpenReadStream();
         var putObjectArgs = new PutObjectArgs()
@@ -31,13 +31,45 @@ public sealed class MinioImageStorageService(
 
         var client = clientFactory.CreateClient();
         await client.PutObjectAsync(putObjectArgs, cancellationToken).ConfigureAwait(false);
+    }
 
-        return new ImageStorageUploadResult(imageId, BuildPublicUrl(objectName));
+    public async Task<ImageStorageDownloadResult?> DownloadAsync(Guid imageId,
+        CancellationToken cancellationToken = default)
+    {
+        var objectName = CatalogImagePaths.BuildObjectName(imageId);
+        var client = clientFactory.CreateClient();
+
+        try
+        {
+            var stat = await client.StatObjectAsync(
+                new StatObjectArgs()
+                    .WithBucket(_options.Bucket)
+                    .WithObject(objectName),
+                cancellationToken).ConfigureAwait(false);
+
+            await using var buffer = new MemoryStream();
+            await client.GetObjectAsync(
+                new GetObjectArgs()
+                    .WithBucket(_options.Bucket)
+                    .WithObject(objectName)
+                    .WithCallbackStream(stream => stream.CopyTo(buffer)),
+                cancellationToken).ConfigureAwait(false);
+
+            return new ImageStorageDownloadResult(
+                buffer.ToArray(),
+                string.IsNullOrWhiteSpace(stat.ContentType)
+                    ? "application/octet-stream"
+                    : stat.ContentType);
+        }
+        catch (ObjectNotFoundException)
+        {
+            return null;
+        }
     }
 
     public async Task DeleteAsync(Guid imageId, CancellationToken cancellationToken = default)
     {
-        var objectName = BuildObjectName(imageId);
+        var objectName = CatalogImagePaths.BuildObjectName(imageId);
         var client = clientFactory.CreateClient();
         var removeArgs = new RemoveObjectArgs()
             .WithBucket(_options.Bucket)
@@ -51,19 +83,5 @@ public sealed class MinioImageStorageService(
         {
             // Ignore missing objects
         }
-    }
-
-    private static string BuildObjectName(Guid imageId)
-    {
-        return $"images/{imageId:N}";
-    }
-
-    private string BuildPublicUrl(string objectName)
-    {
-        var baseUrl = string.IsNullOrWhiteSpace(_options.PublicBaseUrl)
-            ? _options.Endpoint
-            : _options.PublicBaseUrl;
-
-        return $"{baseUrl.TrimEnd('/')}/{_options.Bucket}/{objectName}";
     }
 }

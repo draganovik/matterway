@@ -4,23 +4,19 @@ import {
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { buildServiceApiPath } from "~/utils/apiProxy"
 import type {
   AuthSession,
   LoginPayload,
   LoginResponse,
 } from "~/types/auth/session"
-import type { RuntimeConfig } from "nuxt/schema"
 
 const refreshCookieName = "mw_storefront_refresh"
-const authPath = "/api/public/v1/auth"
+const authBasePath = buildServiceApiPath("identity", "public", "auth")
 const authJsonHeaders = {
   "Content-Type": "application/json",
   accept: "application/json",
 } as const
-
-type StorefrontRuntimeConfig = RuntimeConfig & {
-  serverIdentityApiBaseUrl?: string
-}
 
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
@@ -126,7 +122,6 @@ function getCookieOptions() {
 }
 
 export function useAuthSessionStore() {
-  const config = useRuntimeConfig() as StorefrontRuntimeConfig
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
   const refreshCookie = useCookie<string | null>(refreshCookieName, {
@@ -170,23 +165,14 @@ export function useAuthSessionStore() {
     () => Boolean(session.value.accessToken) && !isAccessExpired(),
   )
 
-  function getAuthBaseUrl() {
-    const baseUrl = import.meta.server
-      ? config.serverIdentityApiBaseUrl
-      : config.public.identityApiBaseUrl
-
-    if (!baseUrl) {
-      throw new Error("Missing identity API base URL configuration.")
-    }
-
-    return `${baseUrl}${authPath}`
-  }
-
   function authFetch(
     path: "login" | "logout" | "refresh",
     options: RequestInit,
   ) {
-    return fetch(`${getAuthBaseUrl()}/${path}`, options)
+    return $fetch.raw(`${authBasePath}/${path}`, {
+      ...options,
+      ignoreResponseError: true,
+    } as Parameters<typeof $fetch.raw>[1])
   }
 
   function authJsonPost(
@@ -270,17 +256,25 @@ export function useAuthSessionStore() {
   }
 
   async function login(credentials: LoginPayload) {
-    const response = await authJsonPost("login", credentials)
+    const response = await authJsonPost("login", credentials).catch(() => null)
+
+    if (!response) {
+      throw new Error("Prijava trenutno nije moguća. Pokušajte ponovo.")
+    }
 
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error("Imejl adresa ili lozinka nisu ispravni.")
       }
-      const payload = await response.json().catch(() => null)
-      throw new Error(extractAuthError(payload) || "Prijava nije uspela.")
+      throw new Error(
+        extractAuthError(response._data) || "Prijava nije uspela.",
+      )
     }
 
-    const data = (await response.json()) as LoginResponse
+    const data = response._data as LoginResponse | undefined
+    if (!data) {
+      throw new Error("Prijava nije uspela.")
+    }
     setSession(data)
     if (!isCustomer.value) {
       clearSession()
@@ -307,14 +301,20 @@ export function useAuthSessionStore() {
     if (!refreshToken) return
     runtime.refreshPromise = (async () => {
       try {
-        const response = await authJsonPost("refresh", { refreshToken })
+        const response = await authJsonPost("refresh", { refreshToken }).catch(
+          () => null,
+        )
 
-        if (!response.ok) {
+        if (!response || !response.ok) {
           clearSession()
           return
         }
 
-        const data = (await response.json()) as LoginResponse
+        const data = response._data as LoginResponse | undefined
+        if (!data) {
+          clearSession()
+          return
+        }
         setSession(data)
         if (!isCustomer.value) {
           clearSession()

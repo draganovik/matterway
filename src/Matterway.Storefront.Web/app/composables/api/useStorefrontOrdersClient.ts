@@ -23,6 +23,10 @@ type CheckoutOrderApiResponse = {
 }
 
 function readErrorMessage(payload: unknown): string | undefined {
+  if (typeof payload === "string" && payload.trim()) {
+    return payload.trim()
+  }
+
   if (!payload || typeof payload !== "object") return undefined
 
   const withMessage = payload as {
@@ -107,13 +111,14 @@ export function useStorefrontOrdersClient() {
     const requestBody = JSON.stringify(buildCreateOrderPayload(payload))
 
     const runFetch = (authorization: string) =>
-      fetch("/api/v1/orders", {
+      $fetch.raw<CheckoutOrderApiResponse>("/api/storefront/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: authorization,
         },
         body: requestBody,
+        ignoreResponseError: true,
       })
 
     let authorization = auth.getAccessToken()
@@ -121,19 +126,32 @@ export function useStorefrontOrdersClient() {
       return noSessionResult()
     }
 
-    let response = await runFetch(authorization)
+    let response
+    try {
+      response = await runFetch(authorization)
+    } catch {
+      return {
+        ok: false,
+        error: "Porudžbina trenutno ne može da se završi. Pokušajte ponovo.",
+      }
+    }
     if (response.status === 401) {
       await auth.refreshTokens()
       authorization = auth.getAccessToken()
       if (!authorization) {
         return noSessionResult()
       }
-      response = await runFetch(authorization)
+      try {
+        response = await runFetch(authorization)
+      } catch {
+        return {
+          ok: false,
+          error: "Porudžbina trenutno ne može da se završi. Pokušajte ponovo.",
+        }
+      }
     }
 
-    const body = (await response
-      .json()
-      .catch(() => null)) as CheckoutOrderApiResponse | null
+    const body = response._data as CheckoutOrderApiResponse | null
     if (!response.ok) {
       return {
         ok: false,

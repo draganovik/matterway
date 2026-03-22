@@ -8,7 +8,7 @@ Customer-facing storefront for Matterway, aligned with the same Nuxt platform st
 - @nuxt/ui
 - Tailwind CSS v4
 - TypeScript
-- Server checkout orchestration via `/api/v1/orders` + Stripe webhook registration
+- Server checkout orchestration via `/api/storefront/checkout` + `/api/storefront/webhooks/stripe`
 
 ## Key Features
 
@@ -30,6 +30,7 @@ npm run build
 
 ## Notes
 
-- Runtime API URLs are configured via `NUXT_PUBLIC_*` environment variables.
+- Server-side API URLs are configured via `NUXT_SERVER_*` environment variables.
+- Browser-triggered API calls go through same-origin `/api/<service>/...` proxy routes.
 - Cart is intentionally cleared on sign in and sign out.
 - Admin/catalog management routes are disabled in Storefront.

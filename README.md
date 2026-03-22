@@ -1,39 +1,26 @@
 # Matterway Platform
 
-> A modular, service-oriented commerce platform built with .NET 10,
-> PostgreSQL, MinIO, and Nuxt 4 --- orchestrated through .NET Aspire.
+> A commerce platform for browsing products, managing customer accounts, and operating catalog, order, and payment workflows.
 
-Matterway is a full-stack commerce platform designed as a
-service-oriented backend with two modern Nuxt-based web applications:
+Matterway combines a customer storefront, an internal admin dashboard, and service-owned APIs for catalog, customers, identity, and sales. It runs on .NET 10 with PostgreSQL, MinIO, Nuxt 4, and .NET Aspire.
 
--   **Storefront.Web** --- Customer-facing SSR shopping experience
--   **Dashboard.Web** --- Internal SSR ERP / administration console
+## Overview
 
-The system follows strict service ownership boundaries (Catalog,
-Customers, Identity, Sales), centralized schema migration execution, and
-standardized platform defaults via `Matterway.ServiceDefaults`.
+Storefront.Web handles shopping and checkout. Dashboard.Web handles catalog and administrative workflows. Both use Nuxt server proxy routes to reach the backend APIs.
 
-------------------------------------------------------------------------
+## Architecture
 
-## Architecture Overview
-
-Matterway follows a distributed service architecture where:
-
--   Each API owns its data model and persistence schema
--   Cross-service communication is performed via typed HTTP clients
--   Relational data is stored in PostgreSQL (separate database per
-    service)
--   Media assets are stored in MinIO (S3-compatible object storage)
--   Orchestration and environment wiring are handled by `.NET Aspire`
-
-``` mermaid
+```mermaid
 flowchart LR
-  Storefront["Storefront Web"] --> Catalog["Catalog API"]
+  Browser["Browser"] --> Storefront["Storefront Web"]
+  Browser --> Dashboard["Dashboard Web"]
+
+  Storefront --> Catalog["Catalog API"]
   Storefront --> Customers["Customers API"]
   Storefront --> Identity["Identity API"]
   Storefront --> Sales["Sales API"]
 
-  Dashboard["Dashboard Web"] --> Catalog
+  Dashboard --> Catalog
   Dashboard --> Customers
   Dashboard --> Identity
   Dashboard --> Sales
@@ -50,127 +37,101 @@ flowchart LR
   Sales --> Postgres
 ```
 
-------------------------------------------------------------------------
+## Routing Model
 
-## Core Design Principles
+Internal API routes follow:
 
-### Backend Architecture
+- `/api/public/v1/...`
+- `/api/self/v1/...`
+- `/api/admin/v1/...`
+- `/api/system/v1/...`
 
--   **Style**: ASP.NET Core Minimal APIs
--   **Structure**: Feature-first layout (`Endpoints/<Scope>/<Endpoint>`)
--   **Versioning**: URL segment versioning (`v1`)
--   **Data ownership**: Each service owns its schema and database
--   **Cross-service calls**: Typed HttpClients with resilient defaults
+Browser-facing requests use the same-origin proxy routes exposed by the Nuxt apps:
 
-### API Routing Convention
+- `/api/<service>/<scope>/v1/...`
+- The Nuxt server forwards those requests to the internal API base URL injected by AppHost through `NUXT_SERVER_*`.
+- Storefront-owned orchestration and webhook routes live under `/api/storefront/...`.
 
-All APIs follow a consistent route format:
+Examples:
 
-    /api/{scope}/v{version}/...
+- `/api/identity/public/v1/auth`
+- `/api/catalog/public/v1/articles`
+- `/api/catalog/public/v1/images/<id>`
+- `/api/storefront/checkout`
+- `/api/storefront/webhooks/stripe`
 
-Where scope is:
+This keeps backend ports and CORS setup out of browser-facing code.
 
--   `public` --- Anonymous endpoints
--   `self` --- Authenticated user accessing own resources
--   `admin` --- Operator / employee workflows
--   `system` --- Trusted service-to-service endpoints
+## Authentication
 
-Example:
+- Identity.Api issues JWT access and refresh tokens
+- System-to-system endpoints can require `X-System-Access-Key`
+- Authorization is enforced through role and permission claims
 
-    /api/public/v1/auth
-    /api/self/v1/orders
-    /api/admin/v1/orders
+## Repository Layout
 
-------------------------------------------------------------------------
+```text
+src/
+  Matterway.AppHost/          Aspire orchestration and composition root
+  Matterway.ServiceDefaults/  Shared platform defaults
+  Matterway.Catalog.Api/      Catalog domain and MinIO integration
+  Matterway.Customers.Api/    Customer domain
+  Matterway.Identity.Api/     Authentication and JWT service
+  Matterway.Migrations/       EF Core migration runner
+  Matterway.Sales.Api/        Sales domain
+  Matterway.Storefront.Web/   Nuxt customer application
+  Matterway.Dashboard.Web/    Nuxt admin application
 
-## Authentication & Authorization
+scripts/                      Database, migration, and Docker Hub helpers
+data/                         Local artifacts such as catalog archives
+docs/                         Supporting diagrams and assets
+```
 
--   JWT access + refresh tokens issued by **Identity.Api**
--   Endpoints can explicitly require shared system access key (`X-System-Access-Key`)
--   Role-based and permission-claim (`perm`) authorization
--   Permission levels:
-    -   `observer`
-    -   `operator`
-    -   `administrator`
--   Enforcement handled via shared helpers in
-    `Matterway.ServiceDefaults`
+## Default Development Ports
 
-------------------------------------------------------------------------
-
-## Services and Ports (Default Development Setup)
-
-| Component           | Port  | Responsibility                                     |
-|---------------------|-------|----------------------------------------------------|
-| Catalog.Api         | 2001  | Articles, pricing, discounts, image metadata       |
-| Customers.Api       | 2002  | Profiles, addresses, carts, order mirror           |
-| Identity.Api        | 2003  | Authentication, token issuance, permissions        |
-| Sales.Api           | 2005  | Order lifecycle, payments, status tracking         |
-| Storefront.Web      | 3001  | Customer SSR app (Nuxt 4)                          |
-| Dashboard.Web       | 3002  | Admin SSR app (Nuxt 4)                             |
-| PostgreSQL          | 15432 | Relational datastore                               |
-| MinIO API           | 19000 | Object storage API                                 |
-| MinIO Console       | 19001 | Storage admin console                              |
-| Aspire Dashboard    | 18888 | Local orchestration + telemetry                    |
-
-## Repository Structure
-
-    src/
-      Matterway.AppHost/          Aspire orchestration & composition root
-      Matterway.ServiceDefaults/  Shared platform defaults (auth, OpenAPI, telemetry)
-      Matterway.Catalog.Api/      Catalog domain + MinIO integration
-      Matterway.Customers.Api/    Customer domain
-      Matterway.Identity.Api/     ASP.NET Identity + JWT service
-      Matterway.Migrations/       EF Core migration runner
-      Matterway.Sales.Api/        Sales domain
-      Matterway.Storefront.Web/   Nuxt customer application
-      Matterway.Dashboard.Web/    Nuxt admin application
-
-    scripts/                      EF migration + DB lifecycle helpers
-    data/                         Local artifacts (catalog archives, etc.)
-    docs/                         Architecture diagrams (PlantUML)
-
-------------------------------------------------------------------------
+| Component        | Port  | Responsibility                               |
+|------------------|-------|----------------------------------------------|
+| Catalog.Api      | 2001  | Articles, pricing, discounts, images         |
+| Customers.Api    | 2002  | Profiles, addresses, carts, order mirror     |
+| Identity.Api     | 2003  | Authentication, token issuance, permissions  |
+| Sales.Api        | 2005  | Orders, payments, status tracking            |
+| Storefront.Web   | 3001  | Customer SSR app                             |
+| Dashboard.Web    | 3002  | Admin SSR app                                |
+| PostgreSQL       | 15432 | Relational datastore                         |
+| MinIO API        | 19000 | Object storage API                           |
+| MinIO Console    | 19001 | Storage admin console                        |
+| Aspire Dashboard | 18888 | Local orchestration and telemetry            |
 
 ## Local Development
 
 ### Prerequisites
 
--   Docker (PostgreSQL + MinIO)
--   .NET SDK 10.x
--   Node.js 20+
--   dotnet-ef tool
--   Aspire CLI
--   Stripe CLI (for webhook testing)
+- Docker
+- .NET SDK 10.x
+- Node.js 20+
+- dotnet-ef tool
+- Aspire CLI
+- Stripe CLI for webhook testing
 
-------------------------------------------------------------------------
+### Restore
 
-### 1️⃣ Restore Dependencies
-
-``` bash
+```bash
 dotnet restore Matterway.slnx
 npm install --prefix src/Matterway.Storefront.Web
 npm install --prefix src/Matterway.Dashboard.Web
 ```
 
-------------------------------------------------------------------------
+### Configure AppHost
 
-### 2️⃣ Configure AppHost Settings (Development)
+AppHost reads topology values from:
 
-This section is for local development.
-
-AppHost loads non-secret environment settings from:
 - `src/Matterway.AppHost/appsettings.json`
-- `src/Matterway.AppHost/appsettings.{Environment}.json`
-
-For local runs, defaults are provided in:
 - `src/Matterway.AppHost/appsettings.Development.json`
-
-For production-like setup, copy and customize:
 - `src/Matterway.AppHost/appsettings.Production.json`
 
-Set required secret parameters via user-secrets:
+Set secret parameters with user-secrets:
 
-``` bash
+```bash
 dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:SystemAccessKey" "<value>" --project src/Matterway.AppHost
 dotnet user-secrets set "Parameters:PostgresPassword" "<value>" --project src/Matterway.AppHost
@@ -179,114 +140,79 @@ dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/M
 dotnet user-secrets set "Parameters:StripeSecretKey" "<value>" --project src/Matterway.AppHost
 ```
 
-For deployed environments, prefer environment variables or your platform's secret
-store for sensitive values.
+Required non-secret topology keys:
 
-Required non-secret topology keys (in AppHost appsettings):
 - `Services:AspireDashboard:*`
 - `Services:Postgres:*`
 - `Services:Minio:*`
-- `Services:Identity:*`
-- `Services:Catalog:*`
-- `Services:Customers:*`
-- `Services:Sales:*`
 - `Services:Storefront:*`
 - `Services:Dashboard:*`
 
-Required shared security key in each API appsettings:
-- `Security:SystemAccessKey`
+Runtime notes:
 
-The same key is also present in each service project's `Properties/appsettings*.json`
-for standalone API runs.
+- AppHost injects `NUXT_SERVER_IDENTITY_API_BASE_URL`, `NUXT_SERVER_CATALOG_API_BASE_URL`, `NUXT_SERVER_CUSTOMERS_API_BASE_URL`, and `NUXT_SERVER_SALES_API_BASE_URL` into the Nuxt apps.
+- Storefront.Web also receives `NUXT_SYSTEM_ACCESS_KEY` and `NUXT_STRIPE_SECRET_KEY`.
+- Browser-facing public service URLs are no longer needed.
+- Browser-side CORS setup is no longer needed.
+- API projects still need `Security:SystemAccessKey` for standalone runs.
+- `Matterway.Catalog.Api` image storage uses `ImageStorage:*` settings; AppHost wires these for the stack.
 
-Optional browser CORS allowlist (used outside Development):
-- `Cors:AllowedOrigins`
+### Run the Stack
 
-------------------------------------------------------------------------
-
-### 3️⃣ Run in Debug Mode
-
-``` bash
+```bash
 dotnet run --project src/Matterway.AppHost
 ```
 
-Apply database migrations:
+Useful commands:
 
-``` bash
-./scripts/databases_update.sh
+```bash
+./scripts/databases help
+./scripts/databases update
+./scripts/migrations help
+./scripts/migrations add
+./scripts/dockerhub help
+./scripts/dockerhub push help
 ```
 
-Stripe webhook forwarding:
-
-``` bash
-stripe listen --forward-to http://localhost:3001/api/v1/webhooks/stripe
+```bash
+stripe listen --forward-to http://localhost:3001/api/storefront/webhooks/stripe
 ```
 
-Checkout orchestration endpoint:
+## Deployment
 
-``` bash
-POST http://localhost:3001/api/v1/orders
+```bash
+aspire deploy --environment Production
 ```
 
-------------------------------------------------------------------------
+In non-dev deployments, only the `.Web` projects are exposed externally. Backend APIs stay internal and are reached through the Nuxt server proxy routes.
 
-### 4️⃣ E2E Deployment (Containerized)
+To retag and push the compose-built images, use the Docker Hub helper:
 
-``` bash
-aspire deploy --environment production
+```bash
+./scripts/dockerhub push <source-tag> [dest-tag] [namespace]
 ```
 
-Ensure production configuration values are set before deploying.
+## Database
 
-------------------------------------------------------------------------
-
-## Database & Migration Strategy
-
-Migration management is separated into:
-
--   `Matterway.Migrations` --- Runtime migrator resource
--   `scripts/*` --- Development EF Core CLI helpers
-
-Common workflows:
-
-``` bash
-./scripts/databases_drop.sh
-./scripts/databases_update.sh
-```
-
-------------------------------------------------------------------------
+- `Matterway.Migrations` handles runtime schema updates
+- `./scripts/databases update` applies local migrations
+- `./scripts/databases drop` removes local databases
+- `./scripts/migrations add` creates the `Initialize` migration across API projects
+- `./scripts/migrations remove` removes the latest migration across API projects
 
 ## Observability
 
-Provided by `Matterway.ServiceDefaults`:
+- OpenTelemetry instrumentation
+- Resilient HttpClient defaults
+- ProblemDetails standardization
+- OpenAPI generation
 
--   OpenTelemetry instrumentation
--   Resilient HttpClient defaults
--   ProblemDetails standardization
--   OpenAPI generation
--   Centralized auth & CORS configuration
+Storefront Web has server-side OTEL tracing. Dashboard Web currently does not.
 
-### Web app tracing (Storefront server only)
+## Documentation
 
-Nuxt OTEL server tracing is currently wired only for `Matterway.Storefront.Web`.
-
-The storefront Nuxt server reads OTLP settings from environment (`OTEL_EXPORTER_OTLP_*`,
-`OTEL_SERVICE_NAME`) and falls back to
-`DOTNET_DASHBOARD_OTLP_ENDPOINT_URL` when no explicit OTLP endpoint is provided.
-
-`Matterway.Dashboard.Web` currently has no server-side OTLP tracing setup.
-
-------------------------------------------------------------------------
-
-## Documentation Assets
-
-Located in `docs/`:
-
--   Platform class diagram
--   Checkout sequence diagram
-
-------------------------------------------------------------------------
+- `docs/` contains diagrams and supporting assets
 
 ## License
 
-MIT License --- see `LICENSE.txt`.
+MIT License. See `LICENSE.txt`.

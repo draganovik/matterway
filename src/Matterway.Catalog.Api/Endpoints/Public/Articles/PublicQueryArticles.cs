@@ -1,5 +1,6 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
+using Matterway.Catalog.Api.Infrastructure.Storage;
 
 namespace Matterway.Catalog.Api.Endpoints.Public.Articles;
 
@@ -107,6 +108,9 @@ public class PublicQueryArticles : IEndpoint
         var basePrice = entity.BasePrice;
         var price = entity.GetFinalPrice();
         var discount = entity.GetLatestActiveDiscount();
+        var thumbnail = entity.ArticleImages?
+            .OrderBy(pi => pi.OrderIndex)
+            .FirstOrDefault();
         return new QueryArticleResponse
         {
             Code = ArticleCode.Parse(entity.ArticleCode, null),
@@ -122,14 +126,8 @@ public class PublicQueryArticles : IEndpoint
                     ValidTo = discount.ValidTo
                 },
             Description = entity.Description,
-            ThumbnailUrl = entity.ArticleImages?
-                .OrderBy(pi => pi.OrderIndex)
-                .FirstOrDefault()
-                ?.ImageUrl,
-            ThumbnailAlt = entity.ArticleImages?
-                .OrderBy(pi => pi.OrderIndex)
-                .FirstOrDefault()
-                ?.ImageAlt,
+            ThumbnailUrl = thumbnail is null ? null : CatalogImagePaths.BuildPublicUrl(thumbnail.Id),
+            ThumbnailAlt = thumbnail?.ImageAlt,
             IsAvailable = entity.IsAvailable
         };
     }

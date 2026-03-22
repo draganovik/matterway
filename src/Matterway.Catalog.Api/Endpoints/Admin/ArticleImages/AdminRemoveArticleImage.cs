@@ -63,7 +63,14 @@ public class AdminRemoveArticleImage : IEndpoint
                 article);
         }
 
-        return TypedResults.Ok(MapToResponse(entity, article));
+        return TypedResults.Ok(new RemoveArticleImageResponse
+        {
+            Id = entity.Id,
+            OrderIndex = entity.OrderIndex,
+            ArticleCode = article,
+            ImageUrl = CatalogImagePaths.BuildPublicUrl(entity.Id),
+            ImageAlt = entity.ImageAlt
+        });
     }
 
     public record RemoveArticleImageResponse
@@ -74,17 +81,5 @@ public class AdminRemoveArticleImage : IEndpoint
         public string? ImageAlt { get; init; }
         public required ArticleCode ArticleCode { get; init; }
         public string Message { get; init; } = "Article image removed successfully.";
-    }
-
-    public static RemoveArticleImageResponse MapToResponse(ArticleImage entity, ArticleCode article)
-    {
-        return new RemoveArticleImageResponse
-        {
-            Id = entity.Id,
-            OrderIndex = entity.OrderIndex,
-            ArticleCode = article,
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
-        };
     }
 }
