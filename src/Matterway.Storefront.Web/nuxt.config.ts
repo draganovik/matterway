@@ -30,6 +30,8 @@ export default defineNuxtConfig({
     serverCatalogApiBaseUrl: "",
     serverCustomersApiBaseUrl: "",
     serverSalesApiBaseUrl: "",
+    serverImageCdnBaseUrl: "",
+    serverImageCdnBucket: "",
     systemAccessKey: "",
   },
 

@@ -46,9 +46,10 @@ public class AdminAddArticleImage : IEndpoint
             });
 
         var imageId = Guid.CreateVersion7();
+        string imageUrl;
         try
         {
-            await imageStorageService.UploadAsync(imageId, request.File, cancellationToken);
+            imageUrl = await imageStorageService.UploadAsync(imageId, request.File, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -65,7 +66,7 @@ public class AdminAddArticleImage : IEndpoint
             Id = imageId,
             ArticleCode = article.ToString(),
             OrderIndex = request.OrderIndex,
-            ImageUrl = CatalogImagePaths.BuildPublicUrl(imageId),
+            ImageUrl = imageUrl,
             ImageAlt = request.ImageAlt ?? string.Empty
         };
         ArticleImage? created;
@@ -98,11 +99,12 @@ public class AdminAddArticleImage : IEndpoint
             OrderIndex = created.OrderIndex,
             ArticleCode = article,
             ArticleName = articleEntity.Title,
-            ImageUrl = CatalogImagePaths.BuildPublicUrl(created.Id),
+            ImageUrl = created.ImageUrl,
             ImageAlt = created.ImageAlt
         };
 
-        return TypedResults.Created(articleImageModel.ImageUrl, articleImageModel);
+        var location = $"{httpContext.Request.PathBase}{httpContext.Request.Path}/{created.OrderIndex}";
+        return TypedResults.Created(location, articleImageModel);
     }
 
     public record AddArticleImageRequest

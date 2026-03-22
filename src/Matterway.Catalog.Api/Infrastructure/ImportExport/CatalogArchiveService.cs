@@ -87,7 +87,7 @@ public sealed class CatalogArchiveService(
         {
             foreach (var dbImage in dbImages)
             {
-                var objectName = CatalogImagePaths.BuildObjectName(dbImage.Id);
+                var objectName = ImageStoragePaths.BuildObjectName(dbImage.Id);
                 var (content, contentType) = await LoadImageContentAsync(objectName, cancellationToken);
 
                 var fileExtension = ResolveExtension(contentType);
@@ -168,7 +168,7 @@ public sealed class CatalogArchiveService(
                     ? GuessContentType(image.ImageFile)
                     : image.ContentType;
 
-                var objectName = CatalogImagePaths.BuildObjectName(image.Id);
+                var objectName = ImageStoragePaths.BuildObjectName(image.Id);
                 await client.PutObjectAsync(new PutObjectArgs()
                         .WithBucket(_options.Bucket)
                         .WithObject(objectName)
@@ -202,7 +202,8 @@ public sealed class CatalogArchiveService(
                     context.ArticleDetailText.AddRange(articleDetailTexts.Select(x => x.ToEntity()));
                     context.ArticleDetailNumeric.AddRange(articleDetailNumerics.Select(x => x.ToEntity()));
                     context.ArticleImage.AddRange(
-                        articleImages.Select(x => x.ToEntity(CatalogImagePaths.BuildPublicUrl(x.Id))));
+                        articleImages.Select(x =>
+                            x.ToEntity(ImageStoragePaths.BuildStorageUrl(_options.Endpoint, _options.Bucket, x.Id))));
 
                     await context.SaveChangesAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);

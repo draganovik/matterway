@@ -2,6 +2,7 @@ import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/api/useApiClient"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { buildServiceApiPath } from "~/utils/apiProxy"
+import { buildCatalogImageUrl } from "~/utils/catalogImages"
 import type { ApiResult } from "~/types/common/api"
 import type {
   AddArticleDetailRequest,
@@ -65,8 +66,21 @@ function readCode(source: AnyRecord) {
   return String(source.code ?? "")
 }
 
+function mapArticleImageProperty(payload: unknown): AddArticleImageResponse {
+  const source = asRecord(payload)
+  const id = asString(source.id) ?? ""
+
+  return {
+    id,
+    orderIndex: asNumber(source.orderIndex) ?? 0,
+    imageUrl: buildCatalogImageUrl(asString(source.imageUrl), id),
+    imageAlt: asString(source.imageAlt) ?? null,
+  }
+}
+
 function mapQueryArticleResponse(payload: unknown): QueryArticleResponse {
   const source = asRecord(payload)
+
   return {
     code: readCode(source),
     title: asString(source.title) ?? null,
@@ -76,7 +90,7 @@ function mapQueryArticleResponse(payload: unknown): QueryArticleResponse {
       ? (source.discount as QueryArticleResponse["discount"])
       : null,
     description: asString(source.description) ?? null,
-    thumbnailUrl: asString(source.thumbnailUrl) ?? null,
+    thumbnailUrl: buildCatalogImageUrl(asString(source.thumbnailUrl)),
     thumbnailAlt: asString(source.thumbnailAlt) ?? null,
     isAvailable: Boolean(source.isAvailable),
   }
@@ -84,6 +98,7 @@ function mapQueryArticleResponse(payload: unknown): QueryArticleResponse {
 
 function mapGetArticleResponse(payload: unknown): GetArticleResponse {
   const source = asRecord(payload)
+
   return {
     code: readCode(source),
     title: asString(source.title) ?? null,
@@ -94,7 +109,7 @@ function mapGetArticleResponse(payload: unknown): GetArticleResponse {
       : null,
     description: asString(source.description) ?? null,
     details: asArray(source.details) as GetArticleResponse["details"],
-    images: asArray(source.images) as GetArticleResponse["images"],
+    images: asArray(source.images).map(mapArticleImageProperty),
     createdAt: asString(source.createdAt) ?? null,
     updatedAt: asString(source.updatedAt) ?? null,
     isAvailable: Boolean(source.isAvailable),
@@ -219,7 +234,7 @@ export function useCatalogClient() {
     formData.append("file", payload.file)
     if (payload.imageAlt) formData.append("imageAlt", payload.imageAlt)
 
-    return api.request<AddArticleImageResponse>(
+    const response = await api.request<Record<string, unknown>>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images`,
       {
@@ -227,6 +242,15 @@ export function useCatalogClient() {
         body: formData,
       },
     )
+
+    if (!response.ok || !response.data) {
+      return response as ApiResult<AddArticleImageResponse>
+    }
+
+    return {
+      ...response,
+      data: mapArticleImageProperty(response.data),
+    } satisfies ApiResult<AddArticleImageResponse>
   }
 
   async function updateArticleImage(
@@ -234,7 +258,7 @@ export function useCatalogClient() {
     orderIndex: number | string,
     payload: UpdateArticleImageRequest,
   ) {
-    return api.request<UpdateArticleImageResponse>(
+    const response = await api.request<Record<string, unknown>>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
@@ -242,6 +266,15 @@ export function useCatalogClient() {
         body: JSON.stringify(payload),
       },
     )
+
+    if (!response.ok || !response.data) {
+      return response as ApiResult<UpdateArticleImageResponse>
+    }
+
+    return {
+      ...response,
+      data: mapArticleImageProperty(response.data),
+    } satisfies ApiResult<UpdateArticleImageResponse>
   }
 
   async function removeArticleImage(code: string, orderIndex: number | string) {

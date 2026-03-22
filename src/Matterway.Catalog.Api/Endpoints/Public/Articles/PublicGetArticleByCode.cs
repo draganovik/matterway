@@ -1,6 +1,5 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
-using Matterway.Catalog.Api.Infrastructure.Storage;
 
 namespace Matterway.Catalog.Api.Endpoints.Public.Articles;
 
@@ -140,7 +139,7 @@ public class PublicGetArticleByCode : IEndpoint
         {
             Id = entity.Id,
             OrderIndex = entity.OrderIndex,
-            ImageUrl = CatalogImagePaths.BuildPublicUrl(entity.Id),
+            ImageUrl = entity.ImageUrl,
             ImageAlt = entity.ImageAlt
         };
     }

@@ -11,14 +11,14 @@ public sealed class MinioImageStorageService(
 {
     private readonly ImageStorageOptions _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-    public async Task UploadAsync(Guid imageId, IFormFile file,
+    public async Task<string> UploadAsync(Guid imageId, IFormFile file,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(file);
 
         if (file.Length == 0) throw new InvalidOperationException("Cannot upload an empty file.");
 
-        var objectName = CatalogImagePaths.BuildObjectName(imageId);
+        var objectName = ImageStoragePaths.BuildObjectName(imageId);
 
         await using var stream = file.OpenReadStream();
         var putObjectArgs = new PutObjectArgs()
@@ -31,45 +31,13 @@ public sealed class MinioImageStorageService(
 
         var client = clientFactory.CreateClient();
         await client.PutObjectAsync(putObjectArgs, cancellationToken).ConfigureAwait(false);
-    }
 
-    public async Task<ImageStorageDownloadResult?> DownloadAsync(Guid imageId,
-        CancellationToken cancellationToken = default)
-    {
-        var objectName = CatalogImagePaths.BuildObjectName(imageId);
-        var client = clientFactory.CreateClient();
-
-        try
-        {
-            var stat = await client.StatObjectAsync(
-                new StatObjectArgs()
-                    .WithBucket(_options.Bucket)
-                    .WithObject(objectName),
-                cancellationToken).ConfigureAwait(false);
-
-            await using var buffer = new MemoryStream();
-            await client.GetObjectAsync(
-                new GetObjectArgs()
-                    .WithBucket(_options.Bucket)
-                    .WithObject(objectName)
-                    .WithCallbackStream(stream => stream.CopyTo(buffer)),
-                cancellationToken).ConfigureAwait(false);
-
-            return new ImageStorageDownloadResult(
-                buffer.ToArray(),
-                string.IsNullOrWhiteSpace(stat.ContentType)
-                    ? "application/octet-stream"
-                    : stat.ContentType);
-        }
-        catch (ObjectNotFoundException)
-        {
-            return null;
-        }
+        return ImageStoragePaths.BuildStorageUrl(_options.Endpoint, _options.Bucket, imageId);
     }
 
     public async Task DeleteAsync(Guid imageId, CancellationToken cancellationToken = default)
     {
-        var objectName = CatalogImagePaths.BuildObjectName(imageId);
+        var objectName = ImageStoragePaths.BuildObjectName(imageId);
         var client = clientFactory.CreateClient();
         var removeArgs = new RemoveObjectArgs()
             .WithBucket(_options.Bucket)

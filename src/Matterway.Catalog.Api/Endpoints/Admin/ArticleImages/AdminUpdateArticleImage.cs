@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
-using Matterway.Catalog.Api.Infrastructure.Storage;
 
 namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleImages;
 
@@ -52,7 +51,7 @@ public class AdminUpdateArticleImage : IEndpoint
             OrderIndex = updated.OrderIndex,
             ArticleCode = article,
             ArticleName = articleEntity.Title,
-            ImageUrl = CatalogImagePaths.BuildPublicUrl(updated.Id),
+            ImageUrl = updated.ImageUrl,
             ImageAlt = updated.ImageAlt
         });
     }

@@ -56,7 +56,8 @@ Examples:
 
 - `/api/identity/public/v1/auth`
 - `/api/catalog/public/v1/articles`
-- `/api/catalog/public/v1/images/<id>`
+- `/api/storefront/cdn/images/<id>`
+- `/api/dashboard/cdn/images/<id>`
 - `/api/storefront/checkout`
 - `/api/storefront/webhooks/stripe`
 

@@ -218,5 +218,7 @@ void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
         .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
         .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
-        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp);
+        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", minioHttpEndpoint)
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BUCKET", "article-images");
 }

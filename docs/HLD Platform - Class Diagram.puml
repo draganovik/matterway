@@ -131,10 +131,9 @@ package "Catalog" {
   }
 
   note right of ArticleImage
-    ImageUrl stores the browser-facing
-    proxy path /api/catalog/public/v1/images/<id>.
-    The bytes still live in MinIO behind
-    the Catalog API.
+    ImageUrl stores the canonical object URL.
+    Web apps derive their local image proxy path
+    from the image id and stream bytes from MinIO.
   end note
 
   Discount "0..*" -- "1" Article : articleCode
