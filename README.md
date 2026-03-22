@@ -95,9 +95,9 @@ docs/                         Supporting diagrams and assets
 | Catalog.Api      | 2001  | Articles, pricing, discounts, images         |
 | Customers.Api    | 2002  | Profiles, addresses, carts, order mirror     |
 | Identity.Api     | 2003  | Authentication, token issuance, permissions  |
-| Sales.Api        | 2005  | Orders, payments, status tracking            |
-| Storefront.Web   | 3001  | Customer SSR app                             |
-| Dashboard.Web    | 3002  | Admin SSR app                                |
+| Sales.Api        | 2004  | Orders, payments, status tracking            |
+| Storefront.Web   | 4001  | Customer SSR app                             |
+| Dashboard.Web    | 4002  | Admin SSR app                                |
 | PostgreSQL       | 15432 | Relational datastore                         |
 | MinIO API        | 19000 | Object storage API                           |
 | MinIO Console    | 19001 | Storage admin console                        |
@@ -176,7 +176,7 @@ Useful commands:
 ```
 
 ```bash
-stripe listen --forward-to http://localhost:3001/api/storefront/webhooks/stripe
+stripe listen --forward-to http://localhost:4001/api/storefront/webhooks/stripe
 ```
 
 ## Deployment

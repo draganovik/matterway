@@ -7,13 +7,7 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --ignore-scripts --no-audit --no-fund \
-    && arch="$(uname -m)" \
-    && case "$arch" in \
-      aarch64|arm64) npm install --no-save --no-audit --no-fund @oxc-parser/binding-linux-arm64-gnu ;; \
-      x86_64|amd64) npm install --no-save --no-audit --no-fund @oxc-parser/binding-linux-x64-gnu ;; \
-      *) echo "Unsupported architecture for oxc-parser native binding: $arch" >&2; exit 1 ;; \
-    esac
+    npm ci --ignore-scripts --no-audit --no-fund
 
 FROM deps AS build
 COPY . .

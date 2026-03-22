@@ -142,8 +142,10 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     where TProject : IProjectMetadata, new()
 {
     var api = builder.AddProject<TProject>(apiDefinition.AspireServiceName)
-        .WithExternalHttpEndpoints()
         .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+
+    if (!builder.ExecutionContext.IsPublishMode)
+        api = api.WithExternalHttpEndpoints();
 
     return configure(api).WaitFor(dbMigrator);
 }
