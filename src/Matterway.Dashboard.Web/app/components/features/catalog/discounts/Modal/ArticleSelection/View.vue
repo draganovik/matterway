@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "~/constants/pagination"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import type { QueryArticleResponse } from "~/types/catalog"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
@@ -35,13 +39,13 @@ const filter = ref("")
 const selectedArticleCodes = ref<string[]>([])
 const pagination = reactive({
   page: 1,
-  pageSize: 20,
+  pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
   totalCount: 0,
   totalPages: 1,
 })
 
-const pageSizes = [10, 20, 50, 100].map((value) => ({
-  label: `${value} / strana`,
+const pageSizes = PAGINATION_PAGE_SIZE_OPTIONS.map((value) => ({
+  label: String(value),
   value,
 }))
 
@@ -136,7 +140,7 @@ function changePage(page: number) {
 }
 
 function changePageSize(value: number) {
-  const next = Math.max(1, Number(value) || 20)
+  const next = Math.max(1, Number(value) || DEFAULT_PAGINATION_PAGE_SIZE)
   if (next === pagination.pageSize) return
   pagination.pageSize = next
   pagination.page = 1

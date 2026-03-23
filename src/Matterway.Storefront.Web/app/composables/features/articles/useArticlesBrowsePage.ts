@@ -6,11 +6,13 @@ import {
   type DetailFilterDefinition,
   type DetailFilterState,
 } from "~/lib/articles/filters"
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "~/constants/pagination"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import type { CatalogArticle } from "~/types/catalog/articles"
 import type { PaginationMeta } from "~/types/common/api"
-
-const DEFAULT_PAGE_SIZE = 9
 
 type FiltersState = {
   search: string
@@ -24,12 +26,25 @@ export function useArticlesBrowsePage() {
   const router = useRouter()
   const catalogApi = useCatalogClient()
   const requestVersion = ref(0)
+  const pageOptions = [...PAGINATION_PAGE_SIZE_OPTIONS]
 
   function getRouteQueryValue(value: unknown) {
     if (typeof value === "string") return value
     if (!Array.isArray(value)) return undefined
     const firstString = value.find((item) => typeof item === "string")
     return typeof firstString === "string" ? firstString : undefined
+  }
+
+  function normalizePageSize(value: unknown) {
+    const parsed = Number(
+      typeof value === "number"
+        ? value
+        : (getRouteQueryValue(value) ?? DEFAULT_PAGINATION_PAGE_SIZE),
+    )
+
+    return pageOptions.includes(parsed)
+      ? parsed
+      : DEFAULT_PAGINATION_PAGE_SIZE
   }
 
   function parseRouteFilterState(): FiltersState {
@@ -140,7 +155,7 @@ export function useArticlesBrowsePage() {
 
   const pagination = reactive({
     page: Number(route.query.page ?? 1),
-    pageSize: Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE),
+    pageSize: normalizePageSize(route.query.pageSize),
   })
 
   const items = ref<CatalogArticle[]>([])
@@ -152,7 +167,6 @@ export function useArticlesBrowsePage() {
   const detailDefinitions = ref<DetailFilterDefinition[]>([])
   const detailDefinitionsLoading = ref(false)
 
-  const pageOptions = [9, 12, 18]
   const showInitialSkeleton = computed(
     () => loading.value && !hasLoadedOnce.value,
   )
@@ -246,8 +260,7 @@ export function useArticlesBrowsePage() {
     filters.maxPrice = parsedFilters.maxPrice
     filters.detailFilters = parsedFilters.detailFilters
     pagination.page = Number(route.query.page ?? 1) || 1
-    pagination.pageSize =
-      Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE
+    pagination.pageSize = normalizePageSize(route.query.pageSize)
     detailDefinitions.value = withActiveFilterDefinitions(
       detailDefinitions.value,
     )
@@ -328,7 +341,7 @@ export function useArticlesBrowsePage() {
       query: {
         page: pagination.page !== 1 ? pagination.page : undefined,
         pageSize:
-          pagination.pageSize !== DEFAULT_PAGE_SIZE
+          pagination.pageSize !== DEFAULT_PAGINATION_PAGE_SIZE
             ? pagination.pageSize
             : undefined,
         filter: filter || undefined,
@@ -424,8 +437,9 @@ export function useArticlesBrowsePage() {
   }
 
   function changePageSize(size: number) {
-    if (size === pagination.pageSize) return
-    pagination.pageSize = size
+    const nextSize = normalizePageSize(size)
+    if (nextSize === pagination.pageSize) return
+    pagination.pageSize = nextSize
     pagination.page = 1
     updateRoute()
   }

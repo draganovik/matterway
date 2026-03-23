@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 withDefaults(
   defineProps<{
     items?: Array<Record<string, unknown>>
@@ -20,7 +21,7 @@ withDefaults(
     error: "",
     emptyMessage: "",
     page: 1,
-    pageSize: 20,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
     totalPages: 1,
   },

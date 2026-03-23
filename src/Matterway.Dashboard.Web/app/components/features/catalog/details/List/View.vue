@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import type { QueryDetailResponse } from "~/types/catalog"
 
 withDefaults(
@@ -18,7 +19,7 @@ withDefaults(
     loading: false,
     error: "",
     emptyMessage: "",
-    pageSize: 20,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
   },
 )
 

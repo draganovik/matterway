@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import type { SystemUserResponse } from "~/types/identity"
 
 type RoleFilterValue = "all" | "customers" | "employees"
@@ -28,7 +29,7 @@ withDefaults(
     error: "",
     emptyMessage: "",
     page: 1,
-    pageSize: 20,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
     totalPages: 1,
   },

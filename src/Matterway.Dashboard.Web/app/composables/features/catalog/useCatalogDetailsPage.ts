@@ -1,3 +1,7 @@
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  MAX_PAGINATION_PAGE_SIZE,
+} from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
@@ -25,7 +29,7 @@ export function useCatalogDetailsPage() {
 
   const details = ref<QueryDetailResponse[]>([])
   const filter = ref("")
-  const limit = ref(20)
+  const limit = ref(DEFAULT_PAGINATION_PAGE_SIZE)
 
   const selectedSlug = ref<string | null>(null)
   const selectedDetail = ref<QueryDetailResponse | null>(null)
@@ -76,7 +80,7 @@ export function useCatalogDetailsPage() {
     listState.error = ""
 
     const result = await api.queryDetails({
-      limit: Math.min(50, Math.max(1, limit.value)),
+      limit: Math.min(MAX_PAGINATION_PAGE_SIZE, Math.max(1, limit.value)),
       titleLike: String(filter.value ?? "").trim() || undefined,
     })
 
@@ -138,7 +142,10 @@ export function useCatalogDetailsPage() {
   }
 
   function updateLimit(value: number) {
-    const next = Math.min(50, Math.max(1, Number(value) || 20))
+    const next = Math.min(
+      MAX_PAGINATION_PAGE_SIZE,
+      Math.max(1, Number(value) || DEFAULT_PAGINATION_PAGE_SIZE),
+    )
     if (next === limit.value) return
     limit.value = next
     void loadDetails()

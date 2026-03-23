@@ -1,3 +1,4 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -27,7 +28,7 @@ export function useCatalogArticlesPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: 20 })
+  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
 
   const selectedCode = ref<string | null>(null)
   const selectedArticle = ref<GetArticleResponse | null>(null)
