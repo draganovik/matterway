@@ -16,14 +16,17 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 var existingCount = await context.ArticleImage
                     .Where(pi => pi.ArticleCode == requestModel.ArticleCode)
                     .CountAsync(cancellationToken);
+                var maxOrderIndex = await GetMaxOrderIndex(requestModel.ArticleCode, cancellationToken);
 
                 requestModel.OrderIndex = Math.Clamp(requestModel.OrderIndex, 0, existingCount);
 
-                await context.ArticleImage
-                    .Where(pi => pi.ArticleCode == requestModel.ArticleCode)
-                    .Where(pi => pi.OrderIndex >= requestModel.OrderIndex)
-                    .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(pi => pi.OrderIndex, pi => pi.OrderIndex + 1), cancellationToken);
+                if (maxOrderIndex is not null)
+                    await ShiftOrderRange(
+                        requestModel.ArticleCode,
+                        requestModel.OrderIndex,
+                        maxOrderIndex.Value,
+                        1,
+                        cancellationToken);
 
                 context.ArticleImage.Add(requestModel);
                 var affected = await context.SaveChangesAsync(cancellationToken);
@@ -68,11 +71,13 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                     return false;
                 }
 
-                await context.ArticleImage
-                    .Where(model => model.ArticleCode == normalizedCode)
-                    .Where(model => model.OrderIndex > orderIndex)
-                    .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(model => model.OrderIndex, model => model.OrderIndex - 1),
+                var maxOrderIndex = await GetMaxOrderIndex(normalizedCode, cancellationToken);
+                if (maxOrderIndex is not null)
+                    await ShiftOrderRange(
+                        normalizedCode,
+                        orderIndex + 1,
+                        maxOrderIndex.Value,
+                        -1,
                         cancellationToken);
 
                 await transaction.CommitAsync(cancellationToken);
@@ -93,6 +98,17 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
         return await
             context.ArticleImage.FirstOrDefaultAsync(x => x.OrderIndex == orderIndex && x.ArticleCode == normalizedCode,
                 cancellationToken);
+    }
+
+    public async Task<ICollection<ArticleImage>> GetByArticle(ArticleCode articleCode,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedCode = articleCode.Value;
+        return await context.ArticleImage
+            .AsNoTracking()
+            .Where(x => x.ArticleCode == normalizedCode)
+            .OrderBy(x => x.OrderIndex)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<ArticleImage?> Update(ArticleImage request, int targetOrderIndex,
@@ -126,21 +142,33 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 }
 
                 var clampedTarget = Math.Clamp(targetOrderIndex, 0, total - 1);
-
-                if (clampedTarget < existing.OrderIndex)
-                    await context.ArticleImage
-                        .Where(x => x.ArticleCode == request.ArticleCode)
-                        .Where(x => x.OrderIndex >= clampedTarget && x.OrderIndex < existing.OrderIndex)
-                        .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + 1), cancellationToken);
-                else if (clampedTarget > existing.OrderIndex)
-                    await context.ArticleImage
-                        .Where(x => x.ArticleCode == request.ArticleCode)
-                        .Where(x => x.OrderIndex > existing.OrderIndex && x.OrderIndex <= clampedTarget)
-                        .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - 1), cancellationToken);
-
                 var newAlt = request.ImageAlt ?? existing.ImageAlt;
+
+                if (clampedTarget != existing.OrderIndex)
+                {
+                    // Move the current row out of the indexed range before reordering neighbors.
+                    var temporaryOrderIndex =
+                        await GetTemporaryCurrentOrderIndex(request.ArticleCode, cancellationToken);
+                    await context.ArticleImage
+                        .Where(x => x.ArticleCode == request.ArticleCode && x.Id == request.Id)
+                        .ExecuteUpdateAsync(setters =>
+                            setters.SetProperty(x => x.OrderIndex, _ => temporaryOrderIndex), cancellationToken);
+
+                    if (clampedTarget < existing.OrderIndex)
+                        await ShiftOrderRange(
+                            request.ArticleCode,
+                            clampedTarget,
+                            existing.OrderIndex - 1,
+                            1,
+                            cancellationToken);
+                    else
+                        await ShiftOrderRange(
+                            request.ArticleCode,
+                            existing.OrderIndex + 1,
+                            clampedTarget,
+                            -1,
+                            cancellationToken);
+                }
 
                 var updatedRows = await context.ArticleImage
                     .Where(x => x.ArticleCode == request.ArticleCode && x.Id == request.Id)
@@ -167,5 +195,51 @@ public sealed class EfPgArticleImageRepository(CatalogDbComposer context) : IArt
                 throw;
             }
         });
+    }
+
+    private async Task ShiftOrderRange(
+        string articleCode,
+        int startOrderIndex,
+        int endOrderIndex,
+        int delta,
+        CancellationToken cancellationToken)
+    {
+        if (startOrderIndex > endOrderIndex) return;
+
+        var temporaryOffset = await GetTemporaryOffset(articleCode, cancellationToken);
+
+        await context.ArticleImage
+            .Where(x => x.ArticleCode == articleCode)
+            .Where(x => x.OrderIndex >= startOrderIndex && x.OrderIndex <= endOrderIndex)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex + temporaryOffset), cancellationToken);
+
+        await context.ArticleImage
+            .Where(x => x.ArticleCode == articleCode)
+            .Where(x => x.OrderIndex >= startOrderIndex + temporaryOffset &&
+                        x.OrderIndex <= endOrderIndex + temporaryOffset)
+            .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(x => x.OrderIndex, x => x.OrderIndex - temporaryOffset + delta),
+                cancellationToken);
+    }
+
+    private async Task<int?> GetMaxOrderIndex(string articleCode, CancellationToken cancellationToken)
+    {
+        return await context.ArticleImage
+            .Where(x => x.ArticleCode == articleCode)
+            .MaxAsync(x => (int?)x.OrderIndex, cancellationToken);
+    }
+
+    private async Task<int> GetTemporaryOffset(string articleCode, CancellationToken cancellationToken)
+    {
+        var maxOrderIndex = await GetMaxOrderIndex(articleCode, cancellationToken) ?? -1;
+        return checked(maxOrderIndex + 2);
+    }
+
+    private async Task<int> GetTemporaryCurrentOrderIndex(string articleCode, CancellationToken cancellationToken)
+    {
+        var maxOrderIndex = await GetMaxOrderIndex(articleCode, cancellationToken) ?? -1;
+        var temporaryOffset = checked(maxOrderIndex + 2);
+        return checked(maxOrderIndex + temporaryOffset + 1);
     }
 }

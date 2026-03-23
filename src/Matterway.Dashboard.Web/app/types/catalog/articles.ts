@@ -94,8 +94,12 @@ export type UpdateArticleImageRequest = {
   orderIndex?: NumberInput
 }
 
-export type AddArticleImageResponse = ArticleImageProperty
-export type UpdateArticleImageResponse = ArticleImageProperty
+export type ArticleImagesMutationResponse = {
+  images?: ArticleImageProperty[] | null
+  createdImageId?: string | null
+  updatedImageId?: string | null
+  deletedImageId?: string | null
+}
 
 export type AddArticleDetailRequest = {
   detailSlug: string

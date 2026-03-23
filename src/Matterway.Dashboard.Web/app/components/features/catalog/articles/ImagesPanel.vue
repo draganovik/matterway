@@ -29,10 +29,14 @@ const imageModalOpen = ref(false)
 const imageModalMode = ref<"add" | "edit">("add")
 const activeImage = ref<ArticleImageProperty | null>(null)
 
+function sortImages(next: ArticleImageProperty[]) {
+  return [...next].sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex))
+}
+
 watch(
   () => props.modelValue,
   (value) => {
-    images.value = Array.isArray(value) ? [...value] : []
+    images.value = Array.isArray(value) ? sortImages(value) : []
   },
   { immediate: true },
 )
@@ -46,8 +50,15 @@ watch(
 )
 
 function updateImages(next: ArticleImageProperty[]) {
-  images.value = [...next]
+  images.value = sortImages(next)
   emit("update:modelValue", images.value)
+}
+
+function applyReturnedImages(nextImages?: ArticleImageProperty[] | null) {
+  if (!Array.isArray(nextImages)) return false
+
+  updateImages(nextImages)
+  return true
 }
 
 function openAddImagesModal() {
@@ -81,24 +92,31 @@ async function addImage(payload: {
     addState.error = "Najpre sačuvajte artikal da biste dodali slike."
     return
   }
+  const code = props.code
   if (!payload.file) {
     addState.error = "Izaberite sliku za otpremanje."
     return
   }
   addState.loading = true
-  const result = await api.addArticleImage(props.code, {
+  const result = await api.addArticleImage(code, {
     orderIndex: payload.orderIndex,
     file: payload.file,
     imageAlt: payload.imageAlt,
   })
-  addState.loading = false
   if (!result.ok) {
+    addState.loading = false
     addState.error = result.error || "Dodavanje slike nije uspelo."
     return
   }
-  const next = [...images.value]
-  if (result.data) next.push(result.data)
-  updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
+
+  addState.loading = false
+  if (!applyReturnedImages(result.data?.images)) {
+    addState.error =
+      "Slika je dodata, ali odgovor ne sadrži ažuriranu listu slika."
+    imageModalOpen.value = false
+    return
+  }
+
   addState.success = "Slika je uspešno dodata."
   imageModalOpen.value = false
 }
@@ -107,6 +125,7 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
   updateState.error = ""
   updateState.success = ""
   if (!props.code) return
+  const code = props.code
   if (!activeImage.value) {
     updateState.error = "Izaberite sliku za izmenu."
     return
@@ -117,26 +136,24 @@ async function updateImage(payload: { orderIndex: number; imageAlt: string }) {
     return
   }
   updateState.loading = true
-  const result = await api.updateArticleImage(props.code, targetOrderIndex, {
+  const result = await api.updateArticleImage(code, targetOrderIndex, {
     imageAlt: payload.imageAlt,
     orderIndex: payload.orderIndex,
   })
-  updateState.loading = false
   if (!result.ok) {
+    updateState.loading = false
     updateState.error = result.error || "Ažuriranje slike nije uspelo."
     return
   }
-  const next = images.value.map((item) => {
-    if (item.id === activeImage.value?.id) {
-      return {
-        ...item,
-        orderIndex: payload.orderIndex,
-        imageAlt: payload.imageAlt,
-      }
-    }
-    return item
-  })
-  updateImages(next.sort((a, b) => Number(a.orderIndex) - Number(b.orderIndex)))
+
+  updateState.loading = false
+  if (!applyReturnedImages(result.data?.images)) {
+    updateState.error =
+      "Slika je ažurirana, ali odgovor ne sadrži ažuriranu listu slika."
+    imageModalOpen.value = false
+    return
+  }
+
   updateState.success = "Slika je uspešno ažurirana."
   imageModalOpen.value = false
 }
@@ -145,14 +162,22 @@ async function removeImage(image: ArticleImageProperty) {
   removeState.error = ""
   removeState.success = ""
   if (!props.code) return
+  const code = props.code
   removeState.loading = true
-  const result = await api.removeArticleImage(props.code, image.orderIndex)
-  removeState.loading = false
+  const result = await api.removeArticleImage(code, image.orderIndex)
   if (!result.ok) {
+    removeState.loading = false
     removeState.error = result.error || "Uklanjanje slike nije uspelo."
     return
   }
-  updateImages(images.value.filter((item) => item.id !== image.id))
+
+  removeState.loading = false
+  if (!applyReturnedImages(result.data?.images)) {
+    removeState.error =
+      "Slika je uklonjena, ali odgovor ne sadrži ažuriranu listu slika."
+    return
+  }
+
   removeState.success = "Slika je uspešno uklonjena."
 }
 

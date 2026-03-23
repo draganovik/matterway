@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Endpoints.Public.Articles;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
@@ -36,8 +37,7 @@ public class AdminAddArticleImage : IEndpoint
         IImageStorageService imageStorageService,
         CancellationToken cancellationToken)
     {
-        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
-        if (articleEntity is null) return TypedResults.NotFound();
+        if (await articleRepository.GetBy(article, cancellationToken) is null) return TypedResults.NotFound();
 
         if (request.File is null || request.File.Length == 0)
             return TypedResults.BadRequest(new ProblemDetails
@@ -95,14 +95,13 @@ public class AdminAddArticleImage : IEndpoint
             return TypedResults.BadRequest(problemDetails);
         }
 
+        var refreshedImages = await articleImageRepository.GetByArticle(article, cancellationToken);
         var articleImageModel = new AddArticleImageResponse
         {
-            Id = created.Id,
-            OrderIndex = created.OrderIndex,
-            ArticleCode = article,
-            ArticleName = articleEntity.Title,
-            ImageUrl = created.ImageUrl,
-            ImageAlt = created.ImageAlt
+            Images = refreshedImages
+                .Select(PublicGetArticleByCode.MapImageToResponse)
+                .ToList(),
+            CreatedImageId = created.Id
         };
 
         var location = $"{httpContext.Request.PathBase}{httpContext.Request.Path}/{created.OrderIndex}";
@@ -123,11 +122,7 @@ public class AdminAddArticleImage : IEndpoint
 
     public record AddArticleImageResponse
     {
-        public Guid Id { get; init; }
-        public int OrderIndex { get; init; }
-        public required ArticleCode ArticleCode { get; init; }
-        public string? ArticleName { get; init; }
-        public string? ImageUrl { get; init; }
-        public string? ImageAlt { get; init; }
+        public ICollection<PublicGetArticleByCode.ArticleImageProperty>? Images { get; init; } = [];
+        public required Guid CreatedImageId { get; init; }
     }
 }

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
+using Matterway.Catalog.Api.Endpoints.Public.Articles;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 
 namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleImages;
@@ -27,13 +27,9 @@ public class AdminUpdateArticleImage : IEndpoint
         ArticleCode article,
         int orderIndex,
         UpdateArticleImageRequest request,
-        IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         CancellationToken cancellationToken)
     {
-        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
-        if (articleEntity is null) return TypedResults.NotFound();
-
         var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
@@ -43,18 +39,17 @@ public class AdminUpdateArticleImage : IEndpoint
 
         if (targetOrderIndex < 0) targetOrderIndex = 0;
 
-        var updated = await articleImageRepository.Update(entity, targetOrderIndex, cancellationToken);
+        if (await articleImageRepository.Update(entity, targetOrderIndex, cancellationToken) is null)
+            return TypedResults.NotFound();
 
-        if (updated is null) return TypedResults.NotFound();
+        var refreshedImages = await articleImageRepository.GetByArticle(article, cancellationToken);
 
         return TypedResults.Ok(new UpdateArticleImageResponse
         {
-            Id = updated.Id,
-            OrderIndex = updated.OrderIndex,
-            ArticleCode = article,
-            ArticleName = articleEntity.Title,
-            ImageUrl = updated.ImageUrl,
-            ImageAlt = updated.ImageAlt
+            Images = refreshedImages
+                .Select(PublicGetArticleByCode.MapImageToResponse)
+                .ToList(),
+            UpdatedImageId = entity.Id
         });
     }
 
@@ -68,11 +63,7 @@ public class AdminUpdateArticleImage : IEndpoint
 
     public record UpdateArticleImageResponse
     {
-        public Guid Id { get; init; }
-        public int OrderIndex { get; init; }
-        public required ArticleCode ArticleCode { get; init; }
-        public string? ArticleName { get; init; }
-        public string? ImageUrl { get; init; }
-        public string? ImageAlt { get; init; }
+        public ICollection<PublicGetArticleByCode.ArticleImageProperty>? Images { get; init; } = [];
+        public required Guid UpdatedImageId { get; init; }
     }
 }

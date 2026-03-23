@@ -1,4 +1,5 @@
 using Matterway.Catalog.Api.Domain.Entities;
+using Matterway.Catalog.Api.Endpoints.Public.Articles;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 
@@ -13,7 +14,7 @@ public class AdminRemoveArticleImage : IEndpoint
         endpoints.MapDelete(EndpointKind.Admin, "articles/{article:ArticleCode}/images/{orderIndex:int}", Handle)
             .WithName(RouteName).WithSummary("[admin] Remove an ArticleImage")
             .WithTags(nameof(ArticleImage))
-            .Produces(StatusCodes.Status200OK)
+            .Produces<RemoveArticleImageResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(policy =>
@@ -60,23 +61,19 @@ public class AdminRemoveArticleImage : IEndpoint
                 article);
         }
 
+        var refreshedImages = await articleImageRepository.GetByArticle(article, cancellationToken);
         return TypedResults.Ok(new RemoveArticleImageResponse
         {
-            Id = entity.Id,
-            OrderIndex = entity.OrderIndex,
-            ArticleCode = article,
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
+            Images = refreshedImages
+                .Select(PublicGetArticleByCode.MapImageToResponse)
+                .ToList(),
+            DeletedImageId = entity.Id
         });
     }
 
     public record RemoveArticleImageResponse
     {
-        public Guid Id { get; init; }
-        public int OrderIndex { get; init; }
-        public required string ImageUrl { get; init; }
-        public string? ImageAlt { get; init; }
-        public required ArticleCode ArticleCode { get; init; }
-        public string Message { get; init; } = "Article image removed successfully.";
+        public ICollection<PublicGetArticleByCode.ArticleImageProperty>? Images { get; init; } = [];
+        public required Guid DeletedImageId { get; init; }
     }
 }
