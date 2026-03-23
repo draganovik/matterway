@@ -1,3 +1,4 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { parseNumberOr } from "~/utils/numbers"
 
 type NumericLike = string | number | null | undefined
@@ -17,7 +18,7 @@ type UsePaginationStateOptions = {
 export function usePaginationState(options: UsePaginationStateOptions = {}) {
   const pagination = reactive({
     page: Math.max(1, options.page ?? 1),
-    pageSize: Math.max(1, options.pageSize ?? 20),
+    pageSize: Math.max(1, options.pageSize ?? DEFAULT_PAGINATION_PAGE_SIZE),
     totalCount: 0,
     totalPages: 1,
   })

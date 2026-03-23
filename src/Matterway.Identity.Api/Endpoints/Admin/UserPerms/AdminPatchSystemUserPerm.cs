@@ -8,10 +8,12 @@ namespace Matterway.Identity.Api.Endpoints.Admin.UserPerms;
 
 public class AdminPatchSystemUserPerm : IEndpoint
 {
+    private const string RouteName = nameof(AdminPatchSystemUserPerm);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Admin, "system-users/{id:guid}/perms", Handler)
-            .WithName("AdminPatchSystemUserPerm")
+            .WithName(RouteName)
             .WithSummary("[admin] Set a permission for a system user")
             .WithTags("SystemUsers")
             .Produces<IEnumerable<PatchSystemUserPermResponse>>(StatusCodes.Status200OK)

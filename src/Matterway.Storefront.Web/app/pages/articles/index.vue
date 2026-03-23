@@ -31,6 +31,21 @@ const {
   goToPage,
   changePageSize,
 } = useArticlesBrowsePage()
+
+const { targetRef: resultsSection, requestScrollReset } = useScrollReset(items)
+
+function handlePageChange(page: number) {
+  if (page === pagination.page) return
+  if (
+    page < 1 ||
+    ((meta.value?.totalPages ?? 0) && page > (meta.value?.totalPages ?? 0))
+  ) {
+    return
+  }
+
+  requestScrollReset()
+  goToPage(page)
+}
 </script>
 
 <template>
@@ -58,18 +73,18 @@ const {
       </div>
 
       <ArticlesBrowsePaginationPanel
-        class="mt-auto"
+        class="mt-auto hidden lg:block"
         :page="pagination.page"
         :page-size="pagination.pageSize"
         :page-options="pageOptions"
         :total-count="meta?.totalCount ?? 0"
         :total-pages="meta?.totalPages ?? 0"
-        @go-to-page="goToPage"
+        @go-to-page="handlePageChange"
         @update:page-size="changePageSize"
       />
     </div>
 
-    <div class="space-y-5">
+    <div ref="resultsSection" class="scroll-mt-24 space-y-5">
       <StatusMessages v-if="error" :error="error" />
 
       <div
@@ -98,6 +113,17 @@ const {
         v-else
         :items="items"
         :is-refreshing="isRefreshing"
+      />
+
+      <ArticlesBrowsePaginationPanel
+        class="lg:hidden"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        :page-options="pageOptions"
+        :total-count="meta?.totalCount ?? 0"
+        :total-pages="meta?.totalPages ?? 0"
+        @go-to-page="handlePageChange"
+        @update:page-size="changePageSize"
       />
     </div>
   </div>

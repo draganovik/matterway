@@ -5,10 +5,12 @@ namespace Matterway.Sales.Api.Endpoints.Self.Orders;
 
 public class SelfQueryOrders : IEndpoint
 {
+    private const string RouteName = nameof(SelfQueryOrders);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "orders", Handler)
-            .WithName("SelfQueryOrders").WithSummary("[self] Query own Orders.")
+            .WithName(RouteName).WithSummary("[self] Query own Orders.")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<SelfGetOrderById.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
@@ -41,7 +43,7 @@ public class SelfQueryOrders : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "SelfQueryOrders",
+            RouteName,
             null);
 
         var results = entities.Select(SelfGetOrderById.MapToResponse).ToList();

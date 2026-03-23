@@ -8,7 +8,7 @@ export type {
 export type {
   AddArticleDetailRequest,
   AddArticleImageRequest,
-  AddArticleImageResponse,
+  ArticleImagesMutationResponse,
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
@@ -18,7 +18,6 @@ export type {
   QueryArticlesResponse,
   UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
-  UpdateArticleImageResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "./articles"
@@ -28,6 +27,7 @@ export type {
   PutDetailResponse,
   QueryDetailResponse,
   QueryDetailsParams,
+  QueryDetailsResponse,
 } from "./details"
 export type {
   CreateDiscountRequest,

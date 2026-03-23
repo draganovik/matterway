@@ -10,10 +10,12 @@ namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
 public class AdminUpdateSystemUser : IEndpoint
 {
+    private const string RouteName = nameof(AdminUpdateSystemUser);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Admin, "system-users/{id:guid}", Handler)
-            .WithName("AdminUpdateSystemUser").WithSummary("[admin] Update system user by id")
+            .WithName(RouteName).WithSummary("[admin] Update system user by id")
             .WithTags("SystemUsers")
             .Produces<UpdateSystemUserResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

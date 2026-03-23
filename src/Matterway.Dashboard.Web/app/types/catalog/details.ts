@@ -1,5 +1,8 @@
+import type { PaginationResponse } from "../common/pagination"
+
 export type QueryDetailsParams = {
-  limit: number
+  page: number
+  pageSize: number
   titleLike?: string
 }
 
@@ -8,6 +11,8 @@ export type QueryDetailResponse = {
   title?: string | null
   unit?: string | null
 }
+
+export type QueryDetailsResponse = PaginationResponse<QueryDetailResponse>
 
 export type PutDetailRequest = {
   title: string

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "~/constants/pagination"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import type { QueryArticleResponse } from "~/types/catalog"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
@@ -35,13 +39,13 @@ const filter = ref("")
 const selectedArticleCodes = ref<string[]>([])
 const pagination = reactive({
   page: 1,
-  pageSize: 20,
+  pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
   totalCount: 0,
   totalPages: 1,
 })
 
-const pageSizes = [10, 20, 50, 100].map((value) => ({
-  label: `${value} / strana`,
+const pageSizes = PAGINATION_PAGE_SIZE_OPTIONS.map((value) => ({
+  label: String(value),
   value,
 }))
 
@@ -136,7 +140,7 @@ function changePage(page: number) {
 }
 
 function changePageSize(value: number) {
-  const next = Math.max(1, Number(value) || 20)
+  const next = Math.max(1, Number(value) || DEFAULT_PAGINATION_PAGE_SIZE)
   if (next === pagination.pageSize) return
   pagination.pageSize = next
   pagination.page = 1
@@ -201,7 +205,7 @@ function submitSelection() {
         <UFormField label="Pretraga">
           <UTextarea
             v-model="filter"
-            placeholder="Pretraga pomoću RSQL filtera (npr. title==chair;available==true)."
+            placeholder="Pretraga pomoću RSQL filtera (npr. title==NAS;available==true)."
             :rows="3"
             class="w-full"
           />
@@ -242,14 +246,23 @@ function submitSelection() {
           @toggle="toggleSelection"
         />
 
-        <div
-          class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
-        >
-          <div class="text-muted text-sm">
+        <div class="border-default space-y-3 border-t pt-3">
+          <UFormField label="Po stranici" class="w-full">
+            <USelect
+              :items="pageSizes"
+              :model-value="pagination.pageSize"
+              placeholder="Izaberi broj"
+              class="w-full"
+              @update:model-value="changePageSize(Number($event))"
+            />
+          </UFormField>
+
+          <div class="text-muted text-center text-sm">
             Strana {{ pagination.page }} od {{ pagination.totalPages }} - ukupno
             {{ pagination.totalCount }}
           </div>
-          <div class="flex items-center gap-2">
+
+          <div class="flex justify-center">
             <UPagination
               :page="pagination.page"
               :items-per-page="pagination.pageSize"
@@ -258,17 +271,6 @@ function submitSelection() {
               show-controls
               @update:page="changePage"
             />
-            <UFormField label="Po stranici">
-              <USelectMenu
-                :items="pageSizes"
-                :model-value="pagination.pageSize"
-                value-key="value"
-                label-key="label"
-                placeholder="Izaberi broj"
-                class="min-w-34"
-                @update:model-value="changePageSize"
-              />
-            </UFormField>
           </div>
         </div>
       </div>

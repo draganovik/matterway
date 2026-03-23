@@ -6,10 +6,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Articles;
 
 public class AdminCreateArticle : IEndpoint
 {
+    private const string RouteName = nameof(AdminCreateArticle);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "articles", Handle)
-            .WithName("AdminCreateArticle").WithSummary("[admin] Create a new Article")
+            .WithName(RouteName).WithSummary("[admin] Create a new Article")
             .WithTags("Articles")
             .Produces<CreateArticleResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

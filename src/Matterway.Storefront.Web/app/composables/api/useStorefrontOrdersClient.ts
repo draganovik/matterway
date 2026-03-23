@@ -1,6 +1,6 @@
 import type { ParsedCardExpiry } from "~/types/checkout"
-import type { CheckoutAddress } from "~/types/customers/address"
-import type { SalesOrder } from "~/types/sales/orders"
+import type { CheckoutAddress } from "~/types/customers"
+import type { SalesOrder } from "~/types/sales"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 
 type CreateCheckoutOrderRequest = {

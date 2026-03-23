@@ -1,5 +1,7 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
+import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { normalizeSlug } from "~/utils/normalization"
 import type { QueryDetailResponse } from "~/types/catalog"
@@ -25,7 +27,15 @@ export function useCatalogDetailsPage() {
 
   const details = ref<QueryDetailResponse[]>([])
   const filter = ref("")
-  const limit = ref(20)
+  const {
+    pagination,
+    resetTotals,
+    applyMeta,
+    changePage,
+    changePageSize,
+    searchWithPageReset,
+    watchPagination,
+  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
 
   const selectedSlug = ref<string | null>(null)
   const selectedDetail = ref<QueryDetailResponse | null>(null)
@@ -38,14 +48,6 @@ export function useCatalogDetailsPage() {
   })
 
   const canDelete = computed(() => Boolean(selectedSlug.value))
-
-  function sortDetails(items: QueryDetailResponse[]) {
-    return [...items].sort((a, b) => {
-      const left = (a.title || a.slug || "").toLowerCase()
-      const right = (b.title || b.slug || "").toLowerCase()
-      return left.localeCompare(right)
-    })
-  }
 
   function applyDetailToForm(detail: QueryDetailResponse | null) {
     if (!detail) {
@@ -64,6 +66,18 @@ export function useCatalogDetailsPage() {
     }
   }
 
+  function clearSelectedDetail() {
+    selectedSlug.value = null
+    selectedDetail.value = null
+    applyDetailToForm(null)
+  }
+
+  function resetDetailsList() {
+    details.value = []
+    resetTotals()
+    clearSelectedDetail()
+  }
+
   function resetMessages() {
     saveState.error = ""
     saveState.success = ""
@@ -76,7 +90,8 @@ export function useCatalogDetailsPage() {
     listState.error = ""
 
     const result = await api.queryDetails({
-      limit: Math.min(50, Math.max(1, limit.value)),
+      page: pagination.page,
+      pageSize: pagination.pageSize,
       titleLike: String(filter.value ?? "").trim() || undefined,
     })
 
@@ -85,11 +100,17 @@ export function useCatalogDetailsPage() {
     if (!result.ok) {
       listState.error =
         result.error || "Učitavanje definicija detalja nije uspelo."
-      details.value = []
+      resetDetailsList()
       return
     }
 
-    details.value = sortDetails(result.data || [])
+    if (result.status === 204 || !result.data) {
+      resetDetailsList()
+      return
+    }
+
+    details.value = result.data.data || []
+    applyMeta(result.data.meta, details.value.length)
 
     if (selectedSlug.value) {
       const match =
@@ -134,14 +155,7 @@ export function useCatalogDetailsPage() {
   }
 
   function searchDetails() {
-    void loadDetails()
-  }
-
-  function updateLimit(value: number) {
-    const next = Math.min(50, Math.max(1, Number(value) || 20))
-    if (next === limit.value) return
-    limit.value = next
-    void loadDetails()
+    searchWithPageReset(loadDetails)
   }
 
   async function saveDetail() {
@@ -181,15 +195,16 @@ export function useCatalogDetailsPage() {
       title: result.data?.title ?? title,
       unit: result.data?.unit ?? (unit || null),
     }
+    const targetSlug = nextDetail.slug || slug
+    selectedSlug.value = targetSlug
 
-    const withoutCurrent = details.value.filter(
-      (item) => item.slug !== nextDetail.slug,
-    )
-    details.value = sortDetails([...withoutCurrent, nextDetail])
+    await loadDetails()
 
-    selectedSlug.value = nextDetail.slug || slug
-    selectedDetail.value = nextDetail
-    applyDetailToForm(nextDetail)
+    const refreshedDetail =
+      details.value.find((item) => item.slug === targetSlug) || nextDetail
+    selectedSlug.value = targetSlug
+    selectedDetail.value = refreshedDetail
+    applyDetailToForm(refreshedDetail)
 
     saveState.success = "Detalj je uspešno ažuriran."
   }
@@ -214,26 +229,34 @@ export function useCatalogDetailsPage() {
       return
     }
 
-    details.value = details.value.filter((item) => item.slug !== slug)
-    selectedSlug.value = null
-    selectedDetail.value = null
-    applyDetailToForm(null)
+    const wasLastItemOnPage = details.value.length === 1
+    clearSelectedDetail()
     deleteConfirmOpen.value = false
+
+    if (wasLastItemOnPage && pagination.page > 1) {
+      changePage(pagination.page - 1)
+    } else {
+      await loadDetails()
+    }
 
     removeState.success = result.data?.message || "Detalj je uspešno uklonjen."
   }
 
-  function handleDetailCreated(detail: QueryDetailResponse) {
-    const next = details.value.filter((item) => item.slug !== detail.slug)
-    details.value = sortDetails([...next, detail])
-
+  async function handleDetailCreated(detail: QueryDetailResponse) {
     const slug = detail.slug || ""
-    if (!slug) return
+    selectedSlug.value = slug || null
 
+    await loadDetails()
+
+    if (!slug) return
+    const createdDetail =
+      details.value.find((item) => item.slug === slug) || detail
     selectedSlug.value = slug
-    selectedDetail.value = detail
-    applyDetailToForm(detail)
+    selectedDetail.value = createdDetail
+    applyDetailToForm(createdDetail)
   }
+
+  watchPagination(loadDetails)
 
   onMounted(() => {
     void loadDetails()
@@ -246,7 +269,9 @@ export function useCatalogDetailsPage() {
     removeState,
     details,
     filter,
-    limit,
+    pagination,
+    changePage,
+    changePageSize,
     selectedSlug,
     selectedDetail,
     createModalOpen,
@@ -257,7 +282,6 @@ export function useCatalogDetailsPage() {
     requestRemoveDetail,
     selectDetail,
     searchDetails,
-    updateLimit,
     saveDetail,
     removeDetail,
     handleDetailCreated,

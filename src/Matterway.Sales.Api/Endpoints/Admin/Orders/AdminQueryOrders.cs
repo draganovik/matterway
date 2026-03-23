@@ -5,10 +5,12 @@ namespace Matterway.Sales.Api.Endpoints.Admin.Orders;
 
 public class AdminQueryOrders : IEndpoint
 {
+    private const string RouteName = nameof(AdminQueryOrders);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "orders", Handler)
-            .WithName("AdminQueryOrders").WithSummary("[admin] Query Orders")
+            .WithName(RouteName).WithSummary("[admin] Query Orders")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<AdminGetOrderById.OrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
@@ -40,7 +42,7 @@ public class AdminQueryOrders : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "AdminQueryOrders",
+            RouteName,
             null);
 
         var results = entities.Select(AdminGetOrderById.MapToResponse).ToList();

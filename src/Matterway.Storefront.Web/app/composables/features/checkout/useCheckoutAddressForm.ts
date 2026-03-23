@@ -1,4 +1,4 @@
-import type { CheckoutAddress } from "~/types/customers/address"
+import type { CheckoutAddress } from "~/types/customers"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"
 
 function createInitialAddress(): CheckoutAddress {

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import type { ArticleImageProperty } from "~/types/catalog"
+import {
+  catalogImageUploadAccept,
+  getSupportedCatalogImageFormatsLabel,
+  isSupportedCatalogImageFile,
+} from "~/utils/catalogImages"
 
 type ImageSubmitPayload = {
   orderIndex: number
@@ -41,6 +46,7 @@ const file = ref<File | null>(null)
 const orderIndex = ref<number | null>(0)
 const imageAlt = ref("")
 const validationError = ref("")
+const supportedFormatsLabel = getSupportedCatalogImageFormatsLabel()
 
 const controlsDisabled = computed(
   () => !props.canEdit || props.loading || props.mode !== "add",
@@ -69,10 +75,9 @@ function setSelectedFile(next: File | null) {
     return
   }
 
-  const isImage = !next.type || next.type.startsWith("image/")
-  if (!isImage) {
+  if (!isSupportedCatalogImageFile(next)) {
     file.value = null
-    validationError.value = "Podržane su samo slikovne datoteke."
+    validationError.value = `Podržani formati su samo: ${supportedFormatsLabel}.`
     return
   }
 
@@ -137,7 +142,7 @@ useModalCloseReset({
         <UFormField v-if="mode === 'add'" label="Datoteka" required>
           <UFileUpload
             :model-value="file"
-            accept="image/*"
+            :accept="catalogImageUploadAccept"
             :preview="false"
             :interactive="!controlsDisabled"
             :disabled="controlsDisabled"
@@ -151,7 +156,7 @@ useModalCloseReset({
               actions: 'hidden',
             }"
             label="Prevucite sliku ovde"
-            description="ili kliknite za izbor"
+            :description="`ili kliknite za izbor (${supportedFormatsLabel})`"
             @update:model-value="handleSelectedFileChange"
           >
             <template #leading>

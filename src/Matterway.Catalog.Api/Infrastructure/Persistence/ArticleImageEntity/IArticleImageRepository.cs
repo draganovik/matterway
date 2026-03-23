@@ -7,6 +7,9 @@ public interface IArticleImageRepository
     Task<ArticleImage?> GetBy(ArticleCode articleCode, int orderIndex,
         CancellationToken cancellationToken = default);
 
+    Task<ICollection<ArticleImage>> GetByArticle(ArticleCode articleCode,
+        CancellationToken cancellationToken = default);
+
     Task<ArticleImage?> Create(ArticleImage requestModel, CancellationToken cancellationToken = default);
 
     Task<ArticleImage?> Update(ArticleImage request, int targetOrderIndex,

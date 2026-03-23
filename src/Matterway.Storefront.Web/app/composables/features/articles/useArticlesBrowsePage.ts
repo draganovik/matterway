@@ -6,11 +6,13 @@ import {
   type DetailFilterDefinition,
   type DetailFilterState,
 } from "~/lib/articles/filters"
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "~/constants/pagination"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 import type { PaginationMeta } from "~/types/common/api"
-
-const DEFAULT_PAGE_SIZE = 9
 
 type FiltersState = {
   search: string
@@ -24,12 +26,23 @@ export function useArticlesBrowsePage() {
   const router = useRouter()
   const catalogApi = useCatalogClient()
   const requestVersion = ref(0)
+  const pageOptions = [...PAGINATION_PAGE_SIZE_OPTIONS]
 
   function getRouteQueryValue(value: unknown) {
     if (typeof value === "string") return value
     if (!Array.isArray(value)) return undefined
     const firstString = value.find((item) => typeof item === "string")
     return typeof firstString === "string" ? firstString : undefined
+  }
+
+  function normalizePageSize(value: unknown) {
+    const parsed = Number(
+      typeof value === "number"
+        ? value
+        : (getRouteQueryValue(value) ?? DEFAULT_PAGINATION_PAGE_SIZE),
+    )
+
+    return pageOptions.includes(parsed) ? parsed : DEFAULT_PAGINATION_PAGE_SIZE
   }
 
   function parseRouteFilterState(): FiltersState {
@@ -140,7 +153,7 @@ export function useArticlesBrowsePage() {
 
   const pagination = reactive({
     page: Number(route.query.page ?? 1),
-    pageSize: Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE),
+    pageSize: normalizePageSize(route.query.pageSize),
   })
 
   const items = ref<CatalogArticle[]>([])
@@ -152,7 +165,6 @@ export function useArticlesBrowsePage() {
   const detailDefinitions = ref<DetailFilterDefinition[]>([])
   const detailDefinitionsLoading = ref(false)
 
-  const pageOptions = [9, 12, 18]
   const showInitialSkeleton = computed(
     () => loading.value && !hasLoadedOnce.value,
   )
@@ -177,65 +189,24 @@ export function useArticlesBrowsePage() {
     )
   }
 
-  function mergeDetailDefinitions(
-    next: DetailFilterDefinition[],
-    current: DetailFilterDefinition[],
-  ) {
-    const map = new Map(
-      current.map((definition) => [definition.slug, definition]),
-    )
-
-    for (const definition of next) {
-      map.set(definition.slug, definition)
-    }
-
-    return Array.from(map.values()).sort((a, b) =>
-      a.label.localeCompare(b.label),
-    )
-  }
-
-  async function loadDetailDefinitions(forVersion: number) {
+  async function loadDetailDefinitions() {
     detailDefinitionsLoading.value = true
     try {
-      const articleCodes = items.value.map((item) => item.code).slice(0, 24)
-      if (!articleCodes.length) {
-        if (forVersion === requestVersion.value) {
-          detailDefinitions.value = withActiveFilterDefinitions(
-            detailDefinitions.value,
-          )
-        }
+      const result = await catalogApi.queryDetailDefinitions()
+
+      if (result.error) {
+        detailDefinitions.value = withActiveFilterDefinitions(
+          detailDefinitions.value,
+        )
         return
       }
 
-      const responses = await Promise.all(
-        articleCodes.map((code) => catalogApi.getArticle(code)),
-      )
-
-      const rawDefinitions: Array<{
-        slug?: string | null
-        title?: string | null
-        unit?: string | null
-      }> = []
-
-      for (const response of responses) {
-        for (const detail of response.item?.articleDetails ?? []) {
-          rawDefinitions.push({
-            slug: detail.detailSlug,
-            title: detail.title,
-            unit: detail.unit,
-          })
-        }
-      }
-
-      if (forVersion !== requestVersion.value) return
-      const normalizedDefinitions = normalizeDetailDefinitions(rawDefinitions)
+      const normalizedDefinitions = normalizeDetailDefinitions(result.items)
       detailDefinitions.value = withActiveFilterDefinitions(
-        mergeDetailDefinitions(normalizedDefinitions, detailDefinitions.value),
+        normalizedDefinitions,
       )
     } finally {
-      if (forVersion === requestVersion.value) {
-        detailDefinitionsLoading.value = false
-      }
+      detailDefinitionsLoading.value = false
     }
   }
 
@@ -246,8 +217,7 @@ export function useArticlesBrowsePage() {
     filters.maxPrice = parsedFilters.maxPrice
     filters.detailFilters = parsedFilters.detailFilters
     pagination.page = Number(route.query.page ?? 1) || 1
-    pagination.pageSize =
-      Number(route.query.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE
+    pagination.pageSize = normalizePageSize(route.query.pageSize)
     detailDefinitions.value = withActiveFilterDefinitions(
       detailDefinitions.value,
     )
@@ -314,8 +284,6 @@ export function useArticlesBrowsePage() {
     if (result.error) {
       error.value = result.error
     }
-
-    await loadDetailDefinitions(forVersion)
     if (forVersion !== requestVersion.value) return
     hasLoadedOnce.value = true
     loading.value = false
@@ -328,7 +296,7 @@ export function useArticlesBrowsePage() {
       query: {
         page: pagination.page !== 1 ? pagination.page : undefined,
         pageSize:
-          pagination.pageSize !== DEFAULT_PAGE_SIZE
+          pagination.pageSize !== DEFAULT_PAGINATION_PAGE_SIZE
             ? pagination.pageSize
             : undefined,
         filter: filter || undefined,
@@ -424,8 +392,9 @@ export function useArticlesBrowsePage() {
   }
 
   function changePageSize(size: number) {
-    if (size === pagination.pageSize) return
-    pagination.pageSize = size
+    const nextSize = normalizePageSize(size)
+    if (nextSize === pagination.pageSize) return
+    pagination.pageSize = nextSize
     pagination.page = 1
     updateRoute()
   }
@@ -438,6 +407,8 @@ export function useArticlesBrowsePage() {
     },
     { immediate: true },
   )
+
+  void loadDetailDefinitions()
 
   return {
     filters,

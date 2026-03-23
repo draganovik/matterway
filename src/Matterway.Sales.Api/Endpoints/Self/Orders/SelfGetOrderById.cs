@@ -6,10 +6,12 @@ namespace Matterway.Sales.Api.Endpoints.Self.Orders;
 
 public class SelfGetOrderById : IEndpoint
 {
+    private const string RouteName = nameof(SelfGetOrderById);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "orders/{orderId:OrderId}", Handler)
-            .WithName("SelfGetOrderById").WithSummary("[self] Get own Order by id.")
+            .WithName(RouteName).WithSummary("[self] Get own Order by id.")
             .WithTags(nameof(Order))
             .Produces<OrderResponse>()
             .Produces(StatusCodes.Status404NotFound)

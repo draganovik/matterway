@@ -9,12 +9,13 @@ namespace Matterway.Sales.Api.Endpoints.System.Orders;
 
 public class SystemCreateOrder : IEndpoint
 {
+    private const string RouteName = nameof(SystemCreateOrder);
     private const string DefaultCountry = "Serbia";
 
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.System, "orders", Handler)
-            .WithName("SystemCreateOrder")
+            .WithName(RouteName)
             .WithSummary("[system] Create customer Order from cart items.")
             .WithTags(nameof(Order))
             .Produces<OrderResponse>(StatusCodes.Status201Created)

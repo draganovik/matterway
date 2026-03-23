@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CheckoutAddress } from "~/types/customers/address"
+import type { CheckoutAddress } from "~/types/customers"
 
 const address = defineModel<CheckoutAddress>({ required: true })
 </script>

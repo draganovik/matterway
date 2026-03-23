@@ -13,7 +13,7 @@ public class AdminQuerySystemUsers : IEndpoint
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "system-users", Handler)
-            .WithName("AdminQuerySystemUsers").WithSummary("[admin] Query system users")
+            .WithName(RouteName).WithSummary("[admin] Query system users")
             .WithTags("SystemUsers")
             .Produces<PaginationResponse<QuerySystemUsersResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)

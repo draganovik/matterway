@@ -6,10 +6,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Articles;
 
 public class AdminUpdateArticle : IEndpoint
 {
+    private const string RouteName = nameof(AdminUpdateArticle);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Admin, "articles/{code:ArticleCode}", Handle)
-            .WithName("AdminUpdateArticle").WithSummary("[admin] Update an Article")
+            .WithName(RouteName).WithSummary("[admin] Update an Article")
             .WithTags("Articles")
             .Produces<UpdateArticleResponse>()
             .Produces(StatusCodes.Status404NotFound)

@@ -18,7 +18,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: "update:article", value: GetArticleResponse | null): void
-  (event: "updated", value: GetArticleResponse): void
   (event: "remove"): void
 }>()
 
@@ -64,7 +63,6 @@ function updateArticleData(patch: Partial<GetArticleResponse>) {
   if (!props.article) return
   const next = { ...props.article, ...patch }
   emit("update:article", next)
-  emit("updated", next)
 }
 
 async function saveArticle() {

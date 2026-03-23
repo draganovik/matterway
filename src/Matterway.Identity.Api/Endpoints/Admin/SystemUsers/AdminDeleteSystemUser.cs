@@ -5,10 +5,12 @@ namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
 public class AdminDeleteSystemUser : IEndpoint
 {
+    private const string RouteName = nameof(AdminDeleteSystemUser);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.Admin, "system-users/{id:guid}", Handler)
-            .WithName("AdminDeleteSystemUser").WithSummary("[admin] Delete system user by id")
+            .WithName(RouteName).WithSummary("[admin] Delete system user by id")
             .WithTags("SystemUsers")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status403Forbidden)

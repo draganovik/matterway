@@ -1,3 +1,4 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
@@ -40,7 +41,7 @@ export function useCatalogDiscountsPage() {
   const discounts = ref<DiscountListItem[]>([])
   const discountFilter = ref("")
   const listPage = ref(1)
-  const listPageSize = ref(20)
+  const listPageSize = ref(DEFAULT_PAGINATION_PAGE_SIZE)
 
   const selectedKey = ref<string | null>(null)
   const selectedDiscount = ref<DiscountListItem | null>(null)
@@ -189,7 +190,10 @@ export function useCatalogDiscountsPage() {
   }
 
   function changeListPageSize(value: number) {
-    listPageSize.value = Math.max(1, Number(value) || 20)
+    listPageSize.value = Math.max(
+      1,
+      Number(value) || DEFAULT_PAGINATION_PAGE_SIZE,
+    )
     listPage.value = 1
   }
 

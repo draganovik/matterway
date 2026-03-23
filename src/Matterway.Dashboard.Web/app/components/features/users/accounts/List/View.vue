@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import type { SystemUserResponse } from "~/types/identity"
 
 type RoleFilterValue = "all" | "customers" | "employees"
@@ -28,7 +29,7 @@ withDefaults(
     error: "",
     emptyMessage: "",
     page: 1,
-    pageSize: 20,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
     totalPages: 1,
   },
@@ -42,6 +43,10 @@ const emit = defineEmits<{
   "update:page-size": [value: number]
   select: [value: string]
 }>()
+
+function updateRoleFilter(value: string | number | null | undefined) {
+  emit("update:role-filter", String(value || "all") as RoleFilterValue)
+}
 </script>
 
 <template>
@@ -71,14 +76,12 @@ const emit = defineEmits<{
   >
     <template #search-controls>
       <UFormField label="Uloga" class="w-full">
-        <USelectMenu
+        <USelect
           :items="roleFilterOptions"
           :model-value="roleFilter"
-          value-key="value"
-          label-key="label"
           placeholder="Sve uloge"
           class="w-full"
-          @update:model-value="emit('update:role-filter', $event)"
+          @update:model-value="updateRoleFilter($event)"
         />
       </UFormField>
     </template>

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  DEFAULT_PAGINATION_PAGE_SIZE,
+  PAGINATION_PAGE_SIZE_OPTIONS,
+} from "~/constants/pagination"
+
 const props = withDefaults(
   defineProps<{
     title: string
@@ -31,9 +36,9 @@ const props = withDefaults(
     emptyMessage: "Nema rezultata.",
     filterInputType: "textarea",
     filterPlaceholder:
-      "Pretraga uz RSQL filtere (npr. title==chair; available==true).",
+      "Pretraga uz RSQL filtere (npr. title==NAS; available==true).",
     page: 1,
-    pageSize: 20,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
     totalPages: 1,
   },
@@ -54,8 +59,8 @@ watch(
   },
 )
 
-const pageSizes = [10, 20, 50, 100].map((value) => ({
-  label: `${value} / strana`,
+const pageSizes = PAGINATION_PAGE_SIZE_OPTIONS.map((value) => ({
+  label: String(value),
   value,
 }))
 
@@ -119,14 +124,12 @@ function updatePageSize(value: number) {
       <div class="flex flex-wrap items-end gap-3 [&>*]:min-w-0 [&>*]:flex-1">
         <slot name="search-controls" />
         <UFormField label="Po stranici" class="w-full">
-          <USelectMenu
+          <USelect
             :items="pageSizes"
             :model-value="pageSize"
-            value-key="value"
-            label-key="label"
             placeholder="Izaberi broj"
             class="w-full"
-            @update:model-value="updatePageSize"
+            @update:model-value="updatePageSize(Number($event))"
           />
         </UFormField>
         <UButton

@@ -134,13 +134,39 @@ async function loadDefinitions() {
   definitionState.error = ""
   definitionState.success = ""
   definitionState.loading = true
-  const result = await api.queryDetails({ limit: 200 })
-  definitionState.loading = false
-  if (!result.ok) {
-    definitionState.error = result.error || "Učitavanje definicija nije uspelo."
-    return
+  try {
+    const items: QueryDetailResponse[] = []
+    const pageSize = 200
+    let page = 1
+
+    while (true) {
+      const result = await api.queryDetails({ page, pageSize })
+
+      if (!result.ok) {
+        definitionState.error =
+          result.error || "Učitavanje definicija nije uspelo."
+        return
+      }
+
+      if (result.status === 204 || !result.data) {
+        break
+      }
+
+      items.push(...(result.data.data || []))
+
+      const totalPages = Math.max(1, Number(result.data.meta?.totalPages) || 1)
+      if (page >= totalPages) {
+        break
+      }
+
+      page += 1
+    }
+
+    detailOptions.value = items
+  } finally {
+    definitionState.loading = false
   }
-  detailOptions.value = result.data || []
+
   if (!selectedKey.value && detailOptions.value[0]?.slug) {
     selectedKey.value = detailOptions.value[0].slug as string
   }

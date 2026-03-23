@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SalesOrder, SalesOrderStatus } from "~/types/sales/orders"
+import type { SalesOrder, SalesOrderStatus } from "~/types/sales"
 import { formatDate, formatMoney } from "~/utils/formatters"
 import { formatOrderStatus } from "~/utils/labels"
 

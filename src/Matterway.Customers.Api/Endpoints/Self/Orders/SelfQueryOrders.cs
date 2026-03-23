@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Orders;
 
 public class SelfQueryOrders : IEndpoint
 {
+    private const string RouteName = nameof(SelfQueryOrders);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "orders", Handler)
-            .WithName("SelfQueryOrders").WithSummary("[self] Query own orders.")
+            .WithName(RouteName).WithSummary("[self] Query own orders.")
             .WithTags(nameof(CustomerOrder))
             .Produces<PaginationResponse<CustomerOrderResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
@@ -34,7 +36,7 @@ public class SelfQueryOrders : IEndpoint
         var entities = await customerOrderRepository.QueryForCustomer(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize);
 
-        var baseUri = linkGenerator.GetUriByName(httpContext, "SelfQueryOrders", null);
+        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName, null);
         var response = entities.Select(MapToResponse).ToList();
 
         var paginationResponse = PaginationResponse<CustomerOrderResponse>.Create(

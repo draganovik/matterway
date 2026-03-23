@@ -1,3 +1,4 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useIdentityClient } from "~/composables/api/useIdentityClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -39,7 +40,7 @@ export function useUsersAccountsPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: 20 })
+  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
 
   const roleFilterOptions = [
     { label: "Svi", value: "all" as const },

@@ -6,10 +6,12 @@ namespace Matterway.Sales.Api.Endpoints.Admin.Payments;
 
 public class AdminGetPaymentById : IEndpoint
 {
+    private const string RouteName = nameof(AdminGetPaymentById);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "payments/{paymentId:guid}", Handler)
-            .WithName("AdminGetPaymentById").WithSummary("[admin] Get Payment by id")
+            .WithName(RouteName).WithSummary("[admin] Get Payment by id")
             .WithTags(nameof(Payment))
             .Produces<SystemRegisterPayment.PaymentResponse>()
             .Produces(StatusCodes.Status404NotFound)

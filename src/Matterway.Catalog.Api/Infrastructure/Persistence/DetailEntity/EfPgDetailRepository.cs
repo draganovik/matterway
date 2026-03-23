@@ -5,13 +5,27 @@ namespace Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 
 public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRepository
 {
-    private const int MaxLimit = 50;
-    private const int DefaultLimit = 10;
+    public async Task<int> Count(string? titleLike, CancellationToken cancellationToken = default)
+    {
+        return await BuildQuery(titleLike)
+            .CountAsync(cancellationToken);
+    }
 
-    public async Task<ICollection<Detail>> Query(string? titleLike, int limit,
+    public async Task<ICollection<Detail>> Query(int page, int pageSize, string? titleLike,
         CancellationToken cancellationToken = default)
     {
-        var normalizedLimit = Math.Clamp(limit <= 0 ? DefaultLimit : limit, 1, MaxLimit);
+        var offset = (page - 1) * pageSize;
+
+        return await BuildQuery(titleLike)
+            .AsNoTracking()
+            .OrderBy(d => d.Title)
+            .Skip(offset)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<Detail> BuildQuery(string? titleLike)
+    {
         var query = context.Detail.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(titleLike))
@@ -20,11 +34,7 @@ public sealed class EfPgDetailRepository(CatalogDbComposer context) : IDetailRep
             query = query.Where(d => d.Title.ToLower().Contains(normalized));
         }
 
-        return await query
-            .AsNoTracking()
-            .OrderBy(d => d.Title)
-            .Take(normalizedLimit)
-            .ToListAsync(cancellationToken);
+        return query;
     }
 
     public async Task<Detail?> GetBy(string slug, CancellationToken cancellationToken = default)

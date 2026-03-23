@@ -5,10 +5,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.CartItems;
 
 public class SelfDeleteCartItem : IEndpoint
 {
+    private const string RouteName = nameof(SelfDeleteCartItem);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.Self, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
-            .WithName("SelfDeleteCartItem").WithSummary("[self] Delete own CartItem.")
+            .WithName(RouteName).WithSummary("[self] Delete own CartItem.")
             .WithTags(nameof(CustomerArticle))
             .Produces<DeleteCartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)

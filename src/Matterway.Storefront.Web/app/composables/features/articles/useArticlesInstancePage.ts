@@ -1,5 +1,5 @@
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 
 export function useArticlesInstancePage() {
   const catalogApi = useCatalogClient()

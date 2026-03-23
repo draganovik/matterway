@@ -11,7 +11,7 @@ public class AdminQueryCustomers : IEndpoint
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "customers", Handler)
-            .WithName("AdminQueryCustomers").WithSummary("[admin] Query Customers")
+            .WithName(RouteName).WithSummary("[admin] Query Customers")
             .WithTags(nameof(Customer))
             .Produces<PaginationResponse<CustomerResponse>>()
             .Produces(StatusCodes.Status204NoContent)

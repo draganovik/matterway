@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Admin.Customers;
 
 public class AdminCreateCustomer : IEndpoint
 {
+    private const string RouteName = nameof(AdminCreateCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "customers", Handler)
-            .WithName("AdminCreateCustomer").WithSummary("[admin] Create a Customer")
+            .WithName(RouteName).WithSummary("[admin] Create a Customer")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

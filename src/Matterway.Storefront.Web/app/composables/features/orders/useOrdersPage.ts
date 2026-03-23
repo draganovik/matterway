@@ -1,9 +1,10 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useSalesClient } from "~/composables/api/useSalesClient"
 import type { PaginationMeta } from "~/types/common/api"
-import type { SalesOrder } from "~/types/sales/orders"
+import type { SalesOrder } from "~/types/sales"
 
 const DEFAULT_PAGE = 1
-const PAGE_SIZE = 10
+const PAGE_SIZE = DEFAULT_PAGINATION_PAGE_SIZE
 
 export function useOrdersPage() {
   const salesApi = useSalesClient()

@@ -1,3 +1,4 @@
+import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -40,7 +41,7 @@ export function useUsersCustomersPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: 20 })
+  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
 
   const selectedId = ref<string | null>(null)
   const selectedCustomer = ref<CustomerResponse | null>(null)

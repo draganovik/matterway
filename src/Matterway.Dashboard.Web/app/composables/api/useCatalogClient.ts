@@ -7,7 +7,8 @@ import type { ApiResult } from "~/types/common/api"
 import type {
   AddArticleDetailRequest,
   AddArticleImageRequest,
-  AddArticleImageResponse,
+  ArticleImageProperty,
+  ArticleImagesMutationResponse,
   CreateArticleRequest,
   CreateArticleResponse,
   CreateDiscountRequest,
@@ -23,12 +24,11 @@ import type {
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,
-  QueryDetailResponse,
   QueryDetailsParams,
+  QueryDetailsResponse,
   QueryDiscountResponse,
   UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
-  UpdateArticleImageResponse,
   UpdateArticleRequest,
   UpdateArticleResponse,
   UpdateDiscountRequest,
@@ -38,6 +38,7 @@ import type { PaginationResponse } from "~/types/common/pagination"
 
 const ADMIN_ARTICLES_PATH = "admin/articles"
 const PUBLIC_ARTICLES_PATH = "public/articles"
+const PUBLIC_DETAILS_PATH = "public/details"
 const ADMIN_DETAILS_PATH = "admin/details"
 const ADMIN_DISCOUNTS_PATH = "admin/discounts"
 
@@ -66,7 +67,7 @@ function readCode(source: AnyRecord) {
   return String(source.code ?? "")
 }
 
-function mapArticleImageProperty(payload: unknown): AddArticleImageResponse {
+function mapArticleImageProperty(payload: unknown): ArticleImageProperty {
   const source = asRecord(payload)
   const id = asString(source.id) ?? ""
 
@@ -129,6 +130,19 @@ function mapArticleMutationResponse(
     createdAt: asString(source.createdAt) ?? null,
     updatedAt: asString(source.updatedAt) ?? null,
     isAvailable: Boolean(source.isAvailable),
+  }
+}
+
+function mapArticleImagesMutationResponse(
+  payload: unknown,
+): ArticleImagesMutationResponse {
+  const source = asRecord(payload)
+
+  return {
+    images: asArray(source.images).map(mapArticleImageProperty),
+    createdImageId: asString(source.createdImageId) ?? null,
+    updatedImageId: asString(source.updatedImageId) ?? null,
+    deletedImageId: asString(source.deletedImageId) ?? null,
   }
 }
 
@@ -244,13 +258,13 @@ export function useCatalogClient() {
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<AddArticleImageResponse>
+      return response as ApiResult<ArticleImagesMutationResponse>
     }
 
     return {
       ...response,
-      data: mapArticleImageProperty(response.data),
-    } satisfies ApiResult<AddArticleImageResponse>
+      data: mapArticleImagesMutationResponse(response.data),
+    } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
   async function updateArticleImage(
@@ -268,23 +282,32 @@ export function useCatalogClient() {
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<UpdateArticleImageResponse>
+      return response as ApiResult<ArticleImagesMutationResponse>
     }
 
     return {
       ...response,
-      data: mapArticleImageProperty(response.data),
-    } satisfies ApiResult<UpdateArticleImageResponse>
+      data: mapArticleImagesMutationResponse(response.data),
+    } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
   async function removeArticleImage(code: string, orderIndex: number | string) {
-    return api.request(
+    const response = await api.request<Record<string, unknown>>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
         method: "DELETE",
       },
     )
+
+    if (!response.ok || !response.data) {
+      return response as ApiResult<ArticleImagesMutationResponse>
+    }
+
+    return {
+      ...response,
+      data: mapArticleImagesMutationResponse(response.data),
+    } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
   async function addArticleDetail(
@@ -324,12 +347,13 @@ export function useCatalogClient() {
 
   async function queryDetails(params: QueryDetailsParams) {
     const query = buildQuery({
-      Limit: params.limit,
+      Page: params.page,
+      PageSize: params.pageSize,
       TitleLike: params.titleLike || undefined,
     })
-    return api.request<QueryDetailResponse[]>(
+    return api.request<QueryDetailsResponse>(
       "catalog",
-      `${ADMIN_DETAILS_PATH}${query}`,
+      `${PUBLIC_DETAILS_PATH}${query}`,
     )
   }
 

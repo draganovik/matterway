@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.System.Customers;
 
 public class SystemVerifyCustomer : IEndpoint
 {
+    private const string RouteName = nameof(SystemVerifyCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.System, "customers/{customerId:guid}/verify", Handler)
-            .WithName("SystemVerifyCustomer").WithSummary("[system] Verify Customer by id")
+            .WithName(RouteName).WithSummary("[system] Verify Customer by id")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

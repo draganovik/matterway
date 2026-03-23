@@ -6,10 +6,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.CatalogArchive;
 
 public class AdminImportCatalogArchive : IEndpoint
 {
+    private const string RouteName = nameof(AdminImportCatalogArchive);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "catalog/archive/import", Handle)
-            .WithName("AdminImportCatalogArchive")
+            .WithName(RouteName)
             .WithSummary("[admin] Import catalog data and image binaries from zip archive")
             .WithTags("CatalogArchive")
             .Produces<ImportCatalogArchiveResponse>(StatusCodes.Status200OK)

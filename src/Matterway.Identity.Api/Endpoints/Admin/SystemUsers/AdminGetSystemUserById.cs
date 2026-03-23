@@ -7,10 +7,12 @@ namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
 public class AdminGetSystemUserById : IEndpoint
 {
+    private const string RouteName = nameof(AdminGetSystemUserById);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "system-users/{id:guid}", Handler)
-            .WithName("AdminGetSystemUserById").WithSummary("[admin] Get system user by id")
+            .WithName(RouteName).WithSummary("[admin] Get system user by id")
             .WithTags("SystemUsers")
             .Produces<GetSystemUserByIdResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

@@ -1,6 +1,6 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"
-import type { RegisterPayload } from "~/types/customers/address"
+import type { RegisterPayload } from "~/types/customers"
 
 export function useAuthRegistrationWorkflow() {
   const customers = useCustomersClient()

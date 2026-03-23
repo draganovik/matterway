@@ -11,7 +11,7 @@ public class SelfQueryCartItems : IEndpoint
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "cart/items", Handler)
-            .WithName("SelfQueryCartItems").WithSummary("[self] Query own CartItems.")
+            .WithName(RouteName).WithSummary("[self] Query own CartItems.")
             .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<CartItemResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
