@@ -18,6 +18,7 @@ public sealed class ImageStorageInitializer(
         {
             var client = clientFactory.CreateClient();
             await EnsureBucketAsync(client, cancellationToken).ConfigureAwait(false);
+            await EnsureBucketReadPolicyAsync(client, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -42,6 +43,41 @@ public sealed class ImageStorageInitializer(
         logger.LogInformation("Creating image storage bucket '{Bucket}'.", _options.Bucket);
         await client.MakeBucketAsync(
             new MakeBucketArgs().WithBucket(_options.Bucket),
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task EnsureBucketReadPolicyAsync(IMinioClient client, CancellationToken cancellationToken)
+    {
+        var policyJson = $$"""
+                           {
+                             "Version": "2012-10-17",
+                             "Statement": [
+                               {
+                                 "Effect": "Allow",
+                                 "Principal": {
+                                   "AWS": [
+                                     "*"
+                                   ]
+                                 },
+                                 "Action": [
+                                   "s3:GetObject"
+                                 ],
+                                 "Resource": [
+                                   "arn:aws:s3:::{{_options.Bucket}}/images/*"
+                                 ]
+                               }
+                             ]
+                           }
+                           """;
+
+        logger.LogInformation(
+            "Ensuring anonymous read policy for image storage bucket '{Bucket}' on prefix 'images/*'.",
+            _options.Bucket);
+
+        await client.SetPolicyAsync(
+            new SetPolicyArgs()
+                .WithBucket(_options.Bucket)
+                .WithPolicy(policyJson),
             cancellationToken).ConfigureAwait(false);
     }
 }
