@@ -42,9 +42,7 @@ export function useArticlesBrowsePage() {
         : (getRouteQueryValue(value) ?? DEFAULT_PAGINATION_PAGE_SIZE),
     )
 
-    return pageOptions.includes(parsed)
-      ? parsed
-      : DEFAULT_PAGINATION_PAGE_SIZE
+    return pageOptions.includes(parsed) ? parsed : DEFAULT_PAGINATION_PAGE_SIZE
   }
 
   function parseRouteFilterState(): FiltersState {

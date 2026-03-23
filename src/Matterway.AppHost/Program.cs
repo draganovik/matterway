@@ -1,11 +1,13 @@
-using Matterway.AppHost.Composition;
+using Matterway.AppHost.ApiDocumentation;
+using Matterway.AppHost.Configuration;
+using Matterway.AppHost.WebApps;
 using Matterway.ServiceDefaults;
 using Microsoft.Extensions.Hosting;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 const string composeEnvironmentName = "matterway-platform";
-var services = ServicesSettings.Bind(builder.Configuration);
+var services = AppHostServicesOptions.Bind(builder.Configuration);
 
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var systemAccessKey = builder.AddParameter("SystemAccessKey", true);
@@ -95,12 +97,12 @@ var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>
     [ApiDirectory.Sales.ServiceName] = salesApi
 };
 
-WebAppComposition.AddWebApp(
+WebAppRegistration.Add(
     builder,
-    new WebAppCompositionOptions
+    new WebAppOptions
     {
         ServiceName = "mtw-storefront-web",
-        RelativePath = "../Matterway.Storefront.Web",
+        SourcePath = "../Matterway.Storefront.Web",
         HostPort = services.Storefront.Port,
         Dependencies = [catalogApi, salesApi],
         ConfigureEnvironment = environment =>
@@ -112,19 +114,19 @@ WebAppComposition.AddWebApp(
         }
     });
 
-WebAppComposition.AddWebApp(
+WebAppRegistration.Add(
     builder,
-    new WebAppCompositionOptions
+    new WebAppOptions
     {
         ServiceName = "mtw-dashboard-web",
-        RelativePath = "../Matterway.Dashboard.Web",
+        SourcePath = "../Matterway.Dashboard.Web",
         HostPort = services.Dashboard.Port,
         Dependencies = [identityApi, catalogApi, customersApi, salesApi],
         ConfigureEnvironment = ConfigureCommonWebEnvironment
     });
 
 if (builder.Environment.IsDevelopment())
-    ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
+    ScalarApiRegistration.AddApiReferences(builder, apisByServiceName);
 
 foreach (var api in apisByServiceName.Values)
     api
@@ -149,7 +151,7 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     return configure(api).WaitFor(dbMigrator);
 }
 
-void ConfigureWebTelemetryEnvironment(WebAppEnvironmentBuilder environment, string telemetryServiceName)
+void ConfigureWebTelemetryEnvironment(WebAppEnvironment environment, string telemetryServiceName)
 {
     static string? NormalizeHttpEndpoint(string? endpoint)
     {
@@ -213,7 +215,7 @@ void ConfigureWebTelemetryEnvironment(WebAppEnvironmentBuilder environment, stri
         environment.WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", protocol);
 }
 
-void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
+void ConfigureCommonWebEnvironment(WebAppEnvironment environment)
 {
     environment
         .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)

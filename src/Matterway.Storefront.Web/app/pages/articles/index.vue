@@ -84,7 +84,7 @@ function handlePageChange(page: number) {
       />
     </div>
 
-    <div ref="resultsSection" class="space-y-5 scroll-mt-24">
+    <div ref="resultsSection" class="scroll-mt-24 space-y-5">
       <StatusMessages v-if="error" :error="error" />
 
       <div
