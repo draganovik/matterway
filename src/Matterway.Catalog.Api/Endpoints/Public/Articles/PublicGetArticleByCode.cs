@@ -5,10 +5,12 @@ namespace Matterway.Catalog.Api.Endpoints.Public.Articles;
 
 public class PublicGetArticleByCode : IEndpoint
 {
+    private const string RouteName = nameof(PublicGetArticleByCode);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Public, "articles/{code:ArticleCode}", Handle)
-            .WithName("PublicGetArticleByCode").WithSummary("[public] Get an Article")
+            .WithName(RouteName).WithSummary("[public] Get an Article")
             .WithTags("Articles")
             .Produces<GetArticleByCodeResponse>()
             .Produces(StatusCodes.Status404NotFound)

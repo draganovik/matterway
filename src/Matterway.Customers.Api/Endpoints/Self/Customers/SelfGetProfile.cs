@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Customers;
 
 public class SelfGetProfile : IEndpoint
 {
+    private const string RouteName = nameof(SelfGetProfile);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "profile", Handler)
-            .WithName("SelfGetProfile").WithSummary("[self] Get own Customer profile.")
+            .WithName(RouteName).WithSummary("[self] Get own Customer profile.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

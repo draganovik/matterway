@@ -9,10 +9,12 @@ namespace Matterway.Identity.Api.Endpoints.System.Users;
 
 public class SystemCreateCustomerUser : IEndpoint
 {
+    private const string RouteName = nameof(SystemCreateCustomerUser);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.System, "users/customer", Handler)
-            .WithName("SystemCreateCustomerUser")
+            .WithName(RouteName)
             .WithSummary("[system] Create a customer system user")
             .WithTags("SystemUsers")
             .Produces<CreateUserResponse>(StatusCodes.Status201Created)

@@ -5,10 +5,12 @@ namespace Matterway.Identity.Api.Endpoints.System.Auth;
 
 public class SystemIntrospect : IEndpoint
 {
+    private const string RouteName = nameof(SystemIntrospect);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.System, "auth/introspect", Handler)
-            .WithName("SystemIntrospect")
+            .WithName(RouteName)
             .WithSummary("[system] Introspect access token and return claims")
             .WithTags("Auth")
             .Produces<AuthIntrospectResponse>(StatusCodes.Status200OK)

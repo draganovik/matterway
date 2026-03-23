@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Customers;
 
 public class SelfUpdateCustomer : IEndpoint
 {
+    private const string RouteName = nameof(SelfUpdateCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Self, "profile", Handler)
-            .WithName("SelfUpdateCustomer").WithSummary("[self] Update own Customer profile.")
+            .WithName(RouteName).WithSummary("[self] Update own Customer profile.")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

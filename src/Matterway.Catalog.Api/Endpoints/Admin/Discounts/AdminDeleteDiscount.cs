@@ -5,10 +5,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Discounts;
 
 public class AdminDeleteDiscount : IEndpoint
 {
+    private const string RouteName = nameof(AdminDeleteDiscount);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.Admin, "discounts/{code}", Handle)
-            .WithName("AdminDeleteDiscount").WithSummary("[admin] Delete all discounts for a code")
+            .WithName(RouteName).WithSummary("[admin] Delete all discounts for a code")
             .WithTags(nameof(Discount))
             .Produces<DeleteDiscountResponse>()
             .Produces(StatusCodes.Status404NotFound)

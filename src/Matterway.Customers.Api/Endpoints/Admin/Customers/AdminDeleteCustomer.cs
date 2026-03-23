@@ -5,10 +5,12 @@ namespace Matterway.Customers.Api.Endpoints.Admin.Customers;
 
 public class AdminDeleteCustomer : IEndpoint
 {
+    private const string RouteName = nameof(AdminDeleteCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.Admin, "customers/{systemUserId:guid}", Handler)
-            .WithName("AdminDeleteCustomer").WithSummary("[admin] Delete Customer by id")
+            .WithName(RouteName).WithSummary("[admin] Delete Customer by id")
             .WithTags(nameof(Customer))
             .Produces<DeleteCustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

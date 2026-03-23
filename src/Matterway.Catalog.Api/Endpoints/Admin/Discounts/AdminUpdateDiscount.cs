@@ -7,10 +7,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Discounts;
 
 public class AdminUpdateDiscount : IEndpoint
 {
+    private const string RouteName = nameof(AdminUpdateDiscount);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Admin, "discounts/{code}", Handle)
-            .WithName("AdminUpdateDiscount").WithSummary("[admin] Create or replace a discount across article codes")
+            .WithName(RouteName).WithSummary("[admin] Create or replace a discount across article codes")
             .WithTags(nameof(Discount))
             .Produces<UpdatedDiscountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

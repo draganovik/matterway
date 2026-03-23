@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Admin.Customers;
 
 public class AdminUpdateCustomer : IEndpoint
 {
+    private const string RouteName = nameof(AdminUpdateCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Admin, "customers/{systemUserId:guid}", Handler)
-            .WithName("AdminUpdateCustomer").WithSummary("[admin] Update Customer by id")
+            .WithName(RouteName).WithSummary("[admin] Update Customer by id")
             .WithTags(nameof(Customer))
             .Produces<CustomerResponse>()
             .Produces(StatusCodes.Status404NotFound)

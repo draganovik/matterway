@@ -7,10 +7,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Addresses;
 
 public class SelfPutAddress : IEndpoint
 {
+    private const string RouteName = nameof(SelfPutAddress);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Self, "address", Handler)
-            .WithName("SelfPutAddress").WithSummary("[self] Create or update own Address.")
+            .WithName(RouteName).WithSummary("[self] Create or update own Address.")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

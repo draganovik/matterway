@@ -5,10 +5,12 @@ namespace Matterway.Identity.Api.Endpoints.Public.Auth;
 
 public class PublicRefresh : IEndpoint
 {
+    private const string RouteName = nameof(PublicRefresh);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Public, "auth/refresh", Handler)
-            .WithName("PublicRefresh")
+            .WithName(RouteName)
             .WithSummary("[public] Refresh access token using a refresh token.")
             .WithTags("Auth")
             .Produces<RefreshResponse>(StatusCodes.Status200OK)

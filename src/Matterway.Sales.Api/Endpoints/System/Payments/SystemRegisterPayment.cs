@@ -8,10 +8,12 @@ namespace Matterway.Sales.Api.Endpoints.System.Payments;
 
 public class SystemRegisterPayment : IEndpoint
 {
+    private const string RouteName = nameof(SystemRegisterPayment);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.System, "payments", Handle)
-            .WithName("SystemRegisterPayment").WithSummary("[system] Register a Payment")
+            .WithName(RouteName).WithSummary("[system] Register a Payment")
             .WithTags(nameof(Payment))
             .Produces<PaymentResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)

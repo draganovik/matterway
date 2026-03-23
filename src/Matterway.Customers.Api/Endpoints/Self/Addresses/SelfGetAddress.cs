@@ -7,10 +7,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Addresses;
 
 public class SelfGetAddress : IEndpoint
 {
+    private const string RouteName = nameof(SelfGetAddress);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Self, "address", Handler)
-            .WithName("SelfGetAddress").WithSummary("[self] Get own Address.")
+            .WithName(RouteName).WithSummary("[self] Get own Address.")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>()
             .Produces(StatusCodes.Status404NotFound)

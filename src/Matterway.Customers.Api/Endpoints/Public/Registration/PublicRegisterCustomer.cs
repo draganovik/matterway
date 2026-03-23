@@ -7,10 +7,12 @@ namespace Matterway.Customers.Api.Endpoints.Public.Registration;
 
 public class PublicRegisterCustomer : IEndpoint
 {
+    private const string RouteName = nameof(PublicRegisterCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Public, "register", Handler)
-            .WithName("PublicRegisterCustomer")
+            .WithName(RouteName)
             .WithSummary("[public] Register a new customer (creates identity user and customer profile).")
             .WithTags("Registration")
             .Produces<CustomerResponse>(StatusCodes.Status201Created)

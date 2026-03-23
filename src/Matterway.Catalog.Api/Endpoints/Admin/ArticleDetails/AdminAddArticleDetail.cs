@@ -9,10 +9,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleDetails;
 
 public class AdminAddArticleDetail : IEndpoint
 {
+    private const string RouteName = nameof(AdminAddArticleDetail);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "articles/{article:ArticleCode}/details", Handle)
-            .WithName("AdminAddArticleDetail").WithSummary("[admin] Add a new ArticleDetail")
+            .WithName(RouteName).WithSummary("[admin] Add a new ArticleDetail")
             .WithTags("ArticleDetail")
             .Produces<AddArticleDetailResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)

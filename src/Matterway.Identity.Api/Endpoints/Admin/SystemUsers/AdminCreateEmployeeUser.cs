@@ -10,10 +10,12 @@ namespace Matterway.Identity.Api.Endpoints.Admin.SystemUsers;
 
 public class AdminCreateEmployeeUser : IEndpoint
 {
+    private const string RouteName = nameof(AdminCreateEmployeeUser);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "users/employee", Handler)
-            .WithName("AdminCreateEmployeeUser")
+            .WithName(RouteName)
             .WithSummary("[admin] Create an Employee user")
             .WithTags("SystemUsers")
             .Produces<CreateUserResponse>(StatusCodes.Status201Created)

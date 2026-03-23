@@ -6,10 +6,12 @@ namespace Matterway.Sales.Api.Endpoints.Admin.Payments;
 
 public class AdminQueryPayments : IEndpoint
 {
+    private const string RouteName = nameof(AdminQueryPayments);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "payments", Handler)
-            .WithName("AdminQueryPayments").WithSummary("[admin] Query Payments")
+            .WithName(RouteName).WithSummary("[admin] Query Payments")
             .WithTags(nameof(Payment))
             .Produces<PaginationResponse<SystemRegisterPayment.PaymentResponse>>()
             .Produces(StatusCodes.Status204NoContent)
@@ -41,7 +43,7 @@ public class AdminQueryPayments : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            "AdminQueryPayments",
+            RouteName,
             null);
 
         var results = entities.Select(SystemRegisterPayment.MapToResponse).ToList();

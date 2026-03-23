@@ -7,10 +7,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleImages;
 
 public class AdminUpdateArticleImage : IEndpoint
 {
+    private const string RouteName = nameof(AdminUpdateArticleImage);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPatch(EndpointKind.Admin, "articles/{article:ArticleCode}/images/{orderIndex:int}", Handle)
-            .WithName("AdminUpdateArticleImage").WithSummary("[admin] Update an ArticleImage")
+            .WithName(RouteName).WithSummary("[admin] Update an ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<UpdateArticleImageResponse>()
             .Produces(StatusCodes.Status404NotFound)

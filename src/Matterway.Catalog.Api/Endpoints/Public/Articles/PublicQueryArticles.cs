@@ -10,7 +10,7 @@ public class PublicQueryArticles : IEndpoint
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Public, "articles", Handle)
-            .WithName("PublicQueryArticles").WithSummary("[public] Query Articles")
+            .WithName(RouteName).WithSummary("[public] Query Articles")
             .WithTags("Articles")
             .Produces<PaginationResponse<QueryArticleResponse>>()
             .Produces(StatusCodes.Status204NoContent)

@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.Addresses;
 
 public class SelfDeleteAddress : IEndpoint
 {
+    private const string RouteName = nameof(SelfDeleteAddress);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.Self, "address", Handler)
-            .WithName("SelfDeleteAddress").WithSummary("[self] Delete own Address.")
+            .WithName(RouteName).WithSummary("[self] Delete own Address.")
             .WithTags(nameof(Address))
             .Produces<DeleteAddressResponse>()
             .Produces(StatusCodes.Status404NotFound)

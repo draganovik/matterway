@@ -6,10 +6,12 @@ namespace Matterway.Customers.Api.Endpoints.Admin.CartItems;
 
 public class AdminGetCartItemById : IEndpoint
 {
+    private const string RouteName = nameof(AdminGetCartItemById);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
-            .WithName("AdminGetCartItemById").WithSummary("[admin] Get CartItem by id")
+            .WithName(RouteName).WithSummary("[admin] Get CartItem by id")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)

@@ -7,10 +7,12 @@ namespace Matterway.Identity.Api.Endpoints.Public.Auth;
 
 public class PublicLogin : IEndpoint
 {
+    private const string RouteName = nameof(PublicLogin);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Public, "auth/login", Handler)
-            .WithName("PublicLogin")
+            .WithName(RouteName)
             .WithSummary("[public] Authenticate user and issue tokens.")
             .WithTags("Auth")
             .Produces<LoginResponse>(StatusCodes.Status200OK)

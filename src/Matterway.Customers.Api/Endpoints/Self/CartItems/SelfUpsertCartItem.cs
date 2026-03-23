@@ -8,10 +8,12 @@ namespace Matterway.Customers.Api.Endpoints.Self.CartItems;
 
 public class SelfUpsertCartItem : IEndpoint
 {
+    private const string RouteName = nameof(SelfUpsertCartItem);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Self, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
-            .WithName("SelfUpsertCartItem").WithSummary("[self] Upsert own CartItem.")
+            .WithName(RouteName).WithSummary("[self] Upsert own CartItem.")
             .WithTags(nameof(CustomerArticle))
             .Produces<CartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)

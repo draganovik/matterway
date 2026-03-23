@@ -7,10 +7,12 @@ namespace Matterway.Customers.Api.Endpoints.Admin.Addresses;
 
 public class AdminPutAddressByCustomer : IEndpoint
 {
+    private const string RouteName = nameof(AdminPutAddressByCustomer);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Admin, "customers/{customerId:guid}/address", Handler)
-            .WithName("AdminPutAddressByCustomer")
+            .WithName(RouteName)
             .WithSummary("[admin] Create or replace Customer address by customer id")
             .WithTags(nameof(Address))
             .Produces<AddressResponse>(StatusCodes.Status200OK)

@@ -8,10 +8,12 @@ namespace Matterway.Sales.Api.Endpoints.Admin.Orders;
 
 public class AdminAddOrderStatus : IEndpoint
 {
+    private const string RouteName = nameof(AdminAddOrderStatus);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "orders/{orderId:OrderId}/statuses", Handle)
-            .WithName("AdminAddOrderStatus").WithSummary("[admin] Add an Order status entry")
+            .WithName(RouteName).WithSummary("[admin] Add an Order status entry")
             .WithTags(nameof(OrderStatus))
             .Produces<OrderStatusResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)

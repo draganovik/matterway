@@ -8,10 +8,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.ArticleImages;
 
 public class AdminAddArticleImage : IEndpoint
 {
+    private const string RouteName = nameof(AdminAddArticleImage);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPost(EndpointKind.Admin, "articles/{article:ArticleCode}/images", Handle)
-            .WithName("AdminAddArticleImage").WithSummary("[admin] Add a new ArticleImage")
+            .WithName(RouteName).WithSummary("[admin] Add a new ArticleImage")
             .WithTags(nameof(ArticleImage))
             .Produces<AddArticleImageResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)

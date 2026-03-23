@@ -4,10 +4,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.CatalogArchive;
 
 public class AdminExportCatalogArchive : IEndpoint
 {
+    private const string RouteName = nameof(AdminExportCatalogArchive);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "catalog/archive/export", Handle)
-            .WithName("AdminExportCatalogArchive")
+            .WithName(RouteName)
             .WithSummary("[admin] Export catalog data and image binaries as zip archive")
             .WithTags("CatalogArchive")
             .Produces(StatusCodes.Status200OK)

@@ -5,10 +5,12 @@ namespace Matterway.Identity.Api.Endpoints.System.Users;
 
 public class SystemDeleteUser : IEndpoint
 {
+    private const string RouteName = nameof(SystemDeleteUser);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapDelete(EndpointKind.System, "users/{id:guid}", Handler)
-            .WithName("SystemDeleteUser")
+            .WithName(RouteName)
             .WithSummary("[system] Delete a system user by id")
             .WithTags("SystemUsers")
             .Produces(StatusCodes.Status204NoContent)

@@ -5,10 +5,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Discounts;
 
 public class AdminQueryDiscounts : IEndpoint
 {
+    private const string RouteName = nameof(AdminQueryDiscounts);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapGet(EndpointKind.Admin, "discounts", Handle)
-            .WithName("AdminQueryDiscounts").WithSummary("[admin] Query discount rows")
+            .WithName(RouteName).WithSummary("[admin] Query discount rows")
             .WithTags(nameof(Discount))
             .Produces<ICollection<QueryDiscountResponse>>()
             .RequireAuthorization(policy =>

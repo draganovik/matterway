@@ -6,10 +6,12 @@ namespace Matterway.Catalog.Api.Endpoints.Admin.Details;
 
 public class AdminPutDetail : IEndpoint
 {
+    private const string RouteName = nameof(AdminPutDetail);
+
     public void MapEndpoint(EndpointRouter endpoints)
     {
         endpoints.MapPut(EndpointKind.Admin, "details/{slug}", Handle)
-            .WithName("AdminPutDetail").WithSummary("[admin] Create or replace a Detail definition")
+            .WithName(RouteName).WithSummary("[admin] Create or replace a Detail definition")
             .WithTags(nameof(Detail))
             .Produces<PutDetailResponse>(StatusCodes.Status200OK)
             .Produces<PutDetailResponse>(StatusCodes.Status201Created)
