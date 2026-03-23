@@ -36,7 +36,7 @@ const props = withDefaults(
     emptyMessage: "Nema rezultata.",
     filterInputType: "textarea",
     filterPlaceholder:
-      "Pretraga uz RSQL filtere (npr. title==chair; available==true).",
+      "Pretraga uz RSQL filtere (npr. title==NAS; available==true).",
     page: 1,
     pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
@@ -124,14 +124,12 @@ function updatePageSize(value: number) {
       <div class="flex flex-wrap items-end gap-3 [&>*]:min-w-0 [&>*]:flex-1">
         <slot name="search-controls" />
         <UFormField label="Po stranici" class="w-full">
-          <USelectMenu
+          <USelect
             :items="pageSizes"
             :model-value="pageSize"
-            value-key="value"
-            label-key="label"
             placeholder="Izaberi broj"
             class="w-full"
-            @update:model-value="updatePageSize"
+            @update:model-value="updatePageSize(Number($event))"
           />
         </UFormField>
         <UButton

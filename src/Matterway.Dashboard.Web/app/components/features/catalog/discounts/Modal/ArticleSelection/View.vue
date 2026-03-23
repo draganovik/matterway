@@ -205,7 +205,7 @@ function submitSelection() {
         <UFormField label="Pretraga">
           <UTextarea
             v-model="filter"
-            placeholder="Pretraga pomoću RSQL filtera (npr. title==chair;available==true)."
+            placeholder="Pretraga pomoću RSQL filtera (npr. title==NAS;available==true)."
             :rows="3"
             class="w-full"
           />
@@ -246,14 +246,23 @@ function submitSelection() {
           @toggle="toggleSelection"
         />
 
-        <div
-          class="border-default flex flex-wrap items-center justify-between gap-3 border-t pt-3"
-        >
-          <div class="text-muted text-sm">
+        <div class="border-default space-y-3 border-t pt-3">
+          <UFormField label="Po stranici" class="w-full">
+            <USelect
+              :items="pageSizes"
+              :model-value="pagination.pageSize"
+              placeholder="Izaberi broj"
+              class="w-full"
+              @update:model-value="changePageSize(Number($event))"
+            />
+          </UFormField>
+
+          <div class="text-muted text-center text-sm">
             Strana {{ pagination.page }} od {{ pagination.totalPages }} - ukupno
             {{ pagination.totalCount }}
           </div>
-          <div class="flex items-center gap-2">
+
+          <div class="flex justify-center">
             <UPagination
               :page="pagination.page"
               :items-per-page="pagination.pageSize"
@@ -262,17 +271,6 @@ function submitSelection() {
               show-controls
               @update:page="changePage"
             />
-            <UFormField label="Po stranici">
-              <USelectMenu
-                :items="pageSizes"
-                :model-value="pagination.pageSize"
-                value-key="value"
-                label-key="label"
-                placeholder="Izaberi broj"
-                class="min-w-34"
-                @update:model-value="changePageSize"
-              />
-            </UFormField>
           </div>
         </div>
       </div>

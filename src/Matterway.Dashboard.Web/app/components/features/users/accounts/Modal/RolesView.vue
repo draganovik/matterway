@@ -154,6 +154,16 @@ function applyLocalPermission(service: string, level: SystemUserPermLevel) {
   ])
 }
 
+function updateFormService(value: string | number | null | undefined) {
+  form.value.service = String(
+    value || serviceOptions[0]?.value || "identity",
+  ) as ServiceSection["service"]
+}
+
+function updateFormLevel(value: string | number | null | undefined) {
+  form.value.level = String(value || "Operator") as SystemUserPermLevel
+}
+
 async function setPermission() {
   clearMessages()
   if (!props.canManage) return
@@ -314,26 +324,24 @@ useModalCloseReset({
 
             <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
               <UFormField label="Servis" required>
-                <USelectMenu
-                  v-model="form.service"
+                <USelect
+                  :model-value="form.service"
                   :items="serviceOptions"
-                  value-key="value"
-                  label-key="label"
                   placeholder="Izaberite servis"
                   class="w-full"
                   :disabled="saveState.loading"
+                  @update:model-value="updateFormService($event)"
                 />
               </UFormField>
 
               <UFormField label="Dozvola" required>
-                <USelectMenu
-                  v-model="form.level"
+                <USelect
+                  :model-value="form.level"
                   :items="setLevelOptions"
-                  value-key="value"
-                  label-key="label"
                   placeholder="Izaberite dozvolu"
                   class="w-full"
                   :disabled="saveState.loading"
+                  @update:model-value="updateFormLevel($event)"
                 />
               </UFormField>
 
