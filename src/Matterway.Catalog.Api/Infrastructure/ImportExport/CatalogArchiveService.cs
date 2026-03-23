@@ -87,13 +87,10 @@ public sealed class CatalogArchiveService(
         {
             foreach (var dbImage in dbImages)
             {
-                var objectName = BuildObjectName(dbImage.Id);
-                var (content, contentType) = await LoadImageContentAsync(
-                    objectName,
-                    dbImage.ImageUrl,
-                    cancellationToken);
+                var objectName = ImageStoragePaths.BuildObjectName(dbImage.Id);
+                var (content, contentType) = await LoadImageContentAsync(objectName, cancellationToken);
 
-                var fileExtension = ResolveExtension(contentType, dbImage.ImageUrl);
+                var fileExtension = ResolveExtension(contentType);
                 var imageFile = $"images/{dbImage.ArticleCode}/{dbImage.Id:N}.{fileExtension}";
                 await WriteBinaryEntryAsync(archive, imageFile, content, cancellationToken);
 
@@ -171,7 +168,7 @@ public sealed class CatalogArchiveService(
                     ? GuessContentType(image.ImageFile)
                     : image.ContentType;
 
-                var objectName = BuildObjectName(image.Id);
+                var objectName = ImageStoragePaths.BuildObjectName(image.Id);
                 await client.PutObjectAsync(new PutObjectArgs()
                         .WithBucket(_options.Bucket)
                         .WithObject(objectName)
@@ -205,7 +202,8 @@ public sealed class CatalogArchiveService(
                     context.ArticleDetailText.AddRange(articleDetailTexts.Select(x => x.ToEntity()));
                     context.ArticleDetailNumeric.AddRange(articleDetailNumerics.Select(x => x.ToEntity()));
                     context.ArticleImage.AddRange(
-                        articleImages.Select(x => x.ToEntity(BuildImageUrl(x.Id))));
+                        articleImages.Select(x =>
+                            x.ToEntity(ImageStoragePaths.BuildStorageUrl(_options.Endpoint, _options.Bucket, x.Id))));
 
                     await context.SaveChangesAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
@@ -234,7 +232,6 @@ public sealed class CatalogArchiveService(
 
     private async Task<(byte[] Content, string ContentType)> LoadImageContentAsync(
         string objectName,
-        string? imageUrl,
         CancellationToken cancellationToken)
     {
         var client = minioClientFactory.CreateClient();
@@ -260,22 +257,12 @@ public sealed class CatalogArchiveService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex,
-                "Could not read image object '{ObjectName}' from MinIO bucket '{Bucket}'. Falling back to URL.",
+            logger.LogError(ex,
+                "Could not read image object '{ObjectName}' from MinIO bucket '{Bucket}'.",
                 objectName,
                 _options.Bucket);
+            throw;
         }
-
-        if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out var imageUri))
-            throw new InvalidDataException(
-                $"Image url '{imageUrl}' is invalid and MinIO object '{objectName}' is unavailable.");
-
-        using var http = new HttpClient();
-        using var response = await http.GetAsync(imageUri, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-        var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
-        return (content, contentType);
     }
 
     private async Task RollbackUploadedObjectsAsync(
@@ -337,7 +324,7 @@ public sealed class CatalogArchiveService(
         return payload;
     }
 
-    private static string ResolveExtension(string contentType, string? imageUrl)
+    private static string ResolveExtension(string contentType)
     {
         var byContentType = contentType.ToLowerInvariant() switch
         {
@@ -353,13 +340,6 @@ public sealed class CatalogArchiveService(
 
         if (!string.IsNullOrWhiteSpace(byContentType))
             return byContentType;
-
-        if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-        {
-            var extension = Path.GetExtension(uri.AbsolutePath).Trim().TrimStart('.').ToLowerInvariant();
-            if (!string.IsNullOrWhiteSpace(extension))
-                return extension;
-        }
 
         return "bin";
     }
@@ -378,19 +358,5 @@ public sealed class CatalogArchiveService(
             ".svg" => "image/svg+xml",
             _ => "application/octet-stream"
         };
-    }
-
-    private string BuildImageUrl(Guid imageId)
-    {
-        var objectName = BuildObjectName(imageId);
-        var baseUrl = string.IsNullOrWhiteSpace(_options.PublicBaseUrl)
-            ? _options.Endpoint
-            : _options.PublicBaseUrl;
-        return $"{baseUrl.TrimEnd('/')}/{_options.Bucket}/{objectName}";
-    }
-
-    private static string BuildObjectName(Guid imageId)
-    {
-        return $"images/{imageId:N}";
     }
 }

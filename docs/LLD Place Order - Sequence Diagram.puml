@@ -21,7 +21,7 @@ alt Client-side validation fails
   Checkout --> Customer : Show validation errors\n(no API calls)
 
 else Validation passes
-  Checkout -> StorefrontServer : POST /api/v1/orders\n{customerId, order, payment, address} + Bearer customer JWT
+  Checkout -> StorefrontServer : POST /api/storefront/checkout\n{customerId, order, payment, address} + Bearer customer JWT
   activate StorefrontServer
   StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=false)\nmetadata:{client_id, note}
   activate Stripe
@@ -88,7 +88,7 @@ else Validation passes
   == Asynchronous webhook handling ==
 
   alt Stripe sends charge.succeeded
-    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\ncharge.succeeded(order_id, amount)
+    Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\ncharge.succeeded(order_id, amount)
     activate StorefrontServer
     StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, amount, status=Charged, createdAt}
     activate SalesApi
@@ -101,7 +101,7 @@ else Validation passes
     StorefrontServer --> Stripe : 200 OK
     deactivate StorefrontServer
   else Stripe sends non-charge event
-    Stripe -> StorefrontServer : POST /api/v1/webhooks/stripe\n<other event type>
+    Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\n<other event type>
     activate StorefrontServer
     StorefrontServer --> Stripe : 304 Event ignored
     deactivate Stripe

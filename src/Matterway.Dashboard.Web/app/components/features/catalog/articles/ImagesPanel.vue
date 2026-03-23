@@ -231,16 +231,12 @@ async function handleImageSubmit(payload: {
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-4">
-        <StatusMessages
-          :error="addState.error || updateState.error || removeState.error"
-        />
-        <StatusMessages
-          :success="
-            addState.success || updateState.success || removeState.success
-          "
-        />
-      </div>
+      <StatusMessages
+        :error="addState.error || updateState.error || removeState.error"
+        :success="
+          addState.success || updateState.success || removeState.success
+        "
+      />
     </div>
   </div>
 

@@ -194,6 +194,7 @@ useModalCloseReset({
             v-model="imageAlt"
             placeholder="Prednji prikaz artikla"
             :disabled="!canEdit"
+            class="w-full"
           />
         </UFormField>
 

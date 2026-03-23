@@ -18,9 +18,5 @@ public class ImageStorageOptions
     [Required]
     public string SecretKey { get; set; } = string.Empty;
 
-    public string? PublicBaseUrl { get; set; }
-
     public string? Region { get; set; }
-
-    public bool AllowPublicRead { get; set; }
 }

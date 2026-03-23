@@ -1,3 +1,5 @@
+import { buildCatalogImageUrl } from "~/utils/catalogImages"
+
 export type CatalogArticleDiscount = {
   percentage?: number | null
   validFrom?: string | null
@@ -65,27 +67,31 @@ function readDiscount(value: unknown): CatalogArticleDiscount | null {
 
 function readImage(value: unknown): CatalogArticleImage | null {
   const source = asRecord(value)
-  if (!source.imageUrl) return null
+  const id = typeof source.id === "string" ? source.id : undefined
+  const imageUrlSource =
+    typeof source.imageUrl === "string" ? source.imageUrl : undefined
+  const imageUrl = buildCatalogImageUrl(imageUrlSource, id)
+  if (!id || !imageUrl) return null
+
   return {
-    id: typeof source.id === "string" ? source.id : undefined,
+    id,
     orderIndex: asNumber(source.orderIndex, 0),
-    imageUrl: String(source.imageUrl),
+    imageUrl,
     imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
   }
 }
 
 export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
   const source = asRecord(payload)
-  const thumbnail =
-    readImage(source.thumbnailImage) ||
-    (source.thumbnailUrl
-      ? {
-          imageUrl: String(source.thumbnailUrl),
-          imageAlt: source.thumbnailAlt
-            ? String(source.thumbnailAlt)
-            : undefined,
-        }
-      : null)
+  const thumbnailUrlSource =
+    typeof source.thumbnailUrl === "string" ? source.thumbnailUrl : undefined
+  const thumbnailUrl = buildCatalogImageUrl(thumbnailUrlSource)
+  const thumbnail = thumbnailUrl
+    ? {
+        imageUrl: thumbnailUrl,
+        imageAlt: source.thumbnailAlt ? String(source.thumbnailAlt) : undefined,
+      }
+    : readImage(source.thumbnailImage)
 
   return {
     code: readCode(source),

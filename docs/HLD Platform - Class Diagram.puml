@@ -130,6 +130,12 @@ package "Catalog" {
     +imageAlt: String?
   }
 
+  note right of ArticleImage
+    ImageUrl stores the canonical object URL.
+    Web apps derive their local image proxy path
+    from the image id and stream bytes from MinIO.
+  end note
+
   Discount "0..*" -- "1" Article : articleCode
   ArticleDetailText "0..*" -- "1" Article : articleCode
   ArticleDetailText "0..*" -- "1" Detail : detailSlug
@@ -230,13 +236,14 @@ package "Sales" {
 
   note left of Order
     Current checkout flow
-    1) Storefront -> Storefront Server: POST /api/v1/orders
+    1) Storefront -> Storefront Server: POST /api/storefront/checkout
     2) Storefront Server -> Stripe: initialize payment intent
     3) Storefront Server -> Sales: POST /api/system/v1/orders (+ customer JWT + system key)
     4) Sales reserves or reuses a pending OrderId, then mirrors cart items in Customers
     5) Sales updates the pending Order with items, delivery info, and Processing status
     6) Storefront Server -> Stripe: attach metadata(order_id) + confirm payment intent
-    7) Stripe webhook -> Sales system/payment registration
+    7) Stripe webhook -> Storefront Server: POST /api/storefront/webhooks/stripe
+       Storefront Server -> Sales system/payment registration
     Checkout delivery country is fixed to Serbia.
   end note
 

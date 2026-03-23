@@ -17,7 +17,8 @@ var stripeSecretKey = builder.AddParameter("StripeSecretKey", true);
 builder.AddDockerComposeEnvironment(composeEnvironmentName)
     .WithDashboard(dashboard =>
     {
-        dashboard.WithHostPort(services.AspireDashboard.Port);
+        if (builder.Environment.IsDevelopment())
+            dashboard.WithHostPort(services.AspireDashboard.Port);
         dashboard.WithContainerName("aspire-dashboard");
     })
     .ConfigureComposeFile(compose => compose.Name = "matterway-platform");
@@ -27,12 +28,7 @@ var postgres = builder.AddPostgres("postgres")
     .WithHostPort(services.Postgres.Port)
     .WithPassword(postgresPassword)
     .WithVolume("matterway-postgres-data", "/var/lib/postgresql")
-    .WithBindMount("../../data", "/seed-data", true)
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = [$"{services.Postgres.Port}:5432"];
-    });
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
 
 var databases = (
     Catalog: postgres.AddDatabase("CatalogDb"),
@@ -47,11 +43,7 @@ var minio = builder.AddContainer("minio", "minio/minio:RELEASE.2025-01-20T14-49-
     .WithArgs("server", "/data", "--console-address", ":9001")
     .WithHttpEndpoint(services.Minio.Port, 9000, "http")
     .WithHttpEndpoint(services.Minio.ConsolePort, 9001, "console")
-    .PublishAsDockerComposeService((_, service) =>
-    {
-        service.Restart = "unless-stopped";
-        service.Ports = [$"{services.Minio.Port}:9000", $"{services.Minio.ConsolePort}:9001"];
-    });
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
 
 var dbMigrator = builder.AddProject<Matterway_Migrations>("mtw-db-migrator")
     .WithReference(databases.Catalog)
@@ -63,17 +55,14 @@ var dbMigrator = builder.AddProject<Matterway_Migrations>("mtw-db-migrator")
 
 var identityApi = AddApi<Matterway_Identity_Api>(
     ApiDirectory.Identity,
-    services.Identity.Port,
     api => api.WithReference(databases.Identity));
 
 var catalogApi = AddApi<Matterway_Catalog_Api>(
     ApiDirectory.Catalog,
-    services.Catalog.Port,
     api => api.WithReference(databases.Catalog));
 
 var customersApi = AddApi<Matterway_Customers_Api>(
     ApiDirectory.Customers,
-    services.Customers.Port,
     api => api
         .WithReference(databases.Customers)
         .WithReference(identityApi.GetEndpoint("http"))
@@ -81,7 +70,6 @@ var customersApi = AddApi<Matterway_Customers_Api>(
 
 var salesApi = AddApi<Matterway_Sales_Api>(
     ApiDirectory.Sales,
-    services.Sales.Port,
     api => api.WithReference(databases.Sales)
         .WithReference(customersApi.GetEndpoint("http")));
 
@@ -90,21 +78,14 @@ var catalogApiHttp = catalogApi.GetEndpoint("http");
 var customersApiHttp = customersApi.GetEndpoint("http");
 var salesApiHttp = salesApi.GetEndpoint("http");
 var minioHttpEndpoint = minio.GetEndpoint("http");
-var minioPublicBaseUrl = services.Minio.ToBaseUrl();
-var identityPublicBaseUrl = services.Identity.ToBaseUrl();
-var catalogPublicBaseUrl = services.Catalog.ToBaseUrl();
-var customersPublicBaseUrl = services.Customers.ToBaseUrl();
-var salesPublicBaseUrl = services.Sales.ToBaseUrl();
 
 catalogApi
     .WaitFor(minio)
     .WithReference(minioHttpEndpoint)
     .WithEnvironment("ImageStorage__Bucket", "article-images")
     .WithEnvironment("ImageStorage__Endpoint", minioHttpEndpoint)
-    .WithEnvironment("ImageStorage__PublicBaseUrl", minioPublicBaseUrl)
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
-    .WithEnvironment("ImageStorage__SecretKey", minioPassword)
-    .WithEnvironment("ImageStorage__AllowPublicRead", "true");
+    .WithEnvironment("ImageStorage__SecretKey", minioPassword);
 
 var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
 {
@@ -145,29 +126,25 @@ WebAppComposition.AddWebApp(
 if (builder.Environment.IsDevelopment())
     ScalarComposition.AddScalarApiReference(builder, apisByServiceName);
 
-ApiEnvironmentComposition.ConfigureApiEnvironment(
-    apisByServiceName.Values,
-    identityApiHttp,
-    jwtSigningKey,
-    systemAccessKey,
-    builder.Configuration,
-    [services.Storefront.ToBaseUrl(), services.Dashboard.ToBaseUrl()]);
+foreach (var api in apisByServiceName.Values)
+    api
+        .WithEnvironment("Jwt__Key", jwtSigningKey)
+        .WithEnvironment("Jwt__Issuer", identityApiHttp)
+        .WithEnvironment("Jwt__Audience", identityApiHttp)
+        .WithEnvironment("Security__SystemAccessKey", systemAccessKey);
 
 builder.Build().Run();
 
 IResourceBuilder<ProjectResource> AddApi<TProject>(
     ApiDefinition apiDefinition,
-    int hostPort,
     Func<IResourceBuilder<ProjectResource>, IResourceBuilder<ProjectResource>> configure)
     where TProject : IProjectMetadata, new()
 {
     var api = builder.AddProject<TProject>(apiDefinition.AspireServiceName)
-        .WithExternalHttpEndpoints()
-        .PublishAsDockerComposeService((_, service) =>
-        {
-            service.Restart = "unless-stopped";
-            service.Ports = [$"{hostPort}:8080"];
-        });
+        .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+
+    if (!builder.ExecutionContext.IsPublishMode)
+        api = api.WithExternalHttpEndpoints();
 
     return configure(api).WaitFor(dbMigrator);
 }
@@ -243,12 +220,6 @@ void ConfigureCommonWebEnvironment(WebAppEnvironmentBuilder environment)
         .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
         .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
-        .WithEnvironment("IDENTITY_API_BASE_URL", identityApiHttp)
-        .WithEnvironment("CATALOG_API_BASE_URL", catalogApiHttp)
-        .WithEnvironment("CUSTOMERS_API_BASE_URL", customersApiHttp)
-        .WithEnvironment("SALES_API_BASE_URL", salesApiHttp)
-        .WithEnvironment("NUXT_PUBLIC_IDENTITY_API_BASE_URL", identityPublicBaseUrl)
-        .WithEnvironment("NUXT_PUBLIC_CATALOG_API_BASE_URL", catalogPublicBaseUrl)
-        .WithEnvironment("NUXT_PUBLIC_CUSTOMERS_API_BASE_URL", customersPublicBaseUrl)
-        .WithEnvironment("NUXT_PUBLIC_SALES_API_BASE_URL", salesPublicBaseUrl);
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", minioHttpEndpoint)
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BUCKET", "article-images");
 }

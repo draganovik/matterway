@@ -1,5 +1,4 @@
 using Matterway.Catalog.Api.Domain.Entities;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleImageEntity;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 
@@ -24,15 +23,11 @@ public class AdminRemoveArticleImage : IEndpoint
     private static async Task<Results<Ok<RemoveArticleImageResponse>, NotFound, ProblemHttpResult>> Handle(
         ArticleCode article,
         int orderIndex,
-        IArticleRepository articleRepository,
         IArticleImageRepository articleImageRepository,
         IImageStorageService imageStorageService,
         ILogger<AdminRemoveArticleImage> logger,
         CancellationToken cancellationToken)
     {
-        var articleEntity = await articleRepository.GetBy(article, cancellationToken);
-        if (articleEntity is null) return TypedResults.NotFound();
-
         var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
 
         if (entity is null) return TypedResults.NotFound();
@@ -63,7 +58,14 @@ public class AdminRemoveArticleImage : IEndpoint
                 article);
         }
 
-        return TypedResults.Ok(MapToResponse(entity, article));
+        return TypedResults.Ok(new RemoveArticleImageResponse
+        {
+            Id = entity.Id,
+            OrderIndex = entity.OrderIndex,
+            ArticleCode = article,
+            ImageUrl = entity.ImageUrl,
+            ImageAlt = entity.ImageAlt
+        });
     }
 
     public record RemoveArticleImageResponse
@@ -74,17 +76,5 @@ public class AdminRemoveArticleImage : IEndpoint
         public string? ImageAlt { get; init; }
         public required ArticleCode ArticleCode { get; init; }
         public string Message { get; init; } = "Article image removed successfully.";
-    }
-
-    public static RemoveArticleImageResponse MapToResponse(ArticleImage entity, ArticleCode article)
-    {
-        return new RemoveArticleImageResponse
-        {
-            Id = entity.Id,
-            OrderIndex = entity.OrderIndex,
-            ArticleCode = article,
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
-        };
     }
 }

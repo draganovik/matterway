@@ -18,9 +18,7 @@ public sealed class ImageStorageInitializer(
         {
             var client = clientFactory.CreateClient();
             await EnsureBucketAsync(client, cancellationToken).ConfigureAwait(false);
-
-            if (_options.AllowPublicRead)
-                await EnsurePublicAccessPolicyAsync(client, cancellationToken).ConfigureAwait(false);
+            await EnsureBucketReadPolicyAsync(client, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -48,28 +46,38 @@ public sealed class ImageStorageInitializer(
             cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task EnsurePublicAccessPolicyAsync(IMinioClient client, CancellationToken cancellationToken)
+    private async Task EnsureBucketReadPolicyAsync(IMinioClient client, CancellationToken cancellationToken)
     {
-        var policy =
-            $$"""
-              {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {"AWS": "*"},
-                    "Action": ["s3:GetObject"],
-                    "Resource": ["arn:aws:s3:::{{_options.Bucket}}/*"]
-                  }
-                ]
-              }
-              """;
+        var policyJson = $$"""
+                           {
+                             "Version": "2012-10-17",
+                             "Statement": [
+                               {
+                                 "Effect": "Allow",
+                                 "Principal": {
+                                   "AWS": [
+                                     "*"
+                                   ]
+                                 },
+                                 "Action": [
+                                   "s3:GetObject"
+                                 ],
+                                 "Resource": [
+                                   "arn:aws:s3:::{{_options.Bucket}}/images/*"
+                                 ]
+                               }
+                             ]
+                           }
+                           """;
 
-        logger.LogInformation("Applying public read policy to bucket '{Bucket}'.", _options.Bucket);
+        logger.LogInformation(
+            "Ensuring anonymous read policy for image storage bucket '{Bucket}' on prefix 'images/*'.",
+            _options.Bucket);
+
         await client.SetPolicyAsync(
             new SetPolicyArgs()
                 .WithBucket(_options.Bucket)
-                .WithPolicy(policy),
+                .WithPolicy(policyJson),
             cancellationToken).ConfigureAwait(false);
     }
 }

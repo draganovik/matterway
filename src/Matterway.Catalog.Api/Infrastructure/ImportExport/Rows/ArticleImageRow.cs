@@ -7,7 +7,6 @@ public sealed record ArticleImageRow(
     string ArticleCode,
     int OrderIndex,
     string ImageAlt,
-    string? OriginalImageUrl,
     string ImageFile,
     string ContentType)
 {
@@ -18,7 +17,6 @@ public sealed record ArticleImageRow(
             entity.ArticleCode,
             entity.OrderIndex,
             entity.ImageAlt ?? string.Empty,
-            entity.ImageUrl,
             imageFile,
             contentType);
     }

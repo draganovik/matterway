@@ -49,7 +49,6 @@ public static class WebAppExtensions
 
                 await next();
             });
-            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
             return app;

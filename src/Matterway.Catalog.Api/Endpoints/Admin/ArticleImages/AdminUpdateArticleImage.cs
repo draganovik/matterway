@@ -35,7 +35,7 @@ public class AdminUpdateArticleImage : IEndpoint
         var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
 
-        MapUpdates(entity, request);
+        entity.ImageAlt = request.ImageAlt ?? entity.ImageAlt;
 
         var targetOrderIndex = request.OrderIndex ?? entity.OrderIndex;
 
@@ -45,7 +45,15 @@ public class AdminUpdateArticleImage : IEndpoint
 
         if (updated is null) return TypedResults.NotFound();
 
-        return TypedResults.Ok(MapToResponse(updated, article, articleEntity.Title));
+        return TypedResults.Ok(new UpdateArticleImageResponse
+        {
+            Id = updated.Id,
+            OrderIndex = updated.OrderIndex,
+            ArticleCode = article,
+            ArticleName = articleEntity.Title,
+            ImageUrl = updated.ImageUrl,
+            ImageAlt = updated.ImageAlt
+        });
     }
 
     public record UpdateArticleImageRequest
@@ -64,26 +72,5 @@ public class AdminUpdateArticleImage : IEndpoint
         public string? ArticleName { get; init; }
         public string? ImageUrl { get; init; }
         public string? ImageAlt { get; init; }
-    }
-
-    public static void MapUpdates(ArticleImage entity, UpdateArticleImageRequest request)
-    {
-        entity.ImageAlt = request.ImageAlt ?? entity.ImageAlt;
-    }
-
-    public static UpdateArticleImageResponse MapToResponse(
-        ArticleImage entity,
-        ArticleCode article,
-        string articleName)
-    {
-        return new UpdateArticleImageResponse
-        {
-            Id = entity.Id,
-            OrderIndex = entity.OrderIndex,
-            ArticleCode = article,
-            ArticleName = articleName,
-            ImageUrl = entity.ImageUrl,
-            ImageAlt = entity.ImageAlt
-        };
     }
 }
