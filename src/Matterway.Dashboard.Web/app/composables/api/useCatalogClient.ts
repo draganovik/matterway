@@ -23,8 +23,8 @@ import type {
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,
-  QueryDetailResponse,
   QueryDetailsParams,
+  QueryDetailsResponse,
   QueryDiscountResponse,
   UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
@@ -38,6 +38,7 @@ import type { PaginationResponse } from "~/types/common/pagination"
 
 const ADMIN_ARTICLES_PATH = "admin/articles"
 const PUBLIC_ARTICLES_PATH = "public/articles"
+const PUBLIC_DETAILS_PATH = "public/details"
 const ADMIN_DETAILS_PATH = "admin/details"
 const ADMIN_DISCOUNTS_PATH = "admin/discounts"
 
@@ -324,12 +325,13 @@ export function useCatalogClient() {
 
   async function queryDetails(params: QueryDetailsParams) {
     const query = buildQuery({
-      Limit: params.limit,
+      Page: params.page,
+      PageSize: params.pageSize,
       TitleLike: params.titleLike || undefined,
     })
-    return api.request<QueryDetailResponse[]>(
+    return api.request<QueryDetailsResponse>(
       "catalog",
-      `${ADMIN_DETAILS_PATH}${query}`,
+      `${PUBLIC_DETAILS_PATH}${query}`,
     )
   }
 

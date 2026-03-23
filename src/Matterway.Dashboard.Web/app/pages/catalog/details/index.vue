@@ -14,7 +14,7 @@ const {
   removeState,
   details,
   filter,
-  limit,
+  pagination,
   selectedSlug,
   selectedDetail,
   createModalOpen,
@@ -25,7 +25,8 @@ const {
   requestRemoveDetail,
   selectDetail,
   searchDetails,
-  updateLimit,
+  changePage,
+  changePageSize,
   saveDetail,
   removeDetail,
   handleDetailCreated,
@@ -79,10 +80,14 @@ const {
                 :loading="listState.loading"
                 :error="listState.error"
                 :empty-message="listState.empty"
-                :page-size="limit"
+                :page="pagination.page"
+                :page-size="pagination.pageSize"
+                :total-count="pagination.totalCount"
+                :total-pages="pagination.totalPages"
                 @update:filter="(value) => (filter = value)"
                 @search="searchDetails"
-                @update:page-size="updateLimit"
+                @update:page="changePage"
+                @update:page-size="changePageSize"
                 @select="selectDetail"
               />
             </template>

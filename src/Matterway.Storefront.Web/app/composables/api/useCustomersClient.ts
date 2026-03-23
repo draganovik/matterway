@@ -6,7 +6,7 @@ import type {
   RegisterPayload,
   SelfProfileResponse,
   SelfProfileUpdateRequest,
-} from "~/types/customers/address"
+} from "~/types/customers"
 
 type RemoteCartItem = {
   articleName?: string

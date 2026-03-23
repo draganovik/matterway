@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PutSelfAddressRequest } from "~/types/customers/address"
+import type { PutSelfAddressRequest } from "~/types/customers"
 
 withDefaults(
   defineProps<{

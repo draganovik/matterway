@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SalesOrder } from "~/types/sales/orders"
+import type { SalesOrder } from "~/types/sales"
 
 const props = defineProps<{
   orders: SalesOrder[]

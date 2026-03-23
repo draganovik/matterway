@@ -11,7 +11,7 @@ import {
   PAGINATION_PAGE_SIZE_OPTIONS,
 } from "~/constants/pagination"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 import type { PaginationMeta } from "~/types/common/api"
 
 type FiltersState = {
@@ -189,65 +189,24 @@ export function useArticlesBrowsePage() {
     )
   }
 
-  function mergeDetailDefinitions(
-    next: DetailFilterDefinition[],
-    current: DetailFilterDefinition[],
-  ) {
-    const map = new Map(
-      current.map((definition) => [definition.slug, definition]),
-    )
-
-    for (const definition of next) {
-      map.set(definition.slug, definition)
-    }
-
-    return Array.from(map.values()).sort((a, b) =>
-      a.label.localeCompare(b.label),
-    )
-  }
-
-  async function loadDetailDefinitions(forVersion: number) {
+  async function loadDetailDefinitions() {
     detailDefinitionsLoading.value = true
     try {
-      const articleCodes = items.value.map((item) => item.code).slice(0, 24)
-      if (!articleCodes.length) {
-        if (forVersion === requestVersion.value) {
-          detailDefinitions.value = withActiveFilterDefinitions(
-            detailDefinitions.value,
-          )
-        }
+      const result = await catalogApi.queryDetailDefinitions()
+
+      if (result.error) {
+        detailDefinitions.value = withActiveFilterDefinitions(
+          detailDefinitions.value,
+        )
         return
       }
 
-      const responses = await Promise.all(
-        articleCodes.map((code) => catalogApi.getArticle(code)),
-      )
-
-      const rawDefinitions: Array<{
-        slug?: string | null
-        title?: string | null
-        unit?: string | null
-      }> = []
-
-      for (const response of responses) {
-        for (const detail of response.item?.articleDetails ?? []) {
-          rawDefinitions.push({
-            slug: detail.detailSlug,
-            title: detail.title,
-            unit: detail.unit,
-          })
-        }
-      }
-
-      if (forVersion !== requestVersion.value) return
-      const normalizedDefinitions = normalizeDetailDefinitions(rawDefinitions)
+      const normalizedDefinitions = normalizeDetailDefinitions(result.items)
       detailDefinitions.value = withActiveFilterDefinitions(
-        mergeDetailDefinitions(normalizedDefinitions, detailDefinitions.value),
+        normalizedDefinitions,
       )
     } finally {
-      if (forVersion === requestVersion.value) {
-        detailDefinitionsLoading.value = false
-      }
+      detailDefinitionsLoading.value = false
     }
   }
 
@@ -325,8 +284,6 @@ export function useArticlesBrowsePage() {
     if (result.error) {
       error.value = result.error
     }
-
-    await loadDetailDefinitions(forVersion)
     if (forVersion !== requestVersion.value) return
     hasLoadedOnce.value = true
     loading.value = false
@@ -450,6 +407,8 @@ export function useArticlesBrowsePage() {
     },
     { immediate: true },
   )
+
+  void loadDetailDefinitions()
 
   return {
     filters,

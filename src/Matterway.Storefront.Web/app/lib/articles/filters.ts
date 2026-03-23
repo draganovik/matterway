@@ -1,3 +1,5 @@
+import type { CatalogDetailDefinition } from "~/types/catalog"
+
 export interface DetailFilterDefinition {
   slug: string
   label: string
@@ -26,11 +28,7 @@ function bySlug(definitions: DetailFilterDefinition[]) {
 }
 
 export const normalizeDetailDefinitions = (
-  definitions: Array<{
-    slug?: string | null
-    title?: string | null
-    unit?: string | null
-  }>,
+  definitions: CatalogDetailDefinition[],
 ): DetailFilterDefinition[] => {
   const map = new Map<string, DetailFilterDefinition>()
   for (const definition of definitions) {

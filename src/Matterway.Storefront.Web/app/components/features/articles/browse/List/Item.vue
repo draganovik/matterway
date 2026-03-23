@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 import { useCartStore } from "~/composables/stores/useCartStore"
 import { formatMoney } from "~/utils/formatters"
 

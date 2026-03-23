@@ -5,7 +5,7 @@ import type {
   PutSelfAddressRequest,
   SelfProfileResponse,
   SelfProfileUpdateRequest,
-} from "~/types/customers/address"
+} from "~/types/customers"
 
 type ProfileFormState = {
   systemUserId: string

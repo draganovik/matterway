@@ -1,4 +1,4 @@
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 import type { CartItem } from "~/types/cart"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"

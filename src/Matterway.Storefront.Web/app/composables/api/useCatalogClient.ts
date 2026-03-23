@@ -2,8 +2,10 @@ import { useApiClient } from "~/composables/api/useApiClient"
 import {
   mapCatalogArticleDetail,
   mapCatalogArticleListItem,
+  mapCatalogDetailDefinition,
   type CatalogArticle,
-} from "~/types/catalog/articles"
+  type CatalogDetailDefinition,
+} from "~/types/catalog"
 import type { PaginatedPayload, PaginationMeta } from "~/types/common/api"
 
 export function useCatalogClient() {
@@ -67,8 +69,58 @@ export function useCatalogClient() {
     }
   }
 
+  async function queryDetailDefinitions(): Promise<{
+    items: CatalogDetailDefinition[]
+    error?: string
+  }> {
+    const items: CatalogDetailDefinition[] = []
+    const pageSize = 200
+    let page = 1
+
+    while (true) {
+      const query = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      })
+
+      const response = await api.request<
+        PaginatedPayload<Record<string, unknown>>
+      >(
+        "catalog",
+        `public/details?${query.toString()}`,
+        { method: "GET" },
+        true,
+      )
+
+      if (!response.ok) {
+        return { items: [], error: response.error }
+      }
+
+      if (response.status === 204 || !response.data) {
+        return { items }
+      }
+
+      items.push(
+        ...(response.data.data ?? []).map((item) =>
+          mapCatalogDetailDefinition(item),
+        ),
+      )
+
+      const totalPages = Math.max(
+        1,
+        Number(response.data.meta?.totalPages) || 1,
+      )
+      if (page >= totalPages) {
+        return { items }
+      }
+
+      page += 1
+    }
+  }
+
   return {
     browseArticles,
     getArticle,
+    queryDetailDefinitions,
   }
 }

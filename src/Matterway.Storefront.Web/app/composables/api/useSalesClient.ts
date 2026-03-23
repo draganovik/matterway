@@ -1,7 +1,7 @@
 import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useApiClient } from "~/composables/api/useApiClient"
 import type { PaginatedPayload } from "~/types/common/api"
-import type { SalesOrder } from "~/types/sales/orders"
+import type { SalesOrder } from "~/types/sales"
 
 export function useSalesClient() {
   const api = useApiClient()

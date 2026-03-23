@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CatalogArticle } from "~/types/catalog/articles"
+import type { CatalogArticle } from "~/types/catalog"
 
 const props = defineProps<{
   article: CatalogArticle

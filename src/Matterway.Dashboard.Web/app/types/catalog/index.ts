@@ -28,6 +28,7 @@ export type {
   PutDetailResponse,
   QueryDetailResponse,
   QueryDetailsParams,
+  QueryDetailsResponse,
 } from "./details"
 export type {
   CreateDiscountRequest,
