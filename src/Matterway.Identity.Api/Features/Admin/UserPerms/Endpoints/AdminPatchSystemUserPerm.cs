@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Features.Admin.UserPerms.Contracts;
@@ -72,5 +70,4 @@ public class AdminPatchSystemUserPerm : IEndpoint
             Detail = detail
         };
     }
-
 }

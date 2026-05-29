@@ -23,13 +23,14 @@ public class SystemCreateOrder : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<SystemCreateOrderResponse>, BadRequest<ProblemDetails>, NotFound>> Handler(
-        SystemCreateOrderRequest request,
-        HttpContext httpContext,
-        ICustomerRepository customerRepository,
-        IAddressRepository addressRepository,
-        ICustomerOrderRepository customerOrderRepository,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<SystemCreateOrderResponse>, BadRequest<ProblemDetails>, NotFound>>
+        Handler(
+            SystemCreateOrderRequest request,
+            HttpContext httpContext,
+            ICustomerRepository customerRepository,
+            IAddressRepository addressRepository,
+            ICustomerOrderRepository customerOrderRepository,
+            CancellationToken cancellationToken)
     {
         if (request.CustomerId == Guid.Empty)
             return TypedResults.BadRequest(new ProblemDetails

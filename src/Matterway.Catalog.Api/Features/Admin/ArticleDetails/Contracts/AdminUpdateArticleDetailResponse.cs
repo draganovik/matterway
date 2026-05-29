@@ -1,5 +1,3 @@
-using Matterway.Catalog.Api.Domain.Entities;
-
 namespace Matterway.Catalog.Api.Features.Admin.ArticleDetails.Contracts;
 
 public record AdminUpdateArticleDetailResponse

@@ -22,12 +22,13 @@ public class AdminUpdateArticleImage : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<AdminUpdateArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
-        ArticleCode article,
-        int orderIndex,
-        AdminUpdateArticleImageRequest request,
-        IArticleImageRepository articleImageRepository,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Ok<AdminUpdateArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>>
+        Handle(
+            ArticleCode article,
+            int orderIndex,
+            AdminUpdateArticleImageRequest request,
+            IArticleImageRepository articleImageRepository,
+            CancellationToken cancellationToken)
     {
         var entity = await articleImageRepository.GetBy(article, orderIndex, cancellationToken);
         if (entity is null) return TypedResults.NotFound();

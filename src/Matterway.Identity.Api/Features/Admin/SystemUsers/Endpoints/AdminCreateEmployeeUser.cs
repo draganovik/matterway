@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Features.Admin.SystemUsers.Contracts;
@@ -27,14 +25,15 @@ public class AdminCreateEmployeeUser : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AdminCreateEmployeeSystemUserResponse>, BadRequest<ProblemDetails>>> Handler(
-        AdminCreateEmployeeSystemUserRequest request,
-        HttpContext httpContext,
-        LinkGenerator linkGenerator,
-        CancellationToken cancellationToken,
-        IdentityDbComposer identityDb,
-        UserManager<SystemUser> userManager,
-        RoleManager<IdentityRole<Guid>> roleManager)
+    private static async Task<Results<Created<AdminCreateEmployeeSystemUserResponse>, BadRequest<ProblemDetails>>>
+        Handler(
+            AdminCreateEmployeeSystemUserRequest request,
+            HttpContext httpContext,
+            LinkGenerator linkGenerator,
+            CancellationToken cancellationToken,
+            IdentityDbComposer identityDb,
+            UserManager<SystemUser> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager)
     {
         var strategy = identityDb.Database.CreateExecutionStrategy();
         return await ExecutionStrategyExtensions
@@ -101,5 +100,4 @@ public class AdminCreateEmployeeUser : IEndpoint
             Detail = detail
         };
     }
-
 }

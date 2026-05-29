@@ -1,9 +1,12 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Features.Public.Articles.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
-using DetailResponse = Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.DetailResponse;
-using DiscountResponse = Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.DiscountResponse;
-using ImageResponse = Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.ImageResponse;
+using DetailResponse =
+    Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.DetailResponse;
+using DiscountResponse =
+    Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.DiscountResponse;
+using ImageResponse =
+    Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicGetArticleByCodeResponse.ImageResponse;
 
 namespace Matterway.Catalog.Api.Features.Public.Articles.Endpoints;
 

@@ -22,7 +22,8 @@ public class AdminPutDetail : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<AdminPutDetailResponse>, Created<AdminPutDetailResponse>, BadRequest<ProblemDetails>>>
+    private static async Task<Results<Ok<AdminPutDetailResponse>, Created<AdminPutDetailResponse>,
+            BadRequest<ProblemDetails>>>
         Handle(
             string slug,
             AdminPutDetailRequest request,

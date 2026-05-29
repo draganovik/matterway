@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Features.Admin.SystemUsers.Contracts;
 using Matterway.Identity.Api.Infrastructure.Persistence.SystemUserEntity;
@@ -101,5 +99,4 @@ public class AdminQuerySystemUsers : IEndpoint
 
         return role.HasValue;
     }
-
 }

@@ -39,5 +39,4 @@ public class AdminDeleteDiscount : IEndpoint
             RemovedCount = deletedCount
         });
     }
-
 }

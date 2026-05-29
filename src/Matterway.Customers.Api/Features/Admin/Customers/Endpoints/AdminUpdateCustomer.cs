@@ -20,7 +20,8 @@ public class AdminUpdateCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<AdminBaseCustomerResponse>, NotFound, ForbidHttpResult>> Handler(Guid systemUserId,
+    private static async Task<Results<Ok<AdminBaseCustomerResponse>, NotFound, ForbidHttpResult>> Handler(
+        Guid systemUserId,
         AdminUpdateCustomerRequest request,
         HttpContext httpContext,
         ICustomerRepository customerRepository,

@@ -1,7 +1,8 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Features.Public.Articles.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
-using DiscountResponse = Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicQueryArticleResponse.DiscountResponse;
+using DiscountResponse =
+    Matterway.Catalog.Api.Features.Public.Articles.Contracts.PublicQueryArticleResponse.DiscountResponse;
 
 namespace Matterway.Catalog.Api.Features.Public.Articles.Endpoints;
 

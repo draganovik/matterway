@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Matterway.Identity.Api.Features.Public.Auth.Contracts;
 using Matterway.Identity.Api.Infrastructure.Services.AuthToken;
 
