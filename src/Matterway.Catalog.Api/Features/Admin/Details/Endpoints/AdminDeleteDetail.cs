@@ -46,5 +46,4 @@ public class AdminDeleteDetail : IEndpoint
             Message = "Detail removed successfully."
         });
     }
-
 }

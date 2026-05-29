@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Matterway.Catalog.Api.Domain.Entities;
 
 namespace Matterway.Catalog.Api.Features.Admin.Discounts.Contracts;
 

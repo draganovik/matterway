@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Matterway.Identity.Api.Domain;
 using Matterway.Identity.Api.Domain.Entities;
 using Matterway.Identity.Api.Features.System.Users.Contracts;
@@ -25,7 +24,8 @@ public class SystemCreateCustomerUser : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<SystemCreateCustomerUserResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>
+    private static async Task<Results<Created<SystemCreateCustomerUserResponse>, BadRequest<ProblemDetails>,
+            ForbidHttpResult>>
         Handler(
             SystemCreateCustomerUserRequest request,
             HttpContext httpContext,
@@ -37,7 +37,8 @@ public class SystemCreateCustomerUser : IEndpoint
     {
         var strategy = identityDb.Database.CreateExecutionStrategy();
         return await ExecutionStrategyExtensions
-            .ExecuteAsync<Results<Created<SystemCreateCustomerUserResponse>, BadRequest<ProblemDetails>, ForbidHttpResult>>(
+            .ExecuteAsync<Results<Created<SystemCreateCustomerUserResponse>, BadRequest<ProblemDetails>,
+                ForbidHttpResult>>(
                 strategy,
                 async () =>
                 {
@@ -90,5 +91,4 @@ public class SystemCreateCustomerUser : IEndpoint
             Detail = detail
         };
     }
-
 }

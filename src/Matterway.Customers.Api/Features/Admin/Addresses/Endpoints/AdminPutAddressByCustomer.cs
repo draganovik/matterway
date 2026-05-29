@@ -26,7 +26,8 @@ public class AdminPutAddressByCustomer : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<AdminBaseAddressResponse>, Created<AdminBaseAddressResponse>, NotFound, BadRequest<ProblemDetails>>>
+        Task<Results<Ok<AdminBaseAddressResponse>, Created<AdminBaseAddressResponse>, NotFound,
+            BadRequest<ProblemDetails>>>
         Handler(
             Guid customerId,
             AdminPutAddressRequest request,

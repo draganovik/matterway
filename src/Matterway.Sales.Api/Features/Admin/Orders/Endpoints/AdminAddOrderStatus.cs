@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
 using Matterway.Sales.Api.Features.Admin.Orders.Contracts;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
@@ -26,14 +24,15 @@ public class AdminAddOrderStatus : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AdminAddOrderStatusResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
-        OrderId orderId,
-        AdminAddOrderStatusRequest request,
-        HttpContext httpContext,
-        LinkGenerator linkGenerator,
-        IOrderRepository orderRepository,
-        IOrderStatusRepository orderStatusRepository,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<AdminAddOrderStatusResponse>, BadRequest<ProblemDetails>, NotFound>>
+        Handle(
+            OrderId orderId,
+            AdminAddOrderStatusRequest request,
+            HttpContext httpContext,
+            LinkGenerator linkGenerator,
+            IOrderRepository orderRepository,
+            IOrderStatusRepository orderStatusRepository,
+            CancellationToken cancellationToken)
     {
         if (!await orderRepository.Exists(orderId, cancellationToken))
             return TypedResults.NotFound();

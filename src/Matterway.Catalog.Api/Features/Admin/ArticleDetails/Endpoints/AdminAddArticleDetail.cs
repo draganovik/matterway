@@ -25,17 +25,18 @@ public class AdminAddArticleDetail : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AdminAddArticleDetailResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
-        [FromRoute]
-        ArticleCode article,
-        AdminAddArticleDetailRequest request,
-        HttpContext httpContext,
-        LinkGenerator linkGenerator,
-        IArticleRepository articleRepository,
-        IDetailRepository detailRepository,
-        IArticleDetailTextRepository detailTextRepository,
-        IArticleDetailNumericRepository detailNumericRepository,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<AdminAddArticleDetailResponse>, NotFound, BadRequest<ProblemDetails>>>
+        Handle(
+            [FromRoute]
+            ArticleCode article,
+            AdminAddArticleDetailRequest request,
+            HttpContext httpContext,
+            LinkGenerator linkGenerator,
+            IArticleRepository articleRepository,
+            IDetailRepository detailRepository,
+            IArticleDetailTextRepository detailTextRepository,
+            IArticleDetailNumericRepository detailNumericRepository,
+            CancellationToken cancellationToken)
     {
         var articleEntity = await articleRepository.GetBy(article, cancellationToken);
         if (articleEntity is null) return TypedResults.NotFound();

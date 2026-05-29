@@ -68,5 +68,4 @@ public class AdminDeleteArticle : IEndpoint
         };
         return TypedResults.Ok(response);
     }
-
 }

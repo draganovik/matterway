@@ -22,7 +22,8 @@ public class PublicRegisterCustomer : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<PublicRegisterCustomerResponse>, BadRequest<ProblemDetails>, ProblemHttpResult>>
+    private static async
+        Task<Results<Created<PublicRegisterCustomerResponse>, BadRequest<ProblemDetails>, ProblemHttpResult>>
         Handler(
             PublicRegisterCustomerRequest request,
             IIdentityClient identityClient,

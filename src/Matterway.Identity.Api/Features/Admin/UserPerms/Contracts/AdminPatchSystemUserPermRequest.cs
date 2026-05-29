@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Matterway.Identity.Api.Domain;
 
 namespace Matterway.Identity.Api.Features.Admin.UserPerms.Contracts;
 

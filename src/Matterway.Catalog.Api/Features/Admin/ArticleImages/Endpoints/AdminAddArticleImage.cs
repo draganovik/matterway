@@ -25,16 +25,17 @@ public class AdminAddArticleImage : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<AdminAddArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>> Handle(
-        [FromRoute]
-        ArticleCode article,
-        [FromForm]
-        AdminAddArticleImageRequest request,
-        HttpContext httpContext,
-        IArticleRepository articleRepository,
-        IArticleImageRepository articleImageRepository,
-        IImageStorageService imageStorageService,
-        CancellationToken cancellationToken)
+    private static async Task<Results<Created<AdminAddArticleImageResponse>, NotFound, BadRequest<ProblemDetails>>>
+        Handle(
+            [FromRoute]
+            ArticleCode article,
+            [FromForm]
+            AdminAddArticleImageRequest request,
+            HttpContext httpContext,
+            IArticleRepository articleRepository,
+            IArticleImageRepository articleImageRepository,
+            IImageStorageService imageStorageService,
+            CancellationToken cancellationToken)
     {
         if (await articleRepository.GetBy(article, cancellationToken) is null) return TypedResults.NotFound();
 
