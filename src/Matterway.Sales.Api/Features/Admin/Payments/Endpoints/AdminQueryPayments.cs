@@ -1,8 +1,8 @@
 using Matterway.Sales.Api.Domain.Entities;
-using Matterway.Sales.Api.Endpoints.System.Payments;
+using Matterway.Sales.Api.Features.Admin.Payments.Contracts;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;
 
-namespace Matterway.Sales.Api.Endpoints.Admin.Payments;
+namespace Matterway.Sales.Api.Features.Admin.Payments.Endpoints;
 
 public class AdminQueryPayments : IEndpoint
 {
@@ -13,7 +13,7 @@ public class AdminQueryPayments : IEndpoint
         endpoints.MapGet(EndpointKind.Admin, "payments", Handler)
             .WithName(RouteName).WithSummary("[admin] Query Payments")
             .WithTags(nameof(Payment))
-            .Produces<PaginationResponse<SystemRegisterPayment.PaymentResponse>>()
+            .Produces<PaginationResponse<AdminBasePaymentResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .RequireAuthorization(policy =>
@@ -24,8 +24,8 @@ public class AdminQueryPayments : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<SystemRegisterPayment.PaymentResponse>>, NoContent, ValidationProblem>>
-        Handler([AsParameters] QueryPaymentsParameters queryParameters,
+        Task<Results<Ok<PaginationResponse<AdminBasePaymentResponse>>, NoContent, ValidationProblem>>
+        Handler([AsParameters] AdminQueryPaymentParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
             IPaymentRepository paymentRepository,
@@ -46,9 +46,9 @@ public class AdminQueryPayments : IEndpoint
             RouteName,
             null);
 
-        var results = entities.Select(SystemRegisterPayment.MapToResponse).ToList();
+        var results = entities.Select(ToResponse).ToList();
 
-        var paginationResponse = PaginationResponse<SystemRegisterPayment.PaymentResponse>.Create(
+        var paginationResponse = PaginationResponse<AdminBasePaymentResponse>.Create(
             results,
             total,
             queryParameters.Page,
@@ -58,8 +58,16 @@ public class AdminQueryPayments : IEndpoint
         return TypedResults.Ok(paginationResponse);
     }
 
-    public sealed record QueryPaymentsParameters : PaginationRequestParameters
+    private static AdminBasePaymentResponse ToResponse(Payment entity)
     {
-        public OrderId? OrderId { get; init; }
+        return new AdminBasePaymentResponse
+        {
+            Id = entity.Id,
+            OrderId = entity.OrderId,
+            Provider = entity.Provider,
+            Amount = entity.Amount,
+            Status = entity.Status,
+            CreatedAt = entity.CreatedAt
+        };
     }
 }

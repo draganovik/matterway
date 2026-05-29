@@ -1,8 +1,8 @@
 using Matterway.Sales.Api.Domain.Entities;
-using Matterway.Sales.Api.Endpoints.System.Payments;
+using Matterway.Sales.Api.Features.Admin.Payments.Contracts;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;
 
-namespace Matterway.Sales.Api.Endpoints.Admin.Payments;
+namespace Matterway.Sales.Api.Features.Admin.Payments.Endpoints;
 
 public class AdminGetPaymentById : IEndpoint
 {
@@ -13,7 +13,7 @@ public class AdminGetPaymentById : IEndpoint
         endpoints.MapGet(EndpointKind.Admin, "payments/{paymentId:guid}", Handler)
             .WithName(RouteName).WithSummary("[admin] Get Payment by id")
             .WithTags(nameof(Payment))
-            .Produces<SystemRegisterPayment.PaymentResponse>()
+            .Produces<AdminBasePaymentResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
@@ -22,13 +22,26 @@ public class AdminGetPaymentById : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<SystemRegisterPayment.PaymentResponse>, NotFound>> Handler(
+    private static async Task<Results<Ok<AdminBasePaymentResponse>, NotFound>> Handler(
         Guid paymentId,
         IPaymentRepository paymentRepository,
         CancellationToken cancellationToken)
     {
         var entity = await paymentRepository.GetById(paymentId, cancellationToken);
         if (entity is null) return TypedResults.NotFound();
-        return TypedResults.Ok(SystemRegisterPayment.MapToResponse(entity));
+        return TypedResults.Ok(ToResponse(entity));
+    }
+
+    private static AdminBasePaymentResponse ToResponse(Payment entity)
+    {
+        return new AdminBasePaymentResponse
+        {
+            Id = entity.Id,
+            OrderId = entity.OrderId,
+            Provider = entity.Provider,
+            Amount = entity.Amount,
+            Status = entity.Status,
+            CreatedAt = entity.CreatedAt
+        };
     }
 }

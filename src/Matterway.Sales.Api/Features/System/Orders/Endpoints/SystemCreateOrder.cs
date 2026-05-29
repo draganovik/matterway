@@ -1,11 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
+using Matterway.Sales.Api.Features.System.Orders.Contracts;
 using Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 
-namespace Matterway.Sales.Api.Endpoints.System.Orders;
+namespace Matterway.Sales.Api.Features.System.Orders.Endpoints;
 
 public class SystemCreateOrder : IEndpoint
 {
@@ -18,7 +18,7 @@ public class SystemCreateOrder : IEndpoint
             .WithName(RouteName)
             .WithSummary("[system] Create customer Order from cart items.")
             .WithTags(nameof(Order))
-            .Produces<OrderResponse>(StatusCodes.Status201Created)
+            .Produces<SystemCreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
@@ -33,10 +33,10 @@ public class SystemCreateOrder : IEndpoint
     }
 
     private static async Task<
-            Results<Created<OrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult,
+            Results<Created<SystemCreateOrderResponse>, BadRequest<ProblemDetails>, NotFound, ForbidHttpResult,
                 ProblemHttpResult>>
         Handler(
-            CreateOrderRequest request,
+            SystemCreateOrderRequest request,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
             ICustomersClient customersClient,
@@ -75,7 +75,7 @@ public class SystemCreateOrder : IEndpoint
         }
 
         var orderId = pendingOrder.Id;
-        var customersRequest = MapToCustomersRequest(effectiveCustomerId, orderId, request);
+        var customersRequest = ToCustomersRequest(effectiveCustomerId, orderId, request);
         var customersResult = await customersClient.CreateOrderAsync(
             customersRequest,
             cancellationToken);
@@ -130,7 +130,7 @@ public class SystemCreateOrder : IEndpoint
         if (customersOrder.Items.Any(item => string.IsNullOrWhiteSpace(item.ArticleName)))
             return BadRequestProblem("Order items must include article titles.");
 
-        var order = MapToEntity(request, customersOrder, effectiveCustomerId, pendingOrder.PlacedAt);
+        var order = ToEntity(request, customersOrder, effectiveCustomerId, pendingOrder.PlacedAt);
 
         var created = await orderRepository.Update(order, cancellationToken);
         if (created is null)
@@ -146,41 +146,7 @@ public class SystemCreateOrder : IEndpoint
             "SelfGetOrderById",
             new { orderId = created.Id });
 
-        return TypedResults.Created(location, MapToResponse(created));
-    }
-
-    public record CreateOrderRequest
-    {
-        public EOrderType? Type { get; init; }
-
-        public DeliveryInfoRequest? DeliveryInfo { get; init; }
-    }
-
-    public record DeliveryInfoRequest
-    {
-        public string? Country { get; init; }
-
-        [Required]
-        public required string City { get; init; }
-
-        [Required]
-        public required string ZipCode { get; init; }
-
-        [Required]
-        public required string AddressLine1 { get; init; }
-
-        public string? AddressLine2 { get; init; }
-
-        public string? ContactPhone { get; init; }
-    }
-
-    public record OrderResponse
-    {
-        public OrderId Id { get; init; }
-        public Guid? CustomerId { get; init; }
-        public EOrderType Type { get; init; }
-        public decimal TotalAmount { get; init; }
-        public DateTime PlacedAt { get; init; }
+        return TypedResults.Created(location, ToResponse(created));
     }
 
     private static BadRequest<ProblemDetails> BadRequestProblem(
@@ -195,10 +161,10 @@ public class SystemCreateOrder : IEndpoint
         });
     }
 
-    private static CustomersCreateOrderRequest MapToCustomersRequest(
+    private static CustomersCreateOrderRequest ToCustomersRequest(
         Guid customerId,
         OrderId orderId,
-        CreateOrderRequest request)
+        SystemCreateOrderRequest request)
     {
         return new CustomersCreateOrderRequest
         {
@@ -218,8 +184,8 @@ public class SystemCreateOrder : IEndpoint
         };
     }
 
-    private static Order MapToEntity(
-        CreateOrderRequest request,
+    private static Order ToEntity(
+        SystemCreateOrderRequest request,
         CustomersOrderResponse customerOrder,
         Guid customerId,
         DateTime placedAt)
@@ -233,7 +199,7 @@ public class SystemCreateOrder : IEndpoint
         };
 
         if (customerOrder.DeliveryInfo is not null)
-            order.DeliveryInfo = MapToDeliveryInfo(order.Id, customerOrder.DeliveryInfo);
+            order.DeliveryInfo = ToDeliveryInfo(order.Id, customerOrder.DeliveryInfo);
 
         order.Items.AddRange(customerOrder.Items.Select(item => new OrderItem
         {
@@ -247,7 +213,7 @@ public class SystemCreateOrder : IEndpoint
         return order;
     }
 
-    private static OrderDeliveryInfo MapToDeliveryInfo(OrderId orderId, CustomersDeliveryInfoResponse request)
+    private static OrderDeliveryInfo ToDeliveryInfo(OrderId orderId, CustomersDeliveryInfoResponse request)
     {
         return new OrderDeliveryInfo
         {
@@ -266,9 +232,9 @@ public class SystemCreateOrder : IEndpoint
         return Math.Round(items.Sum(item => item.UnitPrice * item.Quantity), 2, MidpointRounding.AwayFromZero);
     }
 
-    private static OrderResponse MapToResponse(Order entity)
+    private static SystemCreateOrderResponse ToResponse(Order entity)
     {
-        return new OrderResponse
+        return new SystemCreateOrderResponse
         {
             Id = entity.Id,
             CustomerId = entity.CustomerId,

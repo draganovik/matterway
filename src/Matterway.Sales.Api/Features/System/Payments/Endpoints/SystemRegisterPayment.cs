@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations;
 using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
+using Matterway.Sales.Api.Features.System.Payments.Contracts;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 using Matterway.Sales.Api.Infrastructure.Persistence.PaymentEntity;
 
-namespace Matterway.Sales.Api.Endpoints.System.Payments;
+namespace Matterway.Sales.Api.Features.System.Payments.Endpoints;
 
 public class SystemRegisterPayment : IEndpoint
 {
@@ -15,7 +15,7 @@ public class SystemRegisterPayment : IEndpoint
         endpoints.MapPost(EndpointKind.System, "payments", Handle)
             .WithName(RouteName).WithSummary("[system] Register a Payment")
             .WithTags(nameof(Payment))
-            .Produces<PaymentResponse>(StatusCodes.Status201Created)
+            .Produces<SystemBasePaymentResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
@@ -23,8 +23,8 @@ public class SystemRegisterPayment : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<PaymentResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
-        RegisterPaymentRequest request,
+    private static async Task<Results<Created<SystemBasePaymentResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
+        SystemRegisterPaymentRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,
         IOrderRepository orderRepository,
@@ -34,7 +34,7 @@ public class SystemRegisterPayment : IEndpoint
         if (!await orderRepository.Exists(request.OrderId, cancellationToken))
             return TypedResults.NotFound();
 
-        var payment = MapToEntity(request);
+        var payment = ToEntity(request);
 
         var created = await paymentRepository.Create(payment, cancellationToken);
         if (created is null)
@@ -49,37 +49,10 @@ public class SystemRegisterPayment : IEndpoint
             "AdminGetPaymentById",
             new { paymentId = created.Id });
 
-        return TypedResults.Created(location, MapToResponse(created));
+        return TypedResults.Created(location, ToResponse(created));
     }
 
-    public record RegisterPaymentRequest
-    {
-        [Required]
-        public OrderId OrderId { get; init; }
-
-        [Required]
-        public required string Provider { get; init; }
-
-        [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
-        public decimal Amount { get; init; }
-
-        public EPaymentStatus Status { get; init; } = EPaymentStatus.Reserved;
-
-        public DateTime? CreatedAt { get; init; }
-    }
-
-    public record PaymentResponse
-    {
-        public Guid Id { get; init; }
-        public OrderId OrderId { get; init; }
-        public string? Provider { get; init; }
-        public decimal Amount { get; init; }
-        public EPaymentStatus Status { get; init; }
-        public DateTime CreatedAt { get; init; }
-    }
-
-    private static Payment MapToEntity(RegisterPaymentRequest request)
+    private static Payment ToEntity(SystemRegisterPaymentRequest request)
     {
         return new Payment
         {
@@ -91,9 +64,9 @@ public class SystemRegisterPayment : IEndpoint
         };
     }
 
-    public static PaymentResponse MapToResponse(Payment entity)
+    private static SystemBasePaymentResponse ToResponse(Payment entity)
     {
-        return new PaymentResponse
+        return new SystemBasePaymentResponse
         {
             Id = entity.Id,
             OrderId = entity.OrderId,

@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Matterway.Sales.Api.Domain;
 using Matterway.Sales.Api.Domain.Entities;
+using Matterway.Sales.Api.Features.Admin.Orders.Contracts;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderEntity;
 using Matterway.Sales.Api.Infrastructure.Persistence.OrderStatusEntity;
 
-namespace Matterway.Sales.Api.Endpoints.Admin.Orders;
+namespace Matterway.Sales.Api.Features.Admin.Orders.Endpoints;
 
 public class AdminAddOrderStatus : IEndpoint
 {
@@ -15,7 +16,7 @@ public class AdminAddOrderStatus : IEndpoint
         endpoints.MapPost(EndpointKind.Admin, "orders/{orderId:OrderId}/statuses", Handle)
             .WithName(RouteName).WithSummary("[admin] Add an Order status entry")
             .WithTags(nameof(OrderStatus))
-            .Produces<OrderStatusResponse>(StatusCodes.Status201Created)
+            .Produces<AdminAddOrderStatusResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesValidationProblem()
@@ -25,9 +26,9 @@ public class AdminAddOrderStatus : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<OrderStatusResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
+    private static async Task<Results<Created<AdminAddOrderStatusResponse>, BadRequest<ProblemDetails>, NotFound>> Handle(
         OrderId orderId,
-        AddOrderStatusRequest request,
+        AdminAddOrderStatusRequest request,
         HttpContext httpContext,
         LinkGenerator linkGenerator,
         IOrderRepository orderRepository,
@@ -66,27 +67,12 @@ public class AdminAddOrderStatus : IEndpoint
             "AdminGetOrderById",
             new { orderId });
 
-        return TypedResults.Created(location, MapToResponse(created));
+        return TypedResults.Created(location, ToResponse(created));
     }
 
-    public record AddOrderStatusRequest
+    private static AdminAddOrderStatusResponse ToResponse(OrderStatus entity)
     {
-        [Required]
-        public EOrderStatusType? Status { get; init; }
-
-        public string? Note { get; init; }
-    }
-
-    public record OrderStatusResponse
-    {
-        public EOrderStatusType Status { get; init; }
-        public DateTime ChangedAt { get; init; }
-        public string? Note { get; init; }
-    }
-
-    private static OrderStatusResponse MapToResponse(OrderStatus entity)
-    {
-        return new OrderStatusResponse
+        return new AdminAddOrderStatusResponse
         {
             Status = entity.Status,
             ChangedAt = entity.ChangedAt,
