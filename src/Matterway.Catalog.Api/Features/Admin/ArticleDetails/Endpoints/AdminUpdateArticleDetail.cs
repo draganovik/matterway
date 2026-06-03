@@ -1,8 +1,8 @@
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Features.Admin.ArticleDetails.Contracts;
-using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailNumericEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleDetailTextEntity;
+using Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
 
 namespace Matterway.Catalog.Api.Features.Admin.ArticleDetails.Endpoints;
