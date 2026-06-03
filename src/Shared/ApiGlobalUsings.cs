@@ -1,7 +1,10 @@
 global using Asp.Versioning;
-global using Matterway.ServiceDefaults.Identifiers;
 global using Matterway.ServiceDefaults.Authorization;
 global using Matterway.ServiceDefaults.Bootstraps;
 global using Matterway.ServiceDefaults.Contracts;
+global using Matterway.ServiceDefaults.Identifiers;
 global using Microsoft.AspNetCore.Http.HttpResults;
-global using Microsoft.AspNetCore.Mvc;
+global using FromFormAttribute = Microsoft.AspNetCore.Mvc.FromFormAttribute;
+global using FromRouteAttribute = Microsoft.AspNetCore.Mvc.FromRouteAttribute;
+global using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;
+global using ValidationProblemDetails = Microsoft.AspNetCore.Mvc.ValidationProblemDetails;

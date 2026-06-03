@@ -89,12 +89,12 @@ catalogApi
     .WithEnvironment("ImageStorage__AccessKey", minioUser)
     .WithEnvironment("ImageStorage__SecretKey", minioPassword);
 
-var apisByServiceName = new Dictionary<string, IResourceBuilder<ProjectResource>>(StringComparer.Ordinal)
+var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResource> Resource)[]
 {
-    [ApiDirectory.Identity.ServiceName] = identityApi,
-    [ApiDirectory.Catalog.ServiceName] = catalogApi,
-    [ApiDirectory.Customers.ServiceName] = customersApi,
-    [ApiDirectory.Sales.ServiceName] = salesApi
+    (ApiDirectory.Identity, identityApi),
+    (ApiDirectory.Catalog, catalogApi),
+    (ApiDirectory.Customers, customersApi),
+    (ApiDirectory.Sales, salesApi)
 };
 
 WebAppRegistration.Add(
@@ -126,9 +126,9 @@ WebAppRegistration.Add(
     });
 
 if (builder.Environment.IsDevelopment())
-    ScalarApiRegistration.AddApiReferences(builder, apisByServiceName);
+    ScalarApiRegistration.AddApiReferences(builder, apiResources);
 
-foreach (var api in apisByServiceName.Values)
+foreach (var (_, api) in apiResources)
     api
         .WithEnvironment("Jwt__Key", jwtSigningKey)
         .WithEnvironment("Jwt__Issuer", identityApiHttp)

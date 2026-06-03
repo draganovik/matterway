@@ -146,17 +146,12 @@ public static class BuilderExtensions
         var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
 
         builder.Services.AddApiVersioning(versioningOptions =>
-            {
-                versioningOptions.DefaultApiVersion = versions[0];
-                versioningOptions.AssumeDefaultVersionWhenUnspecified = true;
-                versioningOptions.ReportApiVersions = true;
-                versioningOptions.ApiVersionReader = new UrlSegmentApiVersionReader();
-            })
-            .AddApiExplorer(explorerOptions =>
-            {
-                explorerOptions.GroupNameFormat = "'v'VVV";
-                explorerOptions.SubstituteApiVersionInUrl = true;
-            });
+        {
+            versioningOptions.DefaultApiVersion = versions[0];
+            versioningOptions.AssumeDefaultVersionWhenUnspecified = true;
+            versioningOptions.ReportApiVersions = true;
+            versioningOptions.ApiVersionReader = new UrlSegmentApiVersionReader();
+        });
     }
 
     private static void ConfigureOpenApi(
@@ -171,7 +166,10 @@ public static class BuilderExtensions
             builder.Services.AddOpenApi(documentName, openApiOptions =>
             {
                 openApiOptions.ShouldInclude =
-                    description => ApiVersioningConventions.ShouldIncludeInDocument(description, version);
+                    description => ApiVersioningConventions.ShouldIncludeInDocument(
+                        description.ActionDescriptor.EndpointMetadata,
+                        version);
+                ApiVersioningConventions.SubstituteRouteVersion(openApiOptions, version);
                 ApiVersioningConventions.AddBearerSecurity(openApiOptions);
             });
         }

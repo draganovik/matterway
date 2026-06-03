@@ -8,25 +8,17 @@ internal static class ScalarApiRegistration
 {
     public static void AddApiReferences(
         IDistributedApplicationBuilder builder,
-        IReadOnlyDictionary<string, IResourceBuilder<ProjectResource>> apisByServiceName)
+        IEnumerable<(ApiDefinition Definition, IResourceBuilder<ProjectResource> Resource)> apiResources)
     {
         var scalarApiReference = builder.AddScalarApiReference();
 
-        foreach (var apiDefinition in ApiDirectory.All)
-        {
-            if (!apisByServiceName.TryGetValue(apiDefinition.ServiceName, out var resource))
-                throw new KeyNotFoundException(
-                    $"No API resource registered for service '{apiDefinition.ServiceName}'. " +
-                    "Ensure it is registered in the AppHost configuration.");
-
-            scalarApiReference.WithApiReference(resource, options =>
+        foreach (var (apiDefinition, resource) in apiResources)
+            scalarApiReference.WithApiReference(resource, "http", options =>
             {
-                foreach (var documentName in GetDocumentNames(apiDefinition))
-                    options.AddDocument(documentName, documentName);
-
-                options.WithOpenApiRoutePattern(ApiDocumentationDefaults.OpenApiRoutePattern);
+                options
+                    .AddDocuments(GetDocumentNames(apiDefinition))
+                    .WithOpenApiRoutePattern(ApiDocumentationDefaults.OpenApiRoutePattern);
             });
-        }
     }
 
     private static IEnumerable<string> GetDocumentNames(ApiDefinition apiDefinition)
