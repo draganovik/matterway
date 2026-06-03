@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Matterway.ServiceDefaults.Authorization;
+using Matterway.ServiceDefaults.Bootstraps;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -15,44 +15,50 @@ public static class ApiVersioningConventions
             throw new ArgumentException("At least one supported API version is required.",
                 nameof(supportedApiVersions));
 
-        return supportedApiVersions
-            .Distinct()
-            .OrderBy(version => version.MajorVersion ?? 0)
-            .ThenBy(version => version.MinorVersion ?? 0)
+        var routeVersions = supportedApiVersions
+            .Select(ToRouteApiVersion)
+            .ToArray();
+
+        var duplicatedMajorVersion = routeVersions
+            .GroupBy(GetMajorVersion)
+            .FirstOrDefault(group => group.Count() > 1);
+        if (duplicatedMajorVersion is not null)
+            throw new ArgumentException(
+                $"Only one API version per major version is supported. Major version {duplicatedMajorVersion.Key} is configured more than once.",
+                nameof(supportedApiVersions));
+
+        return routeVersions
+            .OrderBy(GetMajorVersion)
             .ToArray();
     }
 
     public static string ToDocumentName(ApiVersion version)
     {
-        var majorVersion = version.MajorVersion ?? 0;
-        var minorVersion = version.MinorVersion ?? 0;
-
-        return minorVersion > 0
-            ? $"v{majorVersion}.{minorVersion}"
-            : $"v{majorVersion}";
+        return $"v{GetMajorVersion(version)}";
     }
 
-    public static string[] ToDocumentNames(IReadOnlyCollection<ApiVersion> supportedApiVersions)
+    public static bool ShouldIncludeInDocument(
+        IEnumerable<object> endpointMetadata,
+        ApiVersion documentVersion)
     {
-        return NormalizeSupportedVersions(supportedApiVersions)
-            .Select(ToDocumentName)
-            .ToArray();
-    }
-
-    public static bool ShouldIncludeInDocument(ApiDescription description, ApiVersion documentVersion)
-    {
-        if (TryParseVersionFromRelativePath(description.RelativePath, out var pathVersion))
-            return pathVersion == documentVersion;
-
-        var versionMetadata = description.ActionDescriptor.EndpointMetadata
+        var versionMetadata = endpointMetadata
             .OfType<ApiVersionMetadata>()
             .LastOrDefault();
         if (versionMetadata is null)
             return false;
 
-        var versionModel = versionMetadata.Map(ApiVersionMapping.Explicit);
-        return versionModel.DeclaredApiVersions.Contains(documentVersion) ||
-               versionModel.ImplementedApiVersions.Contains(documentVersion);
+        return versionMetadata.IsMappedTo(documentVersion);
+    }
+
+    public static void SubstituteRouteVersion(OpenApiOptions options, ApiVersion documentVersion)
+    {
+        options.AddDocumentTransformer((document, context, _) =>
+        {
+            var majorVersion = GetMajorVersion(documentVersion);
+            document.Info.Version = ResolveOpenApiInfoVersion(context, majorVersion);
+            SubstituteRouteVersion(document, majorVersion.ToString());
+            return Task.CompletedTask;
+        });
     }
 
     public static void AddBearerSecurity(OpenApiOptions options)
@@ -112,51 +118,69 @@ public static class ApiVersioningConventions
         });
     }
 
-    private static bool TryParseVersionFromRelativePath(string? relativePath, out ApiVersion version)
+    private static int GetMajorVersion(ApiVersion version)
     {
-        version = default!;
-
-        if (string.IsNullOrWhiteSpace(relativePath))
-            return false;
-
-        var routePath = relativePath.Split('?', 2)[0];
-        var segments = routePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var segment in segments)
-            if (TryParseVersionSegment(segment, out version))
-                return true;
-
-        return false;
+        return version.MajorVersion.GetValueOrDefault();
     }
 
-    private static bool TryParseVersionSegment(string segment, out ApiVersion version)
+    private static string ResolveOpenApiInfoVersion(OpenApiDocumentTransformerContext context, int majorVersion)
     {
-        version = default!;
+        var endpointVersion = context.DescriptionGroups
+            .SelectMany(static group => group.Items)
+            .SelectMany(static description => description.ActionDescriptor.EndpointMetadata
+                .OfType<ApiSpecVersionMetadata>())
+            .Where(version => version.MajorVersion == majorVersion)
+            .DefaultIfEmpty(new ApiSpecVersionMetadata(majorVersion))
+            .Max();
 
-        if (!segment.StartsWith("v", StringComparison.OrdinalIgnoreCase))
-            return false;
+        return endpointVersion.ToString();
+    }
 
-        var versionText = segment[1..];
-        var versionParts = versionText.Split('.', StringSplitOptions.RemoveEmptyEntries);
+    private static ApiVersion ToRouteApiVersion(ApiVersion version)
+    {
+        var majorVersion = GetMajorVersion(version);
+        if (majorVersion <= 0)
+            throw new ArgumentException("API major versions must be positive.");
 
-        if (versionParts.Length == 1 &&
-            int.TryParse(versionParts[0], out var majorVersion) &&
-            majorVersion > 0)
+        return new ApiVersion(majorVersion);
+    }
+
+    private static void SubstituteRouteVersion(OpenApiDocument document, string routeVersion)
+    {
+        if (document.Paths is null)
+            return;
+
+        var rewrittenPaths = new OpenApiPaths();
+
+        foreach (var (path, pathItem) in document.Paths)
         {
-            version = new ApiVersion(majorVersion);
-            return true;
+            var rewrittenPath = path
+                .Replace("v{version:apiVersion}", $"v{routeVersion}", StringComparison.OrdinalIgnoreCase)
+                .Replace("v{version}", $"v{routeVersion}", StringComparison.OrdinalIgnoreCase);
+
+            RemoveVersionParameter(pathItem.Parameters);
+
+            if (pathItem.Operations is not null)
+                foreach (var operation in pathItem.Operations.Values)
+                    RemoveVersionParameter(operation.Parameters);
+
+            rewrittenPaths[rewrittenPath] = pathItem;
         }
 
-        if (versionParts.Length == 2 &&
-            int.TryParse(versionParts[0], out majorVersion) &&
-            majorVersion > 0 &&
-            int.TryParse(versionParts[1], out var minorVersion) &&
-            minorVersion >= 0)
-        {
-            version = new ApiVersion(majorVersion, minorVersion);
-            return true;
-        }
+        document.Paths = rewrittenPaths;
+    }
 
-        return false;
+    private static void RemoveVersionParameter(IList<IOpenApiParameter>? parameters)
+    {
+        if (parameters is null)
+            return;
+
+        for (var index = parameters.Count - 1; index >= 0; index--)
+        {
+            var parameter = parameters[index];
+            if (string.Equals(parameter.Name, "version", StringComparison.OrdinalIgnoreCase) &&
+                parameter.In == ParameterLocation.Path)
+                parameters.RemoveAt(index);
+        }
     }
 }

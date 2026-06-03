@@ -161,8 +161,29 @@ Runtime notes:
 ### Run the Stack
 
 ```bash
-dotnet run --project src/Matterway.AppHost
+aspire run --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
 ```
+
+`aspire run` is the local development path. It starts the AppHost resources, launches the Aspire dashboard, and prints the active endpoints.
+
+To run the AppHost in the background:
+
+```bash
+aspire start --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
+aspire ps
+aspire stop
+```
+
+The `--environment` option is not needed for local development. It belongs to Aspire deployment pipeline commands, where it selects deployment state/configuration; it does not turn `deploy` into a live local development run.
+
+For Aspire-managed watch behavior:
+
+```bash
+aspire config set features.defaultWatchEnabled true
+aspire run --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
+```
+
+Without watch mode, restart or rebuild affected resources from the Aspire dashboard or CLI after source changes that are not handled by the resource's own dev server.
 
 Useful commands:
 
@@ -182,8 +203,10 @@ stripe listen --forward-to http://localhost:4001/api/storefront/webhooks/stripe
 ## Deployment
 
 ```bash
-aspire deploy --environment Production
+aspire deploy --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
 ```
+
+The default deployment environment is `Production`, so `--environment Production` is optional. Pass `--environment <name>` only when intentionally deploying to a different named deployment environment.
 
 In non-dev deployments, only the `.Web` projects are exposed externally. Backend APIs stay internal and are reached through the Nuxt server proxy routes.
 

@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;
+using ValidationProblemDetails = Microsoft.AspNetCore.Mvc.ValidationProblemDetails;
 
 namespace Matterway.ServiceDefaults.Extensions;
 
