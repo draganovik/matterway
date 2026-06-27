@@ -15,7 +15,6 @@ public class AdminQueryPayments : IEndpoint
             .WithTags(nameof(Payment))
             .Produces<PaginationResponse<AdminBasePaymentResponse>>()
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
@@ -24,7 +23,7 @@ public class AdminQueryPayments : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<AdminBasePaymentResponse>>, NoContent, ValidationProblem>>
+        Task<Results<Ok<PaginationResponse<AdminBasePaymentResponse>>, NoContent>>
         Handler([AsParameters] AdminQueryPaymentParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,

@@ -17,7 +17,6 @@ public class AdminQuerySystemUsers : IEndpoint
             .Produces<PaginationResponse<AdminQuerySystemUserResponse>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
@@ -25,7 +24,7 @@ public class AdminQuerySystemUsers : IEndpoint
     }
 
     private static async Task<Results<Ok<PaginationResponse<AdminQuerySystemUserResponse>>, NoContent,
-            BadRequest<ProblemDetails>, ValidationProblem>>
+            BadRequest<ProblemDetails>>>
         Handler([AsParameters] AdminQuerySystemUserParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,

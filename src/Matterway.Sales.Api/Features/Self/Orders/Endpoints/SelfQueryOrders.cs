@@ -15,14 +15,13 @@ public class SelfQueryOrders : IEndpoint
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<SelfBaseOrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<SelfBaseOrderResponse>>, NoContent, ValidationProblem>>
+        Task<Results<Ok<PaginationResponse<SelfBaseOrderResponse>>, NoContent>>
         Handler([AsParameters] SelfQueryOrderParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,

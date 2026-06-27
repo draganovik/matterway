@@ -15,7 +15,6 @@ public class AdminCreateArticle : IEndpoint
             .WithTags("Articles")
             .Produces<AdminCreateArticleResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))

@@ -16,7 +16,6 @@ public class AdminUpdateDiscount : IEndpoint
             .WithTags(nameof(Discount))
             .Produces<AdminUpdateDiscountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))

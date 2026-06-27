@@ -7,14 +7,29 @@ namespace Matterway.ServiceDefaults.Validation;
 
 internal static class EndpointRequestValidation
 {
-    public static IReadOnlyDictionary<string, string[]> Validate(IList<object?> arguments)
+    public static int[] GetRequestArgumentIndexes(MethodInfo handlerMethod)
+    {
+        return handlerMethod
+            .GetParameters()
+            .Select(static (parameter, index) => (parameter.ParameterType, Index: index))
+            .Where(static parameter => IsRequestContract(parameter.ParameterType))
+            .Select(static parameter => parameter.Index)
+            .ToArray();
+    }
+
+    public static IReadOnlyDictionary<string, string[]> Validate(
+        IList<object?> arguments,
+        IReadOnlyList<int> requestArgumentIndexes)
     {
         var errors = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         var visited = new HashSet<object>(ReferenceEqualityComparer.Instance);
 
-        foreach (var argument in arguments)
-            if (argument is not null && IsRequestContract(argument.GetType()))
+        foreach (var index in requestArgumentIndexes)
+        {
+            var argument = arguments[index];
+            if (argument is not null)
                 ValidateObject(argument, null, errors, visited);
+        }
 
         return errors.ToDictionary(
             static pair => pair.Key,

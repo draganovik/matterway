@@ -242,9 +242,9 @@ public static class ArticleRsqlSupport
     private static IReadOnlyList<IReadOnlyList<FilterToken>> ParseFilterGroupsOrThrow(string rsqlFilter)
     {
         var result = new List<IReadOnlyList<FilterToken>>();
-        foreach (var orSegment in SplitSegments(rsqlFilter, ','))
+        foreach (var orSegment in SplitTopLevelSegments(rsqlFilter, ','))
         {
-            var tokens = SplitSegments(orSegment, ';')
+            var tokens = SplitTopLevelSegments(orSegment, ';')
                 .Select(ParseTokenOrThrow)
                 .ToList();
 
@@ -260,9 +260,74 @@ public static class ArticleRsqlSupport
         return result;
     }
 
-    private static IEnumerable<string> SplitSegments(string value, char separator)
+    private static IReadOnlyList<string> SplitTopLevelSegments(string value, char separator)
     {
-        return value.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var segments = new List<string>();
+        var segmentStart = 0;
+        var parenthesisDepth = 0;
+        char? quote = null;
+
+        for (var index = 0; index < value.Length; index++)
+        {
+            var current = value[index];
+
+            if (quote is not null)
+            {
+                if (current == '\\' && index + 1 < value.Length)
+                {
+                    index++;
+                    continue;
+                }
+
+                if (current == quote)
+                    quote = null;
+
+                continue;
+            }
+
+            if (current is '\'' or '"')
+            {
+                quote = current;
+                continue;
+            }
+
+            if (current == '(')
+            {
+                parenthesisDepth++;
+                continue;
+            }
+
+            if (current == ')')
+            {
+                parenthesisDepth--;
+                if (parenthesisDepth < 0)
+                    throw BadFilter("Filter contains unbalanced parentheses.");
+
+                continue;
+            }
+
+            if (current != separator || parenthesisDepth != 0)
+                continue;
+
+            AddSegment(value[segmentStart..index]);
+            segmentStart = index + 1;
+        }
+
+        if (parenthesisDepth != 0)
+            throw BadFilter("Filter contains unbalanced parentheses.");
+
+        if (quote is not null)
+            throw BadFilter("Filter contains an unterminated quoted value.");
+
+        AddSegment(value[segmentStart..]);
+        return segments;
+
+        void AddSegment(string segment)
+        {
+            var trimmed = segment.Trim();
+            if (trimmed.Length > 0)
+                segments.Add(trimmed);
+        }
     }
 
     private static FilterToken ParseTokenOrThrow(string rawToken)
@@ -295,10 +360,16 @@ public static class ArticleRsqlSupport
     private static IReadOnlyList<string> SplitList(string rawValue)
     {
         var trimmed = rawValue.Trim();
-        if (trimmed.StartsWith('(') && trimmed.EndsWith(')'))
+
+        var startsWithParenthesis = trimmed.StartsWith('(');
+        var endsWithParenthesis = trimmed.EndsWith(')');
+        if (startsWithParenthesis != endsWithParenthesis)
+            throw BadFilter("Filter contains unbalanced parentheses.");
+
+        if (startsWithParenthesis)
             trimmed = trimmed[1..^1];
 
-        return trimmed.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        return SplitTopLevelSegments(trimmed, ',')
             .Select(UnwrapValue)
             .ToArray();
     }

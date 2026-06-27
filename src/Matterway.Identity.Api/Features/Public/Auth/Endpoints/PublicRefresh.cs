@@ -15,7 +15,6 @@ public class PublicRefresh : IEndpoint
             .WithTags("Auth")
             .Produces<PublicRefreshAuthResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem()
             .AllowAnonymous()
             .MapToApiVersion(new ApiVersion(1));
     }

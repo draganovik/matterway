@@ -17,7 +17,6 @@ public class PublicLogin : IEndpoint
             .WithTags("Auth")
             .Produces<PublicLoginAuthResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem()
             .AllowAnonymous()
             .MapToApiVersion(new ApiVersion(1));
     }

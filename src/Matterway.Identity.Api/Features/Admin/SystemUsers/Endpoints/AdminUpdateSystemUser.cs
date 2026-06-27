@@ -18,7 +18,6 @@ public class AdminUpdateSystemUser : IEndpoint
             .WithTags("SystemUsers")
             .Produces<AdminUpdateSystemUserResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>

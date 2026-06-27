@@ -17,7 +17,6 @@ public class SystemRegisterPayment : IEndpoint
             .Produces<SystemBasePaymentResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1));
     }

@@ -18,7 +18,6 @@ public class PublicQueryArticles : IEndpoint
             .Produces<PaginationResponse<PublicQueryArticleResponse>>()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .MapToApiVersion(new ApiVersion(1))
             .AddOpenApiOperationTransformer((operation, context, ct) =>
             {
