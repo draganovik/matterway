@@ -4,7 +4,8 @@ namespace Matterway.Catalog.Api.Features.Admin.Articles.Contracts;
 
 public record AdminUpdateArticleRequest
 {
-    public ArticleCode? Code { get; init; }
+    [ArticleCode]
+    public string? Code { get; init; }
 
     [MinLength(1, ErrorMessage = "Title cannot be empty if provided.")]
     public string? Title { get; init; }

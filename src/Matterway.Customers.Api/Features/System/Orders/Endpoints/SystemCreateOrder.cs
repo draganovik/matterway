@@ -18,6 +18,7 @@ public class SystemCreateOrder : IEndpoint
             .WithTags(nameof(CustomerOrder))
             .Produces<SystemCreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
             .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1));
@@ -48,6 +49,8 @@ public class SystemCreateOrder : IEndpoint
                 Detail = "OrderId is required."
             });
 
+        var orderId = OrderId.Parse(request.OrderId!, null);
+
         var customer = await customerRepository.GetBy(request.CustomerId, cancellationToken);
         if (customer is null) return TypedResults.NotFound();
 
@@ -71,7 +74,7 @@ public class SystemCreateOrder : IEndpoint
                 Detail = "Customer address is unavailable."
             });
 
-        var createdOrder = await customerOrderRepository.CreateFromCart(request.CustomerId, request.OrderId,
+        var createdOrder = await customerOrderRepository.CreateFromCart(request.CustomerId, orderId,
             cancellationToken);
         if (createdOrder is null)
             return TypedResults.BadRequest(new ProblemDetails

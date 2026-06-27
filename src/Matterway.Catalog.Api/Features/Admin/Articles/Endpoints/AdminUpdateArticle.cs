@@ -16,6 +16,7 @@ public class AdminUpdateArticle : IEndpoint
             .Produces<AdminUpdateArticleResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
@@ -42,7 +43,11 @@ public class AdminUpdateArticle : IEndpoint
 
     private static void ApplyToEntity(Article entity, AdminUpdateArticleRequest request)
     {
-        entity.UpdateDetails(request.Code, request.Title, request.Description);
+        var nextCode = string.IsNullOrWhiteSpace(request.Code)
+            ? (ArticleCode?)null
+            : ArticleCode.Parse(request.Code, null);
+
+        entity.UpdateDetails(nextCode, request.Title, request.Description);
         if (request.IsAvailable.HasValue)
             entity.SetAvailability(request.IsAvailable.Value);
 

@@ -5,17 +5,18 @@ namespace Matterway.Catalog.Api.Features.Admin.Articles.Contracts;
 public record AdminCreateArticleRequest
 {
     [Required]
-    public required ArticleCode Code { get; init; }
+    [ArticleCode]
+    public string? Code { get; init; }
 
     [Required]
-    public required string Title { get; init; }
+    public string? Title { get; init; }
 
     [Required]
     [Range(0.01, double.MaxValue, ErrorMessage = "Base price must be greater than zero.")]
-    public required decimal BasePrice { get; init; }
+    public decimal? BasePrice { get; init; }
 
     [Required]
-    public required string Description { get; init; }
+    public string? Description { get; init; }
 
     public bool IsAvailable { get; init; }
 }

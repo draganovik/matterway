@@ -33,8 +33,4 @@
         <Folder Include="Infrastructure\"/>
     </ItemGroup>
 
-    <PropertyGroup>
-        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.Http.Validation.Generated</InterceptorsNamespaces>
-    </PropertyGroup>
-
 </Project>

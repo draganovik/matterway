@@ -15,6 +15,7 @@ public class AdminCreateArticle : IEndpoint
             .WithTags("Articles")
             .Produces<AdminCreateArticleResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
@@ -54,11 +55,11 @@ public class AdminCreateArticle : IEndpoint
     {
         var article = new Article
         {
-            ArticleCode = request.Code.ToString(),
-            Title = request.Title,
-            Description = request.Description
+            ArticleCode = ArticleCode.Parse(request.Code!, null).Value,
+            Title = request.Title!,
+            Description = request.Description!
         };
-        article.SetBasePrice(request.BasePrice);
+        article.SetBasePrice(request.BasePrice!.Value);
         article.SetAvailability(request.IsAvailable);
         return article;
     }

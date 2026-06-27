@@ -37,7 +37,6 @@ public static class BuilderBootstrap
             routeOptions.ConstraintMap[nameof(OrderId)] = typeof(OrderIdRouteConstraint);
         });
 
-        builder.Services.AddValidation();
         builder.AddServiceDefaults();
 
         return builder;
