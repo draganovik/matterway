@@ -1,4 +1,5 @@
 @startuml LLD: Place Order - Sequence Diagram
+skinparam defaultFontSize 16
 skinparam actorStyle hollow
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
