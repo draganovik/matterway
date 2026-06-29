@@ -34,7 +34,6 @@ import type {
   UpdateDiscountRequest,
   UpdatedDiscountResponse,
 } from "~/types/catalog"
-import type { PaginationResponse } from "~/types/common/pagination"
 
 const ADMIN_ARTICLES_PATH = "admin/articles"
 const PUBLIC_ARTICLES_PATH = "public/articles"
@@ -42,107 +41,25 @@ const PUBLIC_DETAILS_PATH = "public/details"
 const ADMIN_DETAILS_PATH = "admin/details"
 const ADMIN_DISCOUNTS_PATH = "admin/discounts"
 
-type AnyRecord = Record<string, unknown>
-
-function asRecord(value: unknown): AnyRecord {
-  return value && typeof value === "object" ? (value as AnyRecord) : {}
-}
-
-function asArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : []
-}
-
-function asNumber(value: unknown) {
-  if (typeof value === "number") return value
-
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function asString(value: unknown) {
-  return typeof value === "string" ? value : undefined
-}
-
-function readCode(source: AnyRecord) {
-  return String(source.code ?? "")
-}
-
-function mapArticleImageProperty(payload: unknown): ArticleImageProperty {
-  const source = asRecord(payload)
-  const id = asString(source.id) ?? ""
-
+function mapArticleImageProperty(
+  image: ArticleImageProperty,
+): ArticleImageProperty {
   return {
-    id,
-    orderIndex: asNumber(source.orderIndex) ?? 0,
-    imageUrl: buildCatalogImageUrl(asString(source.imageUrl), id),
-    imageAlt: asString(source.imageAlt) ?? null,
+    ...image,
+    imageUrl: buildCatalogImageUrl(image.imageUrl, image.id),
   }
 }
 
-function mapQueryArticleResponse(payload: unknown): QueryArticleResponse {
-  const source = asRecord(payload)
-
-  return {
-    code: readCode(source),
-    title: asString(source.title) ?? null,
-    basePrice: asNumber(source.basePrice) ?? null,
-    price: asNumber(source.price) ?? null,
-    discount: source.discount
-      ? (source.discount as QueryArticleResponse["discount"])
-      : null,
-    description: asString(source.description) ?? null,
-    thumbnailUrl: buildCatalogImageUrl(asString(source.thumbnailUrl)),
-    thumbnailAlt: asString(source.thumbnailAlt) ?? null,
-    isAvailable: Boolean(source.isAvailable),
-  }
+function mapArticleImages(images?: ArticleImageProperty[] | null) {
+  return images?.map(mapArticleImageProperty) ?? images
 }
 
-function mapGetArticleResponse(payload: unknown): GetArticleResponse {
-  const source = asRecord(payload)
-
+function mapQueryArticleResponse(
+  article: QueryArticleResponse,
+): QueryArticleResponse {
   return {
-    code: readCode(source),
-    title: asString(source.title) ?? null,
-    basePrice: asNumber(source.basePrice) ?? null,
-    price: asNumber(source.price) ?? null,
-    discount: source.discount
-      ? (source.discount as GetArticleResponse["discount"])
-      : null,
-    description: asString(source.description) ?? null,
-    details: asArray(source.details) as GetArticleResponse["details"],
-    images: asArray(source.images).map(mapArticleImageProperty),
-    createdAt: asString(source.createdAt) ?? null,
-    updatedAt: asString(source.updatedAt) ?? null,
-    isAvailable: Boolean(source.isAvailable),
-  }
-}
-
-function mapArticleMutationResponse(
-  payload: unknown,
-): CreateArticleResponse | UpdateArticleResponse {
-  const source = asRecord(payload)
-  return {
-    code: readCode(source),
-    title: asString(source.title) ?? null,
-    basePrice: asNumber(source.basePrice) ?? null,
-    price: asNumber(source.price) ?? null,
-    description: asString(source.description) ?? null,
-    createdAt: asString(source.createdAt) ?? null,
-    updatedAt: asString(source.updatedAt) ?? null,
-    isAvailable: Boolean(source.isAvailable),
-  }
-}
-
-function mapArticleImagesMutationResponse(
-  payload: unknown,
-): ArticleImagesMutationResponse {
-  const source = asRecord(payload)
-
-  return {
-    images: asArray(source.images).map(mapArticleImageProperty),
-    createdImageId: asString(source.createdImageId) ?? null,
-    updatedImageId: asString(source.updatedImageId) ?? null,
-    deletedImageId: asString(source.deletedImageId) ?? null,
+    ...article,
+    thumbnailUrl: buildCatalogImageUrl(article.thumbnailUrl),
   }
 }
 
@@ -156,12 +73,13 @@ export function useCatalogClient() {
       Page: params.page,
       PageSize: params.pageSize,
     })
-    const response = await api.request<
-      PaginationResponse<Record<string, unknown>>
-    >("catalog", `${PUBLIC_ARTICLES_PATH}${query}`)
+    const response = await api.request<QueryArticlesResponse>(
+      "catalog",
+      `${PUBLIC_ARTICLES_PATH}${query}`,
+    )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<QueryArticlesResponse>
+      return response
     }
 
     return {
@@ -174,43 +92,33 @@ export function useCatalogClient() {
   }
 
   async function getArticle(code: string) {
-    const response = await api.request<Record<string, unknown>>(
+    const response = await api.request<GetArticleResponse>(
       "catalog",
       `${PUBLIC_ARTICLES_PATH}/${code}`,
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<GetArticleResponse>
+      return response
     }
 
     return {
       ...response,
-      data: mapGetArticleResponse(response.data),
+      data: {
+        ...response.data,
+        images: mapArticleImages(response.data.images),
+      },
     } satisfies ApiResult<GetArticleResponse>
   }
 
   async function createArticle(payload: CreateArticleRequest) {
-    const response = await api.request<Record<string, unknown>>(
-      "catalog",
-      ADMIN_ARTICLES_PATH,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      },
-    )
-
-    if (!response.ok || !response.data) {
-      return response as ApiResult<CreateArticleResponse>
-    }
-
-    return {
-      ...response,
-      data: mapArticleMutationResponse(response.data) as CreateArticleResponse,
-    } satisfies ApiResult<CreateArticleResponse>
+    return api.request<CreateArticleResponse>("catalog", ADMIN_ARTICLES_PATH, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
   }
 
   async function updateArticle(code: string, payload: UpdateArticleRequest) {
-    const response = await api.request<Record<string, unknown>>(
+    return api.request<UpdateArticleResponse>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}`,
       {
@@ -218,15 +126,6 @@ export function useCatalogClient() {
         body: JSON.stringify(payload),
       },
     )
-
-    if (!response.ok || !response.data) {
-      return response as ApiResult<UpdateArticleResponse>
-    }
-
-    return {
-      ...response,
-      data: mapArticleMutationResponse(response.data) as UpdateArticleResponse,
-    } satisfies ApiResult<UpdateArticleResponse>
   }
 
   async function deleteArticle(code: string) {
@@ -248,7 +147,7 @@ export function useCatalogClient() {
     formData.append("file", payload.file)
     if (payload.imageAlt) formData.append("imageAlt", payload.imageAlt)
 
-    const response = await api.request<Record<string, unknown>>(
+    const response = await api.request<ArticleImagesMutationResponse>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images`,
       {
@@ -258,12 +157,15 @@ export function useCatalogClient() {
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<ArticleImagesMutationResponse>
+      return response
     }
 
     return {
       ...response,
-      data: mapArticleImagesMutationResponse(response.data),
+      data: {
+        ...response.data,
+        images: mapArticleImages(response.data.images),
+      },
     } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
@@ -272,7 +174,7 @@ export function useCatalogClient() {
     orderIndex: number | string,
     payload: UpdateArticleImageRequest,
   ) {
-    const response = await api.request<Record<string, unknown>>(
+    const response = await api.request<ArticleImagesMutationResponse>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
@@ -282,17 +184,20 @@ export function useCatalogClient() {
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<ArticleImagesMutationResponse>
+      return response
     }
 
     return {
       ...response,
-      data: mapArticleImagesMutationResponse(response.data),
+      data: {
+        ...response.data,
+        images: mapArticleImages(response.data.images),
+      },
     } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
   async function removeArticleImage(code: string, orderIndex: number | string) {
-    const response = await api.request<Record<string, unknown>>(
+    const response = await api.request<ArticleImagesMutationResponse>(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
@@ -301,12 +206,15 @@ export function useCatalogClient() {
     )
 
     if (!response.ok || !response.data) {
-      return response as ApiResult<ArticleImagesMutationResponse>
+      return response
     }
 
     return {
       ...response,
-      data: mapArticleImagesMutationResponse(response.data),
+      data: {
+        ...response.data,
+        images: mapArticleImages(response.data.images),
+      },
     } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 

@@ -1,0 +1,8 @@
+{
+  "appHost": {
+    "path": "src/Matterway.AppHost/Matterway.AppHost.csproj"
+  },
+  "features": {
+    "defaultWatchEnabled": "true"
+  }
+}

@@ -2,13 +2,11 @@
 
 > A commerce platform for browsing products, managing customer accounts, and operating catalog, order, and payment workflows.
 
-Matterway combines a customer storefront, an internal admin dashboard, and service-owned APIs for catalog, customers, identity, and sales. It runs on .NET 10 with PostgreSQL, MinIO, Nuxt 4, and .NET Aspire.
-
-## Overview
-
-Storefront.Web handles shopping and checkout. Dashboard.Web handles catalog and administrative workflows. Both use Nuxt server proxy routes to reach the backend APIs.
+Matterway combines a customer storefront, an internal administration dashboard, and service-owned APIs for catalog, customers, identity, and sales. The stack uses .NET 10, PostgreSQL, MinIO, Nuxt 4, and Aspire.
 
 ## Architecture
+
+The Storefront and Dashboard are the only browser-facing applications. Their Nuxt server routes proxy requests to the internal APIs and orchestrate flows such as checkout.
 
 ```mermaid
 flowchart LR
@@ -29,45 +27,32 @@ flowchart LR
   Customers --> Identity
   Sales --> Customers
 
-  Migrations["Migration Runner"] --> Postgres
+  Migrations["Migration Runner"] --> Postgres["PostgreSQL"]
   Catalog --> Minio["MinIO Object Storage"]
-  Catalog --> Postgres["PostgreSQL"]
+  Catalog --> Postgres
   Customers --> Postgres
   Identity --> Postgres
   Sales --> Postgres
 ```
 
-## Routing Model
+### Routing
 
-Internal API routes follow:
+Backend API routes use these scopes:
 
 - `/api/public/v1/...`
 - `/api/self/v1/...`
 - `/api/admin/v1/...`
 - `/api/system/v1/...`
 
-Browser-facing requests use the same-origin proxy routes exposed by the Nuxt apps:
+Browser requests use same-origin Nuxt routes such as `/api/<service>/<scope>/v1/...`. AppHost injects the internal service addresses through `NUXT_SERVER_*`, so browser code does not need backend ports or CORS configuration.
 
-- `/api/<service>/<scope>/v1/...`
-- The Nuxt server forwards those requests to the internal API base URL injected by AppHost through `NUXT_SERVER_*`.
-- Storefront-owned orchestration and webhook routes live under `/api/storefront/...`.
+Storefront-owned routes live under `/api/storefront/...`, including checkout and Stripe webhooks. Image requests use `/api/storefront/cdn/images/<id>` or `/api/dashboard/cdn/images/<id>`.
 
-Examples:
+### Authentication
 
-- `/api/identity/public/v1/auth`
-- `/api/catalog/public/v1/articles`
-- `/api/storefront/cdn/images/<id>`
-- `/api/dashboard/cdn/images/<id>`
-- `/api/storefront/checkout`
-- `/api/storefront/webhooks/stripe`
-
-This keeps backend ports and CORS setup out of browser-facing code.
-
-## Authentication
-
-- Identity.Api issues JWT access and refresh tokens
-- System-to-system endpoints can require `X-System-Access-Key`
-- Authorization is enforced through role and permission claims
+- Identity.Api issues JWT access and refresh tokens.
+- Role and permission claims control user access.
+- Internal system endpoints can additionally require `X-System-Access-Key`.
 
 ## Repository Layout
 
@@ -81,27 +66,12 @@ src/
   Matterway.Migrations/       EF Core migration runner
   Matterway.Sales.Api/        Sales domain
   Matterway.Storefront.Web/   Nuxt customer application
-  Matterway.Dashboard.Web/    Nuxt admin application
+  Matterway.Dashboard.Web/    Nuxt administration application
 
 scripts/                      Database, migration, and Docker Hub helpers
 data/                         Local artifacts such as catalog archives
-docs/                         Supporting diagrams and assets
+docs/                         Diagrams, thesis materials, and supporting assets
 ```
-
-## Default Development Ports
-
-| Component        | Port  | Responsibility                               |
-|------------------|-------|----------------------------------------------|
-| Catalog.Api      | 2001  | Articles, pricing, discounts, images         |
-| Customers.Api    | 2002  | Profiles, addresses, carts, order mirror     |
-| Identity.Api     | 2003  | Authentication, token issuance, permissions  |
-| Sales.Api        | 2004  | Orders, payments, status tracking            |
-| Storefront.Web   | 4001  | Customer SSR app                             |
-| Dashboard.Web    | 4002  | Admin SSR app                                |
-| PostgreSQL       | 15432 | Relational datastore                         |
-| MinIO API        | 19000 | Object storage API                           |
-| MinIO Console    | 19001 | Storage admin console                        |
-| Aspire Dashboard | 18888 | Local orchestration and telemetry            |
 
 ## Local Development
 
@@ -110,11 +80,11 @@ docs/                         Supporting diagrams and assets
 - Docker
 - .NET SDK 10.x
 - Node.js 20+
-- dotnet-ef tool
 - Aspire CLI
-- Stripe CLI for webhook testing
+- `dotnet-ef` tool
+- Stripe CLI, only for webhook testing
 
-### Restore
+### Install Dependencies
 
 ```bash
 dotnet restore Matterway.slnx
@@ -124,13 +94,7 @@ npm install --prefix src/Matterway.Dashboard.Web
 
 ### Configure AppHost
 
-AppHost reads topology values from:
-
-- `src/Matterway.AppHost/appsettings.json`
-- `src/Matterway.AppHost/appsettings.Development.json`
-- `src/Matterway.AppHost/appsettings.Production.json`
-
-Set secret parameters with user-secrets:
+Versioned topology settings are in `src/Matterway.AppHost/appsettings*.json`. Store secrets outside the repository:
 
 ```bash
 dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
@@ -141,102 +105,87 @@ dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/M
 dotnet user-secrets set "Parameters:StripeSecretKey" "<value>" --project src/Matterway.AppHost
 ```
 
-Required non-secret topology keys:
+Required topology sections are `Services:AspireDashboard`, `Services:Postgres`, `Services:Minio`, `Services:Storefront`, and `Services:Dashboard`.
 
-- `Services:AspireDashboard:*`
-- `Services:Postgres:*`
-- `Services:Minio:*`
-- `Services:Storefront:*`
-- `Services:Dashboard:*`
+API projects keep `appsettings*.json` in their project roots for standalone local runs. These files are excluded from publish output; AppHost supplies deployment settings and secrets as environment variables. Catalog image storage uses `ImageStorage:*`, which AppHost wires to MinIO.
 
-Runtime notes:
+### Run
 
-- AppHost injects `NUXT_SERVER_IDENTITY_API_BASE_URL`, `NUXT_SERVER_CATALOG_API_BASE_URL`, `NUXT_SERVER_CUSTOMERS_API_BASE_URL`, and `NUXT_SERVER_SALES_API_BASE_URL` into the Nuxt apps.
-- Storefront.Web also receives `NUXT_SYSTEM_ACCESS_KEY` and `NUXT_STRIPE_SECRET_KEY`.
-- Browser-facing public service URLs are no longer needed.
-- Browser-side CORS setup is no longer needed.
-- API projects still need `Security:SystemAccessKey` for standalone runs.
-- `Matterway.Catalog.Api` image storage uses `ImageStorage:*` settings; AppHost wires these for the stack.
-
-### Run the Stack
+`aspire.config.json` selects the AppHost and enables watch mode, so the normal development command is:
 
 ```bash
-aspire run --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
+aspire run
 ```
 
-`aspire run` is the local development path. It starts the AppHost resources, launches the Aspire dashboard, and prints the active endpoints.
-
-To run the AppHost in the background:
+For a background session:
 
 ```bash
-aspire start --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
+aspire start
 aspire ps
 aspire stop
 ```
 
-The `--environment` option is not needed for local development. It belongs to Aspire deployment pipeline commands, where it selects deployment state/configuration; it does not turn `deploy` into a live local development run.
+### Default Development Endpoints
 
-For Aspire-managed watch behavior:
+| Component        | Port  | Responsibility                              |
+|------------------|-------|---------------------------------------------|
+| Catalog.Api      | 2001  | Articles, pricing, discounts, images        |
+| Customers.Api    | 2002  | Profiles, addresses, carts, order mirror    |
+| Identity.Api     | 2003  | Authentication, tokens, permissions         |
+| Sales.Api        | 2004  | Orders, payments, status tracking           |
+| Storefront.Web   | 4001  | Customer SSR application                    |
+| Dashboard.Web    | 4002  | Administration SSR application              |
+| PostgreSQL       | 15432 | Relational datastore                        |
+| MinIO API        | 19000 | Object storage API                          |
+| MinIO Console    | 19001 | Object storage administration               |
+| Aspire Dashboard | 18888 | Local orchestration and telemetry           |
 
-```bash
-aspire config set features.defaultWatchEnabled true
-aspire run --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
-```
-
-Without watch mode, restart or rebuild affected resources from the Aspire dashboard or CLI after source changes that are not handled by the resource's own dev server.
-
-Useful commands:
-
-```bash
-./scripts/databases help
-./scripts/databases update
-./scripts/migrations help
-./scripts/migrations add
-./scripts/dockerhub help
-./scripts/dockerhub push help
-```
+### Test Stripe Webhooks
 
 ```bash
 stripe listen --forward-to http://localhost:4001/api/storefront/webhooks/stripe
 ```
 
+## Database and Migrations
+
+`Matterway.Migrations` applies all four service schemas during an Aspire-managed start or deployment. The repository helpers are for direct local maintenance:
+
+| Task | Command |
+|------|---------|
+| Apply all migrations | `./scripts/databases update` |
+| Drop all local databases | `./scripts/databases drop` |
+| Add each service's `Initialize` migration | `./scripts/migrations add` |
+| Remove each service's latest migration | `./scripts/migrations remove` |
+| Show helper usage | `./scripts/databases help` or `./scripts/migrations help` |
+
 ## Deployment
 
 ```bash
-aspire deploy --apphost src/Matterway.AppHost/Matterway.AppHost.csproj
+aspire deploy
 ```
 
-The default deployment environment is `Production`, so `--environment Production` is optional. Pass `--environment <name>` only when intentionally deploying to a different named deployment environment.
+The default deployment environment is `Production`. Use `--environment <name>` only for another named deployment environment.
 
-In non-dev deployments, only the `.Web` projects are exposed externally. Backend APIs stay internal and are reached through the Nuxt server proxy routes.
+Aspire generates the Docker Compose deployment and container images. The two Nuxt projects use their multi-stage Dockerfiles; .NET project images, including the APIs and migration runner, are built by the .NET SDK through Aspire and do not require project-level Dockerfiles.
 
-To retag and push the compose-built images, use the Docker Hub helper:
+Only Storefront.Web and Dashboard.Web have public HTTP endpoints in publish mode. The APIs, PostgreSQL, MinIO, and migration runner remain internal to the generated composition.
+
+To retag and push the generated application images:
 
 ```bash
 ./scripts/dockerhub push <source-tag> [dest-tag] [namespace]
 ```
 
-## Database
-
-- `Matterway.Migrations` handles runtime schema updates
-- `./scripts/databases update` applies local migrations
-- `./scripts/databases drop` removes local databases
-- `./scripts/migrations add` creates the `Initialize` migration across API projects
-- `./scripts/migrations remove` removes the latest migration across API projects
+Run `./scripts/dockerhub help` for examples and defaults.
 
 ## Observability
 
-- OpenTelemetry instrumentation
-- Resilient HttpClient defaults
-- ProblemDetails standardization
-- OpenAPI generation
-
-Storefront Web has server-side OTEL tracing. Dashboard Web currently does not.
+The platform configures OpenTelemetry, resilient `HttpClient` defaults, standardized ProblemDetails responses, and OpenAPI generation. Storefront.Web exports server-side traces; Dashboard.Web currently does not.
 
 ## Documentation
 
-- `docs/` contains diagrams and supporting assets
+See [`docs/README.md`](docs/README.md) for the editable PlantUML sources, rendered diagrams, and the current thesis document.
 
 ## License
 
-MIT License. See `LICENSE.txt`.
+MIT License. See [`LICENSE.txt`](LICENSE.txt).

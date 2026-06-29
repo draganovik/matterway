@@ -14,8 +14,8 @@ public sealed class IdentityDbFactory : IDesignTimeDbContextFactory<IdentityDbCo
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)
-            .AddJsonFile("Properties/appsettings.json", true)
-            .AddJsonFile($"Properties/appsettings.{environmentName}.json", true)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile($"appsettings.{environmentName}.json", true)
             .AddEnvironmentVariables()
             .Build();
 
