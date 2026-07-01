@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+diagram_dir="$repo_root/docs/diagrams"
+export_dir="$diagram_dir/exports"
+
+if ! command -v plantuml >/dev/null 2>&1; then
+  echo "plantuml is required but was not found on PATH." >&2
+  exit 1
+fi
+
+mkdir -p "$export_dir"
+work_dir="$(mktemp -d "${TMPDIR:-/tmp}/matterway-diagrams.XXXXXX")"
+trap 'rm -rf "$work_dir"' EXIT
+
+for source in "$diagram_dir"/*.puml; do
+  stem="$(basename "$source" .puml)"
+  normalized="$work_dir/$stem.puml"
+  out_dir="$work_dir/out/$stem"
+
+  mkdir -p "$out_dir"
+  awk -v name="$stem" '
+    NR == 1 && /^@startuml/ {
+      print "@startuml " name
+      next
+    }
+    { print }
+  ' "$source" > "$normalized"
+
+  plantuml -tpng -o "$out_dir" "$normalized"
+
+  generated=()
+  if [ -f "$out_dir/$stem.png" ]; then
+    generated+=("$out_dir/$stem.png")
+  fi
+
+  shopt -s nullglob
+  continuation_pages=("$out_dir"/"$stem"_*.png)
+  shopt -u nullglob
+  if [ "${#continuation_pages[@]}" -gt 0 ]; then
+    IFS=$'\n' continuation_pages=($(printf "%s\n" "${continuation_pages[@]}" | sort))
+    unset IFS
+    generated+=("${continuation_pages[@]}")
+  fi
+
+  if [ "${#generated[@]}" -eq 0 ]; then
+    echo "No PNG generated for $source" >&2
+    exit 1
+  fi
+
+  find "$export_dir" -maxdepth 1 -type f \
+    \( -name "$stem.png" -o -name "$stem-"??".png" -o -name "$stem"_???.png \) \
+    -delete
+
+  if [ "${#generated[@]}" -eq 1 ]; then
+    cp "${generated[0]}" "$export_dir/$stem.png"
+  else
+    for index in "${!generated[@]}"; do
+      page_number="$(printf "%02d" "$((index + 1))")"
+      cp "${generated[$index]}" "$export_dir/$stem-$page_number.png"
+    done
+  fi
+
+  echo "Exported $stem (${#generated[@]} page(s))"
+done

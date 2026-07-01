@@ -35,7 +35,7 @@ Dashboard variant:
 - The Nuxt server forwards those requests to internal service URLs.
 - Unauthenticated redirect: /login
 - Permission check via service + level (observer/operator/manager)
-- Authenticated-but-unauthorized route access logs out and redirects to /login
+- Dashboard permission denial redirects to /
 end note
 
 == Login (Getting the token) ==
@@ -80,6 +80,8 @@ deactivate IdentityApi
 deactivate AuthStore
 deactivate Page
 
+newpage Refresh strategy and route guard
+
 == Refresh strategy ==
 User -> Page : 2.1 Open route
 activate Page
@@ -117,7 +119,7 @@ deactivate AuthStore
 
 alt Not authenticated for protected route
   Middleware --> Page : 2.4.1.1 Redirect to login variant
-else Authenticated but not authorized (Dashboard only)
+else Dashboard permission denied
   Middleware -> Registry : 2.4.2.1 Resolve feature + required permissions
   activate Registry
   Registry --> Middleware : 2.4.2.2 return feature metadata
@@ -125,14 +127,8 @@ else Authenticated but not authorized (Dashboard only)
   Middleware -> AuthStore : 2.4.2.3 hasPermission(service, allowedLevels)
   activate AuthStore
   AuthStore --> Middleware : 2.4.2.4 return false
-  Middleware -> AuthStore : 2.4.2.5 logout()
-  AuthStore -> IdentityApi : 2.4.2.6 POST /api/identity/public/v1/auth/logout (best effort)
-  activate IdentityApi
-  IdentityApi --> AuthStore : 2.4.2.7 HTTP 200/401/network error ignored
-  deactivate IdentityApi
-  AuthStore -> AuthStore : 2.4.2.8 clearSession() + remove refresh cookie
   deactivate AuthStore
-  Middleware --> Page : 2.4.2.9 Redirect to /login
+  Middleware --> Page : 2.4.2.5 Redirect to /
 else Authenticated and authorized
   alt Dashboard
     Middleware -> Registry : 2.4.3.1 Resolve feature + required permissions
@@ -150,6 +146,8 @@ else Authenticated and authorized
 end
 deactivate Middleware
 deactivate Page
+
+newpage API request refresh retry and logout
 
 User -> Page : 3.1 Trigger API action
 activate Page

@@ -85,29 +85,31 @@ else Validation passes
     end
 
   end
+end
 
-  == Asynchronous webhook handling ==
+newpage Asynchronous webhook handling
 
-  alt Stripe sends charge.succeeded
-    Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\ncharge.succeeded(order_id, amount)
-    activate StorefrontServer
-    StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, amount, status=Charged, createdAt}
-    activate SalesApi
-    SalesApi -> SalesDb : Verify order exists + insert Payment
-    activate SalesDb
-    SalesDb --> SalesApi : Payment stored
-    deactivate SalesDb
-    SalesApi --> StorefrontServer : 201 Created
-    deactivate SalesApi
-    StorefrontServer --> Stripe : 200 OK
-    deactivate StorefrontServer
-  else Stripe sends non-charge event
-    Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\n<other event type>
-    activate StorefrontServer
-    StorefrontServer --> Stripe : 304 Event ignored
-    deactivate Stripe
-    deactivate StorefrontServer
-  end
+== Asynchronous webhook handling ==
+
+alt Stripe sends charge.succeeded
+  Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\ncharge.succeeded(order_id, amount)
+  activate StorefrontServer
+  StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, amount, status=Charged, createdAt}
+  activate SalesApi
+  SalesApi -> SalesDb : Verify order exists + insert Payment
+  activate SalesDb
+  SalesDb --> SalesApi : Payment stored
+  deactivate SalesDb
+  SalesApi --> StorefrontServer : 201 Created
+  deactivate SalesApi
+  StorefrontServer --> Stripe : 200 OK
+  deactivate StorefrontServer
+else Stripe sends non-charge event
+  Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\n<other event type>
+  activate StorefrontServer
+  StorefrontServer --> Stripe : 304 Event ignored
+  deactivate Stripe
+  deactivate StorefrontServer
 end
 
 @enduml

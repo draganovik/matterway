@@ -18,7 +18,7 @@ package "Sales" {
   usecase viewOwnOrders as "View Own Orders"
 
   usecase viewOrders as "View Orders
-                         ..<i>extention points</i>..
+                         ..<i>extension points</i>..
                          View Payments"
   usecase viewPayments as "View Payments"
   usecase updateOrderStatus as "Update Order Status"
