@@ -17,7 +17,6 @@ public class AdminPatchSystemUserPerm : IEndpoint
             .WithTags("SystemUsers")
             .Produces<IEnumerable<AdminPatchSystemUserPermResponse>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))

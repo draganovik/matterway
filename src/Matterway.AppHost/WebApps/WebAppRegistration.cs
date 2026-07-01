@@ -12,7 +12,8 @@ internal static class WebAppRegistration
         {
             var publishedWebApp = builder.AddDockerfile(options.ServiceName, options.SourcePath)
                 .WithEnvironment("PORT", options.HostPort.ToString())
-                .WithHttpEndpoint(options.HostPort, options.HostPort, httpEndpoint);
+                .WithHttpEndpoint(options.HostPort, options.HostPort, httpEndpoint)
+                .WithExternalHttpEndpoints();
 
             foreach (var dependency in options.Dependencies)
                 publishedWebApp = publishedWebApp.WaitFor(dependency);

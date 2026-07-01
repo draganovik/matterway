@@ -1,12 +1,13 @@
 @startuml HLD: Platform - Class Diagram
-skinparam classAttributeIconSize 10
+skinparam defaultFontSize 32
+skinparam classAttributeIconSize 16
 hide circle
 
 class ArticleCode <<value object>> {
   +value: String
 }
 
-note right of ArticleCode
+note bottom of ArticleCode
   Exactly 8 uppercase
   letters or digits
 end note
@@ -15,7 +16,7 @@ class OrderId <<value object>> {
   +value: String
 }
 
-note right of OrderId
+note bottom of OrderId
   Canonical form:
   19 lowercase hex chars
 end note
@@ -234,7 +235,7 @@ package "Sales" {
     +quantity: Numeric
   }
 
-  note left of Order
+  note bottom of Order
     Current checkout flow
     1) Storefront -> Storefront Server: POST /api/storefront/checkout
     2) Storefront Server -> Stripe: initialize payment intent
@@ -294,7 +295,7 @@ package "Sales" {
   Payment "0..*" -- "1" Order : orderId
 }
 
-SystemUser "1" .left. "0..1" Customer
+SystemUser "1" .down. "0..1" Customer
 
 CustomerArticle "0..*" .up. "1" Article
 CustomerOrder "0..1" .right. "1" Order : shared orderId

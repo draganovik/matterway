@@ -13,7 +13,7 @@ package "Catalog" {
   usecase viewDetailedArticles as "View Detailed Articles"
   usecase viewDiscounts as "View Discounts"
   usecase queryArticles as "Query Articles
-                           ..<i>extention points</i>..
+                           ..<i>extension points</i>..
                            Get Detailed Article"
   queryArticles <.. viewDetailedArticles: <<extend>>
   queryArticles ..> viewDiscounts: <<include>>

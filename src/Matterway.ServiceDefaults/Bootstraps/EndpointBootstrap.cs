@@ -1,4 +1,6 @@
+using Matterway.ServiceDefaults.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
 namespace Matterway.ServiceDefaults.Bootstraps;
@@ -34,7 +36,21 @@ public sealed class EndpointRouter(IReadOnlyDictionary<EndpointKind, RouteGroupB
         Func<RouteGroupBuilder, string, Delegate, RouteHandlerBuilder> map)
     {
         var builder = map(ResolveGroup(endpointKind), pattern, handler);
+        var requestArgumentIndexes = EndpointRequestValidation.GetRequestArgumentIndexes(handler.Method);
+
         builder.WithMetadata(new EndpointKindMetadata(endpointKind));
+
+        if (requestArgumentIndexes.Length > 0)
+            builder
+                .ProducesValidationProblem()
+                .AddEndpointFilter((context, next) =>
+                {
+                    var errors = EndpointRequestValidation.Validate(context.Arguments, requestArgumentIndexes);
+                    return errors.Count > 0
+                        ? new ValueTask<object?>(TypedResults.ValidationProblem(errors))
+                        : next(context);
+                });
+
         return builder;
     }
 

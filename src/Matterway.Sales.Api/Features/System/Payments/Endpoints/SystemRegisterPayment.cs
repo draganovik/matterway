@@ -17,7 +17,6 @@ public class SystemRegisterPayment : IEndpoint
             .Produces<SystemBasePaymentResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireSystemAccessKey()
             .MapToApiVersion(new ApiVersion(1));
     }
@@ -30,10 +29,12 @@ public class SystemRegisterPayment : IEndpoint
         IPaymentRepository paymentRepository,
         CancellationToken cancellationToken)
     {
-        if (!await orderRepository.Exists(request.OrderId, cancellationToken))
+        var orderId = OrderId.Parse(request.OrderId!, null);
+
+        if (!await orderRepository.Exists(orderId, cancellationToken))
             return TypedResults.NotFound();
 
-        var payment = ToEntity(request);
+        var payment = ToEntity(request, orderId);
 
         var created = await paymentRepository.Create(payment, cancellationToken);
         if (created is null)
@@ -51,13 +52,13 @@ public class SystemRegisterPayment : IEndpoint
         return TypedResults.Created(location, ToResponse(created));
     }
 
-    private static Payment ToEntity(SystemRegisterPaymentRequest request)
+    private static Payment ToEntity(SystemRegisterPaymentRequest request, OrderId orderId)
     {
         return new Payment
         {
-            OrderId = request.OrderId,
-            Provider = request.Provider,
-            Amount = request.Amount,
+            OrderId = orderId,
+            Provider = request.Provider!,
+            Amount = request.Amount!.Value,
             Status = request.Status,
             CreatedAt = request.CreatedAt ?? DateTime.UtcNow
         };

@@ -27,7 +27,7 @@ package "Customers" {
   usecase verifyCustomer as "Verify Customer"
 
   usecase manageCustomers as "Manage Customers
-                              ..<i>extention points</i>..
+                              ..<i>extension points</i>..
                               Upsert Customer Address"
   usecase manageCustomerAddress as "Manage Customer Address"
   manageCustomerAddress .left.> manageCustomers : <<extend>>

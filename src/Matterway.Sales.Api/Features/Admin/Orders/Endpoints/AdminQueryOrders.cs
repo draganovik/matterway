@@ -15,7 +15,6 @@ public class AdminQueryOrders : IEndpoint
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<AdminBaseOrderResponse>>()
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
@@ -24,7 +23,7 @@ public class AdminQueryOrders : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<AdminBaseOrderResponse>>, NoContent, ValidationProblem>>
+        Task<Results<Ok<PaginationResponse<AdminBaseOrderResponse>>, NoContent>>
         Handler([AsParameters] AdminQueryOrderParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,

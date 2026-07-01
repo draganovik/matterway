@@ -54,11 +54,11 @@ public class AdminCreateArticle : IEndpoint
     {
         var article = new Article
         {
-            ArticleCode = request.Code.ToString(),
-            Title = request.Title,
-            Description = request.Description
+            ArticleCode = ArticleCode.Parse(request.Code!, null).Value,
+            Title = request.Title!,
+            Description = request.Description!
         };
-        article.SetBasePrice(request.BasePrice);
+        article.SetBasePrice(request.BasePrice!.Value);
         article.SetAvailability(request.IsAvailable);
         return article;
     }

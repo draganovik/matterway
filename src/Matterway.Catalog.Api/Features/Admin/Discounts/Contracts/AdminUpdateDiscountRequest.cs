@@ -14,5 +14,6 @@ public record AdminUpdateDiscountRequest
 
     [Required]
     [MinLength(1, ErrorMessage = "At least one articleCode is required.")]
-    public required ICollection<ArticleCode> ArticleCodes { get; init; }
+    [ArticleCodeCollection]
+    public ICollection<string>? ArticleCodes { get; init; }
 }

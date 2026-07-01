@@ -19,7 +19,6 @@ public class AdminCreateEmployeeUser : IEndpoint
             .WithTags("SystemUsers")
             .Produces<AdminCreateEmployeeSystemUserResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesValidationProblem()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.AsManager(context.User)))
             .MapToApiVersion(new ApiVersion(1));

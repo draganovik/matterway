@@ -48,7 +48,11 @@ public class AdminUpdateDiscount : IEndpoint
                 Detail = "ValidTo must be greater than or equal to ValidFrom."
             });
 
-        if (request.ArticleCodes.Count == 0)
+        var articleCodes = request.ArticleCodes?
+            .Select(static code => ArticleCode.Parse(code, null))
+            .ToArray() ?? [];
+
+        if (articleCodes.Length == 0)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Cannot update discounts",
@@ -56,8 +60,8 @@ public class AdminUpdateDiscount : IEndpoint
                 Detail = "At least one articleCode is required."
             });
 
-        var articles = await articleRepository.GetByCodes(request.ArticleCodes, cancellationToken);
-        var distinctCodes = request.ArticleCodes.Distinct().ToArray();
+        var articles = await articleRepository.GetByCodes(articleCodes, cancellationToken);
+        var distinctCodes = articleCodes.Distinct().ToArray();
         if (articles.Count != distinctCodes.Length)
             return TypedResults.BadRequest(new ProblemDetails
             {

@@ -19,7 +19,7 @@ package "Identity" {
   usecase signOut as "Sign Out"
 
   usecase manageSystemUsers as "Manage System Users
-                                ..<i>extention points</i>..
+                                ..<i>extension points</i>..
                                 Delete System User [manager only]"
   usecase deleteSystemUser as "Delete System User"
   usecase viewSystemUsers as "View System Users"

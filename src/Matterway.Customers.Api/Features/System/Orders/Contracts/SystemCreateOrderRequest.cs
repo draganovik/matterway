@@ -8,7 +8,8 @@ public record SystemCreateOrderRequest
     public Guid CustomerId { get; init; }
 
     [Required]
-    public OrderId OrderId { get; init; }
+    [OrderId]
+    public string? OrderId { get; init; }
 
     public DeliveryInfoRequest? DeliveryInfo { get; init; }
 

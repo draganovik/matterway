@@ -75,7 +75,7 @@ function normalizePermissionLevel(raw: string): PermissionLevel | null {
 export function useAuthSessionStore() {
   const runtime = useAuthRuntimeState()
   const session = useSessionState()
-  const refreshCookie = useCookie<string | null>(refreshCookieName, {
+  const refreshTokenCookie = useCookie<string | null>(refreshCookieName, {
     ...getCookieOptions(),
     default: () => null,
   })
@@ -136,10 +136,13 @@ export function useAuthSessionStore() {
   }
 
   function writeRefreshCookie(token: string | null, expires: Date | null) {
-    refreshCookie.value = token
-    if (!import.meta.client) return
+    if (!import.meta.client) {
+      refreshTokenCookie.value = token
+      return
+    }
     if (!token) {
       document.cookie = `${refreshCookieName}=; Max-Age=0; Path=/; SameSite=Lax`
+      refreshCookie(refreshCookieName)
       return
     }
     const attrs = [
@@ -150,6 +153,7 @@ export function useAuthSessionStore() {
     if (expires) attrs.push(`Expires=${expires.toUTCString()}`)
     if (window.location.protocol === "https:") attrs.push("Secure")
     document.cookie = attrs.join("; ")
+    refreshCookie(refreshCookieName)
   }
 
   function setSession(data: LoginResponse) {
@@ -239,7 +243,7 @@ export function useAuthSessionStore() {
 
   async function refreshTokens() {
     if (runtime.refreshPromise) return runtime.refreshPromise
-    const refreshToken = refreshCookie.value
+    const refreshToken = refreshTokenCookie.value
     if (!refreshToken) return
     runtime.refreshPromise = (async () => {
       try {
@@ -307,7 +311,7 @@ export function useAuthSessionStore() {
         session.value.accessToken = null
       }
 
-      if (refreshCookie.value) {
+      if (refreshTokenCookie.value) {
         try {
           await refreshTokens()
         } catch {
