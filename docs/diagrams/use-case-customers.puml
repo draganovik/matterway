@@ -4,33 +4,38 @@ left to right direction
 skinparam shadowing false
 skinparam actorStyle hollow
 
-rectangle #line:transparent {
+together {
   actor user as "User"
   actor csmr as "Customer"
 }
-rectangle #line:transparent {
+together  {
   actor empl as "Employee"
   actor sysm as "System"
-  empl -[hidden]- sysm
+  sysm -[hidden]l- empl
 }
 
-user --|> csmr
-user --|> empl
+user <|-- csmr
+user <|-- empl
 
 package "Customers" {
+  together {
+    usecase syncOnOrder as "Sync On Order"
+    usecase verifyCustomer as "Verify Customer"
+  }
+
   usecase createCustomer as "Create Customer"
   usecase manageOwnProfile as "Manage Own Profile"
   usecase manageOwnAddress as "Manage Own Address"
   usecase manageOwnCartItems as "Manage Own Cart Items"
 
-  usecase syncOnOrder as "Sync On Order"
-  usecase verifyCustomer as "Verify Customer"
-
   usecase manageCustomers as "Manage Customers
                               ..<i>extension points</i>..
                               Upsert Customer Address"
+  usecase viewCustomers as "View Customers"
   usecase manageCustomerAddress as "Manage Customer Address"
-  manageCustomerAddress .left.> manageCustomers : <<extend>>
+
+  manageCustomerAddress .r.> manageCustomers : <<extend>>
+  manageCustomers .r.> viewCustomers : <<include>>
 }
 
 user -- createCustomer
@@ -41,5 +46,6 @@ csmr -- manageOwnCartItems
 syncOnOrder -- sysm
 verifyCustomer -- sysm
 
+viewCustomers -- empl : perm:[observer,operator,manager]
 manageCustomers -- empl : perm:[operator,manager]
 @enduml

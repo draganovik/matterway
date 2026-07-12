@@ -20,6 +20,7 @@ Customer -> Checkout : Place order
 activate Checkout
 alt Client-side validation fails
   Checkout --> Customer : Show validation errors\n(no API calls)
+  deactivate Checkout
 
 else Validation passes
   Checkout -> StorefrontServer : POST /api/storefront/checkout\n{customerId, order, payment, address} + Bearer customer JWT
@@ -34,12 +35,13 @@ else Validation passes
 
   alt Stripe payment init fails
     Stripe --> StorefrontServer : Error
+    deactivate Stripe
     StorefrontServer --> Checkout : 500 Payment initialization failed
     deactivate StorefrontServer
     Checkout --> Customer : Show payment error
   else Stripe payment init succeeds
     Stripe --> StorefrontServer : 200 {paymentIntentId}
-    activate StorefrontServer
+    deactivate Stripe
     StorefrontServer -> SalesApi : POST /api/system/v1/orders\n{type, deliveryInfo} + Bearer customer JWT + X-System-Access-Key
     activate SalesApi
     note over SalesApi
@@ -71,19 +73,22 @@ else Validation passes
 
     alt Customers or Sales finalization fails
       StorefrontServer -> Stripe : Cancel PaymentIntent
+      activate Stripe
       Stripe --> StorefrontServer : 200 Canceled
+      deactivate Stripe
       StorefrontServer --> Checkout : 500 Order creation failed
+      deactivate StorefrontServer
       Checkout --> Customer : Show checkout error
     else Sales order created
       StorefrontServer -> Stripe : Update metadata(order_id)\n+ Confirm PaymentIntent
+      activate Stripe
       Stripe --> StorefrontServer : 200 Confirmed
+      deactivate Stripe
       StorefrontServer --> Checkout : 200 {order}
       deactivate StorefrontServer
       Checkout -> Checkout : cart.clear()
       Checkout --> Customer : Redirect to /orders
-      deactivate Checkout
     end
-
   end
 end
 
@@ -108,7 +113,6 @@ else Stripe sends non-charge event
   Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\n<other event type>
   activate StorefrontServer
   StorefrontServer --> Stripe : 304 Event ignored
-  deactivate Stripe
   deactivate StorefrontServer
 end
 

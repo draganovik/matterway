@@ -8,10 +8,10 @@ actor user as "User"
 actor csmr as "Customer"
 actor empl as "Employee"
 
-user --|> csmr
-user --|> empl
+user <|-- csmr
+user <|-- empl
 
-actor systm as "System"
+actor systm as "System\n(eg. Stripe)"
 
 package "Sales" {
   usecase placeOwnOrder as "Place Own Order"
@@ -33,6 +33,7 @@ csmr --- viewOwnOrders
 
 updateOrderStatus --- empl : perm:[operator,manager]
 viewOrders --- empl
+placeOwnOrder --- systm
 
 registerPayment --- systm
 @enduml

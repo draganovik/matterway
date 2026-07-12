@@ -6,17 +6,19 @@ skinparam actorStyle hollow
 
 actor user as "User"
 
-rectangle #line:transparent {
+together {
   actor empl as "Employee"
   actor sysm as "System"
 }
 
-user --|> empl
+user <|-- empl
 
 package "Identity" {
-  usecase signIn as "Sign In"
-  usecase refreshSession as "Refresh Session"
-  usecase signOut as "Sign Out"
+  together {
+    usecase signIn as "Sign In"
+    usecase refreshSession as "Refresh Session"
+    usecase signOut as "Sign Out"
+  }
 
   usecase manageSystemUsers as "Manage System Users
                                 ..<i>extension points</i>..
@@ -24,16 +26,20 @@ package "Identity" {
   usecase deleteSystemUser as "Delete System User"
   usecase viewSystemUsers as "View System Users"
 
-  usecase viewUserPermissions as "View User Permissions"
-  usecase manageUserPermissions as "Manage User Permissions"
+  together {
+    usecase viewUserPermissions as "View User Permissions"
+    usecase manageUserPermissions as "Manage User Permissions"
+    usecase createEmployeeAccount as "Create Employee User Account"
+  }
 
-  usecase createEmployeeAccount as "Create Employee User Account"
-  usecase createCustomerAccount as "Create Customer User Account"
-  usecase introspectAccessToken as "Introspect Access Token"
+  together {
+    usecase createCustomerAccount as "Create Customer User Account"
+    usecase introspectAccessToken as "Introspect Access Token"
+  }
 
-  manageSystemUsers .down.> viewSystemUsers : <<include>>
-  manageUserPermissions .up.> viewSystemUsers : <<include>>
-  deleteSystemUser .up.> manageSystemUsers : <<extend>>
+  manageUserPermissions .u.> viewUserPermissions : <<include>>
+  manageSystemUsers .u.> viewSystemUsers : <<include>>
+  manageSystemUsers <.u. deleteSystemUser : <<extend>>
 }
 
 user --- signIn
@@ -41,7 +47,7 @@ user --- refreshSession
 user --- signOut
 
 manageSystemUsers --- empl : perm:[operator,manager]
-viewUserPermissions --- empl : perm:[operator,manager]
+
 manageUserPermissions --- empl : perm:[manager]
 createEmployeeAccount --- empl : perm:[manager]
 

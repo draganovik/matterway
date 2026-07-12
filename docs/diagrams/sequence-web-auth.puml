@@ -53,8 +53,10 @@ AuthStore -> IdentityApi : 1.6 POST /login
 activate IdentityApi
 alt Login succeeds and role matches app policy
   IdentityApi --> AuthStore : 1.6.1.1 HTTP 200 LoginResponse
+  deactivate IdentityApi
   AuthStore -> AuthStore : 1.6.1.2 setSession + write refresh cookie + scheduleRefresh
   AuthStore --> Page : 1.6.1.3 return login success
+  deactivate AuthStore
   alt Dashboard
     Page -> Registry : 1.6.1.4 Resolve first permitted feature route
     activate Registry
@@ -67,17 +69,19 @@ alt Login succeeds and role matches app policy
   end
 else Login fails
   IdentityApi --> AuthStore : 1.6.2.1 HTTP 401/403 error payload
+  deactivate IdentityApi
   AuthStore --> Page : 1.6.2.2 return login error
+  deactivate AuthStore
   Page --> User : 1.6.2.3 Show login error
 else Login succeeds but role mismatches app policy
   IdentityApi --> AuthStore : 1.6.3.1 HTTP 200 LoginResponse
+  deactivate IdentityApi
   AuthStore -> AuthStore : 1.6.3.2 setSession + write refresh cookie + scheduleRefresh
   AuthStore -> AuthStore : 1.6.3.3 clearSession()
   AuthStore --> Page : 1.6.3.4 return role error
+  deactivate AuthStore
   Page --> User : 1.6.3.5 Show login error
 end
-deactivate IdentityApi
-deactivate AuthStore
 deactivate Page
 
 newpage Refresh strategy and route guard
@@ -96,22 +100,23 @@ else Access token missing/expired and refresh cookie exists,\nand refresh succee
   AuthStore -> IdentityApi : 2.3.2.1 POST /api/identity/public/v1/auth/refresh {refreshToken}
   activate IdentityApi
   IdentityApi --> AuthStore : 2.3.2.2 HTTP 200 LoginResponse
+  deactivate IdentityApi
   AuthStore -> AuthStore : 2.3.2.3 setSession + write refresh cookie + scheduleRefresh
   AuthStore --> Middleware : 2.3.2.4 return initialized (authenticated)
-  deactivate IdentityApi
 else Access token missing/expired and refresh cookie exists,\nand refresh returns wrong role or fails
   AuthStore -> IdentityApi : 2.3.3.1 POST /api/identity/public/v1/auth/refresh {refreshToken}
   activate IdentityApi
   alt HTTP 200 LoginResponse but role mismatches app policy
     IdentityApi --> AuthStore : 2.3.3.2 HTTP 200 LoginResponse
+    deactivate IdentityApi
     AuthStore -> AuthStore : 2.3.3.3 setSession + write refresh cookie + scheduleRefresh
     AuthStore -> AuthStore : 2.3.3.4 clearSession()
   else HTTP 401/403 error or network failure
     IdentityApi --> AuthStore : 2.3.3.2 HTTP 401/403 error
+    deactivate IdentityApi
     AuthStore -> AuthStore : 2.3.3.3 clearSession()
   end
   AuthStore --> Middleware : 2.3.3.5 return initialized (anonymous)
-  deactivate IdentityApi
 else No access token and no refresh cookie
   AuthStore --> Middleware : 2.3.4.1 return initialized (anonymous)
 end
@@ -162,6 +167,7 @@ ApiClient -> DomainApi : 3.5 HTTP request to /api/<service>/... + Bearer token
 activate DomainApi
 alt Domain API returns 401 and refresh succeeds
   DomainApi --> ApiClient : 3.5.1.1 HTTP 401 Unauthorized
+  deactivate DomainApi
   ApiClient -> AuthStore : 3.5.1.2 refreshTokens()
   activate AuthStore
   AuthStore -> IdentityApi : 3.5.1.3 POST /api/identity/public/v1/auth/refresh
@@ -182,9 +188,9 @@ else Domain API returns 401 and refresh fails
   AuthStore -> IdentityApi : 3.5.2.3 POST /api/identity/public/v1/auth/refresh
   activate IdentityApi
   IdentityApi --> AuthStore : 3.5.2.4 HTTP 200 wrong-role response or 401/403 error
+  deactivate IdentityApi
   AuthStore -> AuthStore : 3.5.2.5 clearSession()
   AuthStore --> ApiClient : 3.5.2.6 return refresh failure (no token)
-  deactivate IdentityApi
   deactivate AuthStore
   ApiClient --> Page : 3.5.2.7 Return original 401 ApiResult (no retry)
 else Domain API returns non-401
@@ -203,12 +209,12 @@ Page -> AuthStore : 4.2 logout()
 activate AuthStore
 AuthStore -> IdentityApi : 4.3 POST /api/identity/public/v1/auth/logout (best effort)
 activate IdentityApi
-IdentityApi --> AuthStore : 4.4 HTTP 200/401/network error ignored
+IdentityApi --> AuthStore : 4.4 HTTP 204/401/network error ignored
 deactivate IdentityApi
 AuthStore -> AuthStore : 4.5 clearSession() + remove refresh cookie
 AuthStore --> Page : 4.6 return logout completed
 deactivate AuthStore
-Page -> Page : 4.7 clear cart on auth loss
+Page -> Page : 4.7 Storefront only: clear cart on auth loss
 Page --> User : 4.8 Navigate to app logout target
 deactivate Page
 

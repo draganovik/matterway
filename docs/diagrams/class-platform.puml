@@ -1,25 +1,26 @@
 @startuml HLD: Platform - Class Diagram
-skinparam defaultFontSize 32
-skinparam classAttributeIconSize 16
+skinparam defaultFontSize 28
+skinparam Ranksep 50
 hide circle
 
-class ArticleCode <<value object>> {
-  +value: String
+together {
+  class ArticleCode <<value object>> {
+    +value: String
+  }
+  note right of ArticleCode
+    Exactly 8 uppercase
+    letters or digits
+  end note
+
+  class OrderId <<value object>> {
+    +value: String
+  }
+
+  note right of OrderId
+    Canonical form:
+    19 lowercase hex chars
+  end note
 }
-
-note bottom of ArticleCode
-  Exactly 8 uppercase
-  letters or digits
-end note
-
-class OrderId <<value object>> {
-  +value: String
-}
-
-note bottom of OrderId
-  Canonical form:
-  19 lowercase hex chars
-end note
 
 package "Identity" {
   enum EIdentityRole {
@@ -64,18 +65,9 @@ package "Identity" {
     +claimValue: String
   }
 
-  note left of IdentityUserClaim
-    Permission claims use:
-    claimType = "perm"
-    claimValue = "<service>:<level>"
-    where level in PermissionLevel
-    one claim per service for employees
-    missing service claim resolves to Observer
-  end note
-
-  SystemUser "1" -- "0..*" IdentityUserClaim
-  SystemUser "1" -- "0..*" IdentityUserRole
-  IdentityUserRole "0..*" -- "1" IdentityRole
+  SystemUser "1" -- "0..*" IdentityUserClaim : userId
+  SystemUser "1" -- "0..*" IdentityUserRole : userId
+  IdentityUserRole "0..*" -- "1" IdentityRole : roleId
 }
 
 package "Catalog" {
@@ -131,17 +123,11 @@ package "Catalog" {
     +imageAlt: String?
   }
 
-  note right of ArticleImage
-    ImageUrl stores the canonical object URL.
-    Web apps derive their local image proxy path
-    from the image id and stream bytes from MinIO.
-  end note
-
   Discount "0..*" -- "1" Article : articleCode
   ArticleDetailText "0..*" -- "1" Article : articleCode
-  ArticleDetailText "0..*" -- "1" Detail : detailSlug
+  ArticleDetailText "0..*" -u- "1" Detail : detailSlug
   ArticleDetailNumeric "0..*" -- "1" Article : articleCode
-  ArticleDetailNumeric "0..*" -- "1" Detail : detailSlug
+  ArticleDetailNumeric "0..*" -u- "1" Detail : detailSlug
   ArticleImage "0..*" -- "1" Article : articleCode
 }
 
@@ -174,7 +160,7 @@ package "Customers" {
     --
     +customerId: UUID
     +orderId: OrderId?
-    +articleName: String?
+    +articleName: String
     +unitPrice: Money?
     +quantity: Numeric
   }
@@ -187,18 +173,10 @@ package "Customers" {
     +placedAt: DateTime
   }
 
-  note right of Customer
-    Public registration creates the
-    Identity user first, then the
-    Customer row. If the Customer
-    write fails, the Identity user
-    is deleted as cleanup.
-  end note
-
   CustomerOrder "0..*" -- "1" Customer : customerId
-  Customer "1" -- "0..1" Address : customerId
-  CustomerArticle "0..*" -- "1" Customer : customerId
-  CustomerArticle "0..*" -- "0..1" CustomerOrder : orderId
+  Customer "1" -l- "0..1" Address : customerId \n
+  CustomerArticle "0..*" -r- "1" Customer : customerId
+  CustomerArticle "0..*" -r- "0..1" CustomerOrder : orderId \n
 }
 
 package "Sales" {
@@ -212,9 +190,10 @@ package "Sales" {
     +city: String
     +zipCode: String
     +addressLine1: String
-    +addressLine2: String
+    +addressLine2: String?
     +contactPhone: String
   }
+
   class Order {
     +id: OrderId
     --
@@ -233,32 +212,6 @@ package "Sales" {
     +articleTitle: String
     +unitPrice: Money
     +quantity: Numeric
-  }
-
-  note bottom of Order
-    Current checkout flow
-    1) Storefront -> Storefront Server: POST /api/storefront/checkout
-    2) Storefront Server -> Stripe: initialize payment intent
-    3) Storefront Server -> Sales: POST /api/system/v1/orders (+ customer JWT + system key)
-    4) Sales reserves or reuses a pending OrderId, then mirrors cart items in Customers
-    5) Sales updates the pending Order with items, delivery info, and Processing status
-    6) Storefront Server -> Stripe: attach metadata(order_id) + confirm payment intent
-    7) Stripe webhook -> Storefront Server: POST /api/storefront/webhooks/stripe
-       Storefront Server -> Sales system/payment registration
-    Checkout delivery country is fixed to Serbia.
-  end note
-
-  enum EOrderType {
-    Retail
-    Ecommerce
-  }
-
-  enum EOrderStatusType {
-    Processing
-    Reserved
-    Delivery
-    Completed
-    Cancelled
   }
 
   class OrderStatus {
@@ -282,6 +235,14 @@ package "Sales" {
     +createdAt: DateTime
   }
 
+  enum EOrderStatusType {
+    Processing
+    Reserved
+    Delivery
+    Completed
+    Cancelled
+  }
+
   enum EPaymentStatus {
     Reserved
     Charged
@@ -289,14 +250,21 @@ package "Sales" {
     Refunded
   }
 
+  enum EOrderType {
+    Retail
+    Ecommerce
+  }
+
   OrderItem "0..*" -- "1" Order : orderId
-  OrderStatus "0..*" -- "1" Order : orderId
-  OrderDeliveryInfo "0..1" -- "1" Order : orderId
-  Payment "0..*" -- "1" Order : orderId
+  OrderStatus "0..*" -u- "1" Order : orderId
+  OrderDeliveryInfo "0..1" -r- "1" Order : orderId \n
+  Payment "0..*" -d- "1" Order : orderId
 }
 
-SystemUser "1" .down. "0..1" Customer
+Customer "0..1" .u. "1" SystemUser : ref.
 
-CustomerArticle "0..*" .up. "1" Article
-CustomerOrder "0..1" .right. "1" Order : shared orderId
+CustomerArticle "0..*" .u. "1" Article : ref.
+
+CustomerOrder "0..1" .. "1" Order : ref.
+
 @enduml
