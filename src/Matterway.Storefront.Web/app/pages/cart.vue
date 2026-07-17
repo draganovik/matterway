@@ -7,28 +7,26 @@ definePageMeta({
   public: true,
 })
 
-const { cart, isEmpty, initialize, goToCheckout, clearCart } = useCartPage()
+const { cart, isEmpty, initialize, goToCheckout } = useCartPage()
 
 await initialize()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <UCard class="border-default border">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold">Vaša korpa</h1>
-        </div>
-        <div class="flex items-center gap-2">
-          <UBadge color="primary" variant="soft"
-            >{{ cart.totalItems.value }} stavki</UBadge
-          >
-          <UBadge color="neutral" variant="soft">{{
-            formatMoney(cart.totalPrice.value)
-          }}</UBadge>
-        </div>
+  <div class="space-y-4">
+    <header
+      class="border-default flex flex-wrap items-center justify-between gap-3 border-b pb-3"
+    >
+      <h1 class="text-xl font-semibold">Vaša korpa</h1>
+      <div class="flex items-center gap-2">
+        <UBadge color="primary" variant="soft">
+          {{ cart.totalItems.value }} stavki
+        </UBadge>
+        <UBadge color="neutral" variant="soft">
+          {{ formatMoney(cart.totalPrice.value) }}
+        </UBadge>
       </div>
-    </UCard>
+    </header>
 
     <EmptyState
       v-if="isEmpty"
@@ -39,15 +37,15 @@ await initialize()
       <UButton to="/articles" color="primary">Pogledaj artikle</UButton>
     </EmptyState>
 
-    <div v-else class="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">
+    <div v-else class="grid items-start gap-4 lg:grid-cols-[1fr_20rem]">
       <CartListView :items="cart.items.value" @remove="cart.remove" />
 
       <CartActionPanel
-        class="lg:sticky lg:top-24"
+        class="lg:sticky lg:top-20"
         :total-items="cart.totalItems.value"
         :total-price="cart.totalPrice.value"
         @checkout="goToCheckout"
-        @clear="clearCart"
+        @clear="cart.clear"
       />
     </div>
   </div>

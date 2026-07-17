@@ -1,6 +1,5 @@
 import {
   decodeJwtPayload,
-  getJwtArrayClaim,
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
@@ -137,8 +136,6 @@ export function useAuthSessionStore() {
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
       ),
   )
-
-  const permissions = computed(() => getJwtArrayClaim(payload.value, "perm"))
 
   const isCustomer = computed(() => role.value?.toLowerCase() === "customer")
 
@@ -355,11 +352,9 @@ export function useAuthSessionStore() {
   }
 
   return {
-    session,
     payload,
     role,
     customerId,
-    permissions,
     isCustomer,
     isLoggedIn,
     login,
@@ -367,7 +362,6 @@ export function useAuthSessionStore() {
     refreshTokens,
     getAccessToken,
     initialize,
-    isAccessExpired,
     isInitialized,
   }
 }

@@ -213,10 +213,6 @@ export function useProfilePage() {
     addressSuccess.value = "Adresa je uspešno sačuvana."
   }
 
-  async function initialize() {
-    await loadData()
-  }
-
   return {
     isLoading,
     profileSaving,
@@ -231,6 +227,5 @@ export function useProfilePage() {
     loadData,
     saveProfile,
     saveAddress,
-    initialize,
   }
 }

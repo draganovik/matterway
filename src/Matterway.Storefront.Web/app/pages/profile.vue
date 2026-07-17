@@ -19,41 +19,40 @@ const {
   loadData,
   saveProfile,
   saveAddress,
-  initialize,
 } = useProfilePage()
 
-await initialize()
+await loadData()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <UCard class="border-default border">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold">Moji podaci</h1>
-          <p class="text-muted text-sm">
-            Ažurirajte lične podatke i adresu za isporuku.
-          </p>
-        </div>
-
-        <UButton
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-refresh-cw"
-          :loading="isLoading"
-          @click="loadData"
-        >
-          {{ isLoading ? "Osvežavanje" : "Osveži" }}
-        </UButton>
+  <div class="space-y-4">
+    <header
+      class="border-default flex flex-wrap items-center justify-between gap-3 border-b pb-3"
+    >
+      <div>
+        <h1 class="text-xl font-semibold">Moji podaci</h1>
+        <p class="text-muted text-sm">
+          Ažurirajte lične podatke i adresu za isporuku.
+        </p>
       </div>
-    </UCard>
 
-    <div v-if="isLoading" class="grid gap-6 lg:grid-cols-2">
+      <UButton
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-refresh-cw"
+        :loading="isLoading"
+        @click="loadData"
+      >
+        {{ isLoading ? "Osvežavanje" : "Osveži" }}
+      </UButton>
+    </header>
+
+    <div v-if="isLoading" class="grid gap-4 lg:grid-cols-2">
       <USkeleton class="h-96" />
       <USkeleton class="h-96" />
     </div>
 
-    <div v-else class="grid gap-6 lg:grid-cols-2">
+    <div v-else class="grid gap-4 lg:grid-cols-2">
       <ProfileIdentityPanel
         v-model="profileForm"
         :loading="profileSaving"

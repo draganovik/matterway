@@ -12,13 +12,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <UCard
-    :ui="{ body: 'p-0 sm:p-0' }"
-    class="border-default overflow-hidden border"
-  >
+  <UCard :ui="{ body: 'p-0' }">
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="storefront-subtle-surface text-muted">
+        <thead class="bg-muted/60 text-muted">
           <tr>
             <th class="px-3 py-2 font-medium">Porudžbina</th>
             <th class="px-3 py-2 font-medium">Datum</th>

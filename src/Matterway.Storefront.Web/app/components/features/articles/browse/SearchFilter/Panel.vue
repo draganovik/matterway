@@ -63,7 +63,6 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           :model-value="filters.search"
           placeholder="npr. Philips Hue"
           class="w-full"
-          :ui="{ root: 'w-full' }"
           @update:model-value="emit('setSearch', String($event ?? ''))"
         />
       </UFormField>
@@ -78,7 +77,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             variant="outline"
             placeholder="0"
             class="w-full"
-            :ui="{ root: 'w-full', base: 'w-full text-left' }"
+            :ui="{ base: 'w-full text-left' }"
             @update:model-value="
               emit('setMinPrice', toNumberOrUndefined($event))
             "
@@ -93,7 +92,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
             variant="outline"
             placeholder="100000"
             class="w-full"
-            :ui="{ root: 'w-full', base: 'w-full text-left' }"
+            :ui="{ base: 'w-full text-left' }"
             @update:model-value="
               emit('setMaxPrice', toNumberOrUndefined($event))
             "

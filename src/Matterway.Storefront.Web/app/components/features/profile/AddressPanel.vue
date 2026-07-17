@@ -26,7 +26,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <UCard class="border-default border">
+  <UCard>
     <template #header>
       <h2 class="text-base font-semibold">Adresa za isporuku</h2>
     </template>

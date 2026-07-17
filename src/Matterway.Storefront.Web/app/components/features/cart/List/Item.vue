@@ -12,25 +12,25 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <tr class="border-default border-t">
-    <td class="px-3 py-3">
+  <tr class="border-default hover:bg-muted/40 border-t transition-colors">
+    <td class="px-3 py-2.5">
       <NuxtLink
         :to="`/articles/${props.item.articleCode}`"
-        class="truncate text-sm font-semibold hover:text-cyan-700"
+        class="hover:text-primary truncate text-sm font-semibold"
       >
         {{ props.item.articleName }}
       </NuxtLink>
     </td>
 
-    <td class="text-muted px-3 py-3 whitespace-nowrap">
+    <td class="text-muted px-3 py-2.5 whitespace-nowrap">
       {{ props.item.articleCode ? `#${props.item.articleCode}` : "-" }}
     </td>
 
-    <td class="px-3 py-3 text-right whitespace-nowrap">
+    <td class="px-3 py-2.5 text-right whitespace-nowrap">
       {{ formatMoney(props.item.unitPrice) }}
     </td>
 
-    <td class="px-3 py-3">
+    <td class="px-3 py-2.5">
       <div class="flex items-center justify-center">
         <CartQuantityInput
           :article-code="props.item.articleCode"
@@ -41,7 +41,7 @@ const emit = defineEmits<{
       </div>
     </td>
 
-    <td class="px-3 py-3 text-right font-semibold whitespace-nowrap">
+    <td class="px-3 py-2.5 text-right font-semibold whitespace-nowrap">
       {{ formatMoney(props.item.unitPrice * props.item.quantity) }}
     </td>
   </tr>

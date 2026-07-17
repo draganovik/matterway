@@ -67,7 +67,7 @@ watch(
     class="bg-default/85 border-default fixed inset-x-0 top-0 z-40 border-b backdrop-blur"
   >
     <div
-      class="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8"
+      class="mx-auto flex h-14 w-full max-w-7xl items-center gap-3 px-4 sm:px-5 lg:px-6"
     >
       <HeaderAppLogo />
 
@@ -80,15 +80,17 @@ watch(
           color="neutral"
           :class="
             isActive(item.to)
-              ? 'bg-elevated text-toned ring-default ring-1 ring-inset'
-              : 'hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
+              ? 'bg-muted text-highlighted'
+              : 'text-toned hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
           "
         >
           {{ item.label }}
         </UButton>
       </nav>
 
-      <div class="ml-auto hidden w-full max-w-3xl items-center gap-2 lg:flex">
+      <div
+        class="ml-auto hidden max-w-2xl min-w-0 flex-1 items-center gap-2 lg:flex"
+      >
         <form class="min-w-0 flex-1" @submit.prevent="submitSearch">
           <label for="article-search-desktop" class="sr-only">
             Pretraži artikle
@@ -100,7 +102,6 @@ watch(
             placeholder="Pretraži artikle"
             size="md"
             class="w-full"
-            :ui="{ root: 'w-full' }"
           />
         </form>
 
@@ -111,8 +112,9 @@ watch(
           variant="ghost"
           icon="i-lucide-package-check"
           square
+          aria-label="Moje porudžbine"
           :ui="{ leadingIcon: 'text-lg' }"
-          class="hover:bg-muted hover:text-highlighted hover:ring-default focus-visible:bg-muted focus-visible:text-highlighted focus-visible:ring-default hover:ring-1 hover:ring-inset focus-visible:ring-1 focus-visible:ring-inset"
+          class="hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted"
         />
 
         <UButton
@@ -120,8 +122,9 @@ watch(
           color="neutral"
           variant="ghost"
           icon="i-lucide-shopping-bag"
+          aria-label="Korpa"
           :ui="{ leadingIcon: 'text-lg' }"
-          class="hover:bg-muted hover:text-highlighted hover:ring-default focus-visible:bg-muted focus-visible:text-highlighted focus-visible:ring-default hover:ring-1 hover:ring-inset focus-visible:ring-1 focus-visible:ring-inset"
+          class="hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted"
         >
           <span v-if="cartCount">{{ cartCount }}</span>
         </UButton>
@@ -146,8 +149,9 @@ watch(
           color="neutral"
           variant="ghost"
           icon="i-lucide-shopping-bag"
+          aria-label="Korpa"
           :ui="{ leadingIcon: 'text-lg' }"
-          class="hover:bg-muted hover:text-highlighted hover:ring-default focus-visible:bg-muted focus-visible:text-highlighted focus-visible:ring-default hover:ring-1 hover:ring-inset focus-visible:ring-1 focus-visible:ring-inset"
+          class="hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted"
         >
           <span v-if="cartCount">{{ cartCount }}</span>
         </UButton>
@@ -157,7 +161,9 @@ watch(
           variant="ghost"
           icon="i-lucide-menu"
           square
-          class="hover:bg-muted hover:text-highlighted hover:ring-default focus-visible:bg-muted focus-visible:text-highlighted focus-visible:ring-default hover:ring-1 hover:ring-inset focus-visible:ring-1 focus-visible:ring-inset"
+          aria-label="Otvori meni"
+          :aria-expanded="mobileMenuOpen"
+          class="hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted"
           @click="mobileMenuOpen = !mobileMenuOpen"
         />
       </div>
@@ -165,7 +171,7 @@ watch(
 
     <div
       v-if="mobileMenuOpen"
-      class="border-default bg-default border-t px-4 py-4 lg:hidden"
+      class="border-default bg-default border-t px-4 py-3 lg:hidden"
     >
       <form class="mb-3 w-full" @submit.prevent="submitSearch">
         <label for="article-search-mobile" class="sr-only">
@@ -177,7 +183,6 @@ watch(
           icon="i-lucide-search"
           placeholder="Pretraži artikle"
           class="w-full"
-          :ui="{ root: 'w-full' }"
         />
       </form>
       <div class="flex flex-col gap-1">
@@ -198,8 +203,8 @@ watch(
           block
           :class="
             isActive(item.to)
-              ? 'bg-elevated text-toned ring-default ring-1 ring-inset'
-              : 'hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
+              ? 'bg-muted text-highlighted'
+              : 'text-toned hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
           "
           @click="mobileMenuOpen = false"
         >

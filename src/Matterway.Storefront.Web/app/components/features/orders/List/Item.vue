@@ -48,12 +48,12 @@ function revealItems() {
 </script>
 
 <template>
-  <tr class="border-default border-t">
-    <td class="px-3 py-3 font-medium">{{ order.id }}</td>
-    <td class="text-muted px-3 py-3 whitespace-nowrap">
+  <tr class="border-default hover:bg-muted/40 border-t transition-colors">
+    <td class="px-3 py-2.5 font-medium">{{ order.id }}</td>
+    <td class="text-muted px-3 py-2.5 whitespace-nowrap">
       {{ resolveOrderDate(order) }}
     </td>
-    <td class="px-3 py-3 whitespace-nowrap">
+    <td class="px-3 py-2.5 whitespace-nowrap">
       <div class="flex items-center gap-2">
         <UBadge color="neutral" variant="subtle" class="font-normal">
           {{ order.items?.length ?? 0 }} stavki
@@ -65,10 +65,10 @@ function revealItems() {
         />
       </div>
     </td>
-    <td class="px-3 py-3">
+    <td class="px-3 py-2.5">
       {{ order.deliveryInfo?.addressLine1 || "-" }}
     </td>
-    <td class="px-3 py-3 whitespace-nowrap">
+    <td class="px-3 py-2.5 whitespace-nowrap">
       <div class="flex items-center gap-2">
         <UBadge
           :color="latestStatus ? 'primary' : 'neutral'"
@@ -84,7 +84,7 @@ function revealItems() {
         />
       </div>
     </td>
-    <td class="px-3 py-3 text-right font-semibold">
+    <td class="px-3 py-2.5 text-right font-semibold">
       {{ formatMoney(order.totalAmount || 0) }}
     </td>
   </tr>

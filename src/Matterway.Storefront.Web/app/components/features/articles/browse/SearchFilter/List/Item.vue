@@ -85,7 +85,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 </script>
 
 <template>
-  <div class="border-default bg-default rounded-lg border p-2">
+  <div class="border-default bg-elevated rounded-md border p-2">
     <div
       class="grid gap-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_2.5rem] lg:items-center"
     >
@@ -114,7 +114,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           aria-label="Minimalna vrednost"
           size="sm"
           class="w-full"
-          :ui="{ root: 'w-full', base: 'w-full text-left' }"
+          :ui="{ base: 'w-full text-left' }"
           @update:model-value="emit('setMin', toNumberOrUndefined($event))"
         />
         <UInputNumber
@@ -127,7 +127,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           aria-label="Maksimalna vrednost"
           size="sm"
           class="w-full"
-          :ui="{ root: 'w-full', base: 'w-full text-left' }"
+          :ui="{ base: 'w-full text-left' }"
           @update:model-value="emit('setMax', toNumberOrUndefined($event))"
         />
       </template>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { useOverviewPage } from "~/composables/features/overview/useOverviewPage"
+import {
+  OVERVIEW_CATEGORY_FILTERS,
+  useOverviewPage,
+} from "~/composables/features/overview/useOverviewPage"
 
 definePageMeta({
   title: "Početna",
@@ -11,52 +14,92 @@ const {
   loading,
   error,
   totalCount,
-  featured,
-  featuredCount,
-  initialize,
+  latest,
+  lights,
+  cameras,
+  loadOverview,
 } = useOverviewPage()
 
-await initialize()
+await loadOverview()
+
+const sections = computed(() => [
+  {
+    key: "latest",
+    title: "Najnoviji artikli",
+    description: "Poslednji dodati artikli u Matterway katalogu.",
+    to: "/articles",
+    items: latest.value,
+  },
+  {
+    key: "lights",
+    title: "Pametna rasveta",
+    description: "Rasveta koju možete prilagoditi svom prostoru i ritmu.",
+    to: {
+      path: "/articles",
+      query: { filter: OVERVIEW_CATEGORY_FILTERS.light },
+    },
+    items: lights.value,
+  },
+  {
+    key: "cameras",
+    title: "Pametne kamere",
+    description: "Kamere za jednostavniji nadzor doma i okruženja.",
+    to: {
+      path: "/articles",
+      query: { filter: OVERVIEW_CATEGORY_FILTERS.camera },
+    },
+    items: cameras.value,
+  },
+])
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="mx-auto max-w-[62.25rem] space-y-8">
     <OverviewHeroPanel
       :total-count="totalCount"
-      :featured-count="featuredCount"
       :cart-items="cart.totalItems.value"
     />
 
     <StatusMessages v-if="error" :error="error" />
 
-    <section class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-semibold">Izdvojeni artikli</h2>
+    <section v-for="section in sections" :key="section.key" class="space-y-3">
+      <div
+        class="border-default flex items-end justify-between gap-4 border-b pb-2"
+      >
+        <div>
+          <h2 class="text-xl font-semibold">{{ section.title }}</h2>
+          <p class="text-muted mt-0.5 text-sm">{{ section.description }}</p>
+        </div>
         <UButton
-          to="/articles"
+          :to="section.to"
           color="neutral"
           variant="ghost"
           trailing-icon="i-lucide-arrow-right"
+          class="shrink-0"
         >
-          Svi artikli
+          Vidi više
         </UButton>
       </div>
 
-      <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div v-if="loading" class="flex flex-wrap justify-center gap-3">
         <USkeleton
           v-for="n in 4"
-          :key="`overview-skeleton-${n}`"
-          class="h-80"
+          :key="`${section.key}-skeleton-${n}`"
+          class="h-[22rem] w-full sm:w-60 sm:flex-none"
         />
       </div>
 
       <EmptyState
-        v-else-if="!featured.length"
-        title="Nema dostupnih artikala"
-        description="Katalog je trenutno prazan."
+        v-else-if="!section.items.length"
+        :title="`Nema artikala u odeljku ${section.title.toLocaleLowerCase()}`"
+        description="Pogledajte ostatak kataloga ili pokušajte ponovo kasnije."
       />
 
-      <OverviewListView v-else :items="featured" />
+      <ArticlesBrowseListView
+        v-else
+        :items="section.items"
+        :is-refreshing="false"
+      />
     </section>
   </div>
 </template>

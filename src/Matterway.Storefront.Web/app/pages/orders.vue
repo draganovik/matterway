@@ -18,24 +18,22 @@ const {
   selectedOrder,
   openStatusHistory,
   openItems,
+  loadOrders,
   changePage,
-  initialize,
 } = useOrdersPage()
 
-await initialize()
+await loadOrders()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <UCard class="border-default border">
-      <div>
-        <h1 class="text-2xl font-semibold">Moje porudžbine</h1>
-      </div>
-    </UCard>
+  <div class="space-y-4">
+    <header class="border-default border-b pb-3">
+      <h1 class="text-xl font-semibold">Moje porudžbine</h1>
+    </header>
 
     <StatusMessages v-if="error" :error="error" />
 
-    <UCard v-if="loading" class="border-default border">
+    <UCard v-if="loading">
       <USkeleton class="h-8" />
       <USkeleton class="mt-2 h-8" />
       <USkeleton class="mt-2 h-8" />
@@ -57,7 +55,7 @@ await initialize()
 
     <div
       v-if="!loading && !error && orders.length"
-      class="storefront-subtle-surface border-default flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
+      class="border-default bg-elevated flex flex-wrap items-center justify-between gap-3 rounded-md border px-3 py-2"
     >
       <p class="text-muted text-sm">
         Strana {{ currentPage }} od {{ Math.max(totalPages, 1) }} •

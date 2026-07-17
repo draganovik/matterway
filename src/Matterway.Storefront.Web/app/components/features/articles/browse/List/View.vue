@@ -8,16 +8,15 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="@container">
-    <div
-      class="grid grid-cols-1 gap-4 transition-opacity @lg:grid-cols-2 @3xl:grid-cols-3"
-      :class="{ 'opacity-70': props.isRefreshing }"
-    >
-      <ArticlesBrowseListItem
-        v-for="article in props.items"
-        :key="article.code"
-        :article="article"
-      />
-    </div>
+  <div
+    class="flex flex-wrap items-stretch justify-center gap-3 transition-opacity"
+    :class="{ 'opacity-70': props.isRefreshing }"
+  >
+    <ArticlesBrowseListItem
+      v-for="article in props.items"
+      :key="article.code"
+      :article="article"
+      class="w-full sm:w-60 sm:flex-none"
+    />
   </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 const color = computed(() =>
-  colorMode.value === "dark" ? "#020617" : "#f1f5f9",
+  colorMode.value === "dark" ? "#0c0a09" : "#f5f5f4",
 )
 const route = useRoute()
 const appTitle = "Matterway Prodavnica"
