@@ -17,7 +17,6 @@ await initialize()
     <UCard class="border-default border">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p class="text-primary text-xs tracking-[0.3em] uppercase">Korpa</p>
           <h1 class="text-2xl font-semibold">Vaša korpa</h1>
         </div>
         <div class="flex items-center gap-2">

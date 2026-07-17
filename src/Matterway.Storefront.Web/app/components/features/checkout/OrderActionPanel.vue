@@ -59,9 +59,7 @@ const expYearValue = computed({
         <div
           class="border-default bg-elevated/50 rounded-lg border px-3 py-2.5"
         >
-          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Stavke
-          </p>
+          <p class="text-muted text-sm">Stavke</p>
           <p class="mt-1 text-lg leading-none font-semibold">
             {{ props.totalItems }}
           </p>
@@ -70,9 +68,7 @@ const expYearValue = computed({
         <div
           class="border-primary/20 bg-primary/5 rounded-lg border px-3 py-2.5"
         >
-          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Iznos
-          </p>
+          <p class="text-muted text-sm">Iznos</p>
           <p class="mt-1 text-lg leading-none font-semibold">
             {{ formatMoney(props.totalPrice) }}
           </p>

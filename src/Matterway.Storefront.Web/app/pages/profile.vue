@@ -30,7 +30,6 @@ await initialize()
     <UCard class="border-default border">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p class="text-primary text-xs tracking-[0.3em] uppercase">Profil</p>
           <h1 class="text-2xl font-semibold">Moji podaci</h1>
           <p class="text-muted text-sm">
             Ažurirajte lične podatke i adresu za isporuku.

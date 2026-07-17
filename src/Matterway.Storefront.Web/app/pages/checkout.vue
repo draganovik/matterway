@@ -26,9 +26,6 @@ await initialize()
     <UCard class="border-default border">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p class="text-primary text-xs tracking-[0.3em] uppercase">
-            Plaćanje
-          </p>
           <h1 class="text-2xl font-semibold">Završi porudžbinu</h1>
         </div>
         <UBadge color="primary" variant="soft">

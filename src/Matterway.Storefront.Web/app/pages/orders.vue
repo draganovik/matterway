@@ -29,9 +29,6 @@ await initialize()
   <div class="space-y-6">
     <UCard class="border-default border">
       <div>
-        <p class="text-primary text-xs tracking-[0.3em] uppercase">
-          Porudžbine
-        </p>
         <h1 class="text-2xl font-semibold">Moje porudžbine</h1>
       </div>
     </UCard>

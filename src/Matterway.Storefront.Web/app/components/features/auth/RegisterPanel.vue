@@ -24,7 +24,6 @@ const emit = defineEmits<{
   <AuthShell
     hero-title="Kreiranje naloga"
     hero-description="Registrujte se da biste brže završili kupovinu i pratili svoje porudžbine."
-    card-eyebrow="Registracija"
     card-title="Kreiraj nalog"
     card-description="Nalog je namenjen kupcima."
   >
