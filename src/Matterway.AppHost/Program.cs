@@ -157,6 +157,9 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
 IResourceBuilder<T> WithCommonWebEnvironment<T>(IResourceBuilder<T> webApp)
     where T : IResource, IResourceWithEnvironment
 {
+    if (!builder.ExecutionContext.IsPublishMode)
+        webApp = webApp.WithEnvironment("HOST", "localhost");
+
     return webApp
         .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
         .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
