@@ -104,9 +104,7 @@ export function useStorefrontOrdersClient() {
   async function createOrder(
     payload: CreateCheckoutOrderRequest,
   ): Promise<CheckoutOrderResult> {
-    if (!auth.isInitialized.value) {
-      await auth.initialize()
-    }
+    await auth.initialize()
 
     const requestBody = buildCreateOrderPayload(payload)
 

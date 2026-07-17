@@ -3,7 +3,6 @@ export type AuthSession = {
   tokenType: string
   created: string | null
   expires: string | null
-  refreshExpires: string | null
 }
 
 export type LoginResponse = {

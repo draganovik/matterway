@@ -77,6 +77,7 @@ function buildForwardHeaders(event: Parameters<typeof getRequestHeaders>[0]) {
     headers.set(name, value)
   }
   headers.delete("connection")
+  headers.delete("cookie")
   headers.delete("expect")
   headers.delete("host")
   headers.delete("keep-alive")

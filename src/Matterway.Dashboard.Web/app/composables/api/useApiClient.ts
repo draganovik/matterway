@@ -60,9 +60,7 @@ export function useApiClient() {
     path: string,
     options: ApiRequestOptions = {},
   ): Promise<ApiResult<T>> {
-    if (!auth.isInitialized.value) {
-      await auth.initialize()
-    }
+    await auth.initialize()
 
     const requestPath = buildServiceApiPathFromRequestPath(service, path)
     if (!requestPath) {
