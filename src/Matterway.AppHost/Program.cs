@@ -1,6 +1,5 @@
 using Matterway.AppHost.ApiDocumentation;
 using Matterway.AppHost.Configuration;
-using Matterway.AppHost.WebApps;
 using Matterway.ServiceDefaults;
 using Microsoft.Extensions.Hosting;
 using Projects;
@@ -23,7 +22,7 @@ builder.AddDockerComposeEnvironment(composeEnvironmentName)
             dashboard.WithHostPort(services.AspireDashboard.Port);
         dashboard.WithContainerName("aspire-dashboard");
     })
-    .ConfigureComposeFile(compose => compose.Name = "matterway-platform");
+    .ConfigureComposeFile(compose => compose.Name = composeEnvironmentName);
 
 var postgres = builder.AddPostgres("postgres")
     .WithImageTag("18")
@@ -97,33 +96,37 @@ var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResour
     (ApiDirectory.Sales, salesApi)
 };
 
-WebAppRegistration.Add(
-    builder,
-    new WebAppOptions
-    {
-        ServiceName = "mtw-storefront-web",
-        SourcePath = "../Matterway.Storefront.Web",
-        HostPort = services.Storefront.Port,
-        Dependencies = [catalogApi, salesApi],
-        ConfigureEnvironment = environment =>
-        {
-            ConfigureCommonWebEnvironment(environment);
-            ConfigureWebTelemetryEnvironment(environment, "mtw-storefront-web");
-            environment.WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey);
-            environment.WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey);
-        }
-    });
+#pragma warning disable ASPIREJAVASCRIPT001
+WithCommonWebEnvironment(
+        builder.AddViteApp("mtw-storefront-web", "../Matterway.Storefront.Web")
+            .PublishAsPackageScript("start")
+            .WithEndpoint("http", endpoint =>
+            {
+                endpoint.Port = services.Storefront.Port;
+                endpoint.IsProxied = false;
+            })
+            .WithExternalHttpEndpoints())
+    .WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey)
+    .WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey)
+    .WaitFor(catalogApi)
+    .WaitFor(salesApi)
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
 
-WebAppRegistration.Add(
-    builder,
-    new WebAppOptions
-    {
-        ServiceName = "mtw-dashboard-web",
-        SourcePath = "../Matterway.Dashboard.Web",
-        HostPort = services.Dashboard.Port,
-        Dependencies = [identityApi, catalogApi, customersApi, salesApi],
-        ConfigureEnvironment = ConfigureCommonWebEnvironment
-    });
+WithCommonWebEnvironment(
+        builder.AddViteApp("mtw-dashboard-web", "../Matterway.Dashboard.Web")
+            .PublishAsPackageScript("start")
+            .WithEndpoint("http", endpoint =>
+            {
+                endpoint.Port = services.Dashboard.Port;
+                endpoint.IsProxied = false;
+            })
+            .WithExternalHttpEndpoints())
+    .WaitFor(identityApi)
+    .WaitFor(catalogApi)
+    .WaitFor(customersApi)
+    .WaitFor(salesApi)
+    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+#pragma warning restore ASPIREJAVASCRIPT001
 
 if (builder.Environment.IsDevelopment())
     ScalarApiRegistration.AddApiReferences(builder, apiResources);
@@ -151,73 +154,10 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     return configure(api).WaitFor(dbMigrator);
 }
 
-void ConfigureWebTelemetryEnvironment(WebAppEnvironment environment, string telemetryServiceName)
+IResourceBuilder<T> WithCommonWebEnvironment<T>(IResourceBuilder<T> webApp)
+    where T : IResource, IResourceWithEnvironment
 {
-    static string? NormalizeHttpEndpoint(string? endpoint)
-    {
-        if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var endpointUri))
-            return null;
-        if (endpointUri is not { Scheme: "http" or "https" })
-            return null;
-
-        return endpointUri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-    }
-
-    static string? ToTraceEndpoint(string? endpoint)
-    {
-        var normalized = NormalizeHttpEndpoint(endpoint);
-        if (string.IsNullOrWhiteSpace(normalized))
-            return null;
-
-        return normalized.EndsWith("/v1/traces", StringComparison.OrdinalIgnoreCase)
-            ? normalized
-            : $"{normalized}/v1/traces";
-    }
-
-    static string? ToBaseEndpoint(string? endpoint)
-    {
-        var normalized = NormalizeHttpEndpoint(endpoint);
-        if (string.IsNullOrWhiteSpace(normalized))
-            return null;
-
-        return normalized.EndsWith("/v1/traces", StringComparison.OrdinalIgnoreCase)
-            ? normalized[..^10].TrimEnd('/')
-            : normalized;
-    }
-
-    var publishDefaultEndpoint = builder.ExecutionContext.IsPublishMode
-        ? $"http://{composeEnvironmentName}-dashboard:{services.AspireDashboard.OtlpPort}"
-        : null;
-
-    var tracesEndpoint = ToTraceEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"])
-                         ?? ToTraceEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"])
-                         ?? ToTraceEndpoint(builder.Configuration["DOTNET_DASHBOARD_OTLP_ENDPOINT_URL"])
-                         ?? ToTraceEndpoint(publishDefaultEndpoint);
-
-    var baseEndpoint = ToBaseEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"])
-                       ?? ToBaseEndpoint(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"])
-                       ?? ToBaseEndpoint(builder.Configuration["DOTNET_DASHBOARD_OTLP_ENDPOINT_URL"])
-                       ?? ToBaseEndpoint(publishDefaultEndpoint);
-
-    var protocol = builder.Configuration["OTEL_EXPORTER_OTLP_PROTOCOL"];
-    if (string.IsNullOrWhiteSpace(protocol))
-        protocol = "grpc";
-
-    environment
-        .WithEnvironment("OTEL_SERVICE_NAME", telemetryServiceName)
-        .WithEnvironment("OTEL_RESOURCE_ATTRIBUTES", $"service.name={telemetryServiceName}");
-
-    if (!string.IsNullOrWhiteSpace(tracesEndpoint))
-        environment.WithTrimmedEnvironment("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", tracesEndpoint);
-    if (!string.IsNullOrWhiteSpace(baseEndpoint))
-        environment.WithTrimmedEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", baseEndpoint);
-    if (!string.IsNullOrWhiteSpace(tracesEndpoint) || !string.IsNullOrWhiteSpace(baseEndpoint))
-        environment.WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", protocol);
-}
-
-void ConfigureCommonWebEnvironment(WebAppEnvironment environment)
-{
-    environment
+    return webApp
         .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
         .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)

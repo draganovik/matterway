@@ -4,7 +4,7 @@ namespace Matterway.AppHost.Configuration;
 
 internal sealed class AppHostServicesOptions
 {
-    public required AspireDashboardPortOptions AspireDashboard { get; init; }
+    public required ServicePortOptions AspireDashboard { get; init; }
     public required ServicePortOptions Postgres { get; init; }
     public required MinioPortOptions Minio { get; init; }
     public required ServicePortOptions Storefront { get; init; }
@@ -18,13 +18,7 @@ internal sealed class AppHostServicesOptions
 
         return new AppHostServicesOptions
         {
-            AspireDashboard = BindPortOptions<AspireDashboardPortOptions>(servicesSection, "AspireDashboard",
-                options =>
-                {
-                    if (options.OtlpPort <= 0)
-                        throw new InvalidOperationException(
-                            "Services:AspireDashboard:OtlpPort must be greater than zero.");
-                }),
+            AspireDashboard = BindPortOptions<ServicePortOptions>(servicesSection, "AspireDashboard"),
             Postgres = BindPortOptions<ServicePortOptions>(servicesSection, "Postgres"),
             Minio = BindPortOptions<MinioPortOptions>(servicesSection, "Minio",
                 options =>
@@ -73,9 +67,4 @@ internal class ServicePortOptions
 internal sealed class MinioPortOptions : ServicePortOptions
 {
     public int ConsolePort { get; init; }
-}
-
-internal sealed class AspireDashboardPortOptions : ServicePortOptions
-{
-    public int OtlpPort { get; init; }
 }

@@ -73,9 +73,7 @@ public static class AspireServiceDefaults
                     .AddHttpClientInstrumentation();
             });
 
-        var useOtlpExporter =
-            !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]) ||
-            !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"]);
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
         if (useOtlpExporter)
             openTelemetryBuilder.UseOtlpExporter();
 

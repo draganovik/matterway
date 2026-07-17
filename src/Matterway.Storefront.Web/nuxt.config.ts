@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
   ssr: true,
+  nitro: { preset: "node-server" },
 
   components: [
     {
