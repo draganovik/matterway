@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCartStore } from "~/composables/stores/useCartStore"
-import { getJwtStringClaim } from "~/utils/jwt"
 
 const auth = useAuthSessionStore()
 const cart = useCartStore()
@@ -19,17 +18,7 @@ const navItems = [
 const cartCount = computed(() => cart.totalItems.value)
 
 const userLabel = computed(() => {
-  const payload = auth.payload.value
-  const candidates = [
-    getJwtStringClaim(payload, "name"),
-    getJwtStringClaim(payload, "preferred_username"),
-    getJwtStringClaim(payload, "email"),
-    auth.customerId.value,
-    getJwtStringClaim(payload, "sub"),
-  ].filter(Boolean) as string[]
-
-  const raw = candidates[0] || "Kupac"
-  return raw.includes("@") ? raw.split("@")[0] : raw
+  return `Zdravo, ${auth.customerFirstName.value || "Kupac"}!`
 })
 
 function isActive(to: string) {

@@ -61,6 +61,7 @@ export function useProfilePage() {
     profileForm.lastName = value?.lastName?.trim() || ""
     profileForm.birthDate = normalizeDate(value?.birthDate)
     profileForm.defaultAddressId = value?.defaultAddressId || null
+    auth.setCustomerFirstName(value?.firstName)
   }
 
   function applyAddress(value: CustomerAddressResponse | null) {

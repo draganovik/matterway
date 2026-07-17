@@ -1,5 +1,6 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCartStore } from "~/composables/stores/useCartStore"
+import { useCustomersClient } from "~/composables/api/useCustomersClient"
 
 type CustomerSessionSyncResult =
   | { ok: true; skipped?: true }
@@ -26,9 +27,14 @@ function useCustomerSessionSyncRuntime() {
 export function useCustomerSessionSync() {
   const auth = useAuthSessionStore()
   const cart = useCartStore()
+  const customersApi = useCustomersClient()
   const runtime = useCustomerSessionSyncRuntime()
   const syncedCustomerId = useState<string | null>(
     "storefront-customer-session-synced-customer-id",
+    () => null,
+  )
+  const profiledCustomerId = useState<string | null>(
+    "storefront-customer-session-profiled-customer-id",
     () => null,
   )
 
@@ -43,10 +49,16 @@ export function useCustomerSessionSync() {
         await cart.clear().catch(() => null)
       }
       syncedCustomerId.value = null
+      profiledCustomerId.value = null
+      auth.setCustomerFirstName(null)
       return { ok: true as const, skipped: true as const }
     }
 
-    if (!options.force && syncedCustomerId.value === customerId) {
+    const shouldSyncCart =
+      options.force || syncedCustomerId.value !== customerId
+    const shouldLoadProfile = profiledCustomerId.value !== customerId
+
+    if (!shouldSyncCart && !shouldLoadProfile) {
       return { ok: true as const, skipped: true as const }
     }
 
@@ -55,11 +67,26 @@ export function useCustomerSessionSync() {
     }
 
     runtime.syncPromise = (async () => {
-      const result = await cart.refreshFromRemote()
-      if (result.ok) {
+      const [cartResult, profileResponse] = await Promise.all([
+        shouldSyncCart
+          ? cart.refreshFromRemote()
+          : Promise.resolve({ ok: true as const, skipped: true as const }),
+        shouldLoadProfile
+          ? customersApi.getSelfProfile().catch(() => null)
+          : Promise.resolve(null),
+      ])
+
+      if (shouldLoadProfile) {
+        profiledCustomerId.value = customerId
+        auth.setCustomerFirstName(
+          profileResponse?.ok ? profileResponse.data?.firstName : null,
+        )
+      }
+
+      if (shouldSyncCart && cartResult.ok) {
         syncedCustomerId.value = customerId
       }
-      return result
+      return cartResult
     })()
 
     try {

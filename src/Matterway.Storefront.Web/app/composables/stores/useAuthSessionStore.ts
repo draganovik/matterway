@@ -113,6 +113,10 @@ export function useAuthSessionStore() {
     () => null,
   )
   const isInitialized = useState("storefront-auth-is-initialized", () => false)
+  const customerFirstName = useState<string | null>(
+    "storefront-customer-first-name",
+    () => null,
+  )
 
   const payload = computed<JwtPayload | null>(() => {
     if (!session.value.accessToken) return null
@@ -215,6 +219,11 @@ export function useAuthSessionStore() {
     }
     writeRefreshCookie(null, null)
     clearRefreshTimer()
+    customerFirstName.value = null
+  }
+
+  function setCustomerFirstName(value: string | null | undefined) {
+    customerFirstName.value = value?.trim() || null
   }
 
   function getAccessToken() {
@@ -355,12 +364,14 @@ export function useAuthSessionStore() {
     payload,
     role,
     customerId,
+    customerFirstName,
     isCustomer,
     isLoggedIn,
     login,
     logout,
     refreshTokens,
     getAccessToken,
+    setCustomerFirstName,
     initialize,
     isInitialized,
   }
