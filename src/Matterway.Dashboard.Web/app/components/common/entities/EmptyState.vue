@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
   <div
-    class="border-default bg-background rounded-lg border px-4 py-6 text-center"
+    class="border-default bg-default rounded-lg border px-4 py-5 text-center"
   >
     <p class="text-foreground text-sm font-medium">
       {{ title }}

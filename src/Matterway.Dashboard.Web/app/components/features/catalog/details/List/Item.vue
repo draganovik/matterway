@@ -11,10 +11,10 @@ const { item } = defineProps<{
 <template>
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
-      <p class="text-foreground truncate leading-tight font-medium">
+      <p class="text-foreground truncate text-sm leading-tight font-medium">
         {{ item.title || item.slug || "Detalj bez naziva" }}
       </p>
-      <p class="text-muted truncate text-sm leading-tight">
+      <p class="text-muted truncate text-xs leading-tight">
         {{ item.slug || "Bez slug vrednosti" }}
       </p>
     </div>
@@ -23,6 +23,7 @@ const { item } = defineProps<{
       v-if="item.unit"
       color="neutral"
       variant="subtle"
+      size="sm"
       class="shrink-0 text-xs"
     >
       {{ item.unit }}

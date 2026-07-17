@@ -28,7 +28,9 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
 <template>
   <UModal
     v-model:open="isOpen"
-    :ui="{ content: 'sm:max-w-4xl' }"
+    :ui="{
+      content: 'sm:max-w-4xl',
+    }"
     @after:leave="resetModalState"
   >
     <template #header>

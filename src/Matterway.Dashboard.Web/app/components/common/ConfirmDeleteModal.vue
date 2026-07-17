@@ -31,7 +31,12 @@ function close() {
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-lg' }">
+  <UModal
+    v-model:open="isOpen"
+    :ui="{
+      content: 'sm:max-w-lg',
+    }"
+  >
     <template #header>
       <div class="flex items-center gap-3">
         <div

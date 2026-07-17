@@ -92,7 +92,7 @@ function updatePageSize(value: number) {
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-3">
     <div class="shrink-0 space-y-3">
       <div v-if="filterInputType === 'input'">
         <UInput
@@ -139,19 +139,19 @@ function updatePageSize(value: number) {
       </div>
     </div>
 
-    <div class="min-h-0 flex-1 overflow-y-auto">
+    <div class="border-muted min-h-0 flex-1 overflow-y-auto border-y">
       <StatusMessages
-        v-if="error || loading || !items.length"
+        v-if="error || !items.length"
         :error="error"
         :loading="loading ? 'Učitavanje rezultata.' : false"
         :empty="!loading && !error && !items.length ? emptyMessage : false"
       />
-      <div v-else class="flex flex-col gap-2">
+      <div v-else class="flex flex-col">
         <EntitiesListItem
           v-for="item in items"
           :key="String(item[itemKey])"
           :selected="selectedId === String(item[itemKey])"
-          class="flex min-h-19 flex-col gap-2"
+          class="flex flex-col"
           @click="selectItem(item)"
         >
           <slot
@@ -163,7 +163,7 @@ function updatePageSize(value: number) {
       </div>
     </div>
 
-    <div class="border-default shrink-0 border-t pt-3">
+    <div class="shrink-0">
       <div class="flex justify-center">
         <UPagination
           :page="page"

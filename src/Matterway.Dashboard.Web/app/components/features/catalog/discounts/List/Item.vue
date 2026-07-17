@@ -18,12 +18,12 @@ function formatDateTime(value?: string | null) {
 </script>
 
 <template>
-  <div class="grid gap-2">
+  <div class="grid gap-1">
     <div class="flex items-start justify-between gap-2">
-      <p class="text-foreground text-base font-medium">
+      <p class="text-foreground text-sm font-medium">
         {{ item.code || "Nedostaje kod" }}
       </p>
-      <UBadge color="neutral" variant="subtle">
+      <UBadge color="neutral" variant="subtle" size="sm">
         {{ item.articleCodes.length }} artikala
       </UBadge>
     </div>

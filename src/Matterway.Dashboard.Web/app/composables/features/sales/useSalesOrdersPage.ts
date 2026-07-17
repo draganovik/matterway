@@ -11,7 +11,7 @@ export function useSalesOrdersPage() {
     auth.hasPermission("sales", ["operator", "manager"]),
   )
 
-  const listState = useRequestState("Nema porudžbina.")
+  const listState = useRequestState("Nema porudžbina.", true)
   const detailState = useRequestState()
 
   const orders = ref<OrderResponse[]>([])

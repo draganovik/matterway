@@ -5,9 +5,9 @@ export type RequestState = {
   empty: string
 }
 
-export function useRequestState(empty = "") {
+export function useRequestState(empty = "", loading = false) {
   return reactive<RequestState>({
-    loading: false,
+    loading,
     error: "",
     success: "",
     empty,

@@ -33,9 +33,9 @@ function isSelected(article: QueryArticleResponse) {
 </script>
 
 <template>
-  <div class="max-h-75 space-y-2 overflow-y-auto">
+  <div class="max-h-75 overflow-y-auto">
     <StatusMessages
-      v-if="props.error || props.loading || !props.items.length"
+      v-if="props.error || !props.items.length"
       :error="props.error"
       :loading="props.loading ? 'Učitavanje artikala.' : false"
       :empty="
@@ -44,7 +44,7 @@ function isSelected(article: QueryArticleResponse) {
           : false
       "
     />
-    <div v-else class="space-y-2">
+    <div v-else class="border-muted border-y">
       <EntitiesListItem
         v-for="(article, index) in props.items"
         :key="resolveId(article) || `article-${index}`"

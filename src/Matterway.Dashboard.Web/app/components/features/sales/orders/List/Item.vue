@@ -27,7 +27,12 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
       <p class="text-muted truncate text-xs">
         Kreirano: {{ formatDateTime(item.placedAt) }}
       </p>
-      <UBadge color="neutral" variant="subtle" class="w-fit font-normal">
+      <UBadge
+        color="neutral"
+        variant="subtle"
+        size="sm"
+        class="w-fit font-normal"
+      >
         {{ formatMoney(item.totalAmount) }}
       </UBadge>
     </div>
@@ -36,6 +41,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
       <UBadge
         :color="isPaymentBalanced ? 'success' : 'neutral'"
         variant="subtle"
+        size="sm"
         class="font-normal"
       >
         {{ isPaymentBalanced ? "Plaćeno" : "Nije plaćeno" }}
@@ -44,6 +50,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
         v-if="latestStatus"
         color="primary"
         variant="subtle"
+        size="sm"
         class="font-normal"
       >
         {{ formatOrderStatus(latestStatus.status) }}

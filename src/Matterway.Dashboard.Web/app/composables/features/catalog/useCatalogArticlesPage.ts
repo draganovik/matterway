@@ -16,7 +16,7 @@ export function useCatalogArticlesPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState("Nema artikala.")
+  const listState = useRequestState("Nema artikala.", true)
   const articles = ref<QueryArticleResponse[]>([])
   const filter = ref("")
   const {

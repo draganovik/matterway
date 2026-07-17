@@ -118,7 +118,7 @@ function updateImages(images: GetArticleResponse["images"]) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <StatusMessages v-if="error" :error="error" />
 
     <div v-else-if="!article" class="space-y-4">
@@ -141,7 +141,7 @@ function updateImages(images: GetArticleResponse["images"]) {
       />
     </div>
 
-    <div v-else class="grid gap-5">
+    <div v-else class="grid gap-4">
       <section>
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>

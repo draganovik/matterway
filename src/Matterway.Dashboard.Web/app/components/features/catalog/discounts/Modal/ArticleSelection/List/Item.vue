@@ -16,10 +16,10 @@ const { item, selected = false } = defineProps<{
 <template>
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
-      <p class="text-foreground truncate text-base font-medium">
+      <p class="text-foreground truncate text-sm font-medium">
         {{ item.title || "Artikal bez naziva" }}
       </p>
-      <p class="text-muted truncate text-sm">
+      <p class="text-muted truncate text-xs">
         {{ item.code || "Bez šifre" }}
       </p>
     </div>
@@ -27,14 +27,19 @@ const { item, selected = false } = defineProps<{
     <UBadge
       :color="selected ? 'primary' : 'neutral'"
       variant="subtle"
+      size="sm"
       class="shrink-0"
     >
       {{ selected ? "Izabrano" : "Izaberi" }}
     </UBadge>
   </div>
 
-  <div class="text-muted mt-2 flex items-center justify-between text-sm">
-    <UBadge :color="item.isAvailable ? 'success' : 'neutral'" variant="soft">
+  <div class="text-muted mt-1 flex items-center justify-between text-xs">
+    <UBadge
+      :color="item.isAvailable ? 'success' : 'neutral'"
+      variant="soft"
+      size="sm"
+    >
       {{ item.isAvailable ? "Dostupan" : "Nije dostupan" }}
     </UBadge>
     <span>Cena: {{ formatMoney(item.price ?? item.basePrice ?? null) }}</span>

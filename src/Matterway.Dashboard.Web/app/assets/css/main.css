@@ -29,7 +29,8 @@
 }
 
 :root {
-  /* Base surfaces: neutral gray foundation, brighter elevated layers */
+  --ui-radius: 0.375rem;
+
   --ui-bg: var(--color-stone-100);
   --ui-bg-muted: var(--color-stone-200);
   --ui-bg-elevated: var(--color-stone-50);
@@ -67,39 +68,4 @@
   --ui-text: var(--color-stone-200);
   --ui-text-highlighted: var(--color-stone-50);
   --ui-text-inverted: var(--color-stone-950);
-}
-
-.dashboard-panel-surface {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border: 1px solid var(--ui-border);
-  background:
-    linear-gradient(
-      145deg,
-      rgb(245 93 62 / 0.028) 0%,
-      rgb(245 93 62 / 0.012) 24%,
-      rgb(245 93 62 / 0.004) 52%,
-      transparent 100%
-    ),
-    color-mix(in srgb, var(--ui-bg) 80%, transparent);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
-}
-
-.dashboard-panel-surface > * {
-  position: relative;
-  z-index: 1;
-}
-
-.dark .dashboard-panel-surface {
-  background:
-    linear-gradient(
-      145deg,
-      rgb(245 93 62 / 0.04) 0%,
-      rgb(245 93 62 / 0.018) 24%,
-      rgb(245 93 62 / 0.006) 52%,
-      transparent 100%
-    ),
-    color-mix(in srgb, var(--ui-bg-elevated) 24%, var(--ui-bg) 76%);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
 }

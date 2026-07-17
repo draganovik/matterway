@@ -19,14 +19,14 @@ const { sections } = useDashboardOverviewPage()
     </template>
 
     <template #body>
-      <div class="space-y-5">
-        <div class="grid gap-5 xl:grid-cols-3">
+      <div class="space-y-4">
+        <div class="grid gap-4 xl:grid-cols-3">
           <article
             v-for="section in sections"
             :key="section.key"
-            class="dashboard-panel-surface rounded-lg p-5"
+            class="border-default bg-elevated rounded-lg border p-4 shadow-sm"
           >
-            <div class="space-y-5">
+            <div class="space-y-4">
               <div class="flex items-start justify-between gap-4">
                 <div class="flex items-center gap-3">
                   <span
@@ -69,11 +69,7 @@ const { sections } = useDashboardOverviewPage()
           </article>
         </div>
 
-        <UCard
-          v-if="!sections.length"
-          class="dashboard-panel-surface !border-default rounded-lg !border !shadow-sm !ring-0"
-          :ui="{ body: 'p-5 sm:p-5' }"
-        >
+        <UCard v-if="!sections.length" class="!bg-elevated">
           <div class="space-y-2">
             <p class="text-foreground text-lg font-semibold">
               Nema dostupnih sekcija

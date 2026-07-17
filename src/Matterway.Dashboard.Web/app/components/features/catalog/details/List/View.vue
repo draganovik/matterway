@@ -40,7 +40,6 @@ const emit = defineEmits<{
 
 <template>
   <EntitiesListPanel
-    class="details-list-panel"
     :items="items"
     item-key="slug"
     :selected-id="selectedId"
@@ -65,11 +64,3 @@ const emit = defineEmits<{
     </template>
   </EntitiesListPanel>
 </template>
-
-<style scoped>
-.details-list-panel :deep(button.min-h-19) {
-  min-height: 3.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-</style>

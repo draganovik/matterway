@@ -19,7 +19,7 @@ export function useCatalogDetailsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState("Nema definicija detalja.")
+  const listState = useRequestState("Nema definicija detalja.", true)
   const saveState = useRequestState()
   const removeState = useRequestState()
   const deleteConfirmOpen = ref(false)

@@ -16,8 +16,8 @@ const displayEmail = computed(() => item.email?.trim() || "Bez imejla")
 
 <template>
   <div class="flex items-start justify-between gap-3">
-    <div class="min-w-0 space-y-1">
-      <p class="text-foreground truncate text-base font-medium">
+    <div class="min-w-0 space-y-0.5">
+      <p class="text-foreground truncate text-sm font-medium">
         {{ displayEmail }}
       </p>
       <p class="text-muted truncate font-mono text-xs">
@@ -31,6 +31,7 @@ const displayEmail = computed(() => item.email?.trim() || "Bez imejla")
     <UBadge
       color="neutral"
       variant="subtle"
+      size="sm"
       class="shrink-0 font-normal whitespace-nowrap"
     >
       {{ formatIdentityRole(item.role) }}

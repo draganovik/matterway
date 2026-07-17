@@ -23,7 +23,7 @@ export function useUsersCustomersPage() {
   )
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState("Nema kupaca.")
+  const listState = useRequestState("Nema kupaca.", true)
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()

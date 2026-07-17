@@ -32,7 +32,9 @@ const quantitySum = computed(() => quantitySumOf(order.value))
 <template>
   <UModal
     v-model:open="isOpen"
-    :ui="{ content: 'sm:max-w-4xl' }"
+    :ui="{
+      content: 'sm:max-w-4xl',
+    }"
     @after:leave="resetModalState"
   >
     <template #header>

@@ -21,49 +21,56 @@ const {
 <template>
   <UDashboardPanel
     id="catalog-archive"
-    :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
+    :ui="{
+      body: 'min-h-0 overflow-hidden py-3',
+    }"
   >
     <template #header>
       <UDashboardNavbar title="Arhiva kataloga">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #trailing>
+          <PageInfoTooltip
+            text="Otpremite prethodno izvezenu ZIP arhivu da zamenite trenutne podatke kataloga i slike."
+          />
+        </template>
+
+        <template #right>
+          <UButton
+            color="primary"
+            icon="i-lucide-download"
+            :loading="exportState.loading"
+            :disabled="!canOperate"
+            @click="exportArchive"
+          >
+            {{ exportState.loading ? "Priprema arhive" : "Preuzmi arhivu" }}
+          </UButton>
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="h-full min-h-0">
-        <div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto">
-          <div>
-            <h2 class="text-foreground text-base font-semibold">
-              Arhiva kataloga
-            </h2>
-            <p class="text-muted text-sm">
-              Izvezite ili uvezite podatke kataloga i slike artikala kao ZIP
-              arhivu.
-            </p>
-          </div>
+      <div class="h-full min-h-0 overflow-y-auto">
+        <div class="w-full max-w-3xl space-y-4">
+          <StatusMessages
+            v-if="exportState.error || exportState.success"
+            :error="exportState.error"
+            :success="exportState.success"
+          />
 
-          <div class="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-            <CatalogArchiveExportPanel
-              :can-operate="canOperate"
-              :loading="exportState.loading"
-              :error="exportState.error"
-              @download="exportArchive"
-            />
-
-            <CatalogArchiveImportPanel
-              :can-operate="canOperate"
-              :loading="importState.loading"
-              :error="importState.error"
-              :success="importState.success"
-              :has-selected-file="hasSelectedImportFile"
-              :selected-file-name="selectedImportFileName"
-              @select-file="setImportFile"
-              @upload="importArchive"
-              @clear="clearImportFileSelection"
-            />
-          </div>
+          <CatalogArchiveImportPanel
+            :can-operate="canOperate"
+            :loading="importState.loading"
+            :error="importState.error"
+            :success="importState.success"
+            :has-selected-file="hasSelectedImportFile"
+            :selected-file-name="selectedImportFileName"
+            @select-file="setImportFile"
+            @upload="importArchive"
+            @clear="clearImportFileSelection"
+          />
         </div>
       </div>
     </template>

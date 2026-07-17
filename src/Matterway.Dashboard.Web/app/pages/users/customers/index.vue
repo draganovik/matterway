@@ -37,81 +37,75 @@ const {
 <template>
   <UDashboardPanel
     id="users-customers"
-    :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
+    :ui="{
+      body: 'min-h-0 overflow-hidden py-3',
+    }"
   >
     <template #header>
       <UDashboardNavbar title="Kupci">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #trailing>
+          <PageInfoTooltip
+            text="Pregledajte profile kupaca, uređujte izabrane zapise i uklanjajte neispravne unose."
+          />
+        </template>
+
+        <template #right>
+          <UButton
+            color="primary"
+            :disabled="!canEdit"
+            @click="createModalOpen = true"
+          >
+            Novi kupac
+          </UButton>
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <div class="h-full min-h-0">
-        <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-          <div
-            class="flex shrink-0 flex-wrap items-center justify-between gap-3"
-          >
-            <div>
-              <h2 class="text-foreground text-base font-semibold">
-                Upravljanje kupcima
-              </h2>
-              <p class="text-muted text-sm">
-                Pregledajte profile kupaca, uređujte izabrane zapise i
-                uklanjajte neispravne unose.
-              </p>
-            </div>
+        <EntitiesSplitView
+          class="h-full min-h-0"
+          :detail-loading="detailState.loading"
+        >
+          <template #list>
+            <UsersCustomersListView
+              :items="customers"
+              :selected-id="selectedId"
+              :filter="filter"
+              :loading="listState.loading"
+              :error="listState.error"
+              :empty-message="listState.empty"
+              :page="pagination.page"
+              :page-size="pagination.pageSize"
+              :total-count="pagination.totalCount"
+              :total-pages="pagination.totalPages"
+              @update:filter="(value) => (filter = value)"
+              @search="searchCustomers"
+              @update:page="changePage"
+              @update:page-size="changePageSize"
+              @select="selectCustomer"
+            />
+          </template>
 
-            <UButton
-              color="primary"
-              :disabled="!canEdit"
-              @click="createModalOpen = true"
-            >
-              Novi kupac
-            </UButton>
-          </div>
-
-          <EntitiesSplitView
-            class="min-h-0 flex-1"
-            :detail-loading="detailState.loading"
-          >
-            <template #list>
-              <UsersCustomersListView
-                :items="customers"
-                :selected-id="selectedId"
-                :filter="filter"
-                :loading="listState.loading"
-                :error="listState.error"
-                :empty-message="listState.empty"
-                :page="pagination.page"
-                :page-size="pagination.pageSize"
-                :total-count="pagination.totalCount"
-                :total-pages="pagination.totalPages"
-                @update:filter="(value) => (filter = value)"
-                @search="searchCustomers"
-                @update:page="changePage"
-                @update:page-size="changePageSize"
-                @select="selectCustomer"
-              />
-            </template>
-
-            <template #detail>
-              <UsersCustomersInformationPanel
-                v-model="form"
-                :customer="selectedCustomer"
-                :error="detailState.error"
-                :can-edit="canEdit"
-                :save-loading="saveState.loading"
-                :save-error="saveState.error"
-                :save-success="saveState.success"
-                @save="saveCustomer"
-                @remove="requestRemoveCustomer"
-                @reveal-address="revealAddress"
-              />
-            </template>
-          </EntitiesSplitView>
-        </div>
+          <template #detail>
+            <UsersCustomersInformationPanel
+              v-model="form"
+              :customer="selectedCustomer"
+              :error="detailState.error"
+              :can-edit="canEdit"
+              :save-loading="saveState.loading"
+              :save-error="saveState.error"
+              :save-success="saveState.success"
+              @save="saveCustomer"
+              @remove="requestRemoveCustomer"
+              @reveal-address="revealAddress"
+            />
+          </template>
+        </EntitiesSplitView>
 
         <UsersCustomersModalInformationView
           v-model:open="createModalOpen"

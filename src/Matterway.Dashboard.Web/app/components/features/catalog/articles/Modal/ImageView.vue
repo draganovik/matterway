@@ -144,7 +144,7 @@ watch(isOpen, (open) => {
             :disabled="controlsDisabled"
             class="w-full"
             :ui="{
-              base: `border-default bg-elevated/40 w-full rounded-lg border border-dashed p-5 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
+              base: `border-default bg-elevated/40 w-full rounded-lg border border-dashed p-4 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
               wrapper: 'flex flex-col items-center gap-2',
               avatar: 'hidden',
               label: 'mt-0 text-sm font-medium',

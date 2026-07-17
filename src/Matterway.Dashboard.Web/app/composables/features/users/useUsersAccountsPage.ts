@@ -21,7 +21,7 @@ export function useUsersAccountsPage() {
   const canManage = computed(() => auth.hasPermission("identity", ["manager"]))
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState("Nema naloga.")
+  const listState = useRequestState("Nema naloga.", true)
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
