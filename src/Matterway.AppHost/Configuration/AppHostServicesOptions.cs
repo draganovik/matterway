@@ -5,6 +5,7 @@ namespace Matterway.AppHost.Configuration;
 internal sealed class AppHostServicesOptions
 {
     public required ServicePortOptions AspireDashboard { get; init; }
+    public required ServicePortOptions Scalar { get; init; }
     public required ServicePortOptions Postgres { get; init; }
     public required MinioPortOptions Minio { get; init; }
     public required ServicePortOptions Storefront { get; init; }
@@ -19,6 +20,7 @@ internal sealed class AppHostServicesOptions
         return new AppHostServicesOptions
         {
             AspireDashboard = BindPortOptions<ServicePortOptions>(servicesSection, "AspireDashboard"),
+            Scalar = BindPortOptions<ServicePortOptions>(servicesSection, "Scalar"),
             Postgres = BindPortOptions<ServicePortOptions>(servicesSection, "Postgres"),
             Minio = BindPortOptions<MinioPortOptions>(servicesSection, "Minio",
                 options =>

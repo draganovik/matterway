@@ -4,7 +4,11 @@ using Matterway.ServiceDefaults;
 using Microsoft.Extensions.Hosting;
 using Projects;
 
-var builder = DistributedApplication.CreateBuilder(args);
+var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions
+{
+    Args = args,
+    DashboardApplicationName = "Matterway Aspire"
+});
 const string composeEnvironmentName = "matterway-platform";
 var services = AppHostServicesOptions.Bind(builder.Configuration);
 
@@ -129,7 +133,7 @@ WithCommonWebEnvironment(
 #pragma warning restore ASPIREJAVASCRIPT001
 
 if (builder.Environment.IsDevelopment())
-    ScalarApiRegistration.AddApiReferences(builder, apiResources);
+    ScalarApiRegistration.AddApiReferences(builder, services.Scalar.Port, apiResources);
 
 foreach (var (_, api) in apiResources)
     api

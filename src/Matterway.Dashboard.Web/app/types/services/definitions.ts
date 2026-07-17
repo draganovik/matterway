@@ -23,6 +23,7 @@ export type FeatureDefinition = {
 export type ServiceSection = {
   key: string
   label: string
+  icon: string
   service: FeatureDefinition["service"]
   allowed: PermissionLevel[]
   features: FeatureDefinition[]

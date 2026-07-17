@@ -11,6 +11,7 @@ export const serviceSections: ServiceSection[] = [
   {
     key: "catalog",
     label: "Katalog",
+    icon: "i-lucide-package",
     service: "catalog",
     allowed: [...readAllowed],
     features: [
@@ -51,6 +52,7 @@ export const serviceSections: ServiceSection[] = [
   {
     key: "users",
     label: "Korisnici",
+    icon: "i-lucide-users",
     service: "customers",
     allowed: [...readAllowed],
     features: [
@@ -75,6 +77,7 @@ export const serviceSections: ServiceSection[] = [
   {
     key: "sales",
     label: "Prodaja",
+    icon: "i-lucide-receipt-text",
     service: "sales",
     allowed: [...readAllowed],
     features: [

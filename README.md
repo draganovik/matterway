@@ -138,7 +138,8 @@ aspire stop
 | PostgreSQL       | 15432 | Relational datastore                        |
 | MinIO API        | 19000 | Object storage API                          |
 | MinIO Console    | 19001 | Object storage administration               |
-| Aspire Dashboard | 18888 | Local orchestration and telemetry           |
+| Matterway Aspire | 18888 | Local orchestration and telemetry           |
+| Scalar           | 18889 | Unified API reference                       |
 
 ### Test Stripe Webhooks
 
