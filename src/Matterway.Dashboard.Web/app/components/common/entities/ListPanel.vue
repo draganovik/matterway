@@ -6,12 +6,8 @@ import {
 
 const props = withDefaults(
   defineProps<{
-    title: string
-    description?: string
     items: Array<Record<string, unknown>>
     itemKey?: string
-    itemTitleKey?: string
-    itemSubtitleKey?: string
     selectedId?: string | null
     filter?: string
     loading?: boolean
@@ -25,10 +21,7 @@ const props = withDefaults(
     totalPages?: number
   }>(),
   {
-    description: "",
     itemKey: "id",
-    itemTitleKey: "title",
-    itemSubtitleKey: "",
     selectedId: null,
     filter: "",
     loading: false,
@@ -165,17 +158,7 @@ function updatePageSize(value: number) {
             name="item"
             :item="item"
             :selected="selectedId === String(item[itemKey])"
-          >
-            <div class="text-foreground text-base font-medium">
-              {{ item[itemTitleKey] || "Bez naslova" }}
-            </div>
-            <div
-              v-if="itemSubtitleKey && item[itemSubtitleKey]"
-              class="text-muted text-sm"
-            >
-              {{ item[itemSubtitleKey] }}
-            </div>
-          </slot>
+          />
         </EntitiesListItem>
       </div>
     </div>

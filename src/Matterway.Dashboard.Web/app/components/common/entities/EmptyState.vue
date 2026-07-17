@@ -1,14 +1,8 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    title?: string
-    description?: string
-  }>(),
-  {
-    title: "Ništa nije izabrano",
-    description: "Izaberite stavku sa liste da biste započeli izmenu.",
-  },
-)
+defineProps<{
+  title: string
+  description: string
+}>()
 </script>
 
 <template>

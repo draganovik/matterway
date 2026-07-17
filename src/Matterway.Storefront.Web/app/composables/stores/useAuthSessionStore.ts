@@ -14,29 +14,12 @@ import type {
 const refreshCookieName = "mw_storefront_refresh"
 const authBasePath = buildServiceApiPath("identity", "public", "auth")
 const authJsonHeaders = {
-  "Content-Type": "application/json",
   accept: "application/json",
 } as const
 
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
   initPromise: Promise<void> | null
-}
-
-function translateAuthMessage(message: string) {
-  const normalized = message.trim()
-
-  if (!normalized) return normalized
-  if (normalized === "Email is required.") return "Imejl adresa je obavezna."
-  if (normalized === "Invalid email format.") {
-    return "Imejl adresa nije u ispravnom formatu."
-  }
-  if (normalized === "Password is required.") return "Lozinka je obavezna."
-  if (normalized === "One or more validation errors occurred.") {
-    return "Proverite unesene podatke."
-  }
-
-  return normalized
 }
 
 function extractAuthError(payload: unknown) {
@@ -52,21 +35,19 @@ function extractAuthError(payload: unknown) {
   if (candidate.errors && typeof candidate.errors === "object") {
     const entries = Object.entries(candidate.errors as Record<string, unknown>)
     const messages = entries
-      .flatMap(([field, value]) => {
+      .flatMap(([, value]) => {
         if (!Array.isArray(value)) return []
-        const label =
-          field === "Email" ? "Imejl" : field === "Password" ? "Lozinka" : field
         return value
           .filter(
             (item): item is string =>
               typeof item === "string" && item.trim().length > 0,
           )
-          .map((item) => `${label}: ${translateAuthMessage(item)}`)
+          .map((item) => item.trim())
       })
       .filter(Boolean)
 
     if (messages.length) {
-      return `${translateAuthMessage("One or more validation errors occurred.")} ${messages.join(" | ")}`
+      return messages.join(" | ")
     }
   }
 
@@ -76,7 +57,7 @@ function extractAuthError(payload: unknown) {
     (typeof candidate.message === "string" && candidate.message) ||
     ""
 
-  return directMessage ? translateAuthMessage(directMessage) : null
+  return directMessage.trim() || null
 }
 
 function useAuthRuntimeState() {
@@ -167,12 +148,12 @@ export function useAuthSessionStore() {
 
   function authFetch(
     path: "login" | "logout" | "refresh",
-    options: RequestInit,
+    options: Exclude<Parameters<typeof $fetch.raw>[1], undefined>,
   ) {
     return $fetch.raw(`${authBasePath}/${path}`, {
       ...options,
       ignoreResponseError: true,
-    } as Parameters<typeof $fetch.raw>[1])
+    })
   }
 
   function authJsonPost(
@@ -182,7 +163,7 @@ export function useAuthSessionStore() {
     return authFetch(path, {
       method: "POST",
       headers: authJsonHeaders,
-      body: JSON.stringify(body),
+      body,
     })
   }
 

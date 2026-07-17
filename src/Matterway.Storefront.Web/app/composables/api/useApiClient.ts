@@ -2,24 +2,10 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { buildServiceApiPathFromRequestPath } from "~/utils/apiProxy"
 import type { ApiResult, ApiService } from "~/types/common/api"
 
+type ApiRequestOptions = Exclude<Parameters<typeof $fetch.raw>[1], undefined>
+
 const serviceUnavailableMessage =
   "Usluga trenutno nije dostupna. Pokušajte ponovo kasnije."
-const fieldLabels: Record<string, string> = {
-  Email: "Imejl",
-  Password: "Lozinka",
-  FirstName: "Ime",
-  LastName: "Prezime",
-  BirthDate: "Datum rođenja",
-  Country: "Država",
-  City: "Grad",
-  ZipCode: "Poštanski broj",
-  AddressLine1: "Ulica i broj",
-  AddressLine2: "Stan, sprat ili dodatak",
-  ContactPhone: "Kontakt telefon",
-  Quantity: "Količina",
-  SystemUserId: "ID korisnika",
-  CustomerId: "ID kupca",
-}
 
 function getValidationErrors(
   payload: unknown,
@@ -34,47 +20,8 @@ function getValidationErrors(
 function formatValidationErrors(errors?: Record<string, string[]>) {
   if (!errors) return ""
   return Object.entries(errors)
-    .map(
-      ([field, messages]) =>
-        `${fieldLabels[field] || field}: ${messages
-          .map((message) => translateMessage(message))
-          .join(" ")}`,
-    )
+    .map(([field, messages]) => `${field}: ${messages.join(" ")}`)
     .join(" | ")
-}
-
-function translateMessage(message: string) {
-  const normalized = message.trim()
-
-  if (!normalized) return normalized
-  if (normalized === "One or more validation errors occurred.") {
-    return "Proverite unesene podatke."
-  }
-  if (normalized === "Registration failed") return "Registracija nije uspela."
-  if (normalized === "Could not create identity user.") {
-    return "Nalog trenutno nije moguće kreirati."
-  }
-  if (normalized === "Could not clean up the identity user.") {
-    return "Registracija trenutno nije uspela. Pokušajte ponovo."
-  }
-  if (normalized === "Could not create customer profile.") {
-    return "Profil kupca trenutno nije moguće kreirati."
-  }
-  if (normalized === "Bad Request") return "Neispravan zahtev."
-  if (normalized === "Cannot upsert address.") {
-    return "Adresu trenutno nije moguće sačuvati."
-  }
-  if (normalized === "Cannot update customer default address.") {
-    return "Podrazumevanu adresu nije moguće ažurirati."
-  }
-  if (normalized === "Unable to retrieve article.") {
-    return "Artikal trenutno nije moguće učitati."
-  }
-  if (normalized === "Article price is unavailable.") {
-    return "Cena artikla trenutno nije dostupna."
-  }
-
-  return normalized
 }
 
 function getErrorMessage(payload: unknown) {
@@ -112,8 +59,7 @@ export function useApiClient() {
   async function request<T>(
     service: ApiService,
     path: string,
-    options: RequestInit = {},
-    allowUnauthorized = false,
+    options: ApiRequestOptions = {},
   ): Promise<ApiResult<T>> {
     if (!auth.isInitialized.value) {
       await auth.initialize()
@@ -130,13 +76,6 @@ export function useApiClient() {
 
     const headers = new Headers(options.headers || {})
     if (!headers.has("Accept")) headers.set("Accept", "application/json")
-    if (
-      options.body !== undefined &&
-      !headers.has("Content-Type") &&
-      !(options.body instanceof FormData)
-    ) {
-      headers.set("Content-Type", "application/json")
-    }
 
     const accessToken = auth.getAccessToken()
     if (accessToken) headers.set("Authorization", accessToken)
@@ -146,7 +85,7 @@ export function useApiClient() {
         ...options,
         headers,
         ignoreResponseError: true,
-      } as Parameters<typeof $fetch.raw>[1])
+      })
 
     let response
     try {
@@ -159,7 +98,7 @@ export function useApiClient() {
       }
     }
 
-    if (response.status === 401 && !allowUnauthorized) {
+    if (response.status === 401 && !path.startsWith("public/")) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
       if (refreshedToken) {
@@ -187,9 +126,7 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const baseError = translateMessage(
-      getErrorMessage(payload) || "Zahtev nije uspeo.",
-    )
+    const baseError = getErrorMessage(payload) || "Zahtev nije uspeo."
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,
@@ -197,7 +134,6 @@ export function useApiClient() {
       error: validationMessage
         ? `${baseError} ${validationMessage}`
         : baseError,
-      validationErrors,
     }
   }
 

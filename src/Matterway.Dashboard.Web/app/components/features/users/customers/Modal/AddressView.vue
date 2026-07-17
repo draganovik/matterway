@@ -4,7 +4,6 @@ import type {
   CustomerAddressResponse,
   PutCustomerAddressRequest,
 } from "~/types/customers"
-import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 type AddressMode = "view" | "manage"
@@ -179,19 +178,16 @@ async function saveAddress() {
   mode.value = "view"
 }
 
-useModalCloseReset({
-  isOpen,
-  watchSources: [toRef(props, "customerId")],
-  onCloseReset: resetModalState,
-  onOpen: async () => {
-    mode.value = "view"
-    await loadAddress()
-  },
+watch([isOpen, toRef(props, "customerId")], ([open]) => {
+  if (!open) return
+
+  mode.value = "view"
+  void loadAddress()
 })
 </script>
 
 <template>
-  <UModal v-model:open="isOpen">
+  <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">

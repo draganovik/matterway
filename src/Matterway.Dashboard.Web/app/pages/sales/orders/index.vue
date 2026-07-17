@@ -3,8 +3,6 @@ import { useSalesOrdersPage } from "~/composables/features/sales/useSalesOrdersP
 
 definePageMeta({
   title: "Porudžbine",
-  service: "sales",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -67,8 +65,6 @@ const {
 
           <EntitiesSplitView
             class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
             :detail-loading="detailState.loading"
           >
             <template #list>

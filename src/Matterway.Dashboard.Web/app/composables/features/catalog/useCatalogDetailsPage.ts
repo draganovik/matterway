@@ -1,4 +1,3 @@
-import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -20,7 +19,7 @@ export function useCatalogDetailsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "Nema definicija detalja." })
+  const listState = useRequestState("Nema definicija detalja.")
   const saveState = useRequestState()
   const removeState = useRequestState()
   const deleteConfirmOpen = ref(false)
@@ -35,7 +34,7 @@ export function useCatalogDetailsPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
+  } = usePaginationState()
 
   const selectedSlug = ref<string | null>(null)
   const selectedDetail = ref<QueryDetailResponse | null>(null)

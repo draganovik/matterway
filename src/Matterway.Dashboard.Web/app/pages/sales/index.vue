@@ -3,8 +3,6 @@ import { serviceSections } from "~/data/serviceRegistry"
 
 definePageMeta({
   title: "Prodaja",
-  service: "sales",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const salesSection = serviceSections.find((section) => section.key === "sales")

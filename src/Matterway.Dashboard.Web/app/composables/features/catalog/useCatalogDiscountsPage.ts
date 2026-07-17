@@ -3,7 +3,6 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { normalizeCode } from "~/utils/normalization"
-import { parseNumberOr } from "~/utils/numbers"
 import type {
   QueryArticleResponse,
   QueryDiscountResponse,
@@ -33,7 +32,7 @@ export function useCatalogDiscountsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "Nema popusta." })
+  const listState = useRequestState("Nema popusta.")
   const submitState = useRequestState()
   const deleteState = useRequestState()
   const deleteConfirmOpen = ref(false)
@@ -213,10 +212,7 @@ export function useCatalogDiscountsPage() {
       if (result.status === 204 || !result.data) break
 
       articleRows.push(...(result.data.data || []))
-      const totalPages = Math.max(
-        1,
-        parseNumberOr(result.data.meta?.totalPages, 1),
-      )
+      const totalPages = Math.max(1, result.data.meta.totalPages)
       if (page >= totalPages) break
       page += 1
     }

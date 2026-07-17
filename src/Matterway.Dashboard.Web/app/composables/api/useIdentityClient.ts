@@ -24,7 +24,7 @@ export function useIdentityClient() {
       "admin/users/employee",
       {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -58,7 +58,7 @@ export function useIdentityClient() {
       `${ADMIN_SYSTEM_USERS_PATH}/${id}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -85,7 +85,7 @@ export function useIdentityClient() {
       `${ADMIN_SYSTEM_USERS_PATH}/${id}/perms`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }

@@ -3,8 +3,6 @@ import { useCatalogArchivePage } from "~/composables/features/catalog/useCatalog
 
 definePageMeta({
   title: "Arhiva kataloga",
-  service: "catalog",
-  permissions: ["operator", "manager"],
 })
 
 const {

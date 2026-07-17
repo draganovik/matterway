@@ -40,12 +40,8 @@ const emit = defineEmits<{
 
 <template>
   <EntitiesListPanel
-    title="Kupci"
-    description="Koristite paginaciju ili unesite tačan ID sistemskog korisnika da biste prikazali samo tog kupca."
     :items="items"
     item-key="systemUserId"
-    item-title-key="firstName"
-    item-subtitle-key="systemUserId"
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"

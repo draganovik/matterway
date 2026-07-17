@@ -32,7 +32,19 @@ const {
   changePageSize,
 } = useArticlesBrowsePage()
 
-const { targetRef: resultsSection, requestScrollReset } = useScrollReset(items)
+const resultsSection = ref<HTMLElement | null>(null)
+const scrollAfterLoad = ref(false)
+
+watch(
+  items,
+  () => {
+    if (!scrollAfterLoad.value) return
+
+    scrollAfterLoad.value = false
+    resultsSection.value?.scrollIntoView({ block: "start" })
+  },
+  { flush: "post" },
+)
 
 function handlePageChange(page: number) {
   if (page === pagination.page) return
@@ -43,7 +55,7 @@ function handlePageChange(page: number) {
     return
   }
 
-  requestScrollReset()
+  scrollAfterLoad.value = true
   goToPage(page)
 }
 </script>

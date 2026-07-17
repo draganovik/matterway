@@ -11,7 +11,6 @@ import type { PermissionLevel } from "~/types/services/definitions"
 const refreshCookieName = "mw_refresh"
 const authBasePath = buildServiceApiPath("identity", "public", "auth")
 const authJsonHeaders = {
-  "Content-Type": "application/json",
   accept: "application/json",
 } as const
 
@@ -109,12 +108,12 @@ export function useAuthSessionStore() {
 
   function authFetch(
     path: "login" | "logout" | "refresh",
-    options: RequestInit,
+    options: Exclude<Parameters<typeof $fetch.raw>[1], undefined>,
   ) {
     return $fetch.raw(`${authBasePath}/${path}`, {
       ...options,
       ignoreResponseError: true,
-    } as Parameters<typeof $fetch.raw>[1])
+    })
   }
 
   function authJsonPost(
@@ -124,7 +123,7 @@ export function useAuthSessionStore() {
     return authFetch(path, {
       method: "POST",
       headers: authJsonHeaders,
-      body: JSON.stringify(body),
+      body,
     })
   }
 

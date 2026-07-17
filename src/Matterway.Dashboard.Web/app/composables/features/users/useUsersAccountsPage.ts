@@ -1,4 +1,3 @@
-import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useIdentityClient } from "~/composables/api/useIdentityClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -22,7 +21,7 @@ export function useUsersAccountsPage() {
   const canManage = computed(() => auth.hasPermission("identity", ["manager"]))
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState({ empty: "Nema naloga." })
+  const listState = useRequestState("Nema naloga.")
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
@@ -40,7 +39,7 @@ export function useUsersAccountsPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
+  } = usePaginationState()
 
   const roleFilterOptions = [
     { label: "Svi", value: "all" as const },

@@ -16,16 +16,21 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
-const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
-  isOpen,
-  orderId: toRef(props, "orderId"),
-  orderLabel: toRef(props, "orderLabel"),
-  revealErrorMessage: "Učitavanje istorije statusa nije uspelo.",
-})
+const { order, notFound, loadState, displayLabel, resetModalState } =
+  useOrderRevealModal({
+    isOpen,
+    orderId: toRef(props, "orderId"),
+    orderLabel: toRef(props, "orderLabel"),
+    revealErrorMessage: "Učitavanje istorije statusa nije uspelo.",
+  })
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-3xl' }">
+  <UModal
+    v-model:open="isOpen"
+    :ui="{ content: 'sm:max-w-3xl' }"
+    @after:leave="resetModalState"
+  >
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">

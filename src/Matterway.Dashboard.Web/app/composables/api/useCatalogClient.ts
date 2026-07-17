@@ -113,7 +113,7 @@ export function useCatalogClient() {
   async function createArticle(payload: CreateArticleRequest) {
     return api.request<CreateArticleResponse>("catalog", ADMIN_ARTICLES_PATH, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -123,7 +123,7 @@ export function useCatalogClient() {
       `${ADMIN_ARTICLES_PATH}/${code}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -179,7 +179,7 @@ export function useCatalogClient() {
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
 
@@ -224,7 +224,7 @@ export function useCatalogClient() {
   ) {
     return api.request("catalog", `${ADMIN_ARTICLES_PATH}/${code}/details`, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -238,7 +238,7 @@ export function useCatalogClient() {
       `${ADMIN_ARTICLES_PATH}/${code}/details/${detailSlug}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -271,7 +271,7 @@ export function useCatalogClient() {
       `${ADMIN_DETAILS_PATH}/${encodeURIComponent(slug)}`,
       {
         method: "PUT",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -292,10 +292,7 @@ export function useCatalogClient() {
       ADMIN_DISCOUNTS_PATH,
       {
         method: "POST",
-        body: JSON.stringify({
-          ...payload,
-          articleCodes: payload.articleCodes,
-        }),
+        body: payload,
       },
     )
   }
@@ -310,10 +307,7 @@ export function useCatalogClient() {
       `${ADMIN_DISCOUNTS_PATH}/${encodeURIComponent(code)}`,
       {
         method: "PUT",
-        body: JSON.stringify({
-          ...payload,
-          articleCodes: payload.articleCodes,
-        }),
+        body: payload,
       },
     )
   }

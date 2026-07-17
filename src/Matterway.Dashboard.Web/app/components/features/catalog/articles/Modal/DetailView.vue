@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
-import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import type {
   ArticleDetailProperty,
   QueryDetailResponse,
@@ -209,16 +208,13 @@ function submit() {
   })
 }
 
-useModalCloseReset({
-  isOpen,
-  onCloseReset: resetModalState,
-  onOpen: initializeModal,
-  delayMs: 300,
+watch(isOpen, (open) => {
+  if (open) void initializeModal()
 })
 </script>
 
 <template>
-  <UModal v-model:open="isOpen">
+  <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">

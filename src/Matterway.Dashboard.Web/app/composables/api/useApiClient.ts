@@ -2,6 +2,8 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { buildServiceApiPathFromRequestPath } from "~/utils/apiProxy"
 import type { ApiResult, ApiService } from "~/types/common/api"
 
+type ApiRequestOptions = Exclude<Parameters<typeof $fetch.raw>[1], undefined>
+
 function getValidationErrors(
   payload: unknown,
 ): Record<string, string[]> | undefined {
@@ -56,8 +58,7 @@ export function useApiClient() {
   async function request<T>(
     service: ApiService,
     path: string,
-    options: RequestInit = {},
-    allowUnauthorized = false,
+    options: ApiRequestOptions = {},
   ): Promise<ApiResult<T>> {
     if (!auth.isInitialized.value) {
       await auth.initialize()
@@ -74,13 +75,6 @@ export function useApiClient() {
     }
     const headers = new Headers(options.headers || {})
     if (!headers.has("Accept")) headers.set("Accept", "application/json")
-    if (
-      options.body !== undefined &&
-      !headers.has("Content-Type") &&
-      !(options.body instanceof FormData)
-    ) {
-      headers.set("Content-Type", "application/json")
-    }
 
     const accessToken = auth.getAccessToken()
     if (accessToken) headers.set("Authorization", accessToken)
@@ -90,7 +84,7 @@ export function useApiClient() {
         ...options,
         headers,
         ignoreResponseError: true,
-      } as Parameters<typeof $fetch.raw>[1])
+      })
 
     let response
     try {
@@ -103,7 +97,7 @@ export function useApiClient() {
       }
     }
 
-    if (response.status === 401 && !allowUnauthorized) {
+    if (response.status === 401 && !path.startsWith("public/")) {
       await auth.refreshTokens()
       const refreshedToken = auth.getAccessToken()
       if (refreshedToken) {
@@ -139,7 +133,6 @@ export function useApiClient() {
       error: validationMessage
         ? `${baseError} ${validationMessage}`
         : baseError,
-      validationErrors,
     }
   }
 

@@ -6,7 +6,6 @@ import {
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import type { QueryArticleResponse } from "~/types/catalog"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
-import { parseNumberOr } from "~/utils/numbers"
 
 const props = withDefaults(
   defineProps<{
@@ -32,7 +31,7 @@ const isOpen = computed({
 })
 
 const api = useCatalogClient()
-const listState = useRequestState({ empty: "Nema artikala." })
+const listState = useRequestState("Nema artikala.")
 
 const articles = ref<QueryArticleResponse[]>([])
 const filter = ref("")
@@ -108,22 +107,10 @@ async function loadArticles() {
   }
 
   articles.value = result.data.data || []
-  pagination.totalCount = parseNumberOr(
-    result.data.meta?.totalCount,
-    articles.value.length,
-  )
-  pagination.totalPages = Math.max(
-    1,
-    parseNumberOr(result.data.meta?.totalPages, 1),
-  )
-  pagination.page = Math.max(
-    1,
-    parseNumberOr(result.data.meta?.currentPage, pagination.page),
-  )
-  pagination.pageSize = Math.max(
-    1,
-    parseNumberOr(result.data.meta?.pageSize, pagination.pageSize),
-  )
+  pagination.totalCount = result.data.meta.totalCount
+  pagination.totalPages = Math.max(1, result.data.meta.totalPages)
+  pagination.page = Math.max(1, result.data.meta.currentPage)
+  pagination.pageSize = Math.max(1, result.data.meta.pageSize)
 }
 
 function searchArticles() {

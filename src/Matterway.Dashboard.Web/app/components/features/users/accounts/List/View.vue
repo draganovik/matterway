@@ -51,12 +51,8 @@ function updateRoleFilter(value: string | number | null | undefined) {
 
 <template>
   <EntitiesListPanel
-    title="Nalozi"
-    description="Filtrirajte po ulozi, koristite paginaciju ili unesite tačan ID naloga da biste prikazali samo taj nalog."
     :items="items"
     item-key="id"
-    item-title-key="email"
-    item-subtitle-key="id"
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"

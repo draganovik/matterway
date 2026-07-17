@@ -1,10 +1,8 @@
-type PaginationNumber = number | string
-
 export type PaginationMeta = {
-  totalCount?: PaginationNumber
-  totalPages?: PaginationNumber
-  currentPage?: PaginationNumber
-  pageSize?: PaginationNumber
+  totalCount: number
+  totalPages: number
+  currentPage: number
+  pageSize: number
 }
 
 export type PaginationResponse<T> = {

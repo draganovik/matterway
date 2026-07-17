@@ -26,15 +26,10 @@ export function useCustomersClient() {
   }
 
   async function registerCustomer(payload: RegisterPayload) {
-    return api.request(
-      "customers",
-      "public/register",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      },
-      true,
-    )
+    return api.request("customers", "public/register", {
+      method: "POST",
+      body: payload,
+    })
   }
 
   async function getSelfAddress() {
@@ -46,7 +41,7 @@ export function useCustomersClient() {
   async function putSelfAddress(payload: PutSelfAddressRequest) {
     return api.request<CustomerAddressResponse>("customers", "self/address", {
       method: "PUT",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -59,7 +54,7 @@ export function useCustomersClient() {
   async function updateSelfProfile(payload: SelfProfileUpdateRequest) {
     return api.request<SelfProfileResponse>("customers", "self/profile", {
       method: "PATCH",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -88,7 +83,7 @@ export function useCustomersClient() {
       `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
       {
         method: "PUT",
-        body: JSON.stringify({ quantity }),
+        body: { quantity },
       },
     )
   }

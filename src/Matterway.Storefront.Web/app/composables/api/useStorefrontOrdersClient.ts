@@ -108,13 +108,12 @@ export function useStorefrontOrdersClient() {
       await auth.initialize()
     }
 
-    const requestBody = JSON.stringify(buildCreateOrderPayload(payload))
+    const requestBody = buildCreateOrderPayload(payload)
 
     const runFetch = (authorization: string) =>
       $fetch.raw<CheckoutOrderApiResponse>("/api/storefront/checkout", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: authorization,
         },
         body: requestBody,

@@ -3,8 +3,6 @@ import { useCatalogDetailsPage } from "~/composables/features/catalog/useCatalog
 
 definePageMeta({
   title: "Detalji",
-  service: "catalog",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -67,11 +65,7 @@ const {
             </UButton>
           </div>
 
-          <EntitiesSplitView
-            class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
-          >
+          <EntitiesSplitView class="min-h-0 flex-1">
             <template #list>
               <CatalogDetailsListView
                 :items="details"

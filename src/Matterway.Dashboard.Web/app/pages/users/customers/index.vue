@@ -3,8 +3,6 @@ import { useUsersCustomersPage } from "~/composables/features/users/useUsersCust
 
 definePageMeta({
   title: "Kupci",
-  service: "customers",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -76,8 +74,6 @@ const {
 
           <EntitiesSplitView
             class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
             :detail-loading="detailState.loading"
           >
             <template #list>

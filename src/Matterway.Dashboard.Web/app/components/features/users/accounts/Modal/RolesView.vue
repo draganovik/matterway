@@ -5,7 +5,6 @@ import type {
   SystemUserPermResponse,
 } from "~/types/identity"
 import type { ServiceSection } from "~/types/services/definitions"
-import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { permissionServices } from "~/data/serviceRegistry"
 import { formatPermissionLevel, formatServiceName } from "~/utils/labels"
@@ -236,18 +235,13 @@ async function resetPermission(permission: SystemUserPermResponse) {
   resetState.success = "Dozvola je vraćena na nivo pregleda."
 }
 
-useModalCloseReset({
-  isOpen,
-  watchSources: [toRef(props, "systemUserId")],
-  onCloseReset: resetModalState,
-  onOpen: async () => {
-    await loadPermissions()
-  },
+watch([isOpen, toRef(props, "systemUserId")], ([open]) => {
+  if (open) void loadPermissions()
 })
 </script>
 
 <template>
-  <UModal v-model:open="isOpen">
+  <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">Dozvole naloga</h3>

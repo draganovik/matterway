@@ -1,16 +1,7 @@
 <script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    listClass?: string
-    detailClass?: string
-    detailLoading?: boolean
-  }>(),
-  {
-    listClass: "",
-    detailClass: "",
-    detailLoading: false,
-  },
-)
+const props = withDefaults(defineProps<{ detailLoading?: boolean }>(), {
+  detailLoading: false,
+})
 </script>
 
 <template>
@@ -18,8 +9,7 @@ const props = withDefaults(
     class="grid h-full min-h-0 gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]"
   >
     <section
-      class="dashboard-panel-surface flex min-h-0 flex-col gap-5 rounded-2xl p-5"
-      :class="props.listClass"
+      class="dashboard-panel-surface flex min-h-0 flex-col gap-5 overflow-hidden rounded-2xl p-5"
     >
       <slot name="list" />
     </section>
@@ -29,11 +19,8 @@ const props = withDefaults(
       :style="props.detailLoading ? { overflow: 'hidden' } : undefined"
     >
       <div
-        class="relative min-h-0 flex-1"
-        :class="[
-          props.detailClass,
-          props.detailLoading ? 'pointer-events-none select-none' : '',
-        ]"
+        class="relative min-h-0 flex-1 overflow-y-auto"
+        :class="props.detailLoading ? 'pointer-events-none select-none' : ''"
         :aria-busy="props.detailLoading"
       >
         <slot name="detail" />

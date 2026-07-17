@@ -3,8 +3,6 @@ import { useCatalogArticlesPage } from "~/composables/features/catalog/useCatalo
 
 definePageMeta({
   title: "Artikli",
-  service: "catalog",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -70,8 +68,6 @@ const {
 
           <EntitiesSplitView
             class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
             :detail-loading="articleState.loading"
           >
             <template #list>

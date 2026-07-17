@@ -1,4 +1,3 @@
-import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCustomersClient } from "~/composables/api/useCustomersClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -24,7 +23,7 @@ export function useUsersCustomersPage() {
   )
   const isLookupMode = computed(() => Boolean(filter.value.trim()))
 
-  const listState = useRequestState({ empty: "Nema kupaca." })
+  const listState = useRequestState("Nema kupaca.")
   const detailState = useRequestState()
   const saveState = useRequestState()
   const removeState = useRequestState()
@@ -41,7 +40,7 @@ export function useUsersCustomersPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
+  } = usePaginationState()
 
   const selectedId = ref<string | null>(null)
   const selectedCustomer = ref<CustomerResponse | null>(null)

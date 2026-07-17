@@ -44,12 +44,8 @@ function asOrderItem(item: Record<string, unknown>) {
 
 <template>
   <EntitiesListPanel
-    title="Porudžbine"
-    description="Koristite paginaciju i po želji filtrirajte po tačnom ID-ju kupca."
     :items="items"
     item-key="id"
-    item-title-key="id"
-    item-subtitle-key="customerId"
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"

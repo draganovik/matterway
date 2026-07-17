@@ -2,8 +2,9 @@ import { useApiClient } from "~/composables/api/useApiClient"
 import {
   mapCatalogArticleDetail,
   mapCatalogArticleListItem,
-  mapCatalogDetailDefinition,
   type CatalogArticle,
+  type CatalogArticleDetailResponse,
+  type CatalogArticleListResponse,
   type CatalogDetailDefinition,
 } from "~/types/catalog"
 import type { PaginatedPayload, PaginationMeta } from "~/types/common/api"
@@ -31,8 +32,8 @@ export function useCatalogClient() {
     }
 
     const response = await api.request<
-      PaginatedPayload<Record<string, unknown>>
-    >("catalog", `public/articles?${query.toString()}`, { method: "GET" }, true)
+      PaginatedPayload<CatalogArticleListResponse>
+    >("catalog", `public/articles?${query.toString()}`, { method: "GET" })
 
     if (!response.ok) {
       return { items: [], meta: null, error: response.error }
@@ -53,11 +54,10 @@ export function useCatalogClient() {
     item: CatalogArticle | null
     error?: string
   }> {
-    const response = await api.request<Record<string, unknown>>(
+    const response = await api.request<CatalogArticleDetailResponse>(
       "catalog",
       `public/articles/${encodeURIComponent(code)}`,
       { method: "GET" },
-      true,
     )
 
     if (!response.ok) {
@@ -84,13 +84,8 @@ export function useCatalogClient() {
       })
 
       const response = await api.request<
-        PaginatedPayload<Record<string, unknown>>
-      >(
-        "catalog",
-        `public/details?${query.toString()}`,
-        { method: "GET" },
-        true,
-      )
+        PaginatedPayload<CatalogDetailDefinition>
+      >("catalog", `public/details?${query.toString()}`, { method: "GET" })
 
       if (!response.ok) {
         return { items: [], error: response.error }
@@ -100,11 +95,7 @@ export function useCatalogClient() {
         return { items }
       }
 
-      items.push(
-        ...(response.data.data ?? []).map((item) =>
-          mapCatalogDetailDefinition(item),
-        ),
-      )
+      items.push(...(response.data.data ?? []))
 
       const totalPages = Math.max(
         1,

@@ -5,12 +5,11 @@ export type RequestState = {
   empty: string
 }
 
-export function useRequestState(initial?: Partial<RequestState>) {
+export function useRequestState(empty = "") {
   return reactive<RequestState>({
     loading: false,
     error: "",
     success: "",
-    empty: "",
-    ...initial,
+    empty,
   })
 }

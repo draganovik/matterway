@@ -5,5 +5,4 @@ export type ApiResult<T> = {
   status: number
   data?: T
   error?: string
-  validationErrors?: Record<string, string[]>
 }

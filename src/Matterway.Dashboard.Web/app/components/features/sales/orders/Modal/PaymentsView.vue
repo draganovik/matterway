@@ -17,12 +17,13 @@ const props = withDefaults(
 
 const isOpen = defineModel<boolean>("open", { required: true })
 
-const { order, notFound, loadState, displayLabel } = useOrderRevealModal({
-  isOpen,
-  orderId: toRef(props, "orderId"),
-  orderLabel: toRef(props, "orderLabel"),
-  revealErrorMessage: "Učitavanje uplata nije uspelo.",
-})
+const { order, notFound, loadState, displayLabel, resetModalState } =
+  useOrderRevealModal({
+    isOpen,
+    orderId: toRef(props, "orderId"),
+    orderLabel: toRef(props, "orderLabel"),
+    revealErrorMessage: "Učitavanje uplata nije uspelo.",
+  })
 
 const paymentSum = computed(() => paymentSumOf(order.value))
 
@@ -30,7 +31,11 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-4xl' }">
+  <UModal
+    v-model:open="isOpen"
+    :ui="{ content: 'sm:max-w-4xl' }"
+    @after:leave="resetModalState"
+  >
     <template #header>
       <div class="space-y-1">
         <h3 class="text-foreground text-base font-semibold">Uplate</h3>

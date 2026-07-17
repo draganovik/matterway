@@ -41,12 +41,8 @@ const emit = defineEmits<{
 <template>
   <EntitiesListPanel
     class="details-list-panel"
-    title="Definicije detalja"
-    description="Pretražite po nazivu i izaberite stavku za izmenu ili brisanje."
     :items="items"
     item-key="slug"
-    item-title-key="title"
-    item-subtitle-key="slug"
     :selected-id="selectedId"
     :filter="filter"
     filter-input-type="input"
