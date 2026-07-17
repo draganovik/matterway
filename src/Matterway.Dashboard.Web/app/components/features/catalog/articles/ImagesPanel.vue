@@ -197,7 +197,7 @@ async function handleImageSubmit(payload: {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-foreground text-base font-semibold">Slike</h3>
+      <h3 class="text-highlighted text-base font-semibold">Slike</h3>
       <UButton
         color="primary"
         variant="outline"
@@ -210,7 +210,7 @@ async function handleImageSubmit(payload: {
 
     <div
       v-if="!code"
-      class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
+      class="border-default bg-default text-muted rounded-md border px-4 py-4 text-sm"
     >
       Najpre sačuvajte artikal da biste dodali slike.
     </div>

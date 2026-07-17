@@ -97,7 +97,7 @@ async function createStatus() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Novi status</h3>
+        <h3 class="text-highlighted text-base font-semibold">Novi status</h3>
         <p class="text-muted text-sm">
           Dodajte novu promenu statusa za porudžbinu {{ displayLabel }}.
         </p>

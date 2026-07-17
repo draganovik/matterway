@@ -1,8 +1,4 @@
 <script setup lang="ts">
-const colorMode = useColorMode()
-const color = computed(() =>
-  colorMode.value === "dark" ? "#0c0a09" : "#f5f5f4",
-)
 const route = useRoute()
 const appTitle = "Matterway Prodavnica"
 const pageTitle = computed(() => {
@@ -17,7 +13,18 @@ useHead({
   meta: [
     { charset: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { key: "theme-color", name: "theme-color", content: color },
+    {
+      key: "theme-color-light",
+      name: "theme-color",
+      content: "#f5f5f4",
+      media: "(prefers-color-scheme: light)",
+    },
+    {
+      key: "theme-color-dark",
+      name: "theme-color",
+      content: "#0c0a09",
+      media: "(prefers-color-scheme: dark)",
+    },
   ],
   link: [{ rel: "icon", href: "/favicon.svg" }],
   htmlAttrs: {
@@ -28,7 +35,7 @@ useHead({
 
 <template>
   <UApp>
-    <NuxtLoadingIndicator color="var(--ui-primary)" />
+    <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

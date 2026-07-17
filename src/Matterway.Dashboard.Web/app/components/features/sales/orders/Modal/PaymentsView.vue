@@ -40,7 +40,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
   >
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Uplate</h3>
+        <h3 class="text-highlighted text-base font-semibold">Uplate</h3>
         <p class="text-muted text-sm">
           Pregled uplata za porudžbinu {{ displayLabel }}.
         </p>
@@ -63,7 +63,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 
         <template v-else-if="order">
           <div class="space-y-2">
-            <h4 class="text-foreground text-sm font-semibold">Usklađenost</h4>
+            <h4 class="text-highlighted text-sm font-semibold">Usklađenost</h4>
 
             <div class="border-default/70 rounded-md border px-3 py-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
@@ -71,7 +71,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                   <p class="text-muted text-xs">
                     Iznos porudžbine i zbir uplata
                   </p>
-                  <p class="text-foreground font-medium">
+                  <p class="text-highlighted font-medium">
                     {{ formatMoney(order.totalAmount) }} naspram
                     {{ formatMoney(paymentSum) }}
                   </p>
@@ -92,7 +92,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 
           <div class="space-y-2">
             <div class="flex items-center justify-between gap-3">
-              <h4 class="text-foreground text-sm font-semibold">
+              <h4 class="text-highlighted text-sm font-semibold">
                 Registrovane uplate
               </h4>
               <UBadge color="neutral" variant="subtle" class="font-normal">
@@ -102,7 +102,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 
             <div
               v-if="!order.payments?.length"
-              class="border-default/70 bg-background text-muted rounded-md border px-3 py-3 text-sm"
+              class="border-default/70 bg-default text-muted rounded-md border px-3 py-3 text-sm"
             >
               Za ovu porudžbinu nema registrovanih uplata.
             </div>
@@ -117,7 +117,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
                   <div>
                     <dt class="text-muted text-xs">ID</dt>
                     <dd
-                      class="text-foreground mt-1 font-mono text-sm break-all"
+                      class="text-highlighted mt-1 font-mono text-sm break-all"
                     >
                       {{ payment.id }}
                     </dd>
@@ -125,28 +125,28 @@ const isPaymentBalanced = computed(() => paymentsBalanced(order.value))
 
                   <div>
                     <dt class="text-muted text-xs">Status</dt>
-                    <dd class="text-foreground mt-1 text-sm">
+                    <dd class="text-highlighted mt-1 text-sm">
                       {{ formatPaymentStatus(payment.status) }}
                     </dd>
                   </div>
 
                   <div>
                     <dt class="text-muted text-xs">Provajder</dt>
-                    <dd class="text-foreground mt-1 text-sm">
+                    <dd class="text-highlighted mt-1 text-sm">
                       {{ payment.provider || "-" }}
                     </dd>
                   </div>
 
                   <div>
                     <dt class="text-muted text-xs">Iznos</dt>
-                    <dd class="text-foreground mt-1 text-sm font-medium">
+                    <dd class="text-highlighted mt-1 text-sm font-medium">
                       {{ formatMoney(payment.amount) }}
                     </dd>
                   </div>
 
                   <div>
                     <dt class="text-muted text-xs">Kreirano</dt>
-                    <dd class="text-foreground mt-1 text-sm">
+                    <dd class="text-highlighted mt-1 text-sm">
                       {{ formatDateTime(payment.createdAt) }}
                     </dd>
                   </div>

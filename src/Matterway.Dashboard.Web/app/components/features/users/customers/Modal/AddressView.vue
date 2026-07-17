@@ -190,7 +190,7 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
   <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           {{ mode === "manage" ? "Uređivanje adrese" : "Adresa kupca" }}
         </h3>
         <p class="text-muted text-sm">
@@ -220,28 +220,28 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
         <dl v-else-if="address" class="grid gap-3 sm:grid-cols-2">
           <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Država</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.country || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Grad</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.city || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Poštanski broj</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.zipCode || "-" }}
             </dd>
           </div>
 
           <div class="border-default/70 rounded-md border px-3 py-2">
             <dt class="text-muted text-xs">Kontakt telefon</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.contactPhone || "-" }}
             </dd>
           </div>
@@ -250,7 +250,7 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
             class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
           >
             <dt class="text-muted text-xs">Adresa 1</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.addressLine1 || "-" }}
             </dd>
           </div>
@@ -259,7 +259,7 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
             class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
           >
             <dt class="text-muted text-xs">Adresa 2</dt>
-            <dd class="text-foreground mt-1 text-sm font-medium">
+            <dd class="text-highlighted mt-1 text-sm font-medium">
               {{ address.addressLine2 || "-" }}
             </dd>
           </div>

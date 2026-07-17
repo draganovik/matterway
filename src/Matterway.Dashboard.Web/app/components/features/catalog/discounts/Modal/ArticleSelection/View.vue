@@ -180,7 +180,7 @@ function submitSelection() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Izbor artikala</h3>
+        <h3 class="text-highlighted text-base font-semibold">Izbor artikala</h3>
         <p class="text-muted text-sm">
           Pretražite i izaberite artikle povezane sa ovim popustom.
         </p>

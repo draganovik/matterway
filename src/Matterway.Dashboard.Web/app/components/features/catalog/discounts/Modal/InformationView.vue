@@ -123,7 +123,7 @@ async function createDiscount() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Novi popust</h3>
+        <h3 class="text-highlighted text-base font-semibold">Novi popust</h3>
         <p class="text-muted text-sm">
           Kreirajte kod popusta i izaberite artikle na koje se primenjuje.
         </p>

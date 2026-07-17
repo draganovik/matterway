@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        root: "border border-default shadow-sm !ring-0",
+        root: "border border-default !bg-elevated shadow-sm !ring-0",
         header: "sm:px-4",
         body: "sm:p-4",
         footer: "sm:px-4",

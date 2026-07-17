@@ -16,7 +16,7 @@ const { item, selected = false } = defineProps<{
 <template>
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
-      <p class="text-foreground truncate text-sm font-medium">
+      <p class="text-highlighted truncate text-sm font-medium">
         {{ item.title || "Artikal bez naziva" }}
       </p>
       <p class="text-muted truncate text-xs">

@@ -17,7 +17,7 @@ const displayEmail = computed(() => item.email?.trim() || "Bez imejla")
 <template>
   <div class="flex items-start justify-between gap-3">
     <div class="min-w-0 space-y-0.5">
-      <p class="text-foreground truncate text-sm font-medium">
+      <p class="text-highlighted truncate text-sm font-medium">
         {{ displayEmail }}
       </p>
       <p class="text-muted truncate font-mono text-xs">

@@ -11,7 +11,7 @@ const { item } = defineProps<{
 <template>
   <div class="flex items-start justify-between gap-2">
     <div class="min-w-0">
-      <p class="text-foreground truncate text-sm leading-tight font-medium">
+      <p class="text-highlighted truncate text-sm leading-tight font-medium">
         {{ item.title || item.slug || "Detalj bez naziva" }}
       </p>
       <p class="text-muted truncate text-xs leading-tight">

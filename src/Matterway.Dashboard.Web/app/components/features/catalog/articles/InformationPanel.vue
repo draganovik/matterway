@@ -123,7 +123,7 @@ function updateImages(images: GetArticleResponse["images"]) {
 
     <div v-else-if="!article" class="space-y-4">
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           Uređivanje artikla
         </h3>
         <p class="text-muted text-sm">
@@ -145,7 +145,7 @@ function updateImages(images: GetArticleResponse["images"]) {
       <section>
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 class="text-foreground text-base font-semibold">
+            <h3 class="text-highlighted text-base font-semibold">
               Podaci artikla
             </h3>
             <p class="text-muted text-sm">

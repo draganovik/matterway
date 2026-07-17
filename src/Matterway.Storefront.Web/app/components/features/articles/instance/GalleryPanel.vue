@@ -48,7 +48,7 @@ function showPrevious() {
 <template>
   <UCard>
     <div class="space-y-3">
-      <div class="bg-elevated relative overflow-hidden rounded-lg">
+      <div class="bg-elevated relative overflow-hidden rounded-md">
         <div class="relative aspect-[4/3]">
           <ImageWithFallback
             :src="currentImage?.url || null"

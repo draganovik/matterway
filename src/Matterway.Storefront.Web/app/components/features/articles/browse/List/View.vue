@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
   <div
     class="flex flex-wrap items-stretch justify-center gap-3 transition-opacity"
-    :class="{ 'opacity-70': props.isRefreshing }"
+    :class="props.isRefreshing ? 'opacity-70 delay-150' : 'opacity-100 delay-0'"
   >
     <ArticlesBrowseListItem
       v-for="article in props.items"

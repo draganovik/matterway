@@ -14,7 +14,7 @@ const { item } = defineProps<{
 
 <template>
   <div class="flex flex-wrap items-center justify-between gap-1">
-    <p class="text-foreground w-full text-sm font-medium">
+    <p class="text-highlighted w-full text-sm font-medium">
       {{ item.title || "Artikal bez naziva" }}
     </p>
     <p class="text-muted text-xs">

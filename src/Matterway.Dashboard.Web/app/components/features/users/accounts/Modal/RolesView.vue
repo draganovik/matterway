@@ -244,7 +244,7 @@ watch([isOpen, toRef(props, "systemUserId")], ([open]) => {
   <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Dozvole naloga</h3>
+        <h3 class="text-highlighted text-base font-semibold">Dozvole naloga</h3>
         <p class="text-muted text-sm">
           Pregled dozvola za nalog {{ displayLabel }}.
         </p>
@@ -276,10 +276,10 @@ watch([isOpen, toRef(props, "systemUserId")], ([open]) => {
             <div
               v-for="permission in permissions"
               :key="permissionKey(permission)"
-              class="border-default/70 flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
+              class="border-default/70 flex items-center justify-between gap-3 rounded-md border px-3 py-2"
             >
               <div>
-                <p class="text-foreground text-sm font-medium">
+                <p class="text-highlighted text-sm font-medium">
                   {{ formatServiceName(permission.service) }}
                 </p>
                 <p class="text-muted text-xs">
@@ -310,9 +310,9 @@ watch([isOpen, toRef(props, "systemUserId")], ([open]) => {
 
           <div
             v-if="canManage"
-            class="border-default/70 space-y-3 rounded-lg border p-3"
+            class="border-default/70 space-y-3 rounded-md border p-3"
           >
-            <h4 class="text-foreground text-sm font-semibold">
+            <h4 class="text-highlighted text-sm font-semibold">
               Podesi dozvolu
             </h4>
 

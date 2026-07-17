@@ -24,17 +24,17 @@ const { sections } = useDashboardOverviewPage()
           <article
             v-for="section in sections"
             :key="section.key"
-            class="border-default bg-elevated rounded-lg border p-4 shadow-sm"
+            class="border-default bg-elevated rounded-md border p-4 shadow-sm"
           >
             <div class="space-y-4">
               <div class="flex items-start justify-between gap-4">
                 <div class="flex items-center gap-3">
                   <span
-                    class="bg-muted text-toned flex h-11 w-11 items-center justify-center rounded-lg"
+                    class="bg-muted text-toned flex h-11 w-11 items-center justify-center rounded-md"
                   >
                     <UIcon :name="section.icon" class="size-5" />
                   </span>
-                  <h2 class="text-foreground text-xl font-semibold">
+                  <h2 class="text-highlighted text-xl font-semibold">
                     {{ section.label }}
                   </h2>
                 </div>
@@ -53,9 +53,9 @@ const { sections } = useDashboardOverviewPage()
                   v-for="feature in section.features"
                   :key="feature.key"
                   :to="feature.route"
-                  class="border-default hover:bg-muted flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition-colors"
+                  class="border-default hover:bg-muted flex items-center justify-between rounded-md border px-4 py-3 text-sm transition-colors"
                 >
-                  <span class="text-foreground font-medium">
+                  <span class="text-highlighted font-medium">
                     {{ feature.label }}
                   </span>
 
@@ -71,7 +71,7 @@ const { sections } = useDashboardOverviewPage()
 
         <UCard v-if="!sections.length" class="!bg-elevated">
           <div class="space-y-2">
-            <p class="text-foreground text-lg font-semibold">
+            <p class="text-highlighted text-lg font-semibold">
               Nema dostupnih sekcija
             </p>
             <p class="text-muted text-sm">

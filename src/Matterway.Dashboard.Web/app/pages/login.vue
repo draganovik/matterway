@@ -19,7 +19,9 @@ await initialize()
     >
       <div class="grid w-full gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="hidden flex-col justify-center gap-4 lg:flex">
-          <h1 class="text-foreground text-4xl font-semibold">Administracija</h1>
+          <h1 class="text-highlighted text-4xl font-semibold">
+            Administracija
+          </h1>
           <p class="text-muted max-w-md text-sm">
             Bezbedan pristup administrativnim tokovima za katalog, korisnike i
             prodaju. Prijavite se nalogom zaposlenog da nastavite.
@@ -28,7 +30,7 @@ await initialize()
         <UCard class="!bg-elevated/75">
           <template #header>
             <div class="space-y-1">
-              <h2 class="text-foreground text-2xl font-semibold">Prijava</h2>
+              <h2 class="text-highlighted text-2xl font-semibold">Prijava</h2>
               <p class="text-muted text-sm">
                 Koristite podatke za prijavu zaposlenog naloga.
               </p>

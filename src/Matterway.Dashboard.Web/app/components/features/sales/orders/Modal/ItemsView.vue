@@ -39,7 +39,7 @@ const quantitySum = computed(() => quantitySumOf(order.value))
   >
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           Stavke porudžbine
         </h3>
         <p class="text-muted text-sm">
@@ -66,14 +66,14 @@ const quantitySum = computed(() => quantitySumOf(order.value))
           <div class="grid gap-3 sm:grid-cols-2">
             <div class="border-default/70 rounded-md border px-3 py-2">
               <p class="text-muted text-xs">Broj stavki</p>
-              <p class="text-foreground mt-1 text-sm font-semibold">
+              <p class="text-highlighted mt-1 text-sm font-semibold">
                 {{ itemCount }}
               </p>
             </div>
 
             <div class="border-default/70 rounded-md border px-3 py-2">
               <p class="text-muted text-xs">Ukupna količina</p>
-              <p class="text-foreground mt-1 text-sm font-semibold">
+              <p class="text-highlighted mt-1 text-sm font-semibold">
                 {{ quantitySum }}
               </p>
             </div>
@@ -81,7 +81,7 @@ const quantitySum = computed(() => quantitySumOf(order.value))
 
           <div
             v-if="!order.items?.length"
-            class="border-default/70 bg-background text-muted rounded-md border px-3 py-3 text-sm"
+            class="border-default/70 bg-default text-muted rounded-md border px-3 py-3 text-sm"
           >
             Ova porudžbina nema stavke.
           </div>
@@ -95,42 +95,42 @@ const quantitySum = computed(() => quantitySumOf(order.value))
               <dl class="grid gap-2 sm:grid-cols-2">
                 <div>
                   <dt class="text-muted text-xs">ID</dt>
-                  <dd class="text-foreground mt-1 font-mono text-sm break-all">
+                  <dd class="text-highlighted mt-1 font-mono text-sm break-all">
                     {{ item.id }}
                   </dd>
                 </div>
 
                 <div>
                   <dt class="text-muted text-xs">Šifra artikla</dt>
-                  <dd class="text-foreground mt-1 font-mono text-sm break-all">
+                  <dd class="text-highlighted mt-1 font-mono text-sm break-all">
                     {{ item.articleCode }}
                   </dd>
                 </div>
 
                 <div>
                   <dt class="text-muted text-xs">Naziv artikla</dt>
-                  <dd class="text-foreground mt-1 text-sm">
+                  <dd class="text-highlighted mt-1 text-sm">
                     {{ item.articleTitle || "-" }}
                   </dd>
                 </div>
 
                 <div>
                   <dt class="text-muted text-xs">Količina</dt>
-                  <dd class="text-foreground mt-1 text-sm">
+                  <dd class="text-highlighted mt-1 text-sm">
                     {{ item.quantity }}
                   </dd>
                 </div>
 
                 <div>
                   <dt class="text-muted text-xs">Jedinična cena</dt>
-                  <dd class="text-foreground mt-1 text-sm">
+                  <dd class="text-highlighted mt-1 text-sm">
                     {{ formatMoney(item.unitPrice) }}
                   </dd>
                 </div>
 
                 <div>
                   <dt class="text-muted text-xs">Ukupno po stavci</dt>
-                  <dd class="text-foreground mt-1 text-sm font-medium">
+                  <dd class="text-highlighted mt-1 text-sm font-medium">
                     {{ formatMoney(lineTotalOf(item)) }}
                   </dd>
                 </div>

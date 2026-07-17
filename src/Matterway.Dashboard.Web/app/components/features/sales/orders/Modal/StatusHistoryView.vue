@@ -35,7 +35,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
   >
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           Istorija statusa
         </h3>
         <p class="text-muted text-sm">
@@ -60,7 +60,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
 
         <template v-else-if="order">
           <div class="flex items-center justify-between gap-3">
-            <h4 class="text-foreground text-sm font-semibold">
+            <h4 class="text-highlighted text-sm font-semibold">
               Promene statusa
             </h4>
             <UBadge color="neutral" variant="subtle" class="font-normal">
@@ -81,7 +81,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
               class="border-default/70 rounded-md border px-3 py-2"
             >
               <div class="flex items-start justify-between gap-2">
-                <p class="text-foreground text-sm font-medium">
+                <p class="text-highlighted text-sm font-medium">
                   {{ formatOrderStatus(entry.status) }}
                 </p>
                 <p class="text-muted text-xs">Unos {{ index + 1 }}</p>

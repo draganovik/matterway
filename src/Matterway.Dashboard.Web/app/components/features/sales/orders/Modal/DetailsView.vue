@@ -35,7 +35,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
   >
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           Detalji porudžbine
         </h3>
         <p class="text-muted text-sm">
@@ -62,12 +62,12 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
 
         <template v-else-if="order">
           <div class="space-y-2">
-            <h4 class="text-foreground text-sm font-semibold">Pregled</h4>
+            <h4 class="text-highlighted text-sm font-semibold">Pregled</h4>
             <dl class="grid gap-3 sm:grid-cols-2">
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">ID</dt>
                 <dd
-                  class="text-foreground mt-1 font-mono text-sm font-medium break-all"
+                  class="text-highlighted mt-1 font-mono text-sm font-medium break-all"
                 >
                   {{ order.id }}
                 </dd>
@@ -76,7 +76,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">ID kupca</dt>
                 <dd
-                  class="text-foreground mt-1 font-mono text-sm font-medium break-all"
+                  class="text-highlighted mt-1 font-mono text-sm font-medium break-all"
                 >
                   {{ order.customerId || "-" }}
                 </dd>
@@ -84,14 +84,14 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Tip</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ formatOrderType(order.type) }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Kreirano</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ formatDateTime(order.placedAt) }}
                 </dd>
               </div>
@@ -100,7 +100,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
                 class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
               >
                 <dt class="text-muted text-xs">Ukupan iznos</dt>
-                <dd class="text-foreground mt-1 text-sm font-semibold">
+                <dd class="text-highlighted mt-1 text-sm font-semibold">
                   {{ formatMoney(order.totalAmount) }}
                 </dd>
               </div>
@@ -108,34 +108,34 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
           </div>
 
           <div class="space-y-2">
-            <h4 class="text-foreground text-sm font-semibold">
+            <h4 class="text-highlighted text-sm font-semibold">
               Podaci za dostavu
             </h4>
             <dl v-if="order.deliveryInfo" class="grid gap-3 sm:grid-cols-2">
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Država</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.country || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Grad</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.city || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Poštanski broj</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.zipCode || "-" }}
                 </dd>
               </div>
 
               <div class="border-default/70 rounded-md border px-3 py-2">
                 <dt class="text-muted text-xs">Kontakt telefon</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.contactPhone || "-" }}
                 </dd>
               </div>
@@ -144,7 +144,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
                 class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
               >
                 <dt class="text-muted text-xs">Adresa 1</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.addressLine1 || "-" }}
                 </dd>
               </div>
@@ -153,7 +153,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
                 class="border-default/70 rounded-md border px-3 py-2 sm:col-span-2"
               >
                 <dt class="text-muted text-xs">Adresa 2</dt>
-                <dd class="text-foreground mt-1 text-sm font-medium">
+                <dd class="text-highlighted mt-1 text-sm font-medium">
                   {{ order.deliveryInfo.addressLine2 || "-" }}
                 </dd>
               </div>
@@ -161,7 +161,7 @@ const { order, notFound, loadState, displayLabel, resetModalState } =
 
             <div
               v-else
-              class="border-default/70 bg-background text-muted rounded-md border px-3 py-3 text-sm"
+              class="border-default/70 bg-default text-muted rounded-md border px-3 py-3 text-sm"
             >
               Podaci za dostavu nisu dostupni.
             </div>

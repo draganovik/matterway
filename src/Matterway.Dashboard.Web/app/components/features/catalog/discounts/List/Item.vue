@@ -20,7 +20,7 @@ function formatDateTime(value?: string | null) {
 <template>
   <div class="grid gap-1">
     <div class="flex items-start justify-between gap-2">
-      <p class="text-foreground text-sm font-medium">
+      <p class="text-highlighted text-sm font-medium">
         {{ item.code || "Nedostaje kod" }}
       </p>
       <UBadge color="neutral" variant="subtle" size="sm">

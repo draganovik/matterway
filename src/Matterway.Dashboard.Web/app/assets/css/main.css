@@ -28,7 +28,8 @@
   --color-stone-950: #0c0a09;
 }
 
-:root {
+:root,
+.light {
   --ui-radius: 0.375rem;
 
   --ui-bg: var(--color-stone-100);

@@ -41,7 +41,7 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
 <template>
   <div class="space-y-4">
     <div class="space-y-1">
-      <h3 class="text-foreground text-base font-semibold">
+      <h3 class="text-highlighted text-base font-semibold">
         {{ systemUser ? "Izmena naloga" : "Uređivanje naloga" }}
       </h3>
       <p class="text-muted text-sm">
@@ -93,10 +93,10 @@ const createdLabel = computed(() => formatDateTime(props.systemUser?.created))
       </div>
 
       <div
-        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
+        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-md border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Dozvole</h4>
+          <h4 class="text-highlighted text-sm font-semibold">Dozvole</h4>
           <p class="text-muted text-sm">
             Pregledajte dodeljene dozvole po servisima i upravljajte njima ako
             ste menadžer.

@@ -120,7 +120,7 @@ watch(isOpen, (open) => {
   <UModal v-model:open="isOpen" @after:leave="resetModalState">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">
+        <h3 class="text-highlighted text-base font-semibold">
           {{ mode === "edit" ? "Izmena slike" : "Dodavanje slike" }}
         </h3>
         <p class="text-muted text-sm">
@@ -144,7 +144,7 @@ watch(isOpen, (open) => {
             :disabled="controlsDisabled"
             class="w-full"
             :ui="{
-              base: `border-default bg-elevated/40 w-full rounded-lg border border-dashed p-4 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
+              base: `border-default bg-elevated/40 w-full rounded-md border border-dashed p-4 text-center transition ${controlsDisabled ? 'cursor-not-allowed' : 'cursor-pointer'} hover:border-primary/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/5`,
               wrapper: 'flex flex-col items-center gap-2',
               avatar: 'hidden',
               label: 'mt-0 text-sm font-medium',

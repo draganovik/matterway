@@ -20,7 +20,7 @@ const isPaymentBalanced = computed(() => paymentsBalanced(item))
   <div class="flex w-full items-end justify-between gap-3">
     <div class="min-w-0 space-y-1">
       <p
-        class="text-foreground font-mono text-sm leading-snug font-medium break-all"
+        class="text-highlighted font-mono text-sm leading-snug font-medium break-all"
       >
         {{ item.id || "Bez ID-ja" }}
       </p>

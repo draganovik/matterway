@@ -86,7 +86,7 @@ async function createCustomer() {
   <UModal v-model:open="isOpen">
     <template #header>
       <div class="space-y-1">
-        <h3 class="text-foreground text-base font-semibold">Novi kupac</h3>
+        <h3 class="text-highlighted text-base font-semibold">Novi kupac</h3>
         <p class="text-muted text-sm">
           Kreirajte profil kupca povezan sa postojećim sistemskim korisnikom.
         </p>
