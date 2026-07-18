@@ -3,6 +3,7 @@ import {
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import type {
   AuthSession,
@@ -27,12 +28,7 @@ type AuthRuntimeState = {
 function extractAuthError(payload: unknown) {
   if (!payload || typeof payload !== "object") return null
 
-  const candidate = payload as {
-    title?: unknown
-    detail?: unknown
-    message?: unknown
-    errors?: unknown
-  }
+  const candidate = payload as { errors?: unknown }
 
   if (candidate.errors && typeof candidate.errors === "object") {
     const entries = Object.entries(candidate.errors as Record<string, unknown>)
@@ -53,13 +49,7 @@ function extractAuthError(payload: unknown) {
     }
   }
 
-  const directMessage =
-    (typeof candidate.detail === "string" && candidate.detail) ||
-    (typeof candidate.title === "string" && candidate.title) ||
-    (typeof candidate.message === "string" && candidate.message) ||
-    ""
-
-  return directMessage.trim() || null
+  return getApiErrorMessage(payload)
 }
 
 function useAuthRuntimeState() {

@@ -1,8 +1,8 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/api/useApiClient"
-import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import { buildCatalogImageUrl } from "~/utils/catalogImages"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import type { ApiResult } from "~/types/common/api"
 import type {
   AddArticleImageRequest,
@@ -62,7 +62,6 @@ function mapQueryArticleResponse(
 
 export function useCatalogClient() {
   const api = useApiClient()
-  const auth = useAuthSessionStore()
 
   async function queryArticles(params: QueryArticlesParams) {
     const query = buildQuery({
@@ -315,49 +314,22 @@ export function useCatalogClient() {
   async function exportCatalogArchive(): Promise<
     ApiResult<ExportCatalogArchiveResponse>
   > {
-    await auth.initialize()
     const endpoint = buildServiceApiPath(
       "catalog",
       "admin",
       "catalog/archive/export",
     )
-    const token = auth.getAccessToken()
-    const headers = new Headers({ Accept: "application/zip" })
-    if (token) headers.set("Authorization", token)
+    const response = await api.requestRaw<ArrayBuffer>(endpoint, {
+      method: "GET",
+      headers: { Accept: "application/zip" },
+      responseType: "arrayBuffer",
+    })
 
-    const runFetch = () =>
-      $fetch.raw<ArrayBuffer>(endpoint, {
-        method: "GET",
-        headers,
-        responseType: "arrayBuffer",
-        ignoreResponseError: true,
-      })
-
-    let response
-    try {
-      response = await runFetch()
-    } catch {
+    if (!response) {
       return {
         ok: false,
         status: 0,
         error: "Izvoz arhive kataloga trenutno nije dostupan.",
-      }
-    }
-
-    if (response.status === 401) {
-      await auth.refreshTokens()
-      const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) {
-        headers.set("Authorization", refreshedToken)
-        try {
-          response = await runFetch()
-        } catch {
-          return {
-            ok: false,
-            status: 0,
-            error: "Izvoz arhive kataloga trenutno nije dostupan.",
-          }
-        }
       }
     }
 
@@ -368,7 +340,7 @@ export function useCatalogClient() {
         contentType,
       )
       const error =
-        getErrorMessage(payload) || "Izvoz arhive kataloga nije uspeo."
+        getApiErrorMessage(payload) || "Izvoz arhive kataloga nije uspeo."
 
       return { ok: false, status: response.status, error }
     }
@@ -479,33 +451,4 @@ function decodeDownloadErrorPayload(
   }
 
   return text
-}
-
-function getErrorMessage(payload: unknown) {
-  if (typeof payload === "string") {
-    const message = payload.trim()
-    return message || null
-  }
-
-  if (!payload || typeof payload !== "object") return null
-
-  const candidate = payload as {
-    title?: unknown
-    detail?: unknown
-    message?: unknown
-  }
-
-  if (typeof candidate.detail === "string" && candidate.detail.trim()) {
-    return candidate.detail.trim()
-  }
-
-  if (typeof candidate.title === "string" && candidate.title.trim()) {
-    return candidate.title.trim()
-  }
-
-  if (typeof candidate.message === "string" && candidate.message.trim()) {
-    return candidate.message.trim()
-  }
-
-  return null
 }

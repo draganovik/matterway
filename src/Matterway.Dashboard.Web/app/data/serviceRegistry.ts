@@ -4,14 +4,8 @@ import type {
   PermissionLevel,
 } from "~/types/services/definitions"
 
-export { serviceSections, allFeatures } from "~/data/serviceDefinitions"
-export type {
-  PermissionLevel,
-  FeatureDefinition,
-  ServiceSection,
-} from "~/types/services/definitions"
-
-export { permissionLevels, permissionServices } from "~/data/permissionOptions"
+export { serviceSections } from "~/data/serviceDefinitions"
+export { permissionServices } from "~/data/permissionOptions"
 
 type HasPermission = (
   service: FeatureDefinition["service"],

@@ -4,6 +4,7 @@ import {
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import type { AuthSession, LoginResponse } from "~/types/auth/session"
 import type { PermissionLevel } from "~/types/services/definitions"
@@ -245,8 +246,7 @@ export function useAuthSessionStore() {
 
     if (!response.ok) {
       throw new Error(
-        (response._data as { title?: string } | null)?.title ||
-          "Prijava nije uspela.",
+        getApiErrorMessage(response._data) || "Prijava nije uspela.",
       )
     }
 

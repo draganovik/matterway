@@ -13,7 +13,7 @@ export interface DetailFilterState {
   max?: number
 }
 
-export interface ArticleFilterState {
+interface ArticleFilterState {
   search?: string
   minPrice?: number
   maxPrice?: number
@@ -48,9 +48,8 @@ export const resolveDetailDefinition = (
   definitions: DetailFilterDefinition[],
 ) => (slug ? bySlug(definitions).get(slug) : undefined)
 
-export const isNumericDetailDefinition = (
-  definition?: DetailFilterDefinition,
-) => Boolean(definition?.unit)
+const isNumericDetailDefinition = (definition?: DetailFilterDefinition) =>
+  Boolean(definition?.unit)
 
 export const createEmptyDetailFilter = (
   definitions: DetailFilterDefinition[],

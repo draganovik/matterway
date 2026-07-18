@@ -125,18 +125,11 @@ export default defineEventHandler(async (event) => {
     const normalizedError = normalizeCheckoutError(error)
 
     if (paymentIntentId) {
-      try {
-        await cancelStripePaymentIntent(
-          paymentIntentId,
-          stripeSecretKey,
-          requestContext,
-        )
-      } catch (cancelError) {
-        console.error("[checkout] failed to cancel payment intent", {
-          paymentIntentId,
-          error: cancelError,
-        })
-      }
+      await cancelStripePaymentIntent(
+        paymentIntentId,
+        stripeSecretKey,
+        requestContext,
+      )
     }
 
     console.error("[checkout] order submission failed", {

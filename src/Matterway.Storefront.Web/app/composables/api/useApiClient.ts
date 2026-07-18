@@ -1,4 +1,5 @@
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import { buildServiceApiPathFromRequestPath } from "~/utils/apiProxy"
 import type { ApiResult, ApiService } from "~/types/common/api"
 
@@ -24,45 +25,46 @@ function formatValidationErrors(errors?: Record<string, string[]>) {
     .join(" | ")
 }
 
-function getErrorMessage(payload: unknown) {
-  if (typeof payload === "string") {
-    const message = payload.trim()
-    return message || null
-  }
-
-  if (!payload || typeof payload !== "object") return null
-
-  const candidate = payload as {
-    title?: unknown
-    detail?: unknown
-    message?: unknown
-  }
-
-  if (typeof candidate.detail === "string" && candidate.detail.trim()) {
-    return candidate.detail.trim()
-  }
-
-  if (typeof candidate.title === "string" && candidate.title.trim()) {
-    return candidate.title.trim()
-  }
-
-  if (typeof candidate.message === "string" && candidate.message.trim()) {
-    return candidate.message.trim()
-  }
-
-  return null
-}
-
 export function useApiClient() {
   const auth = useAuthSessionStore()
+
+  async function requestRaw<T>(
+    requestPath: string,
+    options: ApiRequestOptions = {},
+    retryUnauthorized = true,
+  ) {
+    await auth.initialize()
+
+    const headers = new Headers(options.headers || {})
+    if (!headers.has("Accept")) headers.set("Accept", "application/json")
+
+    const accessToken = auth.getAccessToken()
+    if (accessToken) headers.set("Authorization", accessToken)
+
+    const runFetch = () =>
+      $fetch.raw<T>(requestPath, {
+        ...options,
+        headers,
+        ignoreResponseError: true,
+      })
+
+    let response = await runFetch().catch(() => null)
+    if (response?.status !== 401 || !retryUnauthorized) return response
+
+    await auth.refreshTokens()
+    const refreshedToken = auth.getAccessToken()
+    if (!refreshedToken) return response
+
+    headers.set("Authorization", refreshedToken)
+    response = await runFetch().catch(() => null)
+    return response
+  }
 
   async function request<T>(
     service: ApiService,
     path: string,
     options: ApiRequestOptions = {},
   ): Promise<ApiResult<T>> {
-    await auth.initialize()
-
     const requestPath = buildServiceApiPathFromRequestPath(service, path)
     if (!requestPath) {
       return {
@@ -72,44 +74,16 @@ export function useApiClient() {
       }
     }
 
-    const headers = new Headers(options.headers || {})
-    if (!headers.has("Accept")) headers.set("Accept", "application/json")
-
-    const accessToken = auth.getAccessToken()
-    if (accessToken) headers.set("Authorization", accessToken)
-
-    const runFetch = async () =>
-      $fetch.raw<T>(requestPath, {
-        ...options,
-        headers,
-        ignoreResponseError: true,
-      })
-
-    let response
-    try {
-      response = await runFetch()
-    } catch {
+    const response = await requestRaw<T>(
+      requestPath,
+      options,
+      !path.startsWith("public/"),
+    )
+    if (!response) {
       return {
         ok: false,
         status: 0,
         error: serviceUnavailableMessage,
-      }
-    }
-
-    if (response.status === 401 && !path.startsWith("public/")) {
-      await auth.refreshTokens()
-      const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) {
-        headers.set("Authorization", refreshedToken)
-        try {
-          response = await runFetch()
-        } catch {
-          return {
-            ok: false,
-            status: 0,
-            error: serviceUnavailableMessage,
-          }
-        }
       }
     }
 
@@ -124,7 +98,7 @@ export function useApiClient() {
     }
 
     const validationErrors = getValidationErrors(payload)
-    const baseError = getErrorMessage(payload) || "Zahtev nije uspeo."
+    const baseError = getApiErrorMessage(payload) || "Zahtev nije uspeo."
     const validationMessage = formatValidationErrors(validationErrors)
     return {
       ok: false,
@@ -135,5 +109,5 @@ export function useApiClient() {
     }
   }
 
-  return { request }
+  return { request, requestRaw }
 }

@@ -1,4 +1,4 @@
-export type RequestState = {
+type RequestState = {
   loading: boolean
   error: string
   success: string
