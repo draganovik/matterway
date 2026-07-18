@@ -43,6 +43,7 @@ const emit = defineEmits<{
           autocomplete="current-password"
           class="w-full"
           required
+          @keydown.enter.exact="submitFormOnEnter"
         />
       </UFormField>
 

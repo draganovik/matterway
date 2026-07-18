@@ -94,6 +94,7 @@ watch(
                 root: 'group',
                 leadingIcon: 'relative z-20 group-focus-within:text-primary',
               }"
+              @keydown.enter.exact="submitFormOnEnter"
             />
           </form>
 
@@ -183,6 +184,7 @@ watch(
               root: 'group',
               leadingIcon: 'relative z-20 group-focus-within:text-primary',
             }"
+            @keydown.enter.exact="submitFormOnEnter"
           />
         </form>
         <div class="flex flex-col gap-1">

@@ -88,6 +88,7 @@ const emit = defineEmits<{
             placeholder="Ponovite lozinku"
             required
             class="w-full"
+            @keydown.enter.exact="submitFormOnEnter"
           />
         </UFormField>
       </div>

@@ -64,6 +64,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           placeholder="npr. Philips Hue"
           class="w-full"
           @update:model-value="emit('setSearch', String($event ?? ''))"
+          @keydown.enter.exact="submitFormOnEnter"
         />
       </UFormField>
 

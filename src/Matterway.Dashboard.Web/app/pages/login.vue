@@ -57,6 +57,7 @@ await initialize()
                 autocomplete="current-password"
                 class="w-full"
                 required
+                @keydown.enter.exact="submitFormOnEnter"
               />
             </UFormField>
 
