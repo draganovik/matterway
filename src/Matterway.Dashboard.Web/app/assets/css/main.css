@@ -70,3 +70,42 @@
   --ui-text-highlighted: var(--color-stone-50);
   --ui-text-inverted: var(--color-stone-950);
 }
+
+@layer base {
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  :focus-visible {
+    z-index: 10 !important;
+    outline: 2px solid color-mix(in srgb, var(--ui-primary) 75%, transparent) !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+  }
+
+  :focus-visible:not([class*="absolute"]):not([class*="fixed"]):not(
+      [class*="sticky"]
+    ) {
+    position: relative;
+  }
+
+  :focus-visible:not([class*="rounded"]) {
+    border-radius: var(--ui-radius);
+  }
+
+  :focus-visible::before {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  :has(> :focus-visible) {
+    outline: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    box-shadow: none !important;
+  }
+}

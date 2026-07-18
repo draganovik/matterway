@@ -119,7 +119,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 
         <div
           v-if="filters.detailFilters.length"
-          class="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
+          class="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:p-1"
         >
           <ArticlesBrowseSearchFilterListItem
             v-for="(detailFilter, index) in filters.detailFilters"

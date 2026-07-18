@@ -83,7 +83,7 @@ function showPrevious() {
         </div>
       </div>
 
-      <div v-if="hasMultipleImages" class="flex gap-2 overflow-x-auto pb-1">
+      <div v-if="hasMultipleImages" class="flex gap-2 overflow-x-auto p-1">
         <button
           v-for="(image, index) in images"
           :key="image.id"

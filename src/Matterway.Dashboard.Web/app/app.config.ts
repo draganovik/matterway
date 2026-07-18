@@ -29,5 +29,13 @@ export default defineAppConfig({
         body: "sm:gap-4 sm:p-4",
       },
     },
+    navigationMenu: {
+      slots: {
+        root: "p-1",
+        link: "rounded-md",
+        childList: "p-1",
+        childLink: "rounded-md",
+      },
+    },
   },
 })

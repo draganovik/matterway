@@ -139,7 +139,7 @@ function updatePageSize(value: number) {
       </div>
     </div>
 
-    <div class="border-muted min-h-0 flex-1 overflow-y-auto border-y">
+    <div class="border-muted min-h-0 flex-1 overflow-y-auto border-y p-1">
       <StatusMessages
         v-if="error || !items.length"
         :error="error"

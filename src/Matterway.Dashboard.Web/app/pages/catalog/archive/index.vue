@@ -52,7 +52,7 @@ const {
     </template>
 
     <template #body>
-      <div class="h-full min-h-0 overflow-y-auto">
+      <div class="h-full min-h-0 overflow-y-auto p-1">
         <div class="w-full max-w-3xl space-y-4">
           <StatusMessages
             v-if="exportState.error || exportState.success"

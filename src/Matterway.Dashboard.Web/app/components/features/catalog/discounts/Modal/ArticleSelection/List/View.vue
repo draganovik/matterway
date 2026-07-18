@@ -33,7 +33,7 @@ function isSelected(article: QueryArticleResponse) {
 </script>
 
 <template>
-  <div class="max-h-75 overflow-y-auto">
+  <div class="max-h-75 overflow-y-auto p-1">
     <StatusMessages
       v-if="props.error || !props.items.length"
       :error="props.error"
