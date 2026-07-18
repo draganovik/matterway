@@ -54,7 +54,7 @@ const sections = computed(() => [
 </script>
 
 <template>
-  <div class="mx-auto max-w-[62.25rem] space-y-8">
+  <div class="mx-auto max-w-[66.25rem] space-y-8">
     <OverviewHeroPanel
       :total-count="totalCount"
       :cart-items="cart.totalItems.value"
@@ -81,11 +81,15 @@ const sections = computed(() => [
         </UButton>
       </div>
 
-      <div v-if="loading" class="flex flex-wrap justify-center gap-3">
+      <div
+        v-if="loading"
+        class="-mx-4 flex w-[calc(100%+2rem)] snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-5 sm:w-[calc(100%+2.5rem)] sm:scroll-px-5 sm:px-5 lg:-mx-6 lg:w-[calc(100%+3rem)] lg:scroll-px-6 lg:px-6 min-[75rem]:-mx-[2.875rem] min-[75rem]:w-[calc(100%+5.75rem)] min-[75rem]:scroll-px-[2.875rem] min-[75rem]:px-[2.875rem]"
+        :aria-label="`Učitavanje odeljka ${section.title}`"
+      >
         <USkeleton
           v-for="n in 4"
           :key="`${section.key}-skeleton-${n}`"
-          class="h-[22rem] w-full sm:w-60 sm:flex-none"
+          class="h-[22rem] w-[min(16rem,calc(100vw-2rem))] flex-none snap-start"
         />
       </div>
 
@@ -99,6 +103,9 @@ const sections = computed(() => [
         v-else
         :items="section.items"
         :is-refreshing="false"
+        :aria-label="section.title"
+        class="-mx-4 w-[calc(100%+2rem)] sm:-mx-5 sm:w-[calc(100%+2.5rem)] lg:-mx-6 lg:w-[calc(100%+3rem)] min-[75rem]:-mx-[2.875rem] min-[75rem]:w-[calc(100%+5.75rem)]"
+        carousel
       />
     </section>
   </div>

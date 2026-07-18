@@ -61,9 +61,11 @@ function handlePageChange(page: number) {
 </script>
 
 <template>
-  <div class="grid gap-4 lg:grid-cols-[21rem_minmax(0,1fr)]">
+  <div
+    class="mx-auto grid w-full max-w-6xl gap-4 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-2"
+  >
     <div
-      class="lg:border-default flex flex-col gap-4 lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)] lg:max-h-[56rem] lg:min-h-0 lg:border-e lg:pe-4"
+      class="lg:border-default flex flex-col gap-4 lg:sticky lg:top-[5.0625rem] lg:h-[calc(100dvh-6.0625rem)] lg:max-h-[56rem] lg:min-h-0 lg:border-e lg:pe-4"
     >
       <div class="lg:min-h-0 lg:flex-1">
         <ArticlesBrowseSearchFilterPanel
@@ -101,12 +103,12 @@ function handlePageChange(page: number) {
 
       <div
         v-if="showInitialSkeleton"
-        class="mx-auto flex max-w-[46.5rem] flex-wrap justify-start gap-3"
+        class="mx-auto flex max-w-[49.5rem] flex-wrap justify-start gap-3"
       >
         <USkeleton
           v-for="n in pagination.pageSize"
           :key="`article-skeleton-${n}`"
-          class="h-96 w-full sm:w-60 sm:flex-none"
+          class="h-96 w-full sm:w-64 sm:flex-none"
         />
       </div>
 
@@ -123,7 +125,7 @@ function handlePageChange(page: number) {
 
       <ArticlesBrowseListView
         v-else
-        class="mx-auto max-w-[46.5rem] !justify-start"
+        class="mx-auto max-w-[49.5rem] !justify-start"
         :items="items"
         :is-refreshing="isRefreshing"
       />

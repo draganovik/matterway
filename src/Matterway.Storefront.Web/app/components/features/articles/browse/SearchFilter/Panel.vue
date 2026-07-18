@@ -40,7 +40,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
 <template>
   <div class="h-fit lg:flex lg:h-full lg:min-h-0 lg:flex-col">
     <form
-      class="space-y-3 lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:overflow-hidden"
+      class="space-y-3 lg:flex lg:h-full lg:min-h-0 lg:flex-col"
       @submit.prevent="emit('submit')"
     >
       <div class="flex items-center gap-2">

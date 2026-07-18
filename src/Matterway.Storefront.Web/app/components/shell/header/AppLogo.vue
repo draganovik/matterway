@@ -7,8 +7,8 @@ import logoUrl from "~/assets/brand/matterway-logo-cyan.svg"
     <ImageWithFallback
       :src="logoUrl"
       alt="Matterway"
-      img-class="h-9 w-9"
-      placeholder-class="h-9 w-9 rounded-md"
+      img-class="h-8 w-8"
+      placeholder-class="h-8 w-8 rounded-md"
     />
   </NuxtLink>
 </template>
