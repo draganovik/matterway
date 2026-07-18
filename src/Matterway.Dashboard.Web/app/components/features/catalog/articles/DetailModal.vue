@@ -274,7 +274,15 @@ watch(isOpen, (open) => {
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton variant="ghost" :disabled="loading" @click="isOpen = false">
+        <UButton
+          variant="ghost"
+          :disabled="loading"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
+        >
           Otkaži
         </UButton>
         <UButton

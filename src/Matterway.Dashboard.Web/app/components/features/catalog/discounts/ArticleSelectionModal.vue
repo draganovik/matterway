@@ -266,7 +266,16 @@ function submitSelection() {
 
     <template #footer>
       <div class="flex w-full justify-between">
-        <UButton variant="ghost" @click="isOpen = false"> Otkaži </UButton>
+        <UButton
+          variant="ghost"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
+        >
+          Otkaži
+        </UButton>
         <UButton color="primary" :disabled="!canEdit" @click="submitSelection">
           Sačuvaj izbor ({{ selectedArticleCodes.length }})
         </UButton>

@@ -32,7 +32,11 @@ function applySelection(next: string[]) {
         color="primary"
         variant="outline"
         :disabled="!canEdit"
-        @click="articleModalOpen = true"
+        @click="
+          () => {
+            articleModalOpen = true
+          }
+        "
       >
         Izaberi artikle
       </UButton>

@@ -327,7 +327,15 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
         >
           Uredi adresu
         </UButton>
-        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
+        <UButton
+          variant="ghost"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
+          >Zatvori</UButton
+        >
       </div>
 
       <div v-else class="flex w-full justify-between gap-2">
@@ -344,7 +352,11 @@ watch([isOpen, toRef(props, "customerId")], ([open]) => {
           <UButton
             variant="ghost"
             :disabled="saveState.loading"
-            @click="isOpen = false"
+            @click="
+              () => {
+                isOpen = false
+              }
+            "
           >
             Otkaži
           </UButton>

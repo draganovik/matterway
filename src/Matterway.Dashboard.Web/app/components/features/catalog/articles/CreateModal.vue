@@ -117,7 +117,11 @@ async function createArticle() {
         <UButton
           variant="ghost"
           :disabled="createState.loading"
-          @click="isOpen = false"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
         >
           Otkaži
         </UButton>

@@ -143,7 +143,15 @@ const quantitySum = computed(() => quantitySumOf(order.value))
 
     <template #footer>
       <div class="flex w-full justify-end">
-        <UButton variant="ghost" @click="isOpen = false">Zatvori</UButton>
+        <UButton
+          variant="ghost"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
+          >Zatvori</UButton
+        >
       </div>
     </template>
   </UModal>

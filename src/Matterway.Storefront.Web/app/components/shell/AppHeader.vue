@@ -154,7 +154,11 @@ watch(
             aria-label="Otvori meni"
             :aria-expanded="mobileMenuOpen"
             class="hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted"
-            @click="mobileMenuOpen = !mobileMenuOpen"
+            @click="
+              () => {
+                mobileMenuOpen = !mobileMenuOpen
+              }
+            "
           />
         </div>
       </div>
@@ -202,7 +206,11 @@ watch(
                 ? 'bg-muted text-highlighted'
                 : 'text-toned hover:bg-muted hover:text-highlighted focus-visible:bg-muted focus-visible:text-highlighted'
             "
-            @click="mobileMenuOpen = false"
+            @click="
+              () => {
+                mobileMenuOpen = false
+              }
+            "
           >
             {{ item.label }}
           </UButton>
@@ -213,7 +221,11 @@ watch(
             color="primary"
             variant="soft"
             block
-            @click="mobileMenuOpen = false"
+            @click="
+              () => {
+                mobileMenuOpen = false
+              }
+            "
           >
             Prijava
           </UButton>
@@ -225,7 +237,11 @@ watch(
               variant="ghost"
               icon="i-lucide-user-cog"
               block
-              @click="mobileMenuOpen = false"
+              @click="
+                () => {
+                  mobileMenuOpen = false
+                }
+              "
             >
               Moj profil
             </UButton>
@@ -236,7 +252,11 @@ watch(
               variant="ghost"
               icon="i-lucide-package-check"
               block
-              @click="mobileMenuOpen = false"
+              @click="
+                () => {
+                  mobileMenuOpen = false
+                }
+              "
             >
               Moje porudžbine
             </UButton>

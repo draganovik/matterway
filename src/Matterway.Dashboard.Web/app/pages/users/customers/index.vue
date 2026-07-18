@@ -57,7 +57,11 @@ const {
           <UButton
             color="primary"
             :disabled="!canEdit"
-            @click="createModalOpen = true"
+            @click="
+              () => {
+                createModalOpen = true
+              }
+            "
           >
             Novi kupac
           </UButton>
@@ -83,7 +87,11 @@ const {
               :page-size="pagination.pageSize"
               :total-count="pagination.totalCount"
               :total-pages="pagination.totalPages"
-              @update:filter="(value) => (filter = value)"
+              @update:filter="
+                (value) => {
+                  filter = value
+                }
+              "
               @search="searchCustomers"
               @update:page="changePage"
               @update:page-size="changePageSize"

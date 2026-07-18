@@ -72,7 +72,11 @@ const {
               :page-size="pagination.pageSize"
               :total-count="pagination.totalCount"
               :total-pages="pagination.totalPages"
-              @update:filter="(value) => (filter = value)"
+              @update:filter="
+                (value) => {
+                  filter = value
+                }
+              "
               @search="searchOrders"
               @update:page="changePage"
               @update:page-size="changePageSize"

@@ -73,7 +73,11 @@ const {
               :page-size="pagination.pageSize"
               :total-count="pagination.totalCount"
               :total-pages="pagination.totalPages"
-              @update:filter="(value) => (filter = value)"
+              @update:filter="
+                (value) => {
+                  filter = value
+                }
+              "
               @search="searchDetails"
               @update:page="changePage"
               @update:page-size="changePageSize"
@@ -92,9 +96,21 @@ const {
               :save-loading="saveState.loading"
               :error="saveState.error"
               :success="saveState.success"
-              @update:slug="(value) => (form.slug = value)"
-              @update:title="(value) => (form.title = value)"
-              @update:unit="(value) => (form.unit = value)"
+              @update:slug="
+                (value) => {
+                  form.slug = value
+                }
+              "
+              @update:title="
+                (value) => {
+                  form.title = value
+                }
+              "
+              @update:unit="
+                (value) => {
+                  form.unit = value
+                }
+              "
               @save="saveDetail"
               @remove="requestRemoveDetail"
             />
