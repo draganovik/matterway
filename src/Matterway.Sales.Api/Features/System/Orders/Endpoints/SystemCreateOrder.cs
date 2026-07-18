@@ -74,8 +74,9 @@ public class SystemCreateOrder : IEndpoint
         }
 
         var orderId = pendingOrder.Id;
-        var customersRequest = ToCustomersRequest(effectiveCustomerId, orderId, request);
-        var customersResult = await customersClient.CreateOrderAsync(
+        var customersRequest = ToCustomersRequest(effectiveCustomerId, request);
+        var customersResult = await customersClient.PutOrderAsync(
+            orderId,
             customersRequest,
             cancellationToken);
 
@@ -162,13 +163,11 @@ public class SystemCreateOrder : IEndpoint
 
     private static CustomersCreateOrderRequest ToCustomersRequest(
         Guid customerId,
-        OrderId orderId,
         SystemCreateOrderRequest request)
     {
         return new CustomersCreateOrderRequest
         {
             CustomerId = customerId,
-            OrderId = orderId,
             DeliveryInfo = request.DeliveryInfo is null
                 ? null
                 : new CustomersDeliveryInfoRequest

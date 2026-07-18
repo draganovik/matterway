@@ -6,5 +6,5 @@ public record AdminUpdateDiscountResponse
     public decimal Percentage { get; init; }
     public DateTime ValidFrom { get; init; }
     public DateTime? ValidTo { get; init; }
-    public required ArticleCode ArticleCode { get; init; }
+    public required IReadOnlyCollection<ArticleCode> ArticleCodes { get; init; }
 }

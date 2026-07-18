@@ -46,42 +46,33 @@ const expYearValue = computed({
 </script>
 
 <template>
-  <UCard
-    class="border-default h-full border"
-    :ui="{ root: 'flex h-full flex-col', body: 'flex-1' }"
-  >
+  <UCard class="h-full" :ui="{ root: 'flex h-full flex-col', body: 'flex-1' }">
     <template #header>
       <h2 class="text-base font-semibold">Plaćanje i potvrda porudžbine</h2>
     </template>
 
-    <div class="space-y-6">
+    <div class="space-y-4">
       <div class="grid gap-3 sm:grid-cols-2">
-        <div
-          class="border-default bg-elevated/50 rounded-lg border px-3 py-2.5"
-        >
-          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Stavke
-          </p>
+        <div class="border-default bg-default rounded-md border px-3 py-2.5">
+          <p class="text-muted text-sm">Stavke</p>
           <p class="mt-1 text-lg leading-none font-semibold">
             {{ props.totalItems }}
           </p>
         </div>
 
         <div
-          class="border-primary/20 bg-primary/5 rounded-lg border px-3 py-2.5"
+          class="border-primary/20 bg-primary/5 rounded-md border px-3 py-2.5"
         >
-          <p class="text-muted text-[11px] tracking-[0.12em] uppercase">
-            Iznos
-          </p>
+          <p class="text-muted text-sm">Iznos</p>
           <p class="mt-1 text-lg leading-none font-semibold">
             {{ formatMoney(props.totalPrice) }}
           </p>
         </div>
       </div>
 
-      <div class="border-default border-t pt-5">
+      <div class="border-default border-t pt-4">
         <div
-          class="border-default bg-elevated mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-xs"
+          class="border-default bg-default mb-4 flex items-center gap-2 rounded-md border px-3 py-2 text-xs"
         >
           <UIcon name="i-lucide-shield-check" class="text-primary h-4 w-4" />
           <span class="text-muted">
@@ -117,7 +108,7 @@ const expYearValue = computed({
               :format-options="{ useGrouping: false, minimumIntegerDigits: 2 }"
               autocomplete="cc-exp-month"
               class="w-full"
-              :ui="{ root: 'w-full', base: 'w-full text-left' }"
+              :ui="{ base: 'w-full text-left' }"
               required
               @blur="emit('monthBlur')"
             />
@@ -136,7 +127,7 @@ const expYearValue = computed({
               :format-options="{ useGrouping: false }"
               autocomplete="cc-exp-year"
               class="w-full"
-              :ui="{ root: 'w-full', base: 'w-full text-left' }"
+              :ui="{ base: 'w-full text-left' }"
               required
             />
           </UFormField>

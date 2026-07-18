@@ -32,5 +32,6 @@ npm run build
 
 - Server-side API URLs are configured via `NUXT_SERVER_*` environment variables.
 - Browser-triggered API calls go through same-origin `/api/<service>/...` proxy routes.
-- Cart is intentionally cleared on sign in and sign out.
+- Guest cart items are merged into the customer's server cart after sign-in or
+  registration; the local cart is cleared on sign-out.
 - Admin/catalog management routes are disabled in Storefront.

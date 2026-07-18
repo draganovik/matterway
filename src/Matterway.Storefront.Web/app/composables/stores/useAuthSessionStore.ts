@@ -1,9 +1,9 @@
 import {
   decodeJwtPayload,
-  getJwtArrayClaim,
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import type {
   AuthSession,
@@ -12,71 +12,44 @@ import type {
 } from "~/types/auth/session"
 
 const refreshCookieName = "mw_storefront_refresh"
+const refreshLockName = "mw-storefront-auth-refresh"
+const refreshRetryDelayMs = 30_000
 const authBasePath = buildServiceApiPath("identity", "public", "auth")
 const authJsonHeaders = {
-  "Content-Type": "application/json",
   accept: "application/json",
 } as const
 
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
   initPromise: Promise<void> | null
-}
-
-function translateAuthMessage(message: string) {
-  const normalized = message.trim()
-
-  if (!normalized) return normalized
-  if (normalized === "Email is required.") return "Imejl adresa je obavezna."
-  if (normalized === "Invalid email format.") {
-    return "Imejl adresa nije u ispravnom formatu."
-  }
-  if (normalized === "Password is required.") return "Lozinka je obavezna."
-  if (normalized === "One or more validation errors occurred.") {
-    return "Proverite unesene podatke."
-  }
-
-  return normalized
+  refreshTimer: ReturnType<typeof setTimeout> | null
 }
 
 function extractAuthError(payload: unknown) {
   if (!payload || typeof payload !== "object") return null
 
-  const candidate = payload as {
-    title?: unknown
-    detail?: unknown
-    message?: unknown
-    errors?: unknown
-  }
+  const candidate = payload as { errors?: unknown }
 
   if (candidate.errors && typeof candidate.errors === "object") {
     const entries = Object.entries(candidate.errors as Record<string, unknown>)
     const messages = entries
-      .flatMap(([field, value]) => {
+      .flatMap(([, value]) => {
         if (!Array.isArray(value)) return []
-        const label =
-          field === "Email" ? "Imejl" : field === "Password" ? "Lozinka" : field
         return value
           .filter(
             (item): item is string =>
               typeof item === "string" && item.trim().length > 0,
           )
-          .map((item) => `${label}: ${translateAuthMessage(item)}`)
+          .map((item) => item.trim())
       })
       .filter(Boolean)
 
     if (messages.length) {
-      return `${translateAuthMessage("One or more validation errors occurred.")} ${messages.join(" | ")}`
+      return messages.join(" | ")
     }
   }
 
-  const directMessage =
-    (typeof candidate.detail === "string" && candidate.detail) ||
-    (typeof candidate.title === "string" && candidate.title) ||
-    (typeof candidate.message === "string" && candidate.message) ||
-    ""
-
-  return directMessage ? translateAuthMessage(directMessage) : null
+  return getApiErrorMessage(payload)
 }
 
 function useAuthRuntimeState() {
@@ -88,6 +61,7 @@ function useAuthRuntimeState() {
     nuxtApp._mwStorefrontAuthRuntime = {
       refreshPromise: null,
       initPromise: null,
+      refreshTimer: null,
     }
   }
 
@@ -100,7 +74,6 @@ function useSessionState() {
     tokenType: "Bearer",
     created: null,
     expires: null,
-    refreshExpires: null,
   }))
 }
 
@@ -128,11 +101,12 @@ export function useAuthSessionStore() {
     ...getCookieOptions(),
     default: () => null,
   })
-  const refreshTimer = useState<ReturnType<typeof setTimeout> | null>(
-    "storefront-auth-refresh-timer",
+  const isInitialized = useState("storefront-auth-is-initialized", () => false)
+  const customerFirstName = useState<string | null>(
+    "storefront-customer-first-name",
     () => null,
   )
-  const isInitialized = useState("storefront-auth-is-initialized", () => false)
+  const hasRefreshSession = computed(() => Boolean(refreshTokenCookie.value))
 
   const payload = computed<JwtPayload | null>(() => {
     if (!session.value.accessToken) return null
@@ -157,8 +131,6 @@ export function useAuthSessionStore() {
       ),
   )
 
-  const permissions = computed(() => getJwtArrayClaim(payload.value, "perm"))
-
   const isCustomer = computed(() => role.value?.toLowerCase() === "customer")
 
   const isLoggedIn = computed(
@@ -167,12 +139,12 @@ export function useAuthSessionStore() {
 
   function authFetch(
     path: "login" | "logout" | "refresh",
-    options: RequestInit,
+    options: Exclude<Parameters<typeof $fetch.raw>[1], undefined>,
   ) {
     return $fetch.raw(`${authBasePath}/${path}`, {
       ...options,
       ignoreResponseError: true,
-    } as Parameters<typeof $fetch.raw>[1])
+    })
   }
 
   function authJsonPost(
@@ -182,15 +154,34 @@ export function useAuthSessionStore() {
     return authFetch(path, {
       method: "POST",
       headers: authJsonHeaders,
-      body: JSON.stringify(body),
+      body,
     })
   }
 
   function clearRefreshTimer() {
-    if (refreshTimer.value) {
-      clearTimeout(refreshTimer.value)
-      refreshTimer.value = null
+    if (runtime.refreshTimer) {
+      clearTimeout(runtime.refreshTimer)
+      runtime.refreshTimer = null
     }
+  }
+
+  function readRefreshToken() {
+    if (import.meta.client) {
+      const prefix = `${refreshCookieName}=`
+      const rawValue = document.cookie
+        .split("; ")
+        .find((cookie) => cookie.startsWith(prefix))
+        ?.slice(prefix.length)
+
+      if (!rawValue) return null
+      try {
+        return decodeURIComponent(rawValue)
+      } catch {
+        return rawValue
+      }
+    }
+
+    return refreshTokenCookie.value
   }
 
   function writeRefreshCookie(token: string | null, expires: Date | null) {
@@ -220,7 +211,6 @@ export function useAuthSessionStore() {
       tokenType: data.tokenType || "Bearer",
       created: data.created,
       expires: data.expires,
-      refreshExpires: data.refreshExpires,
     }
     const refreshExpires = parseDate(data.refreshExpires)
     writeRefreshCookie(data.refreshToken, refreshExpires)
@@ -233,14 +223,18 @@ export function useAuthSessionStore() {
       tokenType: "Bearer",
       created: null,
       expires: null,
-      refreshExpires: null,
     }
     writeRefreshCookie(null, null)
     clearRefreshTimer()
+    customerFirstName.value = null
+  }
+
+  function setCustomerFirstName(value: string | null | undefined) {
+    customerFirstName.value = value?.trim() || null
   }
 
   function getAccessToken() {
-    if (!session.value.accessToken) return null
+    if (!session.value.accessToken || isAccessExpired()) return null
     return `${session.value.tokenType} ${session.value.accessToken}`
   }
 
@@ -252,11 +246,28 @@ export function useAuthSessionStore() {
     if (!created || !expires) return
     const lifetimeMs = Math.max(0, expires.getTime() - created.getTime())
     if (!lifetimeMs) return
-    const delay = Math.floor(lifetimeMs * (2 / 3))
-    if (delay <= 0) return
-    refreshTimer.value = setTimeout(() => {
+    const refreshAt = created.getTime() + Math.floor(lifetimeMs * (2 / 3))
+    const delay = Math.max(0, refreshAt - Date.now())
+    runtime.refreshTimer = setTimeout(() => {
       void refreshTokens()
     }, delay)
+  }
+
+  function scheduleRefreshRetry() {
+    if (!import.meta.client || !readRefreshToken()) return
+    clearRefreshTimer()
+    runtime.refreshTimer = setTimeout(() => {
+      void refreshTokens()
+    }, refreshRetryDelayMs)
+  }
+
+  async function withRefreshLock(callback: () => Promise<void>) {
+    if (!import.meta.client || !("locks" in navigator)) {
+      await callback()
+      return
+    }
+
+    await navigator.locks.request(refreshLockName, callback)
   }
 
   async function login(credentials: LoginPayload) {
@@ -287,6 +298,7 @@ export function useAuthSessionStore() {
   }
 
   async function logout() {
+    await initialize()
     const token = getAccessToken()
     if (token) {
       await authFetch("logout", {
@@ -301,32 +313,43 @@ export function useAuthSessionStore() {
 
   async function refreshTokens() {
     if (runtime.refreshPromise) return runtime.refreshPromise
-    const refreshToken = refreshTokenCookie.value
-    if (!refreshToken) return
-    runtime.refreshPromise = (async () => {
-      try {
-        const response = await authJsonPost("refresh", { refreshToken }).catch(
-          () => null,
-        )
+    runtime.refreshPromise = withRefreshLock(async () => {
+      const refreshToken = readRefreshToken()
+      if (!refreshToken) return
 
-        if (!response || !response.ok) {
-          clearSession()
-          return
-        }
+      const response = await authJsonPost("refresh", { refreshToken }).catch(
+        () => null,
+      )
 
-        const data = response._data as LoginResponse | undefined
-        if (!data) {
-          clearSession()
-          return
-        }
-        setSession(data)
-        if (!isCustomer.value) {
-          clearSession()
-        }
-      } catch {
-        clearSession()
+      if (!response) {
+        scheduleRefreshRetry()
+        return
       }
-    })()
+
+      if (!response.ok) {
+        if (
+          response.status === 408 ||
+          response.status === 425 ||
+          response.status === 429 ||
+          response.status >= 500
+        ) {
+          scheduleRefreshRetry()
+          return
+        }
+
+        clearSession()
+        return
+      }
+
+      const data = response._data as LoginResponse | undefined
+      if (!data) {
+        scheduleRefreshRetry()
+        return
+      }
+
+      setSession(data)
+      if (!isCustomer.value) clearSession()
+    })
 
     try {
       await runtime.refreshPromise
@@ -350,17 +373,16 @@ export function useAuthSessionStore() {
           isInitialized.value = true
           return
         }
-        session.value.accessToken = null
       }
 
-      if (refreshTokenCookie.value) {
+      if (readRefreshToken()) {
         try {
           await refreshTokens()
         } catch {
-          clearSession()
+          scheduleRefreshRetry()
         }
       } else {
-        clearRefreshTimer()
+        clearSession()
       }
 
       isInitialized.value = true
@@ -374,19 +396,18 @@ export function useAuthSessionStore() {
   }
 
   return {
-    session,
-    payload,
     role,
     customerId,
-    permissions,
+    customerFirstName,
     isCustomer,
     isLoggedIn,
+    hasRefreshSession,
     login,
     logout,
     refreshTokens,
     getAccessToken,
+    setCustomerFirstName,
     initialize,
-    isAccessExpired,
     isInitialized,
   }
 }

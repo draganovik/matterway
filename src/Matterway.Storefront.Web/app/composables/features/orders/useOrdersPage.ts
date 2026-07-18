@@ -80,16 +80,10 @@ export function useOrdersPage() {
     await loadOrders()
   }
 
-  async function initialize() {
-    await loadOrders()
-  }
-
   return {
     loading,
     error,
     orders,
-    meta,
-    pagination,
     pageSize: PAGE_SIZE,
     totalPages,
     totalCount,
@@ -101,6 +95,5 @@ export function useOrdersPage() {
     openItems,
     loadOrders,
     changePage,
-    initialize,
   }
 }

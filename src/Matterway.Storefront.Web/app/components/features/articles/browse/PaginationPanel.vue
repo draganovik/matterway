@@ -14,7 +14,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div v-if="props.totalCount > 0" class="space-y-4">
+  <div
+    v-if="props.totalCount > 0"
+    class="border-default space-y-3 border-t pt-3"
+  >
     <UFormField label="Po stranici">
       <USelect
         :model-value="props.pageSize"

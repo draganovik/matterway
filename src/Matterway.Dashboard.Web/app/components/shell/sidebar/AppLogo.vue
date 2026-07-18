@@ -6,7 +6,7 @@ import logoUrl from "~/assets/brand/matterway-logo-red.svg"
   <ImageWithFallback
     :src="logoUrl"
     alt="Matterway"
-    img-class="block h-6 w-6 shrink-0"
-    placeholder-class="h-6 w-6 shrink-0 rounded-sm"
+    img-class="block h-8 w-8 shrink-0"
+    placeholder-class="h-8 w-8 shrink-0 rounded-md"
   />
 </template>

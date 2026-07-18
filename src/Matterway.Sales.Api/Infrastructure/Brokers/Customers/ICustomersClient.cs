@@ -2,14 +2,13 @@ namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
 public interface ICustomersClient
 {
-    Task<BrokerResponse<CustomersOrderResponse>> CreateOrderAsync(CustomersCreateOrderRequest request,
+    Task<BrokerResponse<CustomersOrderResponse>> PutOrderAsync(OrderId orderId, CustomersCreateOrderRequest request,
         CancellationToken cancellationToken);
 }
 
 public sealed record CustomersCreateOrderRequest
 {
     public Guid CustomerId { get; init; }
-    public OrderId OrderId { get; init; }
     public CustomersDeliveryInfoRequest? DeliveryInfo { get; init; }
 }
 

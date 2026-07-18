@@ -1,5 +1,11 @@
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { useCartStore } from "~/composables/stores/useCartStore"
+import type { CatalogArticle } from "~/types/catalog"
+
+export const OVERVIEW_CATEGORY_FILTERS = {
+  light: "category==light",
+  camera: "category==camera",
+} as const
 
 export function useOverviewPage() {
   const catalogApi = useCatalogClient()
@@ -7,44 +13,48 @@ export function useOverviewPage() {
 
   const loading = ref(true)
   const error = ref("")
-  const articles = ref(
-    [] as Awaited<ReturnType<typeof catalogApi.browseArticles>>["items"],
-  )
+  const latest = ref<CatalogArticle[]>([])
+  const lights = ref<CatalogArticle[]>([])
+  const cameras = ref<CatalogArticle[]>([])
   const totalCount = ref(0)
 
   async function loadOverview() {
     loading.value = true
     error.value = ""
 
-    const result = await catalogApi.browseArticles({
-      page: 1,
-      pageSize: 8,
-    })
+    const [latestResult, lightsResult, camerasResult] = await Promise.all([
+      catalogApi.browseArticles({ page: 1, pageSize: 4 }),
+      catalogApi.browseArticles({
+        page: 1,
+        pageSize: 4,
+        filter: OVERVIEW_CATEGORY_FILTERS.light,
+      }),
+      catalogApi.browseArticles({
+        page: 1,
+        pageSize: 4,
+        filter: OVERVIEW_CATEGORY_FILTERS.camera,
+      }),
+    ])
 
-    if (result.error) {
-      error.value = result.error
-    }
-
-    articles.value = result.items
-    totalCount.value = result.meta?.totalCount ?? result.items.length
+    error.value =
+      [latestResult, lightsResult, camerasResult].find((result) => result.error)
+        ?.error ?? ""
+    latest.value = latestResult.items
+    lights.value = lightsResult.items
+    cameras.value = camerasResult.items
+    totalCount.value =
+      latestResult.meta?.totalCount ?? latestResult.items.length
     loading.value = false
   }
-
-  async function initialize() {
-    await loadOverview()
-  }
-
-  const featured = computed(() => articles.value.slice(0, 4))
-  const featuredCount = computed(() => featured.value.length)
 
   return {
     cart,
     loading,
     error,
     totalCount,
-    featured,
-    featuredCount,
+    latest,
+    lights,
+    cameras,
     loadOverview,
-    initialize,
   }
 }

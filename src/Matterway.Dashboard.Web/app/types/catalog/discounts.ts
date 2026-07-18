@@ -8,14 +8,6 @@ export type CreateDiscountRequest = {
   articleCodes: string[]
 }
 
-export type CreatedDiscountResponse = {
-  code: string
-  percentage: NumberInput
-  validFrom: string
-  validTo?: string | null
-  articleCode: string
-}
-
 export type UpdateDiscountRequest = {
   percentage: NumberInput
   validFrom: string
@@ -28,7 +20,7 @@ export type UpdatedDiscountResponse = {
   percentage: NumberInput
   validFrom: string
   validTo?: string | null
-  articleCode: string
+  articleCodes: string[]
 }
 
 export type QueryDiscountResponse = {

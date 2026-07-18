@@ -32,7 +32,19 @@ const {
   changePageSize,
 } = useArticlesBrowsePage()
 
-const { targetRef: resultsSection, requestScrollReset } = useScrollReset(items)
+const resultsSection = ref<HTMLElement | null>(null)
+const scrollAfterLoad = ref(false)
+
+watch(
+  items,
+  () => {
+    if (!scrollAfterLoad.value) return
+
+    scrollAfterLoad.value = false
+    resultsSection.value?.scrollIntoView({ block: "start" })
+  },
+  { flush: "post" },
+)
 
 function handlePageChange(page: number) {
   if (page === pagination.page) return
@@ -43,15 +55,17 @@ function handlePageChange(page: number) {
     return
   }
 
-  requestScrollReset()
+  scrollAfterLoad.value = true
   goToPage(page)
 }
 </script>
 
 <template>
-  <div class="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+  <div
+    class="mx-auto grid w-full max-w-6xl gap-4 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-2"
+  >
     <div
-      class="flex flex-col gap-5 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:max-h-[56rem] lg:min-h-0"
+      class="lg:border-default flex flex-col gap-4 lg:sticky lg:top-[5.0625rem] lg:h-[calc(100dvh-6.0625rem)] lg:max-h-[56rem] lg:min-h-0 lg:border-e lg:pe-4"
     >
       <div class="lg:min-h-0 lg:flex-1">
         <ArticlesBrowseSearchFilterPanel
@@ -84,17 +98,17 @@ function handlePageChange(page: number) {
       />
     </div>
 
-    <div ref="resultsSection" class="scroll-mt-24 space-y-5">
+    <div ref="resultsSection" class="scroll-mt-20 space-y-4">
       <StatusMessages v-if="error" :error="error" />
 
       <div
         v-if="showInitialSkeleton"
-        class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        class="mx-auto flex max-w-[49.5rem] flex-wrap justify-start gap-3"
       >
         <USkeleton
           v-for="n in pagination.pageSize"
           :key="`article-skeleton-${n}`"
-          class="h-96"
+          class="h-96 w-full sm:w-64 sm:flex-none"
         />
       </div>
 
@@ -111,6 +125,7 @@ function handlePageChange(page: number) {
 
       <ArticlesBrowseListView
         v-else
+        class="mx-auto max-w-[49.5rem] !justify-start"
         :items="items"
         :is-refreshing="isRefreshing"
       />

@@ -19,7 +19,7 @@ export interface PaymentAddress {
 
 export type EmptyQuery = Record<string, never>
 
-export interface DeliveryInfoInput {
+interface DeliveryInfoInput {
   country: string
   city: string
   zipCode: string
@@ -33,7 +33,7 @@ export interface CheckoutOrderInput {
   deliveryInfo: DeliveryInfoInput
 }
 
-export interface CheckoutPaymentInput {
+interface CheckoutPaymentInput {
   type: "stripe"
   cardPayment: CardPaymentInput
 }

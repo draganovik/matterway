@@ -14,11 +14,10 @@ public class PublicQueryDetails : IEndpoint
             .WithName(RouteName).WithSummary("[public] Query available detail definitions")
             .WithTags(nameof(Detail))
             .Produces<PaginationResponse<PublicQueryDetailResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<PaginationResponse<PublicQueryDetailResponse>>, NoContent>> Handle(
+    private static async Task<Ok<PaginationResponse<PublicQueryDetailResponse>>> Handle(
         [AsParameters]
         PublicQueryDetailRequest request,
         HttpContext httpContext,
@@ -27,9 +26,6 @@ public class PublicQueryDetails : IEndpoint
         CancellationToken cancellationToken)
     {
         var total = await detailRepository.Count(request.TitleLike, cancellationToken);
-        if (total == 0)
-            return TypedResults.NoContent();
-
         var entities = await detailRepository.Query(
             request.Page,
             request.PageSize,

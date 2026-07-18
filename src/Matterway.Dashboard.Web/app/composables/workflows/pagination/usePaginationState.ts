@@ -1,24 +1,10 @@
 import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
-import { parseNumberOr } from "~/utils/numbers"
+import type { PaginationMeta } from "~/types/common/pagination"
 
-type NumericLike = string | number | null | undefined
-
-type MetaLike = {
-  totalCount?: NumericLike
-  totalPages?: NumericLike
-  currentPage?: NumericLike
-  pageSize?: NumericLike
-}
-
-type UsePaginationStateOptions = {
-  page?: number
-  pageSize?: number
-}
-
-export function usePaginationState(options: UsePaginationStateOptions = {}) {
+export function usePaginationState() {
   const pagination = reactive({
-    page: Math.max(1, options.page ?? 1),
-    pageSize: Math.max(1, options.pageSize ?? DEFAULT_PAGINATION_PAGE_SIZE),
+    page: 1,
+    pageSize: DEFAULT_PAGINATION_PAGE_SIZE,
     totalCount: 0,
     totalPages: 1,
   })
@@ -34,19 +20,13 @@ export function usePaginationState(options: UsePaginationStateOptions = {}) {
   }
 
   function applyMeta(
-    meta: MetaLike | null | undefined,
+    meta: PaginationMeta | null | undefined,
     fallbackTotalCount = 0,
   ) {
-    pagination.totalCount = parseNumberOr(meta?.totalCount, fallbackTotalCount)
-    pagination.totalPages = Math.max(1, parseNumberOr(meta?.totalPages, 1))
-    pagination.page = Math.max(
-      1,
-      parseNumberOr(meta?.currentPage, pagination.page),
-    )
-    pagination.pageSize = Math.max(
-      1,
-      parseNumberOr(meta?.pageSize, pagination.pageSize),
-    )
+    pagination.totalCount = meta?.totalCount ?? fallbackTotalCount
+    pagination.totalPages = Math.max(1, meta?.totalPages ?? 1)
+    pagination.page = Math.max(1, meta?.currentPage ?? pagination.page)
+    pagination.pageSize = Math.max(1, meta?.pageSize ?? pagination.pageSize)
   }
 
   function changePage(page: number) {

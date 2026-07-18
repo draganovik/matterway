@@ -1,4 +1,5 @@
-import { useAuthRegistrationWorkflow } from "~/composables/workflows/useAuthRegistrationWorkflow"
+import { useCustomersClient } from "~/composables/api/useCustomersClient"
+import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCartStore } from "~/composables/stores/useCartStore"
 import { resolveNextRoute } from "~/lib/auth/navigation"
 
@@ -23,7 +24,8 @@ function getDefaultBirthDate() {
 }
 
 export function useAuthRegisterPage() {
-  const registerCustomer = useAuthRegistrationWorkflow()
+  const customersApi = useCustomersClient()
+  const auth = useAuthSessionStore()
   const cart = useCartStore()
   const route = useRoute()
   const nuxtApp = useNuxtApp()
@@ -90,13 +92,18 @@ export function useAuthRegisterPage() {
 
     loading.value = true
     try {
-      await registerCustomer.registerAndSignIn({
+      const registration = await customersApi.registerCustomer({
         firstName,
         lastName,
         birthDate,
         email,
         password,
       })
+      if (!registration.ok) {
+        throw new Error(registration.error || "Registracija nije uspela.")
+      }
+
+      await auth.login({ email, password })
 
       await cart.mergeGuestItemsIntoRemote().catch(() => null)
       await nuxtApp.runWithContext(() => navigateTo(resolveNextRoute(route)))

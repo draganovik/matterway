@@ -2,11 +2,39 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: "orange",
-      neutral: "neutral",
+      neutral: "stone",
     },
     card: {
       slots: {
-        root: "dashboard-panel-surface rounded-lg overflow-hidden !ring-0 border border-default",
+        root: "border border-default !bg-elevated shadow-sm !ring-0",
+        header: "sm:px-4",
+        body: "sm:p-4",
+        footer: "sm:px-4",
+      },
+    },
+    modal: {
+      slots: {
+        header: "min-h-14 sm:px-4",
+        body: "sm:p-4",
+        footer: "sm:px-4",
+      },
+    },
+    dashboardNavbar: {
+      slots: {
+        root: "sm:px-4",
+      },
+    },
+    dashboardPanel: {
+      slots: {
+        body: "sm:gap-4 sm:p-4",
+      },
+    },
+    navigationMenu: {
+      slots: {
+        root: "p-1",
+        link: "rounded-md",
+        childList: "p-1",
+        childLink: "rounded-md",
       },
     },
   },

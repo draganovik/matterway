@@ -3,8 +3,6 @@ import { useSalesOrdersPage } from "~/composables/features/sales/useSalesOrdersP
 
 definePageMeta({
   title: "Porudžbine",
-  service: "sales",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -38,87 +36,81 @@ const {
 <template>
   <UDashboardPanel
     id="sales-orders"
-    :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
+    :ui="{
+      body: 'min-h-0 overflow-hidden py-3',
+    }"
   >
     <template #header>
       <UDashboardNavbar title="Porudžbine">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #trailing>
+          <PageInfoTooltip
+            text="Pregledajte porudžbine i otvarajte detalje, istoriju statusa, uplate i stavke za izabranu porudžbinu."
+          />
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <div class="h-full min-h-0">
-        <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-          <div
-            class="flex shrink-0 flex-wrap items-center justify-between gap-3"
-          >
-            <div>
-              <h2 class="text-foreground text-base font-semibold">
-                Upravljanje porudžbinama
-              </h2>
-              <p class="text-muted text-sm">
-                Pregledajte porudžbine i otvarajte detalje, istoriju statusa,
-                uplate i stavke za izabranu porudžbinu.
-              </p>
-            </div>
-          </div>
+        <EntitiesSplitView
+          class="h-full min-h-0"
+          :detail-loading="detailState.loading"
+        >
+          <template #list>
+            <SalesOrdersListView
+              :items="orders"
+              :selected-id="selectedId"
+              :filter="filter"
+              :loading="listState.loading"
+              :error="listState.error"
+              :empty-message="listState.empty"
+              :page="pagination.page"
+              :page-size="pagination.pageSize"
+              :total-count="pagination.totalCount"
+              :total-pages="pagination.totalPages"
+              @update:filter="
+                (value) => {
+                  filter = value
+                }
+              "
+              @search="searchOrders"
+              @update:page="changePage"
+              @update:page-size="changePageSize"
+              @select="selectOrder"
+            />
+          </template>
 
-          <EntitiesSplitView
-            class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
-            :detail-loading="detailState.loading"
-          >
-            <template #list>
-              <SalesOrdersListView
-                :items="orders"
-                :selected-id="selectedId"
-                :filter="filter"
-                :loading="listState.loading"
-                :error="listState.error"
-                :empty-message="listState.empty"
-                :page="pagination.page"
-                :page-size="pagination.pageSize"
-                :total-count="pagination.totalCount"
-                :total-pages="pagination.totalPages"
-                @update:filter="(value) => (filter = value)"
-                @search="searchOrders"
-                @update:page="changePage"
-                @update:page-size="changePageSize"
-                @select="selectOrder"
-              />
-            </template>
+          <template #detail>
+            <SalesOrdersInformationPanel
+              :order="selectedOrder"
+              :error="detailState.error"
+              :can-manage-statuses="canManageStatuses"
+              @reveal-details="revealDetails"
+              @reveal-status-history="revealStatusHistory"
+              @create-status="openCreateStatus"
+              @reveal-payments="revealPayments"
+              @reveal-items="revealItems"
+            />
+          </template>
+        </EntitiesSplitView>
 
-            <template #detail>
-              <SalesOrdersInformationPanel
-                :order="selectedOrder"
-                :error="detailState.error"
-                :can-manage-statuses="canManageStatuses"
-                @reveal-details="revealDetails"
-                @reveal-status-history="revealStatusHistory"
-                @create-status="openCreateStatus"
-                @reveal-payments="revealPayments"
-                @reveal-items="revealItems"
-              />
-            </template>
-          </EntitiesSplitView>
-        </div>
-
-        <SalesOrdersModalDetailsView
+        <SalesOrdersDetailsModal
           v-model:open="revealDetailsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalStatusHistoryView
+        <SalesOrdersStatusHistoryModal
           v-model:open="revealStatusHistoryModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalCreateStatusView
+        <SalesOrdersCreateStatusModal
           v-model:open="createStatusModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
@@ -126,13 +118,13 @@ const {
           @created="handleStatusCreated"
         />
 
-        <SalesOrdersModalPaymentsView
+        <SalesOrdersPaymentsModal
           v-model:open="revealPaymentsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalItemsView
+        <SalesOrdersItemsModal
           v-model:open="revealItemsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"

@@ -46,9 +46,9 @@ function showPrevious() {
 </script>
 
 <template>
-  <UCard class="border-default border">
+  <UCard>
     <div class="space-y-3">
-      <div class="bg-elevated relative overflow-hidden rounded-xl">
+      <div class="bg-elevated relative overflow-hidden rounded-md">
         <div class="relative aspect-[4/3]">
           <ImageWithFallback
             :src="currentImage?.url || null"
@@ -83,12 +83,12 @@ function showPrevious() {
         </div>
       </div>
 
-      <div v-if="hasMultipleImages" class="flex gap-2 overflow-x-auto pb-1">
+      <div v-if="hasMultipleImages" class="flex gap-2 overflow-x-auto p-1">
         <button
           v-for="(image, index) in images"
           :key="image.id"
           type="button"
-          class="bg-elevated relative w-24 shrink-0 overflow-hidden rounded-lg border"
+          class="bg-elevated relative w-24 shrink-0 overflow-hidden rounded-md border"
           :class="index === activeIndex ? 'border-primary' : 'border-default'"
           @click="selectImage(index)"
         >

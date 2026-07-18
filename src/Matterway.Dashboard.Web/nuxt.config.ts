@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
   ssr: true,
+  nitro: { preset: "node-server" },
   colorMode: {
     preference: "system",
     storageKey: "mw-dashboard-color-mode",

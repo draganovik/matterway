@@ -11,8 +11,8 @@ export const serviceSections: ServiceSection[] = [
   {
     key: "catalog",
     label: "Katalog",
+    icon: "i-lucide-package",
     service: "catalog",
-    allowed: [...readAllowed],
     features: [
       {
         key: "articles",
@@ -20,7 +20,6 @@ export const serviceSections: ServiceSection[] = [
         route: "/catalog/articles",
         service: "catalog",
         allowed: [...readAllowed],
-        actions: [],
       },
       {
         key: "details",
@@ -28,7 +27,6 @@ export const serviceSections: ServiceSection[] = [
         route: "/catalog/details",
         service: "catalog",
         allowed: [...readAllowed],
-        actions: [],
       },
       {
         key: "discounts",
@@ -36,7 +34,6 @@ export const serviceSections: ServiceSection[] = [
         route: "/catalog/discounts",
         service: "catalog",
         allowed: [...readAllowed],
-        actions: [],
       },
       {
         key: "archive",
@@ -44,15 +41,14 @@ export const serviceSections: ServiceSection[] = [
         route: "/catalog/archive",
         service: "catalog",
         allowed: [...managerAllowed],
-        actions: [],
       },
     ],
   },
   {
     key: "users",
     label: "Korisnici",
+    icon: "i-lucide-users",
     service: "customers",
-    allowed: [...readAllowed],
     features: [
       {
         key: "customers",
@@ -60,7 +56,6 @@ export const serviceSections: ServiceSection[] = [
         route: "/users/customers",
         service: "customers",
         allowed: [...readAllowed],
-        actions: [],
       },
       {
         key: "accounts",
@@ -68,15 +63,14 @@ export const serviceSections: ServiceSection[] = [
         route: "/users/accounts",
         service: "identity",
         allowed: [...operateAllowed],
-        actions: [],
       },
     ],
   },
   {
     key: "sales",
     label: "Prodaja",
+    icon: "i-lucide-receipt-text",
     service: "sales",
-    allowed: [...readAllowed],
     features: [
       {
         key: "orders",
@@ -84,7 +78,6 @@ export const serviceSections: ServiceSection[] = [
         route: "/sales/orders",
         service: "sales",
         allowed: [...readAllowed],
-        actions: [],
       },
     ],
   },

@@ -12,9 +12,6 @@ namespace Matterway.ServiceDefaults.Identifiers;
 [TypeConverter(typeof(OrderIdTypeConverter))]
 public readonly record struct OrderId : IParsable<OrderId>, ISpanParsable<OrderId>
 {
-    private const int LegacyDigitsPerGroup = 4;
-    private const int LegacyGroupCount = 4;
-    private const int LegacyTotalDigits = LegacyDigitsPerGroup * LegacyGroupCount;
     private const string EncodedTimestampFormat = "yyyyMMddHHmmssfff";
 
     public const int Length = 19;
@@ -51,8 +48,7 @@ public readonly record struct OrderId : IParsable<OrderId>, ISpanParsable<OrderI
         if (TryParse(s, provider, out var result))
             return result;
 
-        throw new FormatException(
-            $"Order id '{s}' is invalid. Use {Length} hexadecimal characters or the legacy 0000-0000-0000-0000 format.");
+        throw new FormatException($"Order id '{s}' is invalid. Use {Length} hexadecimal characters.");
     }
 
     public static OrderId Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
@@ -104,49 +100,15 @@ public readonly record struct OrderId : IParsable<OrderId>, ISpanParsable<OrderI
         if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        var trimmed = value.Trim();
-        return TryNormalizeLegacy(trimmed, out normalized) || TryNormalizeHex(trimmed, out normalized);
-    }
-
-    private static bool TryNormalizeLegacy(string value, out string normalized)
-    {
-        normalized = string.Empty;
-
-        Span<char> digits = stackalloc char[LegacyTotalDigits];
-        var digitCount = 0;
-
-        foreach (var character in value)
-        {
-            if (character == '-')
-                continue;
-
-            if (!char.IsAsciiDigit(character) || digitCount >= LegacyTotalDigits)
-                return false;
-
-            digits[digitCount++] = character;
-        }
-
-        if (digitCount != LegacyTotalDigits)
+        var trimmed = value.Trim().ToLowerInvariant();
+        if (trimmed.Length != Length)
             return false;
 
-        normalized =
-            $"{new string(digits[..4])}-{new string(digits[4..8])}-{new string(digits[8..12])}-{new string(digits[12..16])}";
-        return true;
-    }
-
-    private static bool TryNormalizeHex(string value, out string normalized)
-    {
-        normalized = string.Empty;
-
-        if (value.Length != Length)
-            return false;
-
-        var lowered = value.ToLowerInvariant();
-        foreach (var character in lowered)
+        foreach (var character in trimmed)
             if (!char.IsAsciiHexDigit(character))
                 return false;
 
-        normalized = lowered;
+        normalized = trimmed;
         return true;
     }
 
@@ -162,7 +124,7 @@ public readonly record struct OrderId : IParsable<OrderId>, ISpanParsable<OrderI
                 return result;
 
             throw new JsonException(
-                $"Order id '{raw}' is invalid. Use {Length} hexadecimal characters or the legacy 0000-0000-0000-0000 format.");
+                $"Order id '{raw}' is invalid. Use {Length} hexadecimal characters.");
         }
 
         public override void Write(Utf8JsonWriter writer, OrderId value, JsonSerializerOptions options)

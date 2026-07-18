@@ -44,13 +44,10 @@ public sealed class EfPgArticleDetailTextRepository(CatalogDbComposer context) :
     {
         var normalizedCode = articleCode.Value;
         context.ArticleDetailText.Update(request);
-        var affected = await context.SaveChangesAsync(cancellationToken);
-        if (affected > 0)
-            return await context.ArticleDetailText
-                .Include(x => x.Detail)
-                .FirstOrDefaultAsync(x => x.ArticleCode == normalizedCode && x.DetailSlug == detailSlug,
-                    cancellationToken);
-
-        return null;
+        await context.SaveChangesAsync(cancellationToken);
+        return await context.ArticleDetailText
+            .Include(x => x.Detail)
+            .FirstOrDefaultAsync(x => x.ArticleCode == normalizedCode && x.DetailSlug == detailSlug,
+                cancellationToken);
     }
 }

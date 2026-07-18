@@ -17,18 +17,6 @@ export function decodeJwtPayload(token: string): JwtPayload | null {
   }
 }
 
-export function getJwtArrayClaim(
-  payload: JwtPayload | null,
-  key: string,
-): string[] {
-  if (!payload) return []
-  const raw = payload[key]
-  if (Array.isArray(raw))
-    return raw.filter((item): item is string => typeof item === "string")
-  if (typeof raw === "string") return [raw]
-  return []
-}
-
 export function getJwtStringClaim(
   payload: JwtPayload | null,
   key: string,

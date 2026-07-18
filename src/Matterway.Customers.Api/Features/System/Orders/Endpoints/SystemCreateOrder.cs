@@ -12,10 +12,11 @@ public class SystemCreateOrder : IEndpoint
 
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPost(EndpointKind.System, "orders", Handler)
+        endpoints.MapPut(EndpointKind.System, "orders/{orderId:OrderId}", Handler)
             .WithName(RouteName)
-            .WithSummary("[system] Create customer order from open cart items.")
+            .WithSummary("[system] Create or return a customer order from open cart items.")
             .WithTags(nameof(CustomerOrder))
+            .Produces<SystemCreateOrderResponse>(StatusCodes.Status200OK)
             .Produces<SystemCreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
@@ -23,8 +24,10 @@ public class SystemCreateOrder : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Created<SystemCreateOrderResponse>, BadRequest<ProblemDetails>, NotFound>>
+    private static async Task<Results<Ok<SystemCreateOrderResponse>, Created<SystemCreateOrderResponse>,
+            BadRequest<ProblemDetails>, NotFound>>
         Handler(
+            OrderId orderId,
             SystemCreateOrderRequest request,
             HttpContext httpContext,
             ICustomerRepository customerRepository,
@@ -40,18 +43,17 @@ public class SystemCreateOrder : IEndpoint
                 Detail = "CustomerId is required."
             });
 
-        if (request.OrderId == default)
+        var customer = await customerRepository.GetBy(request.CustomerId, cancellationToken);
+        if (customer is null) return TypedResults.NotFound();
+
+        var existingOrder = await customerOrderRepository.GetById(orderId, cancellationToken);
+        if (existingOrder is not null && existingOrder.CustomerId != request.CustomerId)
             return TypedResults.BadRequest(new ProblemDetails
             {
                 Title = "Bad Request",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = "OrderId is required."
+                Detail = "OrderId is already assigned to another customer."
             });
-
-        var orderId = OrderId.Parse(request.OrderId!, null);
-
-        var customer = await customerRepository.GetBy(request.CustomerId, cancellationToken);
-        if (customer is null) return TypedResults.NotFound();
 
         var deliveryInfo = request.DeliveryInfo is null
             ? await ResolveDeliveryInfo(customer, addressRepository, cancellationToken)
@@ -83,8 +85,10 @@ public class SystemCreateOrder : IEndpoint
                 Detail = "Unable to create order from cart items."
             });
 
-        var location = $"{httpContext.Request.Path}/{createdOrder.OrderId}";
-        return TypedResults.Created(location, ToResponse(createdOrder, deliveryInfo));
+        var response = ToResponse(createdOrder, deliveryInfo);
+        return existingOrder is null
+            ? TypedResults.Created(httpContext.Request.Path, response)
+            : TypedResults.Ok(response);
     }
 
     private static async Task<SystemCreateOrderResponse.DeliveryInfoResponse?> ResolveDeliveryInfo(

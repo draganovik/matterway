@@ -42,7 +42,7 @@ export function useSalesClient() {
       `${ADMIN_ORDERS_PATH}/${orderId}/statuses`,
       {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }

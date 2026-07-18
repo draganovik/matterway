@@ -6,17 +6,16 @@ export type {
   NumberInput,
 } from "./shared"
 export type {
-  AddArticleDetailRequest,
   AddArticleImageRequest,
   ArticleImagesMutationResponse,
   CreateArticleRequest,
   CreateArticleResponse,
   DeleteArticleResponse,
   GetArticleResponse,
+  PutArticleDetailRequest,
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,
-  UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
   UpdateArticleRequest,
   UpdateArticleResponse,
@@ -31,7 +30,6 @@ export type {
 } from "./details"
 export type {
   CreateDiscountRequest,
-  CreatedDiscountResponse,
   DeleteDiscountResponse,
   QueryDiscountResponse,
   UpdateDiscountRequest,

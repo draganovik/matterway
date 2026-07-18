@@ -8,7 +8,7 @@ actor user as "User"
 
 together {
   actor empl as "Employee"
-  actor sysm as "System"
+  actor sysm as "Customers Service"
 }
 
 user <|-- empl
@@ -26,20 +26,15 @@ package "Identity" {
   usecase deleteSystemUser as "Delete System User"
   usecase viewSystemUsers as "View System Users"
 
-  together {
-    usecase viewUserPermissions as "View User Permissions"
-    usecase manageUserPermissions as "Manage User Permissions"
-    usecase createEmployeeAccount as "Create Employee User Account"
-  }
+  usecase viewUserPermissions as "View User Permissions"
+  usecase manageUserPermissions as "Manage User Permissions"
+  usecase createAccount as "Create Employee Account"
 
-  together {
-    usecase createCustomerAccount as "Create Customer User Account"
-    usecase introspectAccessToken as "Introspect Access Token"
-  }
+  usecase createCustomerAccount as "Create Customer Account"
 
-  manageUserPermissions .u.> viewUserPermissions : <<include>>
-  manageSystemUsers .u.> viewSystemUsers : <<include>>
-  manageSystemUsers <.u. deleteSystemUser : <<extend>>
+  manageUserPermissions .l.> viewUserPermissions : <<include>>
+  manageSystemUsers .r.> viewSystemUsers : <<include>>
+  manageSystemUsers <.l. deleteSystemUser : <<extend>>
 }
 
 user --- signIn
@@ -48,9 +43,9 @@ user --- signOut
 
 manageSystemUsers --- empl : perm:[operator,manager]
 
+viewUserPermissions --- empl : perm:[operator,manager]
 manageUserPermissions --- empl : perm:[manager]
-createEmployeeAccount --- empl : perm:[manager]
+createAccount --- empl : perm:[manager]
 
-introspectAccessToken --- sysm
 createCustomerAccount --- sysm
 @enduml

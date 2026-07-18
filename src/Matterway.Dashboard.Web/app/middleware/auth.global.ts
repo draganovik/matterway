@@ -4,23 +4,17 @@ import { getFeatureByRoute } from "~/data/serviceRegistry"
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuthSessionStore()
 
-  if (to.meta.public) {
-    await auth.initialize()
-    return
-  }
-
   await auth.initialize()
+
+  if (to.meta.public) return
 
   if (!auth.isLoggedIn.value || !auth.isEmployee.value) {
     return navigateTo("/login")
   }
 
   const feature = getFeatureByRoute(to.path)
-  const requiredService = to.meta.service ?? feature?.service
-  const requiredPermissions = to.meta.permissions ?? feature?.allowed
-
-  if (requiredService && requiredPermissions?.length) {
-    if (!auth.hasPermission(requiredService, requiredPermissions)) {
+  if (feature) {
+    if (!auth.hasPermission(feature.service, feature.allowed)) {
       return navigateTo("/")
     }
   }

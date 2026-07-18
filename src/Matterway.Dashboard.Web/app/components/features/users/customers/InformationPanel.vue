@@ -37,7 +37,7 @@ const emit = defineEmits<{
 <template>
   <div class="space-y-4">
     <div class="space-y-1">
-      <h3 class="text-foreground text-base font-semibold">
+      <h3 class="text-highlighted text-base font-semibold">
         {{ customer ? "Izmena kupca" : "Uređivanje kupca" }}
       </h3>
       <p class="text-muted text-sm">
@@ -89,10 +89,10 @@ const emit = defineEmits<{
       </div>
 
       <div
-        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
+        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-md border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">Adresa</h4>
+          <h4 class="text-highlighted text-sm font-semibold">Adresa</h4>
           <p class="text-muted text-sm">
             Otvorite i upravljajte adresom izabranog kupca.
           </p>

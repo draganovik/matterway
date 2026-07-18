@@ -4,6 +4,8 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerOrderEntity
 
 public interface ICustomerOrderRepository
 {
+    Task<CustomerOrder?> GetById(OrderId orderId, CancellationToken cancellationToken = default);
+
     Task<CustomerOrder?> CreateFromCart(Guid customerId, OrderId orderId,
         CancellationToken cancellationToken = default);
 

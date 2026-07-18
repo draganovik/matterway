@@ -1,16 +1,15 @@
-export type RequestState = {
+type RequestState = {
   loading: boolean
   error: string
   success: string
   empty: string
 }
 
-export function useRequestState(initial?: Partial<RequestState>) {
+export function useRequestState(empty = "", loading = false) {
   return reactive<RequestState>({
-    loading: false,
+    loading,
     error: "",
     success: "",
-    empty: "",
-    ...initial,
+    empty,
   })
 }

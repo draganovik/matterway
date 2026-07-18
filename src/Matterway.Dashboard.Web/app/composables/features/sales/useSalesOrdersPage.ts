@@ -1,4 +1,3 @@
-import { DEFAULT_PAGINATION_PAGE_SIZE } from "~/constants/pagination"
 import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useSalesClient } from "~/composables/api/useSalesClient"
 import { usePaginationState } from "~/composables/workflows/pagination/usePaginationState"
@@ -12,7 +11,7 @@ export function useSalesOrdersPage() {
     auth.hasPermission("sales", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "Nema porudžbina." })
+  const listState = useRequestState("Nema porudžbina.", true)
   const detailState = useRequestState()
 
   const orders = ref<OrderResponse[]>([])
@@ -25,7 +24,7 @@ export function useSalesOrdersPage() {
     changePageSize,
     searchWithPageReset,
     watchPagination,
-  } = usePaginationState({ pageSize: DEFAULT_PAGINATION_PAGE_SIZE })
+  } = usePaginationState()
 
   const selectedId = ref<string | null>(null)
   const selectedOrder = ref<OrderResponse | null>(null)
