@@ -195,6 +195,7 @@ function submitSelection() {
             placeholder="Pretraga pomoću RSQL filtera (npr. title==NAS;available==true)."
             :rows="3"
             class="w-full"
+            @keydown.enter.exact.prevent="searchArticles"
           />
         </UFormField>
 

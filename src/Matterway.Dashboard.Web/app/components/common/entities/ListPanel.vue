@@ -111,6 +111,7 @@ function updatePageSize(value: number) {
           size="md"
           :rows="3"
           class="w-full"
+          @keydown.enter.exact.prevent="applySearch"
         />
       </template>
 
