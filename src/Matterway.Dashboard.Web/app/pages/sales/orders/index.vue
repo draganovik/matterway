@@ -94,19 +94,19 @@ const {
           </template>
         </EntitiesSplitView>
 
-        <SalesOrdersModalDetailsView
+        <SalesOrdersDetailsModal
           v-model:open="revealDetailsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalStatusHistoryView
+        <SalesOrdersStatusHistoryModal
           v-model:open="revealStatusHistoryModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalCreateStatusView
+        <SalesOrdersCreateStatusModal
           v-model:open="createStatusModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
@@ -114,13 +114,13 @@ const {
           @created="handleStatusCreated"
         />
 
-        <SalesOrdersModalPaymentsView
+        <SalesOrdersPaymentsModal
           v-model:open="revealPaymentsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"
         />
 
-        <SalesOrdersModalItemsView
+        <SalesOrdersItemsModal
           v-model:open="revealItemsModalOpen"
           :order-id="selectedOrder?.id || null"
           :order-label="selectedOrderLabel"

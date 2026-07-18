@@ -57,7 +57,7 @@ watch(
   >
     <div class="px-4 sm:px-5 lg:px-6">
       <div class="mx-auto flex h-14 w-full max-w-6xl items-center gap-3">
-        <HeaderAppLogo />
+        <AppLogo />
 
         <nav class="ml-2 hidden items-center gap-1 lg:flex">
           <UButton
@@ -121,9 +121,7 @@ watch(
             <span v-if="cartCount">{{ cartCount }}</span>
           </UButton>
 
-          <HeaderUserDropdown
-            v-if="auth.isLoggedIn.value && auth.isCustomer.value"
-          />
+          <UserDropdown v-if="auth.isLoggedIn.value && auth.isCustomer.value" />
           <UButton
             v-else
             to="/login"

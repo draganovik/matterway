@@ -96,7 +96,7 @@ const {
           </template>
         </EntitiesSplitView>
 
-        <CatalogArticlesModalInformationView
+        <CatalogArticlesCreateModal
           v-model:open="createModalOpen"
           :can-edit="canEdit"
           @created="handleArticleCreated"

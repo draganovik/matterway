@@ -121,7 +121,7 @@ function toNumberOrUndefined(value: string | number | null | undefined) {
           v-if="filters.detailFilters.length"
           class="space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:p-1"
         >
-          <ArticlesBrowseSearchFilterListItem
+          <ArticlesBrowseDetailFilterRow
             v-for="(detailFilter, index) in filters.detailFilters"
             :key="`detail-filter-${index}-${detailFilter.slug}`"
             :detail-filter="detailFilter"

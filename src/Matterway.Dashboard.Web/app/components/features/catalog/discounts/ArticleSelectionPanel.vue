@@ -68,7 +68,7 @@ function applySelection(next: string[]) {
     </div>
   </div>
 
-  <CatalogDiscountsModalArticleSelectionView
+  <CatalogDiscountsArticleSelectionModal
     v-model:open="articleModalOpen"
     :selected-ids="selectedIds"
     :can-edit="canEdit"

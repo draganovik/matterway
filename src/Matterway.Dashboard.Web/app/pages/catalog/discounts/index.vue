@@ -105,7 +105,7 @@ const {
         </EntitiesSplitView>
       </div>
 
-      <CatalogDiscountsModalInformationView
+      <CatalogDiscountsCreateModal
         v-model:open="createModalOpen"
         :can-edit="canEdit"
         @created="handleDiscountCreated"

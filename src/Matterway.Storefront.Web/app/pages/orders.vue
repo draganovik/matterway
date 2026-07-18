@@ -71,10 +71,10 @@ await loadOrders()
       />
     </div>
 
-    <OrdersModalStatusHistoryView
+    <OrdersStatusHistoryModal
       v-model:open="statusHistoryOpen"
       :order="selectedOrder"
     />
-    <OrdersModalItemsView v-model:open="itemsOpen" :order="selectedOrder" />
+    <OrdersItemsModal v-model:open="itemsOpen" :order="selectedOrder" />
   </div>
 </template>

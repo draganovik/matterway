@@ -107,13 +107,13 @@ const {
           </template>
         </EntitiesSplitView>
 
-        <UsersCustomersModalInformationView
+        <UsersCustomersCreateModal
           v-model:open="createModalOpen"
           :can-edit="canEdit"
           @created="handleCustomerCreated"
         />
 
-        <UsersCustomersModalAddressView
+        <UsersCustomersAddressModal
           v-model:open="addressModalOpen"
           :customer-id="selectedCustomer?.systemUserId || null"
           :customer-name="selectedCustomerName"

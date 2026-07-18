@@ -222,7 +222,7 @@ async function handleDetailSubmit(payload: {
     </div>
   </div>
 
-  <CatalogArticlesModalDetailView
+  <CatalogArticlesDetailModal
     v-model:open="detailModalOpen"
     :mode="detailModalMode"
     :detail="activeDetail"

@@ -265,7 +265,7 @@ async function handleImageSubmit(payload: {
     </div>
   </div>
 
-  <CatalogArticlesModalImageView
+  <CatalogArticlesImageModal
     v-model:open="imageModalOpen"
     :mode="imageModalMode"
     :image="activeImage"

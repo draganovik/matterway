@@ -225,7 +225,7 @@ function submitSelection() {
           </UButton>
         </div>
 
-        <CatalogDiscountsModalArticleSelectionListView
+        <CatalogDiscountsArticleSelectionListView
           :items="articles"
           :selected-ids="selectedArticleCodes"
           :loading="listState.loading"

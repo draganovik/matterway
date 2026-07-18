@@ -114,13 +114,13 @@ const {
           </template>
         </EntitiesSplitView>
 
-        <UsersAccountsModalInformationView
+        <UsersAccountsCreateModal
           v-model:open="createModalOpen"
           :can-manage="canManage"
           @created="handleEmployeeCreated"
         />
 
-        <UsersAccountsModalRolesView
+        <UsersAccountsPermissionsModal
           v-model:open="rolesModalOpen"
           :system-user-id="selectedSystemUser?.id || null"
           :user-label="selectedUserLabel"

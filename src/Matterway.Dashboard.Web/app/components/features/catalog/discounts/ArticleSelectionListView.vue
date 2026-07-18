@@ -53,7 +53,7 @@ function isSelected(article: QueryArticleResponse) {
           resolveId(article) ? emit('toggle', resolveId(article)) : undefined
         "
       >
-        <CatalogDiscountsModalArticleSelectionListItem
+        <CatalogDiscountsArticleSelectionListItem
           :item="article"
           :selected="isSelected(article)"
         />
