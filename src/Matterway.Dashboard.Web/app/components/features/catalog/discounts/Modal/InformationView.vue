@@ -106,7 +106,8 @@ async function createDiscount() {
   }
 
   createState.loading = true
-  const result = await api.createDiscounts(payload)
+  const { code: discountCode, ...request } = payload
+  const result = await api.putDiscount(discountCode, request)
   createState.loading = false
 
   if (!result.ok) {

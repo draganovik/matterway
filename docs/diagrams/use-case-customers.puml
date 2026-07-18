@@ -18,10 +18,7 @@ user <|-- csmr
 user <|-- empl
 
 package "Customers" {
-  together {
-    usecase syncOnOrder as "Sync On Order"
-    usecase verifyCustomer as "Verify Customer"
-  }
+  usecase syncOnOrder as "Put Order Snapshot by ID"
 
   usecase createCustomer as "Create Customer"
   usecase manageOwnProfile as "Manage Own Profile"
@@ -44,7 +41,6 @@ csmr -- manageOwnAddress
 csmr -- manageOwnCartItems
 
 syncOnOrder -- sysm
-verifyCustomer -- sysm
 
 viewCustomers -- empl : perm:[observer,operator,manager]
 manageCustomers -- empl : perm:[operator,manager]

@@ -14,14 +14,14 @@ public class SelfQueryOrders : IEndpoint
             .WithName(RouteName).WithSummary("[self] Query own Orders.")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<SelfBaseOrderResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<SelfBaseOrderResponse>>, NoContent>>
+        Task<Results<Ok<PaginationResponse<SelfBaseOrderResponse>>, ForbidHttpResult>>
         Handler([AsParameters] SelfQueryOrderParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -29,12 +29,9 @@ public class SelfQueryOrders : IEndpoint
             CancellationToken cancellationToken)
     {
         var customerId = RequestIdentity.GetIdentifier(httpContext.User);
-        if (customerId is null) return TypedResults.NoContent();
+        if (customerId is null) return TypedResults.Forbid();
 
         var total = await orderRepository.Count(customerId, cancellationToken);
-        if (total == 0)
-            return TypedResults.NoContent();
-
         var entities = await orderRepository.Query(
             queryParameters.Page,
             queryParameters.PageSize,

@@ -51,7 +51,7 @@ end
 
 Bff -> Sales : 2.1 Create order
 activate Sales
-Sales -> Customers : 2.2 Finalize cart as an order snapshot
+Sales -> Customers : 2.2 PUT order snapshot by order ID
 activate Customers
 
 alt Order creation succeeds

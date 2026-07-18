@@ -14,7 +14,6 @@ public class AdminQueryCustomers : IEndpoint
             .WithName(RouteName).WithSummary("[admin] Query Customers")
             .WithTags(nameof(Customer))
             .Produces<PaginationResponse<AdminBaseCustomerResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
@@ -22,7 +21,7 @@ public class AdminQueryCustomers : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<PaginationResponse<AdminBaseCustomerResponse>>, NoContent>>
+    private static async Task<Ok<PaginationResponse<AdminBaseCustomerResponse>>>
         Handler([AsParameters] PaginationRequestParameters pagingQuery,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -43,8 +42,6 @@ public class AdminQueryCustomers : IEndpoint
             pagingQuery.Page,
             pagingQuery.PageSize,
             baseUri);
-
-        if (entities.Count == 0) return TypedResults.NoContent();
 
         return TypedResults.Ok(paginationResponse);
     }

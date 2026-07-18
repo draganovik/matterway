@@ -371,7 +371,7 @@ export function useCatalogDiscountsPage() {
     if (!built) return
 
     submitState.loading = true
-    const result = await api.updateDiscount(built.code, built.payload)
+    const result = await api.putDiscount(built.code, built.payload)
     submitState.loading = false
 
     if (!result.ok) {

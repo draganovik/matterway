@@ -99,7 +99,7 @@ async function handleDetailSubmit(payload: {
   )
   if (detailModalMode.value === "edit" && activeDetail.value?.detailSlug) {
     const targetSlug = activeDetail.value.detailSlug
-    const result = await api.updateArticleDetail(props.code, targetSlug, {
+    const result = await api.putArticleDetail(props.code, targetSlug, {
       textValue: payload.textValue ?? undefined,
       numericValue: payload.numericValue ?? undefined,
     })
@@ -129,8 +129,7 @@ async function handleDetailSubmit(payload: {
     mutateState.error = "Detalj već postoji."
     return
   }
-  const addResult = await api.addArticleDetail(props.code, {
-    detailSlug: payload.detailSlug,
+  const addResult = await api.putArticleDetail(props.code, payload.detailSlug, {
     textValue: payload.textValue ?? undefined,
     numericValue: payload.numericValue ?? undefined,
   })

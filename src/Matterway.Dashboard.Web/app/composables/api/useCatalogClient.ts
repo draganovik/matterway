@@ -5,14 +5,11 @@ import { buildServiceApiPath } from "~/utils/apiProxy"
 import { buildCatalogImageUrl } from "~/utils/catalogImages"
 import type { ApiResult } from "~/types/common/api"
 import type {
-  AddArticleDetailRequest,
   AddArticleImageRequest,
   ArticleImageProperty,
   ArticleImagesMutationResponse,
   CreateArticleRequest,
   CreateArticleResponse,
-  CreateDiscountRequest,
-  CreatedDiscountResponse,
   DeleteArticleResponse,
   DeleteDetailResponse,
   DeleteDiscountResponse,
@@ -21,13 +18,13 @@ import type {
   ImportCatalogArchiveResponse,
   PutDetailRequest,
   PutDetailResponse,
+  PutArticleDetailRequest,
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,
   QueryDetailsParams,
   QueryDetailsResponse,
   QueryDiscountResponse,
-  UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
   UpdateArticleRequest,
   UpdateArticleResponse,
@@ -218,26 +215,16 @@ export function useCatalogClient() {
     } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
-  async function addArticleDetail(
-    code: string,
-    payload: AddArticleDetailRequest,
-  ) {
-    return api.request("catalog", `${ADMIN_ARTICLES_PATH}/${code}/details`, {
-      method: "POST",
-      body: payload,
-    })
-  }
-
-  async function updateArticleDetail(
+  async function putArticleDetail(
     code: string,
     detailSlug: string,
-    payload: UpdateArticleDetailRequest,
+    payload: PutArticleDetailRequest,
   ) {
     return api.request(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/details/${detailSlug}`,
       {
-        method: "PATCH",
+        method: "PUT",
         body: payload,
       },
     )
@@ -286,22 +273,11 @@ export function useCatalogClient() {
     )
   }
 
-  async function createDiscounts(payload: CreateDiscountRequest) {
-    return api.request<CreatedDiscountResponse[]>(
-      "catalog",
-      ADMIN_DISCOUNTS_PATH,
-      {
-        method: "POST",
-        body: payload,
-      },
-    )
-  }
-
   async function queryDiscounts() {
     return api.request<QueryDiscountResponse[]>("catalog", ADMIN_DISCOUNTS_PATH)
   }
 
-  async function updateDiscount(code: string, payload: UpdateDiscountRequest) {
+  async function putDiscount(code: string, payload: UpdateDiscountRequest) {
     return api.request<UpdatedDiscountResponse>(
       "catalog",
       `${ADMIN_DISCOUNTS_PATH}/${encodeURIComponent(code)}`,
@@ -422,15 +398,13 @@ export function useCatalogClient() {
     addArticleImage,
     updateArticleImage,
     removeArticleImage,
-    addArticleDetail,
-    updateArticleDetail,
+    putArticleDetail,
     removeArticleDetail,
     queryDetails,
     putDetail,
     deleteDetail,
     queryDiscounts,
-    createDiscounts,
-    updateDiscount,
+    putDiscount,
     deleteDiscount,
     importCatalogArchive,
     exportCatalogArchive,

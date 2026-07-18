@@ -14,26 +14,26 @@ public class SelfQueryCartItems : IEndpoint
             .WithName(RouteName).WithSummary("[self] Query own CartItems.")
             .WithTags(nameof(CustomerArticle))
             .Produces<PaginationResponse<SelfBaseCartItemResponse>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<PaginationResponse<SelfBaseCartItemResponse>>, NoContent, ForbidHttpResult>>
+    private static async Task<Results<Ok<PaginationResponse<SelfBaseCartItemResponse>>, ForbidHttpResult>>
         Handler(
             [AsParameters]
             PaginationRequestParameters pagingQuery,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
-            ICustomerArticleRepository cartItemRepository)
+            ICustomerArticleRepository cartItemRepository,
+            CancellationToken cancellationToken)
     {
         var customerId = RequestIdentity.GetIdentifier(httpContext.User);
         if (customerId is null) return TypedResults.Forbid();
 
-        var total = await cartItemRepository.CountCart(customerId.Value);
+        var total = await cartItemRepository.CountCart(customerId.Value, cancellationToken);
         var entities = await cartItemRepository.QueryCart(customerId.Value, pagingQuery.Page,
-            pagingQuery.PageSize);
+            pagingQuery.PageSize, cancellationToken);
 
         var baseUri = linkGenerator.GetUriByName(httpContext, RouteName, null);
         var response = entities.Select(ToResponse).ToList();
@@ -44,8 +44,6 @@ public class SelfQueryCartItems : IEndpoint
             pagingQuery.Page,
             pagingQuery.PageSize,
             baseUri);
-
-        if (entities.Count == 0) return TypedResults.NoContent();
 
         return TypedResults.Ok(paginationResponse);
     }

@@ -15,7 +15,6 @@ public class AdminQuerySystemUsers : IEndpoint
             .WithName(RouteName).WithSummary("[admin] Query system users")
             .WithTags("SystemUsers")
             .Produces<PaginationResponse<AdminQuerySystemUserResponse>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
@@ -23,7 +22,7 @@ public class AdminQuerySystemUsers : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<PaginationResponse<AdminQuerySystemUserResponse>>, NoContent,
+    private static async Task<Results<Ok<PaginationResponse<AdminQuerySystemUserResponse>>,
             BadRequest<ProblemDetails>>>
         Handler([AsParameters] AdminQuerySystemUserParameters queryParameters,
             HttpContext httpContext,
@@ -40,8 +39,6 @@ public class AdminQuerySystemUsers : IEndpoint
             });
 
         var total = await systemUserRepository.Count(roleFilter, cancellationToken);
-        if (total == 0) return TypedResults.NoContent();
-
         var entities = await systemUserRepository.Query(
             queryParameters.Page,
             queryParameters.PageSize,

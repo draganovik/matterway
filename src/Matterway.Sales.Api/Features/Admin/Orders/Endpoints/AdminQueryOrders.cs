@@ -14,7 +14,6 @@ public class AdminQueryOrders : IEndpoint
             .WithName(RouteName).WithSummary("[admin] Query Orders")
             .WithTags(nameof(Order))
             .Produces<PaginationResponse<AdminBaseOrderResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
@@ -23,7 +22,7 @@ public class AdminQueryOrders : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<AdminBaseOrderResponse>>, NoContent>>
+        Task<Ok<PaginationResponse<AdminBaseOrderResponse>>>
         Handler([AsParameters] AdminQueryOrderParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -31,9 +30,6 @@ public class AdminQueryOrders : IEndpoint
             CancellationToken cancellationToken)
     {
         var total = await orderRepository.Count(queryParameters.CustomerId, cancellationToken);
-        if (total == 0)
-            return TypedResults.NoContent();
-
         var entities = await orderRepository.Query(
             queryParameters.Page,
             queryParameters.PageSize,

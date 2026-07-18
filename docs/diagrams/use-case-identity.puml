@@ -29,17 +29,16 @@ package "Identity" {
   together {
     usecase viewUserPermissions as "View User Permissions"
     usecase manageUserPermissions as "Manage User Permissions"
-    usecase createEmployeeAccount as "Create Employee User Account"
+    usecase createAccount as "Create User Account"
   }
 
-  together {
-    usecase createCustomerAccount as "Create Customer User Account"
-    usecase introspectAccessToken as "Introspect Access Token"
-  }
+  usecase createCustomerAccount as "Create Customer User Account"
 
   manageUserPermissions .u.> viewUserPermissions : <<include>>
   manageSystemUsers .u.> viewSystemUsers : <<include>>
   manageSystemUsers <.u. deleteSystemUser : <<extend>>
+
+  createAccount .u.> createCustomerAccount : <<include>>
 }
 
 user --- signIn
@@ -49,8 +48,7 @@ user --- signOut
 manageSystemUsers --- empl : perm:[operator,manager]
 
 manageUserPermissions --- empl : perm:[manager]
-createEmployeeAccount --- empl : perm:[manager]
+createAccount --- empl : perm:[manager]
 
-introspectAccessToken --- sysm
 createCustomerAccount --- sysm
 @enduml

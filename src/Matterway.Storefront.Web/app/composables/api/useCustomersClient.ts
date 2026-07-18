@@ -1,5 +1,4 @@
 import { useApiClient } from "~/composables/api/useApiClient"
-import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import type {
   CustomerAddressResponse,
   PutSelfAddressRequest,
@@ -17,13 +16,6 @@ type RemoteCartItem = {
 
 export function useCustomersClient() {
   const api = useApiClient()
-  const auth = useAuthSessionStore()
-
-  function getRequiredCustomerId() {
-    const customerId = auth.customerId.value
-    if (!customerId) throw new Error("Sesija je istekla. Prijavite se ponovo.")
-    return customerId
-  }
 
   async function registerCustomer(payload: RegisterPayload) {
     return api.request("customers", "public/register", {
@@ -77,10 +69,9 @@ export function useCustomersClient() {
   }
 
   async function upsertSelfCartItem(articleCode: string, quantity: number) {
-    const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
+      `self/cart/items/${encodeURIComponent(articleCode)}`,
       {
         method: "PUT",
         body: { quantity },
@@ -89,10 +80,9 @@ export function useCustomersClient() {
   }
 
   async function deleteSelfCartItem(articleCode: string) {
-    const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
+      `self/cart/items/${encodeURIComponent(articleCode)}`,
       {
         method: "DELETE",
       },

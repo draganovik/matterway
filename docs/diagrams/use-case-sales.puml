@@ -32,7 +32,7 @@ csmr --- placeOwnOrder
 csmr --- viewOwnOrders
 
 updateOrderStatus --- empl : perm:[operator,manager]
-viewOrders --- empl
+viewOrders --- empl : perm:[observer,operator,manager]
 placeOwnOrder --- systm
 
 registerPayment --- systm
