@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -51,6 +52,8 @@ public static class AspireServiceDefaults
     public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
+        AppContext.SetSwitch("Microsoft.AspNetCore.Hosting.SuppressActivityOpenTelemetryData", false);
+
         builder.Logging.AddOpenTelemetry(logging =>
         {
             logging.IncludeFormattedMessage = true;
@@ -75,7 +78,13 @@ public static class AspireServiceDefaults
 
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
         if (useOtlpExporter)
+        {
+            if (string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_COMPRESSION"]))
+                builder.Services.Configure<OtlpExporterOptions>(options =>
+                    options.Compression = OtlpExportCompression.GZip);
+
             openTelemetryBuilder.UseOtlpExporter();
+        }
 
         return builder;
     }
