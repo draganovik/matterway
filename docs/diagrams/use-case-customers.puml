@@ -8,19 +8,18 @@ together {
   actor user as "User"
   actor csmr as "Customer"
 }
-together  {
-  actor empl as "Employee"
-  actor sysm as "System"
-  sysm -[hidden]l- empl
-}
+
+actor empl as "Employee"
+actor sales as "Sales Service"
+actor identity as "Identity Service"
 
 user <|-- csmr
-user <|-- empl
+user <|-l- empl
 
 package "Customers" {
-  usecase syncOnOrder as "Put Order Snapshot by ID"
+  usecase syncOnOrder as "Create Order Snapshot from Cart"
 
-  usecase createCustomer as "Create Customer"
+  usecase createCustomer as "Register Customer"
   usecase manageOwnProfile as "Manage Own Profile"
   usecase manageOwnAddress as "Manage Own Address"
   usecase manageOwnCartItems as "Manage Own Cart Items"
@@ -29,19 +28,24 @@ package "Customers" {
                               ..<i>extension points</i>..
                               Upsert Customer Address"
   usecase viewCustomers as "View Customers"
+  usecase viewCustomerAddress as "View Customer Address"
   usecase manageCustomerAddress as "Manage Customer Address"
 
-  manageCustomerAddress .r.> manageCustomers : <<extend>>
-  manageCustomers .r.> viewCustomers : <<include>>
+  manageCustomerAddress .l.> manageCustomers : <<extend>>
+  manageCustomerAddress .r.> viewCustomerAddress : <<include>>
+  manageCustomers .l.> viewCustomers : <<include>>
 }
 
 user -- createCustomer
+createCustomer -- identity
 csmr -- manageOwnProfile
 csmr -- manageOwnAddress
 csmr -- manageOwnCartItems
 
-syncOnOrder -- sysm
+syncOnOrder -- sales
 
 viewCustomers -- empl : perm:[observer,operator,manager]
+viewCustomerAddress -- empl : perm:[observer,operator,manager]
 manageCustomers -- empl : perm:[operator,manager]
+manageCustomerAddress -- empl : perm:[operator,manager]
 @enduml

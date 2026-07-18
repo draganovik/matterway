@@ -10,11 +10,11 @@ actor empl as "Employee"
 user <|-- empl
 
 package "Catalog" {
-  usecase viewDetailedArticles as "View Detailed Articles"
-  usecase viewDiscounts as "View Discounts"
+  usecase viewDetailedArticles as "View Article Details"
+  usecase viewDiscounts as "View Active Discounts"
   usecase queryArticles as "Query Articles
                            ..<i>extension points</i>..
-                           Get Detailed Article"
+                           View Article Details"
   queryArticles <.. viewDetailedArticles: <<extend>>
   queryArticles ..> viewDiscounts: <<include>>
 
@@ -27,8 +27,8 @@ package "Catalog" {
   manageArticleDetails <.. manageArticles : <<include>>
   manageArticleImages <.. manageArticles : <<include>>
 
-  usecase viewDetails as "View Details"
-  usecase manageDetails as "Manage Details"
+  usecase viewDetails as "View Detail Definitions"
+  usecase manageDetails as "Manage Detail Definitions"
   viewDetails <.. manageDetails : <<include>>
 
   usecase importCatalogArchive as "Import Catalog Archive"
