@@ -17,9 +17,8 @@ public class SelfGetAddress : IEndpoint
             .Produces<SelfBaseAddressResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.IsCustomer(context.User) ||
-                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 

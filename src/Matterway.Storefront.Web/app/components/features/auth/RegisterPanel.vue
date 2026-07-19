@@ -24,7 +24,6 @@ const emit = defineEmits<{
   <AuthShell
     hero-title="Kreiranje naloga"
     hero-description="Registrujte se da biste brže završili kupovinu i pratili svoje porudžbine."
-    card-eyebrow="Registracija"
     card-title="Kreiraj nalog"
     card-description="Nalog je namenjen kupcima."
   >
@@ -89,6 +88,7 @@ const emit = defineEmits<{
             placeholder="Ponovite lozinku"
             required
             class="w-full"
+            @keydown.enter.exact="submitFormOnEnter"
           />
         </UFormField>
       </div>

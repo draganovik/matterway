@@ -22,23 +22,16 @@ await initialize()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <UCard class="border-default border">
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <p class="text-primary text-xs tracking-[0.3em] uppercase">
-            Plaćanje
-          </p>
-          <h1 class="text-2xl font-semibold">Završi porudžbinu</h1>
-        </div>
-        <UBadge color="primary" variant="soft">
-          {{ totalItems }} stavki
-        </UBadge>
-      </div>
-    </UCard>
+  <div class="space-y-4">
+    <header
+      class="border-default flex items-center justify-between gap-3 border-b pb-3"
+    >
+      <h1 class="text-xl font-semibold">Završi porudžbinu</h1>
+      <UBadge color="primary" variant="soft"> {{ totalItems }} stavki </UBadge>
+    </header>
 
     <div
-      class="grid items-start gap-6 lg:grid-cols-[1fr_26rem] lg:items-stretch"
+      class="grid items-start gap-4 lg:grid-cols-[1fr_25rem] lg:items-stretch"
     >
       <CheckoutDeliveryPanel v-model="address" />
 
@@ -52,7 +45,7 @@ await initialize()
       >
         <CheckoutOrderActionPanel
           v-model="payment"
-          class="lg:sticky lg:top-24 lg:h-full"
+          class="lg:sticky lg:top-20 lg:h-full"
           :current-year="currentYear"
           :total-items="totalItems"
           :total-price="totalPrice"

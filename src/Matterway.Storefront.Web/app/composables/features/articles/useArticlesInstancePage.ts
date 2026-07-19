@@ -58,10 +58,6 @@ export function useArticlesInstancePage() {
     loading.value = false
   }
 
-  async function initialize() {
-    await loadArticle()
-  }
-
   watch(
     () => route.params.slug,
     () => {
@@ -74,6 +70,6 @@ export function useArticlesInstancePage() {
     error,
     loading,
     gallery,
-    initialize,
+    loadArticle,
   }
 }

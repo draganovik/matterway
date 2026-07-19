@@ -16,7 +16,6 @@ public class PublicQueryArticles : IEndpoint
             .WithName(RouteName).WithSummary("[public] Query Articles")
             .WithTags("Articles")
             .Produces<PaginationResponse<PublicQueryArticleResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .MapToApiVersion(new ApiVersion(1))
             .AddOpenApiOperationTransformer((operation, context, ct) =>
@@ -36,15 +35,12 @@ public class PublicQueryArticles : IEndpoint
             });
     }
 
-    private static async Task<Results<Ok<PaginationResponse<PublicQueryArticleResponse>>, NoContent>>
+    private static async Task<Ok<PaginationResponse<PublicQueryArticleResponse>>>
         Handle([AsParameters] PublicQueryArticleParameters queryParameters,
             HttpContext httpContext, LinkGenerator linkGenerator, IArticleRepository articleRepository,
             CancellationToken cancellationToken)
     {
         var total = await articleRepository.Count(queryParameters.Filter, cancellationToken);
-        if (total == 0)
-            return TypedResults.NoContent();
-
         var entities = await articleRepository.Query(
             queryParameters.Page,
             queryParameters.PageSize,

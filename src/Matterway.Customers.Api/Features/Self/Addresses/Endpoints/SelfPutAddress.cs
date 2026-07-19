@@ -18,9 +18,8 @@ public class SelfPutAddress : IEndpoint
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.IsCustomer(context.User) ||
-                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 

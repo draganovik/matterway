@@ -14,7 +14,8 @@ public class AdminUpdateDiscount : IEndpoint
         endpoints.MapPut(EndpointKind.Admin, "discounts/{code}", Handle)
             .WithName(RouteName).WithSummary("[admin] Create or replace a discount across article codes")
             .WithTags(nameof(Discount))
-            .Produces<AdminUpdateDiscountResponse>()
+            .Produces<AdminUpdateDiscountResponse>(StatusCodes.Status200OK)
+            .Produces<AdminUpdateDiscountResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
@@ -22,9 +23,12 @@ public class AdminUpdateDiscount : IEndpoint
             .MapToApiVersion(new ApiVersion(1));
     }
 
-    private static async Task<Results<Ok<AdminUpdateDiscountResponse>, BadRequest<ProblemDetails>>> Handle(
+    private static async Task<Results<Ok<AdminUpdateDiscountResponse>, Created<AdminUpdateDiscountResponse>,
+            BadRequest<ProblemDetails>>>
+        Handle(
         string code,
         AdminUpdateDiscountRequest request,
+        HttpContext httpContext,
         IArticleRepository articleRepository,
         IDiscountRepository discountRepository,
         CancellationToken cancellationToken)
@@ -72,6 +76,8 @@ public class AdminUpdateDiscount : IEndpoint
 
         var newDiscounts = MapToEntities(normalizedCode, request, articles, validFrom, validTo).ToList();
 
+        var isCreate = (await discountRepository.GetBy(normalizedCode, cancellationToken)).Count == 0;
+
         IReadOnlyCollection<Discount> updated;
         try
         {
@@ -87,7 +93,18 @@ public class AdminUpdateDiscount : IEndpoint
             });
         }
 
-        return TypedResults.Ok(ToResponse(updated.First()));
+        if (updated.Count == 0)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Cannot update discounts",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "No discounts were stored."
+            });
+
+        var response = ToResponse(updated);
+        return isCreate
+            ? TypedResults.Created(httpContext.Request.Path, response)
+            : TypedResults.Ok(response);
     }
 
     private static IEnumerable<Discount> MapToEntities(
@@ -109,15 +126,19 @@ public class AdminUpdateDiscount : IEndpoint
             });
     }
 
-    private static AdminUpdateDiscountResponse ToResponse(Discount entity)
+    private static AdminUpdateDiscountResponse ToResponse(IReadOnlyCollection<Discount> entities)
     {
+        var entity = entities.First();
         return new AdminUpdateDiscountResponse
         {
             Code = entity.Code,
             Percentage = entity.Percentage,
             ValidFrom = entity.ValidFrom,
             ValidTo = entity.ValidTo,
-            ArticleCode = ArticleCode.Parse(entity.ArticleCode, null)
+            ArticleCodes = entities
+                .Select(item => ArticleCode.Parse(item.ArticleCode, null))
+                .OrderBy(item => item.Value)
+                .ToArray()
         };
     }
 }

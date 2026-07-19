@@ -13,7 +13,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <UCard class="border-default h-fit border">
+  <UCard class="h-fit">
     <div class="space-y-3">
       <div class="flex items-center justify-between text-sm">
         <span class="text-muted">Stavke</span>

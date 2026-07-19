@@ -5,12 +5,13 @@ namespace Matterway.Sales.Api.Infrastructure.Brokers.Customers;
 
 public class HttpCustomersClient(HttpClient httpClient) : ICustomersClient
 {
-    public async Task<BrokerResponse<CustomersOrderResponse>> CreateOrderAsync(
+    public async Task<BrokerResponse<CustomersOrderResponse>> PutOrderAsync(
+        OrderId orderId,
         CustomersCreateOrderRequest request,
         CancellationToken cancellationToken)
     {
         var httpRequest =
-            new HttpRequestMessage(HttpMethod.Post, "/api/system/v1/orders")
+            new HttpRequestMessage(HttpMethod.Put, $"/api/system/v1/orders/{orderId}")
             {
                 Content = JsonContent.Create(request)
             };

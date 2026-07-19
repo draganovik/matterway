@@ -7,14 +7,14 @@ skinparam actorStyle hollow
 actor user as "User"
 actor empl as "Employee"
 
-user --|> empl
+user <|-- empl
 
 package "Catalog" {
-  usecase viewDetailedArticles as "View Detailed Articles"
-  usecase viewDiscounts as "View Discounts"
+  usecase viewDetailedArticles as "View Article Details"
+  usecase viewDiscounts as "View Active Discounts"
   usecase queryArticles as "Query Articles
                            ..<i>extension points</i>..
-                           Get Detailed Article"
+                           View Article Details"
   queryArticles <.. viewDetailedArticles: <<extend>>
   queryArticles ..> viewDiscounts: <<include>>
 
@@ -22,11 +22,13 @@ package "Catalog" {
   usecase manageArticleDetails as "Manage Article Details"
   usecase manageArticleImages as "Manage Article Images"
   usecase manageDiscounts as "Manage Discounts"
+  usecase viewManagedDiscounts as "View Managed Discounts"
+  manageDiscounts ..> viewManagedDiscounts : <<include>>
   manageArticleDetails <.. manageArticles : <<include>>
   manageArticleImages <.. manageArticles : <<include>>
 
-  usecase viewDetails as "View Details"
-  usecase manageDetails as "Manage Details"
+  usecase viewDetails as "View Detail Definitions"
+  usecase manageDetails as "Manage Detail Definitions"
   viewDetails <.. manageDetails : <<include>>
 
   usecase importCatalogArchive as "Import Catalog Archive"
@@ -37,6 +39,7 @@ user --- queryArticles
 user --- viewDetails
 
 manageArticles -- empl : perm:[operator,manager]
+viewManagedDiscounts -- empl : perm:[observer,operator,manager]
 manageDiscounts -- empl : perm:[operator,manager]
 manageDetails -- empl : perm:[operator,manager]
 importCatalogArchive -- empl : perm:[manager]

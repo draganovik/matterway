@@ -5,13 +5,18 @@ namespace Matterway.Customers.Api.Infrastructure.Persistence.CustomerOrderEntity
 
 public class EfPgCustomerOrderRepository(CustomersDbComposer context) : ICustomerOrderRepository
 {
-    public async Task<CustomerOrder?> CreateFromCart(Guid customerId, OrderId orderId,
-        CancellationToken cancellationToken = default)
+    public async Task<CustomerOrder?> GetById(OrderId orderId, CancellationToken cancellationToken = default)
     {
-        var existing = await context.CustomerOrder
+        return await context.CustomerOrder
             .Include(order => order.Items)
             .AsNoTracking()
             .FirstOrDefaultAsync(order => order.OrderId == orderId, cancellationToken);
+    }
+
+    public async Task<CustomerOrder?> CreateFromCart(Guid customerId, OrderId orderId,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await GetById(orderId, cancellationToken);
         if (existing is not null) return existing;
 
         var cartItems = await context.CustomerArticle

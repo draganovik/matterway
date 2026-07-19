@@ -6,210 +6,158 @@ skinparam responseMessageBelowArrow true
 skinparam maxMessageSize 120
 
 actor "User" as User
-participant "Web Page\n(Storefront or Dashboard)" as Page
-participant "Nuxt Route Middleware\n(auth.global.ts)" as Middleware
-participant "Auth Session Store\n(useAuthSessionStore)" as AuthStore
-participant "Feature Registry\n(Dashboard)" as Registry
-participant "API Client\n(useApiClient)" as ApiClient
-box "Outbound Systems" #FFF7ED
-participant "Identity API\n(/api/identity/public/v1/auth)" as IdentityApi #FDBA74
-participant "Nuxt Server Proxy\n(/api/<service>/...)" as DomainApi #FDBA74
+participant "Web Client\n(Storefront or Dashboard)" as Client
+participant "Backend for Frontend\n(BFF)" as Bff
+box "Application Services" #FFF7ED
+participant "Identity Service" as Identity #FDBA74
+participant "Protected Service" as Service #FDBA74
 end box
 
-note over Page, IdentityApi
-Storefront variant:
-- Required role: customer
-- Auth base path: /api/identity/public/v1/auth
-- Browser-triggered API calls use same-origin `/api/<service>/...` proxy routes.
-- The Nuxt server forwards those requests to internal service URLs.
-- Unauthenticated redirect: /login?next=...
-- After auth restore, a customer-session hook syncs the remote cart once;
-  cart and checkout also force a sync on entry.
-- Guest cart is merged after successful login/register.
-- Cart is cleared when storefront auth is lost.
-
-Dashboard variant:
-- Required role: employee
-- Auth base path: /api/identity/public/v1/auth
-- Browser-triggered API calls use same-origin `/api/<service>/...` proxy routes.
-- The Nuxt server forwards those requests to internal service URLs.
-- Unauthenticated redirect: /login
-- Permission check via service + level (observer/operator/manager)
-- Dashboard permission denial redirects to /
+note over Client, Service
+Storefront accepts customer sessions and may resume the originally requested route.
+Dashboard accepts employee sessions and checks permissions for protected features.
+Both applications access backend services through their BFF boundary.
 end note
 
-== Login (Getting the token) ==
-User -> Page : 1.1 Open /login
-activate Page
-Page -> AuthStore : 1.2 initialize()
-activate AuthStore
-AuthStore --> Page : 1.3 return initialized session state
-deactivate AuthStore
+== Sign-in and role validation ==
+User -> Client : 1.1 Open sign-in page
+activate Client
+User -> Client : 1.2 Submit credentials
+Client -> Bff : 1.3 Authenticate
+activate Bff
+Bff -> Identity : 1.4 Authenticate credentials
+activate Identity
 
-User -> Page : 1.4 Submit credentials
-Page -> AuthStore : 1.5 login(email, password)
-activate AuthStore
-AuthStore -> IdentityApi : 1.6 POST /login
-activate IdentityApi
-alt Login succeeds and role matches app policy
-  IdentityApi --> AuthStore : 1.6.1.1 HTTP 200 LoginResponse
-  AuthStore -> AuthStore : 1.6.1.2 setSession + write refresh cookie + scheduleRefresh
-  AuthStore --> Page : 1.6.1.3 return login success
-  alt Dashboard
-    Page -> Registry : 1.6.1.4 Resolve first permitted feature route
-    activate Registry
-    Registry --> Page : 1.6.1.5 return first authorized route
-    deactivate Registry
-    Page --> User : 1.6.1.6 Navigate to first authorized route
-  else Storefront
-    Page -> Page : 1.6.1.4 merge guest cart into remote cart
-    Page --> User : 1.6.1.5 Navigate to next route (or "/")
+alt Credentials accepted
+  Identity --> Bff : 1.4.1.1 Return access and refresh credentials
+  deactivate Identity
+  Bff --> Client : 1.4.1.2 Return session credentials
+  deactivate Bff
+  Client -> Client : 1.4.1.3 Validate role required by the application
+  alt Role accepted
+    Client -> Client : 1.4.1.4.1 Establish session
+    Client --> User : 1.4.1.4.2 Continue to the application
+  else Role rejected
+    Client -> Client : 1.4.1.5.1 Discard session credentials
+    Client --> User : 1.4.1.5.2 Show access denial
   end
-else Login fails
-  IdentityApi --> AuthStore : 1.6.2.1 HTTP 401/403 error payload
-  AuthStore --> Page : 1.6.2.2 return login error
-  Page --> User : 1.6.2.3 Show login error
-else Login succeeds but role mismatches app policy
-  IdentityApi --> AuthStore : 1.6.3.1 HTTP 200 LoginResponse
-  AuthStore -> AuthStore : 1.6.3.2 setSession + write refresh cookie + scheduleRefresh
-  AuthStore -> AuthStore : 1.6.3.3 clearSession()
-  AuthStore --> Page : 1.6.3.4 return role error
-  Page --> User : 1.6.3.5 Show login error
+else Credentials rejected
+  Identity --> Bff : 1.4.2.1 Reject authentication
+  deactivate Identity
+  Bff --> Client : 1.4.2.2 Return authentication failure
+  deactivate Bff
+  Client --> User : 1.4.2.3 Show sign-in error
 end
-deactivate IdentityApi
-deactivate AuthStore
-deactivate Page
+deactivate Client
 
-newpage Refresh strategy and route guard
+newpage Session restoration and route authorization
 
-== Refresh strategy ==
-User -> Page : 2.1 Open route
-activate Page
-Page -> Middleware : 2.2 Route navigation
-activate Middleware
-Middleware -> AuthStore : 2.3 initialize()
-activate AuthStore
-alt Access token exists and is not expired
-  AuthStore -> AuthStore : 2.3.1.1 scheduleRefresh(2/3 token lifetime)
-  AuthStore --> Middleware : 2.3.1.2 return initialized (authenticated)
-else Access token missing/expired and refresh cookie exists,\nand refresh succeeds
-  AuthStore -> IdentityApi : 2.3.2.1 POST /api/identity/public/v1/auth/refresh {refreshToken}
-  activate IdentityApi
-  IdentityApi --> AuthStore : 2.3.2.2 HTTP 200 LoginResponse
-  AuthStore -> AuthStore : 2.3.2.3 setSession + write refresh cookie + scheduleRefresh
-  AuthStore --> Middleware : 2.3.2.4 return initialized (authenticated)
-  deactivate IdentityApi
-else Access token missing/expired and refresh cookie exists,\nand refresh returns wrong role or fails
-  AuthStore -> IdentityApi : 2.3.3.1 POST /api/identity/public/v1/auth/refresh {refreshToken}
-  activate IdentityApi
-  alt HTTP 200 LoginResponse but role mismatches app policy
-    IdentityApi --> AuthStore : 2.3.3.2 HTTP 200 LoginResponse
-    AuthStore -> AuthStore : 2.3.3.3 setSession + write refresh cookie + scheduleRefresh
-    AuthStore -> AuthStore : 2.3.3.4 clearSession()
-  else HTTP 401/403 error or network failure
-    IdentityApi --> AuthStore : 2.3.3.2 HTTP 401/403 error
-    AuthStore -> AuthStore : 2.3.3.3 clearSession()
+== Session restoration ==
+User -> Client : 2.1 Open a protected route
+activate Client
+Client -> Client : 2.2 Restore session state
+
+alt Access session is valid
+  Client -> Client : 2.2.1.1 Reuse current session
+else Session can be renewed
+  Client -> Bff : 2.2.2.1 Renew session
+  activate Bff
+  Bff -> Identity : 2.2.2.2 Renew session credentials
+  activate Identity
+  alt Renewal accepted and role remains valid
+    Identity --> Bff : 2.2.2.3.1 Return renewed credentials
+    deactivate Identity
+    Bff --> Client : 2.2.2.3.2 Return renewed session
+    deactivate Bff
+    Client -> Client : 2.2.2.3.3 Update session
+  else Renewal rejected or role no longer valid
+    Identity --> Bff : 2.2.2.4.1 Reject renewal
+    deactivate Identity
+    Bff --> Client : 2.2.2.4.2 Return renewal failure
+    deactivate Bff
+    Client -> Client : 2.2.2.4.3 Clear session
+  else Identity service temporarily unavailable
+    Identity --> Bff : 2.2.2.5.1 Return temporary failure
+    deactivate Identity
+    Bff --> Client : 2.2.2.5.2 Return temporary failure
+    deactivate Bff
+    Client -> Client : 2.2.2.5.3 Preserve renewable session context
   end
-  AuthStore --> Middleware : 2.3.3.5 return initialized (anonymous)
-  deactivate IdentityApi
-else No access token and no refresh cookie
-  AuthStore --> Middleware : 2.3.4.1 return initialized (anonymous)
+else No renewable session exists
+  Client -> Client : 2.2.3.1 Continue as anonymous
 end
-deactivate AuthStore
 
-alt Not authenticated for protected route
-  Middleware --> Page : 2.4.1.1 Redirect to login variant
-else Dashboard permission denied
-  Middleware -> Registry : 2.4.2.1 Resolve feature + required permissions
-  activate Registry
-  Registry --> Middleware : 2.4.2.2 return feature metadata
-  deactivate Registry
-  Middleware -> AuthStore : 2.4.2.3 hasPermission(service, allowedLevels)
-  activate AuthStore
-  AuthStore --> Middleware : 2.4.2.4 return false
-  deactivate AuthStore
-  Middleware --> Page : 2.4.2.5 Redirect to /
-else Authenticated and authorized
-  alt Dashboard
-    Middleware -> Registry : 2.4.3.1 Resolve feature + required permissions
-    activate Registry
-    Registry --> Middleware : 2.4.3.2 return feature metadata
-    deactivate Registry
-    Middleware -> AuthStore : 2.4.3.3 hasPermission(service, allowedLevels)
-    activate AuthStore
-    AuthStore --> Middleware : 2.4.3.4 return true
-    deactivate AuthStore
-    Middleware --> Page : 2.4.3.5 Continue navigation
-  else Storefront
-    Middleware --> Page : 2.4.3.1 Continue navigation
+note over Client, Identity
+Concurrent browser contexts coordinate renewal.
+A temporary service failure does not invalidate an otherwise renewable session.
+end note
+
+== Route authorization ==
+alt User is not authenticated
+  Client --> User : 2.3.1.1 Redirect to sign-in
+else Dashboard feature permission is missing
+  Client -> Client : 2.3.2.1 Deny the requested feature
+  Client --> User : 2.3.2.2 Navigate to a safe application route
+else User is authenticated and authorized
+  Client --> User : 2.3.3.1 Continue to the requested route
+end
+deactivate Client
+
+newpage Protected request renewal and logout
+
+== Protected API request ==
+User -> Client : 3.1 Trigger a protected action
+activate Client
+Client -> Bff : 3.2 Send request with access credential
+activate Bff
+Bff -> Service : 3.3 Forward authenticated request
+activate Service
+
+alt Request succeeds or fails for a non-auth reason
+  Service --> Bff : 3.3.1.1 Return service response
+  deactivate Service
+  Bff --> Client : 3.3.1.2 Return response
+else Access credential is rejected
+  Service --> Bff : 3.3.2.1 Reject access credential
+  deactivate Service
+  Bff --> Client : 3.3.2.2 Return authentication failure
+  Client -> Bff : 3.3.2.3 Renew session
+  Bff -> Identity : 3.3.2.4 Renew session credentials
+  activate Identity
+  alt Renewal succeeds
+    Identity --> Bff : 3.3.2.5.1 Return renewed credentials
+    deactivate Identity
+    Bff --> Client : 3.3.2.5.2 Return renewed session
+    Client -> Bff : 3.3.2.5.3 Retry request once
+    Bff -> Service : 3.3.2.5.4 Forward request with renewed credential
+    activate Service
+    Service --> Bff : 3.3.2.5.5 Return service response
+    deactivate Service
+    Bff --> Client : 3.3.2.5.6 Return retried response
+  else Renewal fails
+    Identity --> Bff : 3.3.2.6.1 Reject renewal
+    deactivate Identity
+    Bff --> Client : 3.3.2.6.2 Return renewal failure
+    Client -> Client : 3.3.2.6.3 Clear session
   end
 end
-deactivate Middleware
-deactivate Page
-
-newpage API request refresh retry and logout
-
-User -> Page : 3.1 Trigger API action
-activate Page
-Page -> ApiClient : 3.2 request(service, path)
-activate ApiClient
-ApiClient -> AuthStore : 3.3 initialize() if needed
-activate AuthStore
-AuthStore --> ApiClient : 3.4 return auth ready
-deactivate AuthStore
-
-ApiClient -> DomainApi : 3.5 HTTP request to /api/<service>/... + Bearer token
-activate DomainApi
-alt Domain API returns 401 and refresh succeeds
-  DomainApi --> ApiClient : 3.5.1.1 HTTP 401 Unauthorized
-  ApiClient -> AuthStore : 3.5.1.2 refreshTokens()
-  activate AuthStore
-  AuthStore -> IdentityApi : 3.5.1.3 POST /api/identity/public/v1/auth/refresh
-  activate IdentityApi
-  IdentityApi --> AuthStore : 3.5.1.4 HTTP 200 LoginResponse
-  deactivate IdentityApi
-  AuthStore --> ApiClient : 3.5.1.5 return refreshed token state
-  deactivate AuthStore
-  ApiClient -> DomainApi : 3.5.1.6 Retry HTTP request to /api/<service>/... with new Bearer
-  activate DomainApi
-  DomainApi --> ApiClient : 3.5.1.7 HTTP retried response
-  deactivate DomainApi
-else Domain API returns 401 and refresh fails
-  DomainApi --> ApiClient : 3.5.2.1 HTTP 401 Unauthorized
-  deactivate DomainApi
-  ApiClient -> AuthStore : 3.5.2.2 refreshTokens()
-  activate AuthStore
-  AuthStore -> IdentityApi : 3.5.2.3 POST /api/identity/public/v1/auth/refresh
-  activate IdentityApi
-  IdentityApi --> AuthStore : 3.5.2.4 HTTP 200 wrong-role response or 401/403 error
-  AuthStore -> AuthStore : 3.5.2.5 clearSession()
-  AuthStore --> ApiClient : 3.5.2.6 return refresh failure (no token)
-  deactivate IdentityApi
-  deactivate AuthStore
-  ApiClient --> Page : 3.5.2.7 Return original 401 ApiResult (no retry)
-else Domain API returns non-401
-  DomainApi --> ApiClient : 3.5.3.1 HTTP response
-  deactivate DomainApi
-end
-
-ApiClient --> Page : 3.6 return ApiResult
-deactivate ApiClient
-deactivate Page
+deactivate Bff
+Client --> User : 3.4 Present result
+deactivate Client
 
 == Logout ==
-User -> Page : 4.1 Click logout
-activate Page
-Page -> AuthStore : 4.2 logout()
-activate AuthStore
-AuthStore -> IdentityApi : 4.3 POST /api/identity/public/v1/auth/logout (best effort)
-activate IdentityApi
-IdentityApi --> AuthStore : 4.4 HTTP 200/401/network error ignored
-deactivate IdentityApi
-AuthStore -> AuthStore : 4.5 clearSession() + remove refresh cookie
-AuthStore --> Page : 4.6 return logout completed
-deactivate AuthStore
-Page -> Page : 4.7 clear cart on auth loss
-Page --> User : 4.8 Navigate to app logout target
-deactivate Page
+User -> Client : 4.1 Sign out
+activate Client
+Client -> Bff : 4.2 End current session
+activate Bff
+Bff -> Identity : 4.3 Revoke current session
+activate Identity
+Identity --> Bff : 4.4 Confirm or report best-effort result
+deactivate Identity
+Bff --> Client : 4.5 Complete sign-out request
+deactivate Bff
+Client -> Client : 4.6 Clear local session state
+Client --> User : 4.7 Navigate to the signed-out destination
+deactivate Client
 
 @enduml

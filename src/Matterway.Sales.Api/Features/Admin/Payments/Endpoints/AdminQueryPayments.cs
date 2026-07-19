@@ -14,7 +14,6 @@ public class AdminQueryPayments : IEndpoint
             .WithName(RouteName).WithSummary("[admin] Query Payments")
             .WithTags(nameof(Payment))
             .Produces<PaginationResponse<AdminBasePaymentResponse>>()
-            .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>
                     RequestIdentity.AsObserver(context.User) || RequestIdentity.AsOperator(context.User) ||
@@ -23,7 +22,7 @@ public class AdminQueryPayments : IEndpoint
     }
 
     private static async
-        Task<Results<Ok<PaginationResponse<AdminBasePaymentResponse>>, NoContent>>
+        Task<Ok<PaginationResponse<AdminBasePaymentResponse>>>
         Handler([AsParameters] AdminQueryPaymentParameters queryParameters,
             HttpContext httpContext,
             LinkGenerator linkGenerator,
@@ -31,9 +30,6 @@ public class AdminQueryPayments : IEndpoint
             CancellationToken cancellationToken)
     {
         var total = await paymentRepository.Count(queryParameters.OrderId, cancellationToken);
-        if (total == 0)
-            return TypedResults.NoContent();
-
         var entities = await paymentRepository.Query(
             queryParameters.Page,
             queryParameters.PageSize,

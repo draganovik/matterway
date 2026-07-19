@@ -26,11 +26,9 @@ const emit = defineEmits<{
     v-bind="$attrs"
     :type="props.type"
     :disabled="props.disabled"
-    class="w-full rounded-xl border px-4 py-3 text-left transition"
+    class="border-muted w-full cursor-pointer border-b px-3 py-2 text-left transition-colors last:border-b-0 disabled:cursor-not-allowed disabled:opacity-60"
     :class="
-      props.selected
-        ? 'border-primary/40 bg-primary/5'
-        : 'bg-background hover:border-default hover:bg-muted/40 border-transparent'
+      props.selected ? 'bg-primary/10' : 'hover:bg-muted/60 bg-transparent'
     "
     @click="emit('click', $event)"
   >

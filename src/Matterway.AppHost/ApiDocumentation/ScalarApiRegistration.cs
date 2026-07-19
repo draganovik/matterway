@@ -8,9 +8,10 @@ internal static class ScalarApiRegistration
 {
     public static void AddApiReferences(
         IDistributedApplicationBuilder builder,
+        int port,
         IEnumerable<(ApiDefinition Definition, IResourceBuilder<ProjectResource> Resource)> apiResources)
     {
-        var scalarApiReference = builder.AddScalarApiReference();
+        var scalarApiReference = builder.AddScalarApiReference("scalar", port);
 
         foreach (var (apiDefinition, resource) in apiResources)
             scalarApiReference.WithApiReference(resource, "http", options =>

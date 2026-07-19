@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useDelayedLoading } from "~/composables/workflows/state/useDelayedLoading"
+
 const props = defineProps<{
   error?: string | boolean
   success?: string | boolean
@@ -17,10 +19,24 @@ function resolveMessage(value: string | boolean | undefined, fallback: string) {
   return fallback
 }
 
-const showLoading = computed(() => hasState(props.loading))
 const showError = computed(() => hasState(props.error))
 const showSuccess = computed(() => hasState(props.success))
-const showEmpty = computed(() => hasState(props.empty))
+const loadingRequested = computed(() => hasState(props.loading))
+const delayedLoading = useDelayedLoading(loadingRequested)
+const showEmpty = computed(
+  () =>
+    hasState(props.empty) &&
+    !loadingRequested.value &&
+    !showError.value &&
+    !showSuccess.value,
+)
+const showLoading = computed(
+  () =>
+    delayedLoading.value &&
+    !showError.value &&
+    !showSuccess.value &&
+    !showEmpty.value,
+)
 
 const loadingMessage = computed(() =>
   resolveMessage(props.loading, "Učitavanje..."),
@@ -39,18 +55,18 @@ const emptyMessage = computed(() =>
 <template>
   <div class="space-y-3">
     <UAlert
-      v-if="showLoading"
-      icon="i-lucide-loader"
-      color="neutral"
-      variant="soft"
-      :title="loadingMessage"
-    />
-    <UAlert
       v-if="showError"
       icon="i-lucide-alert-triangle"
       color="error"
       variant="soft"
       :title="errorMessage"
+    />
+    <UAlert
+      v-if="showLoading"
+      icon="i-lucide-loader"
+      color="neutral"
+      variant="soft"
+      :title="loadingMessage"
     />
     <UAlert
       v-if="showSuccess"

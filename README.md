@@ -138,7 +138,8 @@ aspire stop
 | PostgreSQL       | 15432 | Relational datastore                        |
 | MinIO API        | 19000 | Object storage API                          |
 | MinIO Console    | 19001 | Object storage administration               |
-| Aspire Dashboard | 18888 | Local orchestration and telemetry           |
+| Matterway Aspire | 18888 | Local orchestration and telemetry           |
+| Scalar           | 18889 | Unified API reference                       |
 
 ### Test Stripe Webhooks
 
@@ -166,7 +167,7 @@ aspire deploy
 
 The default deployment environment is `Production`. Use `--environment <name>` only for another named deployment environment.
 
-Aspire generates the Docker Compose deployment and container images. The two Nuxt projects use their multi-stage Dockerfiles; .NET project images, including the APIs and migration runner, are built by the .NET SDK through Aspire and do not require project-level Dockerfiles.
+Aspire generates the Docker Compose deployment and container images. It builds and packages the Nuxt servers from their package scripts, while the .NET SDK builds the APIs and migration runner; no project-level Dockerfiles are required.
 
 Only Storefront.Web and Dashboard.Web have public HTTP endpoints in publish mode. The APIs, PostgreSQL, MinIO, and migration runner remain internal to the generated composition.
 

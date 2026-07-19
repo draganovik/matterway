@@ -1,0 +1,379 @@
+<script setup lang="ts">
+import { useIdentityClient } from "~/composables/api/useIdentityClient"
+import type {
+  SystemUserPermLevel,
+  SystemUserPermResponse,
+} from "~/types/identity"
+import type { ServiceSection } from "~/types/services/definitions"
+import { useRequestState } from "~/composables/workflows/state/useRequestState"
+import { permissionServices } from "~/data/serviceRegistry"
+import { formatPermissionLevel, formatServiceName } from "~/utils/labels"
+
+type PermissionForm = {
+  service: ServiceSection["service"]
+  level: SystemUserPermLevel
+}
+
+const props = withDefaults(
+  defineProps<{
+    systemUserId?: string | null
+    userLabel?: string
+    canManage?: boolean
+  }>(),
+  {
+    systemUserId: null,
+    userLabel: "",
+    canManage: false,
+  },
+)
+
+const isOpen = defineModel<boolean>("open", { required: true })
+
+const api = useIdentityClient()
+const loadState = useRequestState()
+const saveState = useRequestState()
+const resetState = useRequestState()
+
+const permissions = ref<SystemUserPermResponse[]>([])
+const notFound = ref(false)
+const resettingService = ref<string | null>(null)
+
+const serviceOptions = permissionServices
+
+const setLevelOptions: Array<{ label: string; value: SystemUserPermLevel }> = [
+  { label: "Operater", value: "Operator" },
+  { label: "Menadžer", value: "Manager" },
+]
+
+const form = ref<PermissionForm>({
+  service: (serviceOptions[0]?.value ||
+    "identity") as ServiceSection["service"],
+  level: "Operator",
+})
+
+const displayLabel = computed(() => props.userLabel.trim() || "Izabrani nalog")
+
+function permissionKey(permission: SystemUserPermResponse) {
+  return permission.service.toLowerCase()
+}
+
+function permissionRank(level: SystemUserPermLevel) {
+  if (level === "Manager") return 3
+  if (level === "Operator") return 2
+  return 1
+}
+
+function normalizePermissions(items: SystemUserPermResponse[]) {
+  const map = new Map<string, SystemUserPermResponse>()
+
+  for (const item of items) {
+    const service = item.service?.trim().toLowerCase()
+    const level = item.level
+    if (!service || !level) continue
+
+    const existing = map.get(service)
+    if (!existing || permissionRank(level) > permissionRank(existing.level)) {
+      map.set(service, {
+        service,
+        level,
+      })
+    }
+  }
+
+  return [...map.values()].sort((left, right) => {
+    return left.service.localeCompare(right.service)
+  })
+}
+
+function clearMessages() {
+  saveState.error = ""
+  saveState.success = ""
+  resetState.error = ""
+  resetState.success = ""
+}
+
+function resetModalState() {
+  loadState.loading = false
+  loadState.error = ""
+  saveState.loading = false
+  saveState.error = ""
+  saveState.success = ""
+  resetState.loading = false
+  resetState.error = ""
+  resetState.success = ""
+  resettingService.value = null
+  permissions.value = []
+  notFound.value = false
+  form.value = {
+    service: (serviceOptions[0]?.value ||
+      "identity") as ServiceSection["service"],
+    level: "Operator",
+  }
+}
+
+async function loadPermissions() {
+  const systemUserId = props.systemUserId?.trim()
+  if (!systemUserId) {
+    loadState.error = "Najpre izaberite nalog."
+    permissions.value = []
+    notFound.value = false
+    return
+  }
+
+  loadState.loading = true
+  loadState.error = ""
+  clearMessages()
+  permissions.value = []
+  notFound.value = false
+
+  const result = await api.getSystemUserPerms(systemUserId)
+  loadState.loading = false
+
+  if (!result.ok) {
+    if (result.status === 404) {
+      notFound.value = true
+      return
+    }
+
+    loadState.error = result.error || "Učitavanje dozvola nije uspelo."
+    return
+  }
+
+  permissions.value = normalizePermissions(result.data || [])
+}
+
+function applyLocalPermission(service: string, level: SystemUserPermLevel) {
+  const normalizedService = service.trim().toLowerCase()
+  permissions.value = normalizePermissions([
+    ...permissions.value.filter((item) => item.service !== normalizedService),
+    {
+      service: normalizedService,
+      level,
+    },
+  ])
+}
+
+function updateFormService(value: string | number | null | undefined) {
+  form.value.service = String(
+    value || serviceOptions[0]?.value || "identity",
+  ) as ServiceSection["service"]
+}
+
+function updateFormLevel(value: string | number | null | undefined) {
+  form.value.level = String(value || "Operator") as SystemUserPermLevel
+}
+
+async function setPermission() {
+  clearMessages()
+  if (!props.canManage) return
+
+  const systemUserId = props.systemUserId?.trim()
+  if (!systemUserId) {
+    saveState.error = "Najpre izaberite nalog."
+    return
+  }
+
+  const payload = {
+    service: form.value.service,
+    level: form.value.level,
+  }
+
+  if (!payload.service) {
+    saveState.error = "Izaberite servis."
+    return
+  }
+
+  saveState.loading = true
+  const result = await api.patchSystemUserPerm(systemUserId, payload)
+  saveState.loading = false
+
+  if (!result.ok) {
+    saveState.error = result.error || "Čuvanje dozvole nije uspelo."
+    return
+  }
+
+  permissions.value = result.data
+    ? normalizePermissions(result.data)
+    : permissions.value
+  if (!result.data) applyLocalPermission(payload.service, payload.level)
+
+  saveState.success = "Dozvola je uspešno ažurirana."
+}
+
+async function resetPermission(permission: SystemUserPermResponse) {
+  clearMessages()
+  if (!props.canManage) return
+  if (permission.level === "Observer") return
+
+  const systemUserId = props.systemUserId?.trim()
+  if (!systemUserId) {
+    resetState.error = "Najpre izaberite nalog."
+    return
+  }
+
+  resettingService.value = permission.service.toLowerCase()
+  resetState.loading = true
+
+  const result = await api.patchSystemUserPerm(systemUserId, {
+    service: permission.service,
+    level: "Observer",
+  })
+
+  resetState.loading = false
+  resettingService.value = null
+
+  if (!result.ok) {
+    resetState.error = result.error || "Resetovanje dozvole nije uspelo."
+    return
+  }
+
+  permissions.value = result.data
+    ? normalizePermissions(result.data)
+    : permissions.value
+  if (!result.data) applyLocalPermission(permission.service, "Observer")
+
+  resetState.success = "Dozvola je vraćena na nivo pregleda."
+}
+
+watch([isOpen, toRef(props, "systemUserId")], ([open]) => {
+  if (open) void loadPermissions()
+})
+</script>
+
+<template>
+  <UModal v-model:open="isOpen" @after:leave="resetModalState">
+    <template #header>
+      <div class="space-y-1">
+        <h3 class="text-highlighted text-base font-semibold">Dozvole naloga</h3>
+        <p class="text-muted text-sm">
+          Pregled dozvola za nalog {{ displayLabel }}.
+        </p>
+      </div>
+    </template>
+
+    <template #body>
+      <div class="space-y-4">
+        <StatusMessages
+          v-if="loadState.loading || loadState.error"
+          :loading="loadState.loading ? 'Učitavanje dozvola.' : false"
+          :error="loadState.error"
+        />
+
+        <EntitiesEmptyState
+          v-else-if="notFound"
+          title="Nalog nije pronađen"
+          description="Izabrani nalog nije moguće učitati."
+        />
+
+        <template v-else>
+          <EntitiesEmptyState
+            v-if="!permissions.length"
+            title="Nema dozvola"
+            description="Ovaj korisnik nema dodeljene dozvole po servisima."
+          />
+
+          <div v-else class="space-y-2">
+            <div
+              v-for="permission in permissions"
+              :key="permissionKey(permission)"
+              class="border-default/70 flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+            >
+              <div>
+                <p class="text-highlighted text-sm font-medium">
+                  {{ formatServiceName(permission.service) }}
+                </p>
+                <p class="text-muted text-xs">
+                  {{ formatPermissionLevel(permission.level) }}
+                </p>
+              </div>
+
+              <UButton
+                v-if="canManage && permission.level !== 'Observer'"
+                color="error"
+                variant="ghost"
+                size="xs"
+                :loading="
+                  resetState.loading &&
+                  resettingService === permission.service.toLowerCase()
+                "
+                @click="resetPermission(permission)"
+              >
+                {{
+                  resetState.loading &&
+                  resettingService === permission.service.toLowerCase()
+                    ? "Vraćanje na pregled"
+                    : "Vrati na pregled"
+                }}
+              </UButton>
+            </div>
+          </div>
+
+          <div
+            v-if="canManage"
+            class="border-default/70 space-y-3 rounded-md border p-3"
+          >
+            <h4 class="text-highlighted text-sm font-semibold">
+              Podesi dozvolu
+            </h4>
+
+            <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
+              <UFormField label="Servis" required>
+                <USelect
+                  :model-value="form.service"
+                  :items="serviceOptions"
+                  placeholder="Izaberite servis"
+                  class="w-full"
+                  :disabled="saveState.loading"
+                  @update:model-value="updateFormService($event)"
+                />
+              </UFormField>
+
+              <UFormField label="Dozvola" required>
+                <USelect
+                  :model-value="form.level"
+                  :items="setLevelOptions"
+                  placeholder="Izaberite dozvolu"
+                  class="w-full"
+                  :disabled="saveState.loading"
+                  @update:model-value="updateFormLevel($event)"
+                />
+              </UFormField>
+
+              <UButton
+                color="primary"
+                :loading="saveState.loading"
+                class="md:mb-0.5"
+                @click="setPermission"
+              >
+                {{ saveState.loading ? "Čuvanje dozvole" : "Sačuvaj dozvolu" }}
+              </UButton>
+            </div>
+
+            <StatusMessages
+              :error="saveState.error || resetState.error"
+              :success="saveState.success || resetState.success"
+            />
+          </div>
+
+          <p v-else class="text-muted text-sm">
+            Za izmenu dozvola potrebna je dozvola menadžera.
+          </p>
+        </template>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="flex w-full justify-end">
+        <UButton
+          variant="ghost"
+          @click="
+            () => {
+              isOpen = false
+            }
+          "
+          >Zatvori</UButton
+        >
+      </div>
+    </template>
+  </UModal>
+</template>

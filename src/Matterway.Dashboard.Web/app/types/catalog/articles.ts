@@ -101,13 +101,7 @@ export type ArticleImagesMutationResponse = {
   deletedImageId?: string | null
 }
 
-export type AddArticleDetailRequest = {
-  detailSlug: string
-  textValue?: string | null
-  numericValue?: NumberInput | null
-}
-
-export type UpdateArticleDetailRequest = {
+export type PutArticleDetailRequest = {
   textValue?: string | null
   numericValue?: NumberInput | null
 }

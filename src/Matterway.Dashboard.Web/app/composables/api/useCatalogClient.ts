@@ -1,18 +1,15 @@
 import { buildQuery } from "~/utils/http"
 import { useApiClient } from "~/composables/api/useApiClient"
-import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import { buildCatalogImageUrl } from "~/utils/catalogImages"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import type { ApiResult } from "~/types/common/api"
 import type {
-  AddArticleDetailRequest,
   AddArticleImageRequest,
   ArticleImageProperty,
   ArticleImagesMutationResponse,
   CreateArticleRequest,
   CreateArticleResponse,
-  CreateDiscountRequest,
-  CreatedDiscountResponse,
   DeleteArticleResponse,
   DeleteDetailResponse,
   DeleteDiscountResponse,
@@ -21,13 +18,13 @@ import type {
   ImportCatalogArchiveResponse,
   PutDetailRequest,
   PutDetailResponse,
+  PutArticleDetailRequest,
   QueryArticleResponse,
   QueryArticlesParams,
   QueryArticlesResponse,
   QueryDetailsParams,
   QueryDetailsResponse,
   QueryDiscountResponse,
-  UpdateArticleDetailRequest,
   UpdateArticleImageRequest,
   UpdateArticleRequest,
   UpdateArticleResponse,
@@ -65,7 +62,6 @@ function mapQueryArticleResponse(
 
 export function useCatalogClient() {
   const api = useApiClient()
-  const auth = useAuthSessionStore()
 
   async function queryArticles(params: QueryArticlesParams) {
     const query = buildQuery({
@@ -113,7 +109,7 @@ export function useCatalogClient() {
   async function createArticle(payload: CreateArticleRequest) {
     return api.request<CreateArticleResponse>("catalog", ADMIN_ARTICLES_PATH, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -123,7 +119,7 @@ export function useCatalogClient() {
       `${ADMIN_ARTICLES_PATH}/${code}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -179,7 +175,7 @@ export function useCatalogClient() {
       `${ADMIN_ARTICLES_PATH}/${code}/images/${orderIndex}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
 
@@ -218,27 +214,17 @@ export function useCatalogClient() {
     } satisfies ApiResult<ArticleImagesMutationResponse>
   }
 
-  async function addArticleDetail(
-    code: string,
-    payload: AddArticleDetailRequest,
-  ) {
-    return api.request("catalog", `${ADMIN_ARTICLES_PATH}/${code}/details`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    })
-  }
-
-  async function updateArticleDetail(
+  async function putArticleDetail(
     code: string,
     detailSlug: string,
-    payload: UpdateArticleDetailRequest,
+    payload: PutArticleDetailRequest,
   ) {
     return api.request(
       "catalog",
       `${ADMIN_ARTICLES_PATH}/${code}/details/${detailSlug}`,
       {
-        method: "PATCH",
-        body: JSON.stringify(payload),
+        method: "PUT",
+        body: payload,
       },
     )
   }
@@ -271,7 +257,7 @@ export function useCatalogClient() {
       `${ADMIN_DETAILS_PATH}/${encodeURIComponent(slug)}`,
       {
         method: "PUT",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -286,34 +272,17 @@ export function useCatalogClient() {
     )
   }
 
-  async function createDiscounts(payload: CreateDiscountRequest) {
-    return api.request<CreatedDiscountResponse[]>(
-      "catalog",
-      ADMIN_DISCOUNTS_PATH,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          ...payload,
-          articleCodes: payload.articleCodes,
-        }),
-      },
-    )
-  }
-
   async function queryDiscounts() {
     return api.request<QueryDiscountResponse[]>("catalog", ADMIN_DISCOUNTS_PATH)
   }
 
-  async function updateDiscount(code: string, payload: UpdateDiscountRequest) {
+  async function putDiscount(code: string, payload: UpdateDiscountRequest) {
     return api.request<UpdatedDiscountResponse>(
       "catalog",
       `${ADMIN_DISCOUNTS_PATH}/${encodeURIComponent(code)}`,
       {
         method: "PUT",
-        body: JSON.stringify({
-          ...payload,
-          articleCodes: payload.articleCodes,
-        }),
+        body: payload,
       },
     )
   }
@@ -345,49 +314,22 @@ export function useCatalogClient() {
   async function exportCatalogArchive(): Promise<
     ApiResult<ExportCatalogArchiveResponse>
   > {
-    await auth.initialize()
     const endpoint = buildServiceApiPath(
       "catalog",
       "admin",
       "catalog/archive/export",
     )
-    const token = auth.getAccessToken()
-    const headers = new Headers({ Accept: "application/zip" })
-    if (token) headers.set("Authorization", token)
+    const response = await api.requestRaw<ArrayBuffer>(endpoint, {
+      method: "GET",
+      headers: { Accept: "application/zip" },
+      responseType: "arrayBuffer",
+    })
 
-    const runFetch = () =>
-      $fetch.raw<ArrayBuffer>(endpoint, {
-        method: "GET",
-        headers,
-        responseType: "arrayBuffer",
-        ignoreResponseError: true,
-      })
-
-    let response
-    try {
-      response = await runFetch()
-    } catch {
+    if (!response) {
       return {
         ok: false,
         status: 0,
         error: "Izvoz arhive kataloga trenutno nije dostupan.",
-      }
-    }
-
-    if (response.status === 401) {
-      await auth.refreshTokens()
-      const refreshedToken = auth.getAccessToken()
-      if (refreshedToken) {
-        headers.set("Authorization", refreshedToken)
-        try {
-          response = await runFetch()
-        } catch {
-          return {
-            ok: false,
-            status: 0,
-            error: "Izvoz arhive kataloga trenutno nije dostupan.",
-          }
-        }
       }
     }
 
@@ -398,7 +340,7 @@ export function useCatalogClient() {
         contentType,
       )
       const error =
-        getErrorMessage(payload) || "Izvoz arhive kataloga nije uspeo."
+        getApiErrorMessage(payload) || "Izvoz arhive kataloga nije uspeo."
 
       return { ok: false, status: response.status, error }
     }
@@ -428,15 +370,13 @@ export function useCatalogClient() {
     addArticleImage,
     updateArticleImage,
     removeArticleImage,
-    addArticleDetail,
-    updateArticleDetail,
+    putArticleDetail,
     removeArticleDetail,
     queryDetails,
     putDetail,
     deleteDetail,
     queryDiscounts,
-    createDiscounts,
-    updateDiscount,
+    putDiscount,
     deleteDiscount,
     importCatalogArchive,
     exportCatalogArchive,
@@ -511,33 +451,4 @@ function decodeDownloadErrorPayload(
   }
 
   return text
-}
-
-function getErrorMessage(payload: unknown) {
-  if (typeof payload === "string") {
-    const message = payload.trim()
-    return message || null
-  }
-
-  if (!payload || typeof payload !== "object") return null
-
-  const candidate = payload as {
-    title?: unknown
-    detail?: unknown
-    message?: unknown
-  }
-
-  if (typeof candidate.detail === "string" && candidate.detail.trim()) {
-    return candidate.detail.trim()
-  }
-
-  if (typeof candidate.title === "string" && candidate.title.trim()) {
-    return candidate.title.trim()
-  }
-
-  if (typeof candidate.message === "string" && candidate.message.trim()) {
-    return candidate.message.trim()
-  }
-
-  return null
 }

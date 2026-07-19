@@ -1,21 +1,21 @@
 import { buildCatalogImageUrl } from "~/utils/catalogImages"
 
 export type CatalogArticleDiscount = {
-  percentage?: number | null
-  validFrom?: string | null
+  percentage: number
+  validFrom: string
   validTo?: string | null
 }
 
 export type CatalogArticleImage = {
   id?: string
   orderIndex?: number
-  imageUrl?: string
-  imageAlt?: string
+  imageUrl?: string | null
+  imageAlt?: string | null
 }
 
 export type CatalogArticleDetail = {
   detailSlug?: string | null
-  title?: string
+  title?: string | null
   unit?: string | null
   textValue?: string | null
   numericValue?: number | null
@@ -32,132 +32,87 @@ export type CatalogArticle = {
   thumbnailImage: CatalogArticleImage | null
   articleImages: CatalogArticleImage[]
   articleDetails: CatalogArticleDetail[]
-  createdAt?: string
-  updatedAt?: string
+  createdAt?: string | null
+  updatedAt?: string | null
 }
 
-type AnyRecord = Record<string, unknown>
-
-function asNumber(value: unknown, fallback = 0) {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
+export type CatalogArticleListResponse = {
+  code: string
+  title?: string | null
+  basePrice?: number | null
+  price?: number | null
+  discount?: CatalogArticleDiscount | null
+  description?: string | null
+  thumbnailUrl?: string | null
+  thumbnailAlt?: string | null
+  isAvailable: boolean
 }
 
-function asRecord(value: unknown): AnyRecord {
-  return value && typeof value === "object" ? (value as AnyRecord) : {}
+export type CatalogArticleDetailResponse = {
+  code: string
+  title?: string | null
+  basePrice?: number | null
+  price?: number | null
+  discount?: CatalogArticleDiscount | null
+  description?: string | null
+  details?: CatalogArticleDetail[] | null
+  images?: CatalogArticleImage[] | null
+  createdAt?: string | null
+  updatedAt?: string | null
+  isAvailable: boolean
 }
 
-function asArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : []
-}
-
-function readCode(source: AnyRecord) {
-  return String(source.code ?? "")
-}
-
-function readDiscount(value: unknown): CatalogArticleDiscount | null {
-  const source = asRecord(value)
-  if (!Object.keys(source).length) return null
+function mapImage(image: CatalogArticleImage): CatalogArticleImage {
   return {
-    percentage: asNumber(source.percentage, 0),
-    validFrom: typeof source.validFrom === "string" ? source.validFrom : null,
-    validTo: typeof source.validTo === "string" ? source.validTo : null,
+    ...image,
+    imageUrl: buildCatalogImageUrl(image.imageUrl, image.id),
   }
 }
 
-function readImage(value: unknown): CatalogArticleImage | null {
-  const source = asRecord(value)
-  const id = typeof source.id === "string" ? source.id : undefined
-  const imageUrlSource =
-    typeof source.imageUrl === "string" ? source.imageUrl : undefined
-  const imageUrl = buildCatalogImageUrl(imageUrlSource, id)
-  if (!id || !imageUrl) return null
+export function mapCatalogArticleListItem(
+  article: CatalogArticleListResponse,
+): CatalogArticle {
+  const thumbnailUrl = buildCatalogImageUrl(article.thumbnailUrl)
 
   return {
-    id,
-    orderIndex: asNumber(source.orderIndex, 0),
-    imageUrl,
-    imageAlt: source.imageAlt ? String(source.imageAlt) : undefined,
-  }
-}
-
-export function mapCatalogArticleListItem(payload: unknown): CatalogArticle {
-  const source = asRecord(payload)
-  const thumbnailUrlSource =
-    typeof source.thumbnailUrl === "string" ? source.thumbnailUrl : undefined
-  const thumbnailUrl = buildCatalogImageUrl(thumbnailUrlSource)
-  const thumbnail = thumbnailUrl
-    ? {
-        imageUrl: thumbnailUrl,
-        imageAlt: source.thumbnailAlt ? String(source.thumbnailAlt) : undefined,
-      }
-    : readImage(source.thumbnailImage)
-
-  return {
-    code: readCode(source),
-    title: String(source.title ?? ""),
-    basePrice: asNumber(source.basePrice ?? source.price),
-    price: asNumber(source.price ?? source.basePrice),
-    discount: readDiscount(source.discount),
-    description: String(source.description ?? ""),
-    isAvailable: Boolean(source.isAvailable),
-    thumbnailImage: thumbnail,
+    code: article.code,
+    title: article.title ?? "",
+    basePrice: article.basePrice ?? 0,
+    price: article.price ?? article.basePrice ?? 0,
+    discount: article.discount ?? null,
+    description: article.description ?? "",
+    isAvailable: article.isAvailable,
+    thumbnailImage: thumbnailUrl
+      ? { imageUrl: thumbnailUrl, imageAlt: article.thumbnailAlt }
+      : null,
     articleImages: [],
     articleDetails: [],
-    createdAt:
-      typeof source.createdAt === "string" ? source.createdAt : undefined,
-    updatedAt:
-      typeof source.updatedAt === "string" ? source.updatedAt : undefined,
   }
 }
 
-export function mapCatalogArticleDetail(payload: unknown): CatalogArticle {
-  const source = asRecord(payload)
-
-  const images = [...asArray(source.images), ...asArray(source.articleImages)]
-    .map(readImage)
-    .filter((image): image is CatalogArticleImage => Boolean(image?.imageUrl))
+export function mapCatalogArticleDetail(
+  article: CatalogArticleDetailResponse,
+): CatalogArticle {
+  const images = (article.images ?? [])
+    .map(mapImage)
     .sort(
-      (a, b) =>
-        Number(a.orderIndex ?? Number.MAX_SAFE_INTEGER) -
-        Number(b.orderIndex ?? Number.MAX_SAFE_INTEGER),
+      (left, right) =>
+        (left.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+        (right.orderIndex ?? Number.MAX_SAFE_INTEGER),
     )
 
-  const thumbnail = readImage(source.thumbnailImage) || images[0] || null
-
-  const details = asArray(source.details).map((detailValue) => {
-    const detail = asRecord(detailValue)
-    const numericValueRaw = detail.numericValue
-    const numericValue =
-      typeof numericValueRaw === "number"
-        ? numericValueRaw
-        : numericValueRaw !== undefined && numericValueRaw !== null
-          ? Number(numericValueRaw)
-          : null
-
-    return {
-      detailSlug: detail.detailSlug ? String(detail.detailSlug) : null,
-      title: detail.title ? String(detail.title) : undefined,
-      unit: detail.unit ? String(detail.unit) : null,
-      textValue: detail.textValue ? String(detail.textValue) : null,
-      numericValue: Number.isFinite(numericValue ?? NaN) ? numericValue : null,
-    }
-  })
-
   return {
-    code: readCode(source),
-    title: String(source.title ?? ""),
-    basePrice: asNumber(source.basePrice ?? source.price),
-    price: asNumber(source.price ?? source.basePrice),
-    discount: readDiscount(source.discount),
-    description: String(source.description ?? ""),
-    isAvailable: Boolean(source.isAvailable),
-    thumbnailImage: thumbnail,
+    code: article.code,
+    title: article.title ?? "",
+    basePrice: article.basePrice ?? 0,
+    price: article.price ?? article.basePrice ?? 0,
+    discount: article.discount ?? null,
+    description: article.description ?? "",
+    isAvailable: article.isAvailable,
+    thumbnailImage: images[0] ?? null,
     articleImages: images,
-    articleDetails: details,
-    createdAt:
-      typeof source.createdAt === "string" ? source.createdAt : undefined,
-    updatedAt:
-      typeof source.updatedAt === "string" ? source.updatedAt : undefined,
+    articleDetails: article.details ?? [],
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
   }
 }

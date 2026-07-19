@@ -50,7 +50,7 @@ const quantitySum = computed(() => quantitySumOf(props.order))
 <template>
   <div class="space-y-4">
     <div class="space-y-1">
-      <h3 class="text-foreground text-base font-semibold">
+      <h3 class="text-highlighted text-base font-semibold">
         {{ order ? "Pregled porudžbine" : "Porudžbine" }}
       </h3>
       <p class="text-muted text-sm">
@@ -73,33 +73,33 @@ const quantitySum = computed(() => quantitySumOf(props.order))
       </div>
 
       <div class="grid gap-3 sm:grid-cols-3">
-        <div class="border-default/70 rounded-lg border px-3 py-2">
+        <div class="border-default/70 rounded-md border px-3 py-2">
           <p class="text-muted text-xs">Tip</p>
-          <p class="text-foreground mt-1 text-sm font-medium">
+          <p class="text-highlighted mt-1 text-sm font-medium">
             {{ formatOrderType(order.type) }}
           </p>
         </div>
 
-        <div class="border-default/70 rounded-lg border px-3 py-2">
+        <div class="border-default/70 rounded-md border px-3 py-2">
           <p class="text-muted text-xs">Kreirano</p>
-          <p class="text-foreground mt-1 text-sm font-medium">
+          <p class="text-highlighted mt-1 text-sm font-medium">
             {{ formatDateTime(order.placedAt) }}
           </p>
         </div>
 
-        <div class="border-default/70 rounded-lg border px-3 py-2">
+        <div class="border-default/70 rounded-md border px-3 py-2">
           <p class="text-muted text-xs">Ukupan iznos</p>
-          <p class="text-foreground mt-1 text-sm font-semibold">
+          <p class="text-highlighted mt-1 text-sm font-semibold">
             {{ formatMoney(order.totalAmount) }}
           </p>
         </div>
       </div>
 
       <div
-        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
+        class="border-default/70 flex flex-wrap items-start justify-between gap-3 rounded-md border p-3"
       >
         <div class="space-y-1">
-          <h4 class="text-foreground text-sm font-semibold">
+          <h4 class="text-highlighted text-sm font-semibold">
             Detalji porudžbine
           </h4>
           <p class="text-muted text-sm">
@@ -112,9 +112,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
         </UButton>
       </div>
 
-      <div class="border-default/70 space-y-2 rounded-lg border p-3">
+      <div class="border-default/70 space-y-2 rounded-md border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">
+          <h4 class="text-highlighted text-sm font-semibold">
             Istorija statusa
           </h4>
 
@@ -142,9 +142,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
 
         <div
           v-if="latestStatus"
-          class="bg-background border-default/60 rounded-md border px-3 py-2"
+          class="bg-default border-default/60 rounded-md border px-3 py-2"
         >
-          <p class="text-foreground text-sm font-medium">
+          <p class="text-highlighted text-sm font-medium">
             {{ formatOrderStatus(latestStatus.status) }}
           </p>
           <p class="text-muted mt-1 text-xs">
@@ -158,9 +158,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
         <p v-else class="text-muted text-sm">Istorija statusa nije dostupna.</p>
       </div>
 
-      <div class="border-default/70 space-y-2 rounded-lg border p-3">
+      <div class="border-default/70 space-y-2 rounded-md border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Uplate</h4>
+          <h4 class="text-highlighted text-sm font-semibold">Uplate</h4>
 
           <div class="flex items-center gap-2">
             <UBadge
@@ -188,9 +188,9 @@ const quantitySum = computed(() => quantitySumOf(props.order))
         </p>
       </div>
 
-      <div class="border-default/70 space-y-2 rounded-lg border p-3">
+      <div class="border-default/70 space-y-2 rounded-md border p-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <h4 class="text-foreground text-sm font-semibold">Stavke</h4>
+          <h4 class="text-highlighted text-sm font-semibold">Stavke</h4>
 
           <UButton size="xs" variant="ghost" @click="emit('revealItems')">
             Otvori stavke

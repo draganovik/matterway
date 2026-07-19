@@ -22,15 +22,10 @@ export function useCartPage() {
     void navigateTo("/checkout")
   }
 
-  async function clearCart() {
-    await cart.clear()
-  }
-
   return {
     cart,
     isEmpty,
     initialize,
     goToCheckout,
-    clearCart,
   }
 }

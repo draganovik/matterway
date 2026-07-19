@@ -50,7 +50,7 @@ export function useCustomersClient() {
       `${ADMIN_CUSTOMERS_PATH}/${customerId}/address`,
       {
         method: "PUT",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }
@@ -58,7 +58,7 @@ export function useCustomersClient() {
   async function createCustomer(payload: CustomerRequest) {
     return api.request<CustomerResponse>("customers", ADMIN_CUSTOMERS_PATH, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -71,7 +71,7 @@ export function useCustomersClient() {
       `${ADMIN_CUSTOMERS_PATH}/${systemUserId}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: payload,
       },
     )
   }

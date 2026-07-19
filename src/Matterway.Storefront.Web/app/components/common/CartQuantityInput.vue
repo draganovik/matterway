@@ -122,6 +122,16 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col items-start gap-1">
     <div class="flex items-center gap-2">
+      <UButton
+        v-if="props.showRemove"
+        color="error"
+        variant="ghost"
+        icon="i-lucide-trash"
+        square
+        :size="props.size"
+        :disabled="props.disabled || loading"
+        @click="emit('remove')"
+      />
       <UInputNumber
         :model-value="inputValue"
         :min="1"
@@ -137,17 +147,6 @@ onBeforeUnmount(() => {
         :ui="{ base: 'text-center font-semibold tabular-nums' }"
         @update:model-value="queueQuantityUpdate"
         @blur="handleBlur"
-      />
-
-      <UButton
-        v-if="props.showRemove"
-        color="error"
-        variant="ghost"
-        icon="i-lucide-trash"
-        square
-        :size="props.size"
-        :disabled="props.disabled || loading"
-        @click="emit('remove')"
       />
     </div>
 

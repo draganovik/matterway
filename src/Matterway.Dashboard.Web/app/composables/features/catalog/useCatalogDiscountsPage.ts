@@ -3,8 +3,8 @@ import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import { useCatalogClient } from "~/composables/api/useCatalogClient"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 import { normalizeCode } from "~/utils/normalization"
-import { parseNumberOr } from "~/utils/numbers"
 import type {
+  CreateDiscountRequest,
   QueryArticleResponse,
   QueryDiscountResponse,
 } from "~/types/catalog"
@@ -33,9 +33,10 @@ export function useCatalogDiscountsPage() {
     auth.hasPermission("catalog", ["operator", "manager"]),
   )
 
-  const listState = useRequestState({ empty: "Nema popusta." })
+  const listState = useRequestState("Nema popusta.", true)
   const submitState = useRequestState()
   const deleteState = useRequestState()
+  const createModalOpen = ref(false)
   const deleteConfirmOpen = ref(false)
 
   const discounts = ref<DiscountListItem[]>([])
@@ -45,7 +46,6 @@ export function useCatalogDiscountsPage() {
 
   const selectedKey = ref<string | null>(null)
   const selectedDiscount = ref<DiscountListItem | null>(null)
-  const isCreateMode = computed(() => !selectedDiscount.value)
 
   const form = ref<DiscountForm>({
     code: "",
@@ -99,7 +99,7 @@ export function useCatalogDiscountsPage() {
     deleteState.success = ""
   }
 
-  function beginCreate() {
+  function clearSelectedDiscount() {
     selectedKey.value = null
     selectedDiscount.value = null
     form.value = {
@@ -109,7 +109,11 @@ export function useCatalogDiscountsPage() {
       validTo: "",
     }
     selectedArticleCodes.value = []
+  }
+
+  function beginCreate() {
     resetMessages()
+    createModalOpen.value = true
   }
 
   function requestRemoveDiscount() {
@@ -213,10 +217,7 @@ export function useCatalogDiscountsPage() {
       if (result.status === 204 || !result.data) break
 
       articleRows.push(...(result.data.data || []))
-      const totalPages = Math.max(
-        1,
-        parseNumberOr(result.data.meta?.totalPages, 1),
-      )
+      const totalPages = Math.max(1, result.data.meta.totalPages)
       if (page >= totalPages) break
       page += 1
     }
@@ -305,7 +306,7 @@ export function useCatalogDiscountsPage() {
     const selected =
       discounts.value.find((item) => item.key === selectedKey.value) || null
     if (!selected) {
-      beginCreate()
+      clearSelectedDiscount()
       return
     }
 
@@ -361,12 +362,16 @@ export function useCatalogDiscountsPage() {
   async function saveDiscount() {
     resetMessages()
     if (!canEdit.value) return
+    if (!selectedDiscount.value) {
+      submitState.error = "Izaberite popust za izmenu."
+      return
+    }
 
     const built = buildPayload()
     if (!built) return
 
     submitState.loading = true
-    const result = await api.updateDiscount(built.code, built.payload)
+    const result = await api.putDiscount(built.code, built.payload)
     submitState.loading = false
 
     if (!result.ok) {
@@ -418,14 +423,31 @@ export function useCatalogDiscountsPage() {
     discounts.value = discounts.value.filter(
       (item) => item.code !== code && item.key !== code,
     )
-    beginCreate()
+    clearSelectedDiscount()
     deleteConfirmOpen.value = false
     deleteState.success =
       result.data?.message || `Popust ${code} je uspešno uklonjen.`
   }
 
+  function handleDiscountCreated(created: CreateDiscountRequest) {
+    const next: DiscountListItem = {
+      key: created.code,
+      code: created.code,
+      percentage: created.percentage,
+      validFrom: created.validFrom,
+      validTo: created.validTo,
+      articleCodes: [...created.articleCodes],
+    }
+
+    discounts.value = sortDiscounts([
+      ...discounts.value.filter((item) => item.code !== created.code),
+      next,
+    ])
+    applyDiscountToEditor(next)
+    submitState.success = `Popust ${created.code} je uspešno kreiran.`
+  }
+
   onMounted(() => {
-    beginCreate()
     void loadDiscounts()
   })
 
@@ -440,7 +462,7 @@ export function useCatalogDiscountsPage() {
     listPageSize,
     selectedKey,
     selectedDiscount,
-    isCreateMode,
+    createModalOpen,
     form,
     selectedArticleCodes,
     filteredDiscountCount,
@@ -454,6 +476,7 @@ export function useCatalogDiscountsPage() {
     selectDiscount,
     saveDiscount,
     removeDiscount,
+    handleDiscountCreated,
     deleteConfirmOpen,
     requestRemoveDiscount,
   }

@@ -12,31 +12,29 @@ public class SelfUpsertCartItem : IEndpoint
 
     public void MapEndpoint(EndpointRouter endpoints)
     {
-        endpoints.MapPut(EndpointKind.Self, "customers/{customerId:guid}/cart-items/{article:ArticleCode}", Handler)
+        endpoints.MapPut(EndpointKind.Self, "cart/items/{article:ArticleCode}", Handler)
             .WithName(RouteName).WithSummary("[self] Upsert own CartItem.")
             .WithTags(nameof(CustomerArticle))
             .Produces<SelfBaseCartItemResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.IsCustomer(context.User) ||
-                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 
     private static async Task<
             Results<Ok<SelfBaseCartItemResponse>, NotFound, BadRequest<ProblemDetails>, ForbidHttpResult>>
-        Handler(Guid customerId,
-            ArticleCode article,
+        Handler(ArticleCode article,
             SelfUpsertCartItemRequest request,
             HttpContext httpContext,
             ICustomerArticleRepository cartItemRepository,
             ICatalogClient catalogClient,
             CancellationToken cancellationToken)
     {
-        if (!RequestIdentity.CanManageOwnedResource(httpContext.User, customerId))
-            return TypedResults.Forbid();
+        var customerId = RequestIdentity.GetIdentifier(httpContext.User);
+        if (customerId is null) return TypedResults.Forbid();
 
         var articleResponse = await catalogClient.GetArticleByCode(article, cancellationToken);
         if (!articleResponse.IsSuccess || articleResponse.Data is null)
@@ -62,7 +60,7 @@ public class SelfUpsertCartItem : IEndpoint
 
         var entity = new CustomerArticle
         {
-            CustomerId = customerId,
+            CustomerId = customerId.Value,
             Quantity = request.Quantity,
             ArticleName = catalogArticle.Title,
             ArticleCode = catalogArticle.Code.ToString(),

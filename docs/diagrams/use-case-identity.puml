@@ -6,17 +6,19 @@ skinparam actorStyle hollow
 
 actor user as "User"
 
-rectangle #line:transparent {
+together {
   actor empl as "Employee"
-  actor sysm as "System"
+  actor sysm as "Customers Service"
 }
 
-user --|> empl
+user <|-- empl
 
 package "Identity" {
-  usecase signIn as "Sign In"
-  usecase refreshSession as "Refresh Session"
-  usecase signOut as "Sign Out"
+  together {
+    usecase signIn as "Sign In"
+    usecase refreshSession as "Refresh Session"
+    usecase signOut as "Sign Out"
+  }
 
   usecase manageSystemUsers as "Manage System Users
                                 ..<i>extension points</i>..
@@ -26,14 +28,13 @@ package "Identity" {
 
   usecase viewUserPermissions as "View User Permissions"
   usecase manageUserPermissions as "Manage User Permissions"
+  usecase createAccount as "Create Employee Account"
 
-  usecase createEmployeeAccount as "Create Employee User Account"
-  usecase createCustomerAccount as "Create Customer User Account"
-  usecase introspectAccessToken as "Introspect Access Token"
+  usecase createCustomerAccount as "Create Customer Account"
 
-  manageSystemUsers .down.> viewSystemUsers : <<include>>
-  manageUserPermissions .up.> viewSystemUsers : <<include>>
-  deleteSystemUser .up.> manageSystemUsers : <<extend>>
+  manageUserPermissions .l.> viewUserPermissions : <<include>>
+  manageSystemUsers .r.> viewSystemUsers : <<include>>
+  manageSystemUsers <.l. deleteSystemUser : <<extend>>
 }
 
 user --- signIn
@@ -41,10 +42,10 @@ user --- refreshSession
 user --- signOut
 
 manageSystemUsers --- empl : perm:[operator,manager]
+
 viewUserPermissions --- empl : perm:[operator,manager]
 manageUserPermissions --- empl : perm:[manager]
-createEmployeeAccount --- empl : perm:[manager]
+createAccount --- empl : perm:[manager]
 
-introspectAccessToken --- sysm
 createCustomerAccount --- sysm
 @enduml

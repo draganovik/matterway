@@ -1,5 +1,4 @@
 import { useApiClient } from "~/composables/api/useApiClient"
-import { useAuthSessionStore } from "~/composables/stores/useAuthSessionStore"
 import type {
   CustomerAddressResponse,
   PutSelfAddressRequest,
@@ -17,24 +16,12 @@ type RemoteCartItem = {
 
 export function useCustomersClient() {
   const api = useApiClient()
-  const auth = useAuthSessionStore()
-
-  function getRequiredCustomerId() {
-    const customerId = auth.customerId.value
-    if (!customerId) throw new Error("Sesija je istekla. Prijavite se ponovo.")
-    return customerId
-  }
 
   async function registerCustomer(payload: RegisterPayload) {
-    return api.request(
-      "customers",
-      "public/register",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      },
-      true,
-    )
+    return api.request("customers", "public/register", {
+      method: "POST",
+      body: payload,
+    })
   }
 
   async function getSelfAddress() {
@@ -46,7 +33,7 @@ export function useCustomersClient() {
   async function putSelfAddress(payload: PutSelfAddressRequest) {
     return api.request<CustomerAddressResponse>("customers", "self/address", {
       method: "PUT",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -59,7 +46,7 @@ export function useCustomersClient() {
   async function updateSelfProfile(payload: SelfProfileUpdateRequest) {
     return api.request<SelfProfileResponse>("customers", "self/profile", {
       method: "PATCH",
-      body: JSON.stringify(payload),
+      body: payload,
     })
   }
 
@@ -82,22 +69,20 @@ export function useCustomersClient() {
   }
 
   async function upsertSelfCartItem(articleCode: string, quantity: number) {
-    const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
+      `self/cart/items/${encodeURIComponent(articleCode)}`,
       {
         method: "PUT",
-        body: JSON.stringify({ quantity }),
+        body: { quantity },
       },
     )
   }
 
   async function deleteSelfCartItem(articleCode: string) {
-    const customerId = getRequiredCustomerId()
     return api.request(
       "customers",
-      `self/customers/${encodeURIComponent(customerId)}/cart-items/${encodeURIComponent(articleCode)}`,
+      `self/cart/items/${encodeURIComponent(articleCode)}`,
       {
         method: "DELETE",
       },

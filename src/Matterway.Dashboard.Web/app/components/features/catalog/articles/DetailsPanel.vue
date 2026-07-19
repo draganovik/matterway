@@ -99,7 +99,7 @@ async function handleDetailSubmit(payload: {
   )
   if (detailModalMode.value === "edit" && activeDetail.value?.detailSlug) {
     const targetSlug = activeDetail.value.detailSlug
-    const result = await api.updateArticleDetail(props.code, targetSlug, {
+    const result = await api.putArticleDetail(props.code, targetSlug, {
       textValue: payload.textValue ?? undefined,
       numericValue: payload.numericValue ?? undefined,
     })
@@ -129,8 +129,7 @@ async function handleDetailSubmit(payload: {
     mutateState.error = "Detalj već postoji."
     return
   }
-  const addResult = await api.addArticleDetail(props.code, {
-    detailSlug: payload.detailSlug,
+  const addResult = await api.putArticleDetail(props.code, payload.detailSlug, {
     textValue: payload.textValue ?? undefined,
     numericValue: payload.numericValue ?? undefined,
   })
@@ -157,7 +156,7 @@ async function handleDetailSubmit(payload: {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-foreground text-base font-semibold">Detalji</h3>
+      <h3 class="text-highlighted text-base font-semibold">Detalji</h3>
       <UButton
         color="primary"
         variant="outline"
@@ -170,7 +169,7 @@ async function handleDetailSubmit(payload: {
 
     <div
       v-if="!code"
-      class="border-default bg-background text-muted rounded-lg border px-4 py-4 text-sm"
+      class="border-default bg-default text-muted rounded-md border px-4 py-4 text-sm"
     >
       Najpre sačuvajte artikal da biste dodali detalje.
     </div>
@@ -187,7 +186,7 @@ async function handleDetailSubmit(payload: {
             class="border-default/40 flex flex-wrap items-center justify-between gap-2 border-t px-3 py-2 first:border-t-0"
           >
             <div class="min-w-0">
-              <div class="text-foreground text-sm font-medium">
+              <div class="text-highlighted text-sm font-medium">
                 {{ detail.title || detail.detailSlug }}
               </div>
               <div class="text-muted text-xs">
@@ -223,7 +222,7 @@ async function handleDetailSubmit(payload: {
     </div>
   </div>
 
-  <CatalogArticlesModalDetailView
+  <CatalogArticlesDetailModal
     v-model:open="detailModalOpen"
     :mode="detailModalMode"
     :detail="activeDetail"

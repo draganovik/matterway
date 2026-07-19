@@ -5,111 +5,101 @@ skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
 skinparam maxMessageSize 120
 
-autonumber
-
 actor "Customer" as Customer
-participant "Storefront Client" as Checkout
-participant "Storefront Server" as StorefrontServer
-participant "Sales API" as SalesApi
-participant "Customers API" as CustomersApi
-database "Sales DB" as SalesDb
-database "Customers DB" as CustomersDb
-participant "Stripe" as Stripe
 
-Customer -> Checkout : Place order
-activate Checkout
-alt Client-side validation fails
-  Checkout --> Customer : Show validation errors\n(no API calls)
+participant "Web Client\n(Storefront)" as Client
+participant "Backend for Frontend\n(BFF)" as Bff
 
-else Validation passes
-  Checkout -> StorefrontServer : POST /api/storefront/checkout\n{customerId, order, payment, address} + Bearer customer JWT
-  activate StorefrontServer
-  StorefrontServer -> Stripe : Create PaymentMethod + PaymentIntent(confirm=false)\nmetadata:{client_id, note}
-  activate Stripe
+box "Application Services" #FFF7ED
+participant "Sales Service" as Sales #FDBA74
+participant "Customer Service" as Customers #FDBA74
+end box
+participant "Payment Provider" as Payment #9CAAF5
 
-  note over Stripe, StorefrontServer
-  Stripe init happens before Sales order creation.
-  No `order_id` metadata exists yet.
-  end note
+note over Client, Payment
+Payment is prepared before the order is created, but confirmed only after
+the Sales Service has created the canonical order from the customer's cart.
+end note
 
-  alt Stripe payment init fails
-    Stripe --> StorefrontServer : Error
-    StorefrontServer --> Checkout : 500 Payment initialization failed
-    deactivate StorefrontServer
-    Checkout --> Customer : Show payment error
-  else Stripe payment init succeeds
-    Stripe --> StorefrontServer : 200 {paymentIntentId}
-    activate StorefrontServer
-    StorefrontServer -> SalesApi : POST /api/system/v1/orders\n{type, deliveryInfo} + Bearer customer JWT + X-System-Access-Key
-    activate SalesApi
-    note over SalesApi
-    Sales generates the canonical `OrderId`
-    (19 lowercase hex chars).
-    Sales validates both customer JWT and system access key.
-    Customer identity is resolved from JWT claims.
+== Place order ==
+Customer -> Client : 1.1 Submit checkout details
+activate Client
+Client -> Client : 1.2 Validate checkout details
+
+alt Validation fails
+  Client --> Customer : 1.2.1.1 Show validation errors
+else Validation succeeds
+  Client -> Bff : 1.2.2.1 Place order
+  activate Bff
+  Bff -> Payment : 1.2.2.2 Prepare payment
+  activate Payment
+
+  alt Payment preparation fails
+    Payment --> Bff : 1.2.2.2.1.1 Return payment failure
+    deactivate Payment
+    Bff --> Client : 1.2.2.2.1.2 Return checkout failure
+    Client --> Customer : 1.2.2.2.1.3 Show payment error
+  else Payment is prepared
+    Payment --> Bff : 1.2.2.2.2.1 Return payment reference
+    deactivate Payment
+    note over Client, Payment
+    The checkout remains in progress and continues with order creation.
+    The prepared payment has not yet been confirmed.
     end note
-    SalesApi -> CustomersApi : POST /api/system/v1/orders\n{customerId, orderId, deliveryInfo}\n(internal system call, no customer JWT forwarding)
-    activate CustomersApi
-    note over SalesApi, CustomersApi
-      Sales reserves or reuses a pending local order first.
-      Customers order creation is idempotent by shared `orderId`.
-      Checkout country is fixed to Serbia.
-    end note
-    CustomersApi -> CustomersDb : Create or return CustomerOrder from open cart\n(set CustomerArticle.OrderId = orderId,\ncopy articleCode/title/unitPrice into order mirror)
-    activate CustomersDb
-    CustomersDb --> CustomersApi : Created {orderId, customerId, items, totalAmount}
-    deactivate CustomersDb
-    CustomersApi --> SalesApi : 201 Created {orderId, customerId, items, totalAmount}
-    deactivate CustomersApi
-
-    SalesApi -> SalesDb : Update pending Order + Items + DeliveryInfo\nkeep initial status=Processing
-    activate SalesDb
-    SalesDb --> SalesApi : Order created
-    deactivate SalesDb
-    SalesApi --> StorefrontServer : 201 Created {id, totalAmount, ...}
-    deactivate SalesApi
-
-    alt Customers or Sales finalization fails
-      StorefrontServer -> Stripe : Cancel PaymentIntent
-      Stripe --> StorefrontServer : 200 Canceled
-      StorefrontServer --> Checkout : 500 Order creation failed
-      Checkout --> Customer : Show checkout error
-    else Sales order created
-      StorefrontServer -> Stripe : Update metadata(order_id)\n+ Confirm PaymentIntent
-      Stripe --> StorefrontServer : 200 Confirmed
-      StorefrontServer --> Checkout : 200 {order}
-      deactivate StorefrontServer
-      Checkout -> Checkout : cart.clear()
-      Checkout --> Customer : Redirect to /orders
-      deactivate Checkout
-    end
-
   end
 end
 
-newpage Asynchronous webhook handling
+Bff -> Sales : 2.1 Create order
+activate Sales
+Sales -> Customers : 2.2 PUT order snapshot by order ID
+activate Customers
 
-== Asynchronous webhook handling ==
+alt Order creation succeeds
+  Customers --> Sales : 2.2.1.1 Return finalized items and total
+  deactivate Customers
+  Sales -> Sales : 2.2.1.2 Create canonical order
+  Sales --> Bff : 2.2.1.3 Return created order
+  deactivate Sales
+  Bff -> Payment : 2.2.1.4 Confirm payment for the order
+  activate Payment
+  Payment --> Bff : 2.2.1.5 Confirm payment
+  deactivate Payment
+  Bff --> Client : 2.2.1.6 Return completed order
+  Client -> Client : 2.2.1.7 Clear local cart
+  Client --> Customer : 2.2.1.8 Show placed orders
+else Order creation fails
+  Customers --> Sales : 2.2.2.1 Return finalization failure
+  deactivate Customers
+  Sales --> Bff : 2.2.2.2 Return order failure
+  deactivate Sales
+  Bff -> Payment : 2.2.2.3 Cancel prepared payment
+  activate Payment
+  Payment --> Bff : 2.2.2.4 Confirm cancellation
+  deactivate Payment
+  Bff --> Client : 2.2.2.5 Return checkout failure
+  Client --> Customer : 2.2.2.6 Show checkout error
+end
+deactivate Bff
+deactivate Client
 
-alt Stripe sends charge.succeeded
-  Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\ncharge.succeeded(order_id, amount)
-  activate StorefrontServer
-  StorefrontServer -> SalesApi : POST /api/system/v1/payments\n{orderId, provider, amount, status=Charged, createdAt}
-  activate SalesApi
-  SalesApi -> SalesDb : Verify order exists + insert Payment
-  activate SalesDb
-  SalesDb --> SalesApi : Payment stored
-  deactivate SalesDb
-  SalesApi --> StorefrontServer : 201 Created
-  deactivate SalesApi
-  StorefrontServer --> Stripe : 200 OK
-  deactivate StorefrontServer
-else Stripe sends non-charge event
-  Stripe -> StorefrontServer : POST /api/storefront/webhooks/stripe\n<other event type>
-  activate StorefrontServer
-  StorefrontServer --> Stripe : 304 Event ignored
-  deactivate Stripe
-  deactivate StorefrontServer
+newpage Asynchronous payment notification
+
+== Asynchronous payment notification ==
+Payment -> Bff : 3.1 Send payment event
+
+activate Bff
+Bff -> Bff : 3.2 Classify event
+
+alt Successful charge for an order
+  Bff -> Sales : 3.2.1.1 Record payment outcome
+  activate Sales
+  Sales -> Sales : 3.2.1.2 Verify order and store payment record
+  Sales --> Bff : 3.2.1.3 Confirm payment recorded
+  deactivate Sales
+  Bff --> Payment : 3.2.1.4 Accept event
+else Unrelated event
+  Bff --> Payment : 3.2.2.1 Ignore event
+  deactivate Bff
 end
 
 @enduml

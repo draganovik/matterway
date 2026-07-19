@@ -296,10 +296,6 @@ export function useCartStore() {
     items.value.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
   )
 
-  function hasArticle(articleCode: string) {
-    return items.value.some((item) => item.articleCode === articleCode)
-  }
-
   function quantityFor(articleCode: string) {
     return (
       items.value.find((item) => item.articleCode === articleCode)?.quantity ??
@@ -319,7 +315,6 @@ export function useCartStore() {
     clear,
     mergeGuestItemsIntoRemote,
     refreshFromRemote,
-    hasArticle,
     quantityFor,
   }
 }

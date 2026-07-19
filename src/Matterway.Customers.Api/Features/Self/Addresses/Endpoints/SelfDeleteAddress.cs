@@ -18,9 +18,8 @@ public class SelfDeleteAddress : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization(policy => policy.RequireAssertion(context =>
-                RequestIdentity.IsCustomer(context.User) ||
-                RequestIdentity.AsOperator(context.User) || RequestIdentity.AsManager(context.User)))
+            .RequireAuthorization(policy =>
+                policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
     }
 

@@ -4,14 +4,16 @@ import {
   getJwtStringClaim,
   type JwtPayload,
 } from "~/utils/jwt"
+import { getApiErrorMessage } from "~/utils/apiErrors"
 import { buildServiceApiPath } from "~/utils/apiProxy"
 import type { AuthSession, LoginResponse } from "~/types/auth/session"
 import type { PermissionLevel } from "~/types/services/definitions"
 
 const refreshCookieName = "mw_refresh"
+const refreshLockName = "mw-dashboard-auth-refresh"
+const refreshRetryDelayMs = 30_000
 const authBasePath = buildServiceApiPath("identity", "public", "auth")
 const authJsonHeaders = {
-  "Content-Type": "application/json",
   accept: "application/json",
 } as const
 
@@ -20,6 +22,7 @@ const allPermissions: PermissionLevel[] = ["observer", "operator", "manager"]
 type AuthRuntimeState = {
   refreshPromise: Promise<void> | null
   initPromise: Promise<void> | null
+  refreshTimer: ReturnType<typeof setTimeout> | null
 }
 
 function useAuthRuntimeState() {
@@ -31,6 +34,7 @@ function useAuthRuntimeState() {
     nuxtApp._mwDashboardAuthRuntime = {
       refreshPromise: null,
       initPromise: null,
+      refreshTimer: null,
     }
   }
 
@@ -43,7 +47,6 @@ function useSessionState() {
     tokenType: "Bearer",
     created: null,
     expires: null,
-    refreshExpires: null,
   }))
 }
 
@@ -79,11 +82,8 @@ export function useAuthSessionStore() {
     ...getCookieOptions(),
     default: () => null,
   })
-  const refreshTimer = useState<ReturnType<typeof setTimeout> | null>(
-    "auth-refresh-timer",
-    () => null,
-  )
   const isInitialized = useState("auth-is-initialized", () => false)
+  const hasRefreshSession = computed(() => Boolean(refreshTokenCookie.value))
 
   const payload = computed<JwtPayload | null>(() => {
     if (!session.value.accessToken) return null
@@ -109,12 +109,12 @@ export function useAuthSessionStore() {
 
   function authFetch(
     path: "login" | "logout" | "refresh",
-    options: RequestInit,
+    options: Exclude<Parameters<typeof $fetch.raw>[1], undefined>,
   ) {
     return $fetch.raw(`${authBasePath}/${path}`, {
       ...options,
       ignoreResponseError: true,
-    } as Parameters<typeof $fetch.raw>[1])
+    })
   }
 
   function authJsonPost(
@@ -124,15 +124,34 @@ export function useAuthSessionStore() {
     return authFetch(path, {
       method: "POST",
       headers: authJsonHeaders,
-      body: JSON.stringify(body),
+      body,
     })
   }
 
   function clearRefreshTimer() {
-    if (refreshTimer.value) {
-      clearTimeout(refreshTimer.value)
-      refreshTimer.value = null
+    if (runtime.refreshTimer) {
+      clearTimeout(runtime.refreshTimer)
+      runtime.refreshTimer = null
     }
+  }
+
+  function readRefreshToken() {
+    if (import.meta.client) {
+      const prefix = `${refreshCookieName}=`
+      const rawValue = document.cookie
+        .split("; ")
+        .find((cookie) => cookie.startsWith(prefix))
+        ?.slice(prefix.length)
+
+      if (!rawValue) return null
+      try {
+        return decodeURIComponent(rawValue)
+      } catch {
+        return rawValue
+      }
+    }
+
+    return refreshTokenCookie.value
   }
 
   function writeRefreshCookie(token: string | null, expires: Date | null) {
@@ -162,7 +181,6 @@ export function useAuthSessionStore() {
       tokenType: data.tokenType || "Bearer",
       created: data.created,
       expires: data.expires,
-      refreshExpires: data.refreshExpires,
     }
     const refreshExpires = parseDate(data.refreshExpires)
     writeRefreshCookie(data.refreshToken, refreshExpires)
@@ -175,14 +193,13 @@ export function useAuthSessionStore() {
       tokenType: "Bearer",
       created: null,
       expires: null,
-      refreshExpires: null,
     }
     writeRefreshCookie(null, null)
     clearRefreshTimer()
   }
 
   function getAccessToken() {
-    if (!session.value.accessToken) return null
+    if (!session.value.accessToken || isAccessExpired()) return null
     return `${session.value.tokenType} ${session.value.accessToken}`
   }
 
@@ -194,11 +211,28 @@ export function useAuthSessionStore() {
     if (!created || !expires) return
     const lifetimeMs = Math.max(0, expires.getTime() - created.getTime())
     if (!lifetimeMs) return
-    const delay = Math.floor(lifetimeMs * (2 / 3))
-    if (delay <= 0) return
-    refreshTimer.value = setTimeout(() => {
+    const refreshAt = created.getTime() + Math.floor(lifetimeMs * (2 / 3))
+    const delay = Math.max(0, refreshAt - Date.now())
+    runtime.refreshTimer = setTimeout(() => {
       void refreshTokens()
     }, delay)
+  }
+
+  function scheduleRefreshRetry() {
+    if (!import.meta.client || !readRefreshToken()) return
+    clearRefreshTimer()
+    runtime.refreshTimer = setTimeout(() => {
+      void refreshTokens()
+    }, refreshRetryDelayMs)
+  }
+
+  async function withRefreshLock(callback: () => Promise<void>) {
+    if (!import.meta.client || !("locks" in navigator)) {
+      await callback()
+      return
+    }
+
+    await navigator.locks.request(refreshLockName, callback)
   }
 
   async function login(email: string, password: string) {
@@ -212,8 +246,7 @@ export function useAuthSessionStore() {
 
     if (!response.ok) {
       throw new Error(
-        (response._data as { title?: string } | null)?.title ||
-          "Prijava nije uspela.",
+        getApiErrorMessage(response._data) || "Prijava nije uspela.",
       )
     }
 
@@ -229,6 +262,7 @@ export function useAuthSessionStore() {
   }
 
   async function logout() {
+    await initialize()
     const token = getAccessToken()
     if (token) {
       await authFetch("logout", {
@@ -243,32 +277,43 @@ export function useAuthSessionStore() {
 
   async function refreshTokens() {
     if (runtime.refreshPromise) return runtime.refreshPromise
-    const refreshToken = refreshTokenCookie.value
-    if (!refreshToken) return
-    runtime.refreshPromise = (async () => {
-      try {
-        const response = await authJsonPost("refresh", { refreshToken }).catch(
-          () => null,
-        )
+    runtime.refreshPromise = withRefreshLock(async () => {
+      const refreshToken = readRefreshToken()
+      if (!refreshToken) return
 
-        if (!response || !response.ok) {
-          clearSession()
-          return
-        }
+      const response = await authJsonPost("refresh", { refreshToken }).catch(
+        () => null,
+      )
 
-        const data = response._data as LoginResponse | undefined
-        if (!data) {
-          clearSession()
-          return
-        }
-        setSession(data)
-        if (!isEmployee.value) {
-          clearSession()
-        }
-      } catch {
-        clearSession()
+      if (!response) {
+        scheduleRefreshRetry()
+        return
       }
-    })()
+
+      if (!response.ok) {
+        if (
+          response.status === 408 ||
+          response.status === 425 ||
+          response.status === 429 ||
+          response.status >= 500
+        ) {
+          scheduleRefreshRetry()
+          return
+        }
+
+        clearSession()
+        return
+      }
+
+      const data = response._data as LoginResponse | undefined
+      if (!data) {
+        scheduleRefreshRetry()
+        return
+      }
+
+      setSession(data)
+      if (!isEmployee.value) clearSession()
+    })
 
     try {
       await runtime.refreshPromise
@@ -308,17 +353,16 @@ export function useAuthSessionStore() {
           isInitialized.value = true
           return
         }
-        session.value.accessToken = null
       }
 
-      if (refreshTokenCookie.value) {
+      if (readRefreshToken()) {
         try {
           await refreshTokens()
         } catch {
-          clearSession()
+          scheduleRefreshRetry()
         }
       } else {
-        clearRefreshTimer()
+        clearSession()
       }
 
       isInitialized.value = true
@@ -332,19 +376,17 @@ export function useAuthSessionStore() {
   }
 
   return {
-    session,
     payload,
     role,
-    permissions,
     isEmployee,
     isLoggedIn,
+    hasRefreshSession,
     login,
     logout,
     refreshTokens,
     getAccessToken,
     hasPermission,
     initialize,
-    isAccessExpired,
     isInitialized,
   }
 }

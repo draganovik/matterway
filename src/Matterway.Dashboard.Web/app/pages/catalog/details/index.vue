@@ -3,8 +3,6 @@ import { useCatalogDetailsPage } from "~/composables/features/catalog/useCatalog
 
 definePageMeta({
   title: "Detalji",
-  service: "catalog",
-  permissions: ["observer", "operator", "manager"],
 })
 
 const {
@@ -36,84 +34,90 @@ const {
 <template>
   <UDashboardPanel
     id="catalog-details"
-    :ui="{ body: 'py-3 sm:py-4 lg:py-6 min-h-0 overflow-hidden' }"
+    :ui="{
+      body: 'min-h-0 overflow-hidden py-3',
+    }"
   >
     <template #header>
       <UDashboardNavbar title="Detalji">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #trailing>
+          <PageInfoTooltip
+            text="Kreirajte i održavajte definicije detalja koje se koriste u vrednostima detalja artikala."
+          />
+        </template>
+
+        <template #right>
+          <UButton color="primary" :disabled="!canEdit" @click="beginCreate">
+            Novi detalj
+          </UButton>
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <div class="h-full min-h-0">
-        <div class="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-          <div
-            class="flex shrink-0 flex-wrap items-center justify-between gap-3"
-          >
-            <div>
-              <h2 class="text-foreground text-base font-semibold">
-                Upravljanje detaljima
-              </h2>
-              <p class="text-muted text-sm">
-                Kreirajte i održavajte definicije detalja koje se koriste u
-                vrednostima detalja artikala.
-              </p>
-            </div>
+        <EntitiesSplitView class="h-full min-h-0">
+          <template #list>
+            <CatalogDetailsListView
+              :items="details"
+              :selected-id="selectedSlug"
+              :filter="filter"
+              :loading="listState.loading"
+              :error="listState.error"
+              :empty-message="listState.empty"
+              :page="pagination.page"
+              :page-size="pagination.pageSize"
+              :total-count="pagination.totalCount"
+              :total-pages="pagination.totalPages"
+              @update:filter="
+                (value) => {
+                  filter = value
+                }
+              "
+              @search="searchDetails"
+              @update:page="changePage"
+              @update:page-size="changePageSize"
+              @select="selectDetail"
+            />
+          </template>
 
-            <UButton color="primary" :disabled="!canEdit" @click="beginCreate">
-              Novi detalj
-            </UButton>
-          </div>
+          <template #detail>
+            <CatalogDetailsInformationPanel
+              :detail="selectedDetail"
+              :can-edit="canEdit"
+              :can-delete="canDelete"
+              :slug="form.slug"
+              :title="form.title"
+              :unit="form.unit"
+              :save-loading="saveState.loading"
+              :error="saveState.error"
+              :success="saveState.success"
+              @update:slug="
+                (value) => {
+                  form.slug = value
+                }
+              "
+              @update:title="
+                (value) => {
+                  form.title = value
+                }
+              "
+              @update:unit="
+                (value) => {
+                  form.unit = value
+                }
+              "
+              @save="saveDetail"
+              @remove="requestRemoveDetail"
+            />
+          </template>
+        </EntitiesSplitView>
 
-          <EntitiesSplitView
-            class="min-h-0 flex-1"
-            list-class="overflow-hidden"
-            detail-class="overflow-y-auto"
-          >
-            <template #list>
-              <CatalogDetailsListView
-                :items="details"
-                :selected-id="selectedSlug"
-                :filter="filter"
-                :loading="listState.loading"
-                :error="listState.error"
-                :empty-message="listState.empty"
-                :page="pagination.page"
-                :page-size="pagination.pageSize"
-                :total-count="pagination.totalCount"
-                :total-pages="pagination.totalPages"
-                @update:filter="(value) => (filter = value)"
-                @search="searchDetails"
-                @update:page="changePage"
-                @update:page-size="changePageSize"
-                @select="selectDetail"
-              />
-            </template>
-
-            <template #detail>
-              <CatalogDetailsInformationPanel
-                :detail="selectedDetail"
-                :can-edit="canEdit"
-                :can-delete="canDelete"
-                :slug="form.slug"
-                :title="form.title"
-                :unit="form.unit"
-                :save-loading="saveState.loading"
-                :error="saveState.error"
-                :success="saveState.success"
-                @update:slug="(value) => (form.slug = value)"
-                @update:title="(value) => (form.title = value)"
-                @update:unit="(value) => (form.unit = value)"
-                @save="saveDetail"
-                @remove="requestRemoveDetail"
-              />
-            </template>
-          </EntitiesSplitView>
-        </div>
-
-        <CatalogDetailsModalDetailView
+        <CatalogDetailsCreateModal
           v-model:open="createModalOpen"
           :can-edit="canEdit"
           @created="handleDetailCreated"

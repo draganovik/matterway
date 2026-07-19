@@ -1,6 +1,11 @@
 export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui"],
   ssr: true,
+  nitro: { preset: "node-server" },
+  colorMode: {
+    preference: "system",
+    storageKey: "mw-storefront-color-mode",
+  },
 
   components: [
     {
@@ -16,7 +21,6 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      titleTemplate: "%s - Matterway Prodavnica",
       link: [{ rel: "icon", href: "/favicon.svg" }],
     },
   },

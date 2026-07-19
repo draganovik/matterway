@@ -1,11 +1,5 @@
 import { allFeatures } from "~/data/serviceDefinitions"
 
-export const permissionLevels = [
-  { label: "Pregled", value: "observer" },
-  { label: "Operater", value: "operator" },
-  { label: "Menadžer", value: "manager" },
-] as const
-
 const serviceLabelMap: Record<string, string> = {
   catalog: "Katalog",
   customers: "Kupci",

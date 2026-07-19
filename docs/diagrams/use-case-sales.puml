@@ -8,31 +8,32 @@ actor user as "User"
 actor csmr as "Customer"
 actor empl as "Employee"
 
-user --|> csmr
-user --|> empl
+user <|-- csmr
+user <|-- empl
 
-actor systm as "System"
+actor systm as "Storefront Web"
 
 package "Sales" {
-  usecase placeOwnOrder as "Place Own Order"
   usecase viewOwnOrders as "View Own Orders"
 
   usecase viewOrders as "View Orders
                          ..<i>extension points</i>..
                          View Payments"
   usecase viewPayments as "View Payments"
-  usecase updateOrderStatus as "Update Order Status"
+  usecase updateOrderStatus as "Add Order Status"
 
   usecase registerPayment as "Register Payment"
+  usecase placeOrder as "Place Order"
 
-  viewPayments .up.> viewOrders : <<extend>>
+  viewPayments .r.> viewOrders : <<extend>>
 }
 
-csmr --- placeOwnOrder
+csmr --- placeOrder
 csmr --- viewOwnOrders
 
 updateOrderStatus --- empl : perm:[operator,manager]
-viewOrders --- empl
+viewOrders --- empl : perm:[observer,operator,manager]
+placeOrder --- systm
 
 registerPayment --- systm
 @enduml

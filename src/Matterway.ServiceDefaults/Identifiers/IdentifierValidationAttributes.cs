@@ -48,8 +48,7 @@ public sealed class OrderIdAttribute : ValidationAttribute
 {
     public OrderIdAttribute()
     {
-        ErrorMessage =
-            $"The field {{0}} must contain {OrderId.Length} hexadecimal characters or the legacy 0000-0000-0000-0000 format.";
+        ErrorMessage = $"The field {{0}} must contain {OrderId.Length} hexadecimal characters.";
     }
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

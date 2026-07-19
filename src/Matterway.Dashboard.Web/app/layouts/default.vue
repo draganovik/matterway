@@ -5,17 +5,11 @@ import { useAuthorizedSections } from "~/composables/workflows/useAuthorizedSect
 const open = ref(false)
 const authorizedSections = useAuthorizedSections()
 
-const iconMap: Record<string, string> = {
-  catalog: "i-lucide-package",
-  users: "i-lucide-users",
-  sales: "i-lucide-receipt-text",
-}
-
 const navItems = computed<NavigationMenuItem[]>(() => {
   return authorizedSections.value
     .map((section) => ({
       label: section.label,
-      icon: iconMap[section.key] || "i-lucide-folder",
+      icon: section.icon,
       to: `/${section.key}`,
       exact: true,
       type: "trigger" as const,

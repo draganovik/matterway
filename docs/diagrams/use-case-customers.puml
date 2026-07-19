@@ -4,42 +4,48 @@ left to right direction
 skinparam shadowing false
 skinparam actorStyle hollow
 
-rectangle #line:transparent {
+together {
   actor user as "User"
   actor csmr as "Customer"
 }
-rectangle #line:transparent {
-  actor empl as "Employee"
-  actor sysm as "System"
-  empl -[hidden]- sysm
-}
 
-user --|> csmr
-user --|> empl
+actor empl as "Employee"
+actor sales as "Sales Service"
+actor identity as "Identity Service"
+
+user <|-- csmr
+user <|-l- empl
 
 package "Customers" {
-  usecase createCustomer as "Create Customer"
+  usecase syncOnOrder as "Create Order Snapshot from Cart"
+
+  usecase createCustomer as "Register Customer"
   usecase manageOwnProfile as "Manage Own Profile"
   usecase manageOwnAddress as "Manage Own Address"
   usecase manageOwnCartItems as "Manage Own Cart Items"
 
-  usecase syncOnOrder as "Sync On Order"
-  usecase verifyCustomer as "Verify Customer"
-
   usecase manageCustomers as "Manage Customers
                               ..<i>extension points</i>..
                               Upsert Customer Address"
+  usecase viewCustomers as "View Customers"
+  usecase viewCustomerAddress as "View Customer Address"
   usecase manageCustomerAddress as "Manage Customer Address"
-  manageCustomerAddress .left.> manageCustomers : <<extend>>
+
+  manageCustomerAddress .l.> manageCustomers : <<extend>>
+  manageCustomerAddress .r.> viewCustomerAddress : <<include>>
+  manageCustomers .l.> viewCustomers : <<include>>
 }
 
 user -- createCustomer
+createCustomer -- identity
 csmr -- manageOwnProfile
 csmr -- manageOwnAddress
 csmr -- manageOwnCartItems
 
-syncOnOrder -- sysm
-verifyCustomer -- sysm
+syncOnOrder -- sales
 
+viewCustomers -- empl : perm:[observer,operator,manager]
+viewCustomerAddress -- empl : perm:[observer,operator,manager]
 manageCustomers -- empl : perm:[operator,manager]
+manageCustomerAddress -- empl : perm:[operator,manager]
 @enduml

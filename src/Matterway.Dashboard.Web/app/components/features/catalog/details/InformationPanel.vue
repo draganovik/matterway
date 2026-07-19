@@ -35,7 +35,7 @@ const emit = defineEmits<{
 <template>
   <div class="space-y-4">
     <div class="space-y-1">
-      <h3 class="text-foreground text-base font-semibold">
+      <h3 class="text-highlighted text-base font-semibold">
         {{ detail ? "Izmena detalja" : "Uređivanje detalja" }}
       </h3>
       <p class="text-muted text-sm">

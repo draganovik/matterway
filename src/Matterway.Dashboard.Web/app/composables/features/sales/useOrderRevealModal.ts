@@ -1,7 +1,6 @@
 import type { Ref } from "vue"
 import type { OrderResponse } from "~/types/sales"
 import { useSalesClient } from "~/composables/api/useSalesClient"
-import { useModalCloseReset } from "~/composables/workflows/modal/useModalCloseReset"
 import { useRequestState } from "~/composables/workflows/state/useRequestState"
 
 type NullableString = string | null | undefined
@@ -71,13 +70,8 @@ export function useOrderRevealModal(options: UseOrderRevealOptions) {
     order.value = result.data
   }
 
-  useModalCloseReset({
-    isOpen: options.isOpen,
-    watchSources: [options.orderId],
-    onCloseReset: resetModalState,
-    onOpen: async () => {
-      await loadOrder()
-    },
+  watch([options.isOpen, options.orderId], ([open]) => {
+    if (open) void loadOrder()
   })
 
   return {
