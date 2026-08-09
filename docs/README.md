@@ -1,6 +1,6 @@
 # Documentation
 
-This directory contains the project diagrams, docs materials, and brand source files.
+This directory contains project diagrams and brand source files.
 
 ## Structure
 
@@ -9,4 +9,7 @@ This directory contains the project diagrams, docs materials, and brand source f
 - `screenshots/` contains examples screenshots.
 - `brand/` contains editable brand source files.
 
-Diagram source and export files intentionally retain the same base filename so their relationship remains clear.
+Run `scripts/export-diagrams` from the repository root after changing PlantUML sources.
+Single-page diagrams retain the same base filename as their source. Multi-page
+sequence diagrams use numbered page suffixes, for example
+`sequence-web-auth-01.png`, `sequence-web-auth-02.png`, and so on.

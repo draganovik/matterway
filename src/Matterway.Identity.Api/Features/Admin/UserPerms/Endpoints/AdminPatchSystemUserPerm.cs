@@ -15,7 +15,7 @@ public class AdminPatchSystemUserPerm : IEndpoint
             .WithName(RouteName)
             .WithSummary("[admin] Set a permission for a system user")
             .WithTags("SystemUsers")
-            .Produces<IEnumerable<AdminPatchSystemUserPermResponse>>(StatusCodes.Status200OK)
+            .Produces<IEnumerable<AdminPatchSystemUserPermResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>

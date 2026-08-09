@@ -15,7 +15,7 @@ public class AdminGetSystemUserPerms : IEndpoint
             .WithName(RouteName)
             .WithSummary("[admin] Get permissions for a system user")
             .WithTags("SystemUsers")
-            .Produces<IEnumerable<AdminGetSystemUserPermResponse>>(StatusCodes.Status200OK)
+            .Produces<IEnumerable<AdminGetSystemUserPermResponse>>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>

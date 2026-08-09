@@ -14,7 +14,7 @@ public class SelfPutAddress : IEndpoint
         endpoints.MapPut(EndpointKind.Self, "address", Handler)
             .WithName(RouteName).WithSummary("[self] Create or update own Address.")
             .WithTags(nameof(Address))
-            .Produces<SelfBaseAddressResponse>(StatusCodes.Status200OK)
+            .Produces<SelfBaseAddressResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)

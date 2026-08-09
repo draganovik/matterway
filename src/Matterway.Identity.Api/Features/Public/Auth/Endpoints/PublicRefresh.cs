@@ -13,7 +13,7 @@ public class PublicRefresh : IEndpoint
             .WithName(RouteName)
             .WithSummary("[public] Refresh access token using a refresh token.")
             .WithTags("Auth")
-            .Produces<PublicRefreshAuthResponse>(StatusCodes.Status200OK)
+            .Produces<PublicRefreshAuthResponse>()
             .Produces(StatusCodes.Status401Unauthorized)
             .AllowAnonymous()
             .MapToApiVersion(new ApiVersion(1));

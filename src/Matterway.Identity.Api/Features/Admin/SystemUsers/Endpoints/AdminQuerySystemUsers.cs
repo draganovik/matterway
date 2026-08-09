@@ -14,7 +14,7 @@ public class AdminQuerySystemUsers : IEndpoint
         endpoints.MapGet(EndpointKind.Admin, "system-users", Handler)
             .WithName(RouteName).WithSummary("[admin] Query system users")
             .WithTags("SystemUsers")
-            .Produces<PaginationResponse<AdminQuerySystemUserResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<AdminQuerySystemUserResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>

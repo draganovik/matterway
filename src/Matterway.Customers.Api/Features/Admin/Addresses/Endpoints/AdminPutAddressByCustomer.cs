@@ -15,7 +15,7 @@ public class AdminPutAddressByCustomer : IEndpoint
             .WithName(RouteName)
             .WithSummary("[admin] Create or replace Customer address by customer id")
             .WithTags(nameof(Address))
-            .Produces<AdminBaseAddressResponse>(StatusCodes.Status200OK)
+            .Produces<AdminBaseAddressResponse>()
             .Produces<AdminBaseAddressResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)

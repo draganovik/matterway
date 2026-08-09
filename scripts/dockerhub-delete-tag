@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+  echo "Usage: $0 <namespace>" >&2
+  exit 2
+fi
+
+DOCKERHUB_NAMESPACE="$1"
+
+repos=(
+  mtw-catalog-api
+  mtw-customers-api
+  mtw-dashboard-web
+  mtw-db-migrator
+  mtw-identity-api
+  mtw-sales-api
+  mtw-storefront-web
+)
+
+read -rsp "Docker Hub PAT: " DOCKERHUB_PAT
+echo
+
+auth_response=$(
+  curl -fsS \
+    -H "Content-Type: application/json" \
+    -d "$(jq -n \
+      --arg identifier "${DOCKERHUB_NAMESPACE}" \
+      --arg secret "${DOCKERHUB_PAT}" \
+      '{identifier: $identifier, secret: $secret}')" \
+    "https://hub.docker.com/v2/auth/token"
+)
+
+DOCKERHUB_BEARER=$(jq -er ".access_token" <<<"${auth_response}")
+unset DOCKERHUB_PAT auth_response
+
+for repo in "${repos[@]}"; do
+  http_code=$(
+    curl -sS -o /dev/null -w "%{http_code}" \
+      -X DELETE \
+      -H "Authorization: Bearer ${DOCKERHUB_BEARER}" \
+      "https://hub.docker.com/v2/namespaces/${DOCKERHUB_NAMESPACE}/repositories/${repo}/tags/v1.0.0"
+  )
+
+  if [[ "${http_code}" != "204" ]]; then
+    echo "Failed to delete ${DOCKERHUB_NAMESPACE}/${repo}:v1.0.0 — HTTP ${http_code}" >&2
+    exit 1
+  fi
+
+  echo "Deleted ${DOCKERHUB_NAMESPACE}/${repo}:v1.0.0"
+done
+
+unset DOCKERHUB_BEARER

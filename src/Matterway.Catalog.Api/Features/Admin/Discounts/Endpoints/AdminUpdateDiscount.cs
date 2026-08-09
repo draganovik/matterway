@@ -14,7 +14,7 @@ public class AdminUpdateDiscount : IEndpoint
         endpoints.MapPut(EndpointKind.Admin, "discounts/{code}", Handle)
             .WithName(RouteName).WithSummary("[admin] Create or replace a discount across article codes")
             .WithTags(nameof(Discount))
-            .Produces<AdminUpdateDiscountResponse>(StatusCodes.Status200OK)
+            .Produces<AdminUpdateDiscountResponse>()
             .Produces<AdminUpdateDiscountResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>

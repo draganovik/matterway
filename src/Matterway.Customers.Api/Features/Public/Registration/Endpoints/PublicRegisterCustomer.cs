@@ -72,7 +72,7 @@ public class PublicRegisterCustomer : IEndpoint
             });
         }
 
-        var location = linkGenerator.GetUriByName(httpContext, "SelfGetProfile", null);
+        var location = linkGenerator.GetUriByName(httpContext, "SelfGetProfile");
         return TypedResults.Created(location, new PublicRegisterCustomerResponse
         {
             SystemUserId = created.Id,

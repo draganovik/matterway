@@ -103,7 +103,7 @@ var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResour
 #pragma warning disable ASPIREJAVASCRIPT001
 WithCommonWebEnvironment(
         builder.AddViteApp("mtw-storefront-web", "../Matterway.Storefront.Web")
-            .PublishAsPackageScript("start")
+            .PublishAsPackageScript()
             .WithEndpoint("http", endpoint =>
             {
                 endpoint.Port = services.Storefront.Port;
@@ -118,7 +118,7 @@ WithCommonWebEnvironment(
 
 WithCommonWebEnvironment(
         builder.AddViteApp("mtw-dashboard-web", "../Matterway.Dashboard.Web")
-            .PublishAsPackageScript("start")
+            .PublishAsPackageScript()
             .WithEndpoint("http", endpoint =>
             {
                 endpoint.Port = services.Dashboard.Port;

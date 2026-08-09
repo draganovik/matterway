@@ -15,7 +15,7 @@ public class PublicLogin : IEndpoint
             .WithName(RouteName)
             .WithSummary("[public] Authenticate user and issue tokens.")
             .WithTags("Auth")
-            .Produces<PublicLoginAuthResponse>(StatusCodes.Status200OK)
+            .Produces<PublicLoginAuthResponse>()
             .Produces(StatusCodes.Status401Unauthorized)
             .AllowAnonymous()
             .MapToApiVersion(new ApiVersion(1));

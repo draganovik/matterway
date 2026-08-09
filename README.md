@@ -68,9 +68,9 @@ src/
   Matterway.Storefront.Web/   Nuxt customer application
   Matterway.Dashboard.Web/    Nuxt administration application
 
-scripts/                      Database, migration, and Docker Hub helpers
+scripts/                      Development and deployment helpers
 data/                         Local artifacts such as catalog archives
-docs/                         Diagrams, thesis materials, and supporting assets
+docs/                         Diagrams and supporting assets
 ```
 
 ## Local Development
@@ -185,7 +185,7 @@ The platform configures OpenTelemetry, resilient `HttpClient` defaults, standard
 
 ## Documentation
 
-See [`docs/README.md`](docs/README.md) for the editable PlantUML sources, rendered diagrams, and the current thesis document.
+See [`docs/README.md`](docs/README.md) for the editable PlantUML sources and rendered diagrams.
 
 ## License
 

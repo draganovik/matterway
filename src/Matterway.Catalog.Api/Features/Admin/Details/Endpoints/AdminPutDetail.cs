@@ -13,7 +13,7 @@ public class AdminPutDetail : IEndpoint
         endpoints.MapPut(EndpointKind.Admin, "details/{slug}", Handle)
             .WithName(RouteName).WithSummary("[admin] Create or replace a Detail definition")
             .WithTags(nameof(Detail))
-            .Produces<AdminPutDetailResponse>(StatusCodes.Status200OK)
+            .Produces<AdminPutDetailResponse>()
             .Produces<AdminPutDetailResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>

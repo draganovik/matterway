@@ -40,8 +40,7 @@ public class SelfQueryOrders : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            RouteName,
-            null);
+            RouteName);
 
         var results = entities.Select(ToResponse).ToList();
 

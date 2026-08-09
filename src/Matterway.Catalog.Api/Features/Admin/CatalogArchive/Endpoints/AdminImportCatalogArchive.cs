@@ -14,7 +14,7 @@ public class AdminImportCatalogArchive : IEndpoint
             .WithName(RouteName)
             .WithSummary("[admin] Import catalog data and image binaries from zip archive")
             .WithTags("CatalogArchive")
-            .Produces<AdminImportCatalogArchiveResponse>(StatusCodes.Status200OK)
+            .Produces<AdminImportCatalogArchiveResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Accepts<AdminImportCatalogArchiveRequest>("multipart/form-data")
             .RequireAuthorization(policy =>

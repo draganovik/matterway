@@ -17,7 +17,7 @@ public sealed class AdminPutArticleDetail : IEndpoint
             .WithName(RouteName)
             .WithSummary("[admin] Create or replace an ArticleDetail")
             .WithTags("ArticleDetail")
-            .Produces<AdminPutArticleDetailResponse>(StatusCodes.Status200OK)
+            .Produces<AdminPutArticleDetailResponse>()
             .Produces<AdminPutArticleDetailResponse>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
