@@ -14,7 +14,7 @@ public class AdminRemoveArticleImage : IEndpoint
         endpoints.MapDelete(EndpointKind.Admin, "articles/{article:ArticleCode}/images/{orderIndex:int}", Handle)
             .WithName(RouteName).WithSummary("[admin] Remove an ArticleImage")
             .WithTags(nameof(ArticleImage))
-            .Produces<AdminRemoveArticleImageResponse>(StatusCodes.Status200OK)
+            .Produces<AdminRemoveArticleImageResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(policy =>

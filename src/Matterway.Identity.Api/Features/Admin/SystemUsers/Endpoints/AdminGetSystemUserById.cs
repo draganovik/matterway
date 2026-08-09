@@ -12,7 +12,7 @@ public class AdminGetSystemUserById : IEndpoint
         endpoints.MapGet(EndpointKind.Admin, "system-users/{id:guid}", Handler)
             .WithName(RouteName).WithSummary("[admin] Get system user by id")
             .WithTags("SystemUsers")
-            .Produces<AdminGetSystemUserResponse>(StatusCodes.Status200OK)
+            .Produces<AdminGetSystemUserResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context =>

@@ -13,7 +13,7 @@ public class AdminDeleteDetail : IEndpoint
         endpoints.MapDelete(EndpointKind.Admin, "details/{slug}", Handle)
             .WithName(RouteName).WithSummary("[admin] Delete a Detail definition")
             .WithTags(nameof(Detail))
-            .Produces<AdminDeleteDetailResponse>(StatusCodes.Status200OK)
+            .Produces<AdminDeleteDetailResponse>()
             .Produces(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(policy =>

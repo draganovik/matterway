@@ -13,7 +13,7 @@ public class SelfQueryCartItems : IEndpoint
         endpoints.MapGet(EndpointKind.Self, "cart/items", Handler)
             .WithName(RouteName).WithSummary("[self] Query own CartItems.")
             .WithTags(nameof(CustomerArticle))
-            .Produces<PaginationResponse<SelfBaseCartItemResponse>>(StatusCodes.Status200OK)
+            .Produces<PaginationResponse<SelfBaseCartItemResponse>>()
             .RequireAuthorization(policy =>
                 policy.RequireAssertion(context => RequestIdentity.IsCustomer(context.User)))
             .MapToApiVersion(new ApiVersion(1));
@@ -35,7 +35,7 @@ public class SelfQueryCartItems : IEndpoint
         var entities = await cartItemRepository.QueryCart(customerId.Value, pagingQuery.Page,
             pagingQuery.PageSize, cancellationToken);
 
-        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName, null);
+        var baseUri = linkGenerator.GetUriByName(httpContext, RouteName);
         var response = entities.Select(ToResponse).ToList();
 
         var paginationResponse = PaginationResponse<SelfBaseCartItemResponse>.Create(

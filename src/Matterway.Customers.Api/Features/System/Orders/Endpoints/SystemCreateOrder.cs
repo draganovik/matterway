@@ -16,7 +16,7 @@ public class SystemCreateOrder : IEndpoint
             .WithName(RouteName)
             .WithSummary("[system] Create or return a customer order from open cart items.")
             .WithTags(nameof(CustomerOrder))
-            .Produces<SystemCreateOrderResponse>(StatusCodes.Status200OK)
+            .Produces<SystemCreateOrderResponse>()
             .Produces<SystemCreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)

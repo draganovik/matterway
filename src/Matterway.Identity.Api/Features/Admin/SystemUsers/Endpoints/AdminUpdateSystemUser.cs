@@ -16,7 +16,7 @@ public class AdminUpdateSystemUser : IEndpoint
         endpoints.MapPatch(EndpointKind.Admin, "system-users/{id:guid}", Handler)
             .WithName(RouteName).WithSummary("[admin] Update system user by id")
             .WithTags("SystemUsers")
-            .Produces<AdminUpdateSystemUserResponse>(StatusCodes.Status200OK)
+            .Produces<AdminUpdateSystemUserResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(policy =>

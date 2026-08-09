@@ -49,8 +49,7 @@ public class PublicQueryArticles : IEndpoint
 
         var location = linkGenerator.GetUriByName(
             httpContext,
-            RouteName,
-            null);
+            RouteName);
 
         if (!string.IsNullOrWhiteSpace(location) && !string.IsNullOrWhiteSpace(queryParameters.Filter))
             location = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(location,
