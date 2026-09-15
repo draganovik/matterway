@@ -1,4 +1,6 @@
-using Matterway.Catalog.Api.Infrastructure.Storage.Minio;
+using Amazon.S3;
+using Matterway.Catalog.Api.Infrastructure.Storage.S3;
+using Microsoft.Extensions.Options;
 
 namespace Matterway.Catalog.Api.Infrastructure.Storage;
 
@@ -21,8 +23,9 @@ public static class ImageStorageRegistration
                     "Image storage secret key must be provided.")
                 .ValidateOnStart();
 
-            builder.Services.AddSingleton<IMinioClientFactory, MinioClientFactory>();
-            builder.Services.AddScoped<IImageStorageService, MinioImageStorageService>();
+            builder.Services.AddSingleton<IAmazonS3>(services =>
+                S3Client.Create(services.GetRequiredService<IOptions<ImageStorageOptions>>().Value));
+            builder.Services.AddScoped<IImageStorageService, S3ImageStorageService>();
             builder.Services.AddHostedService<ImageStorageInitializer>();
 
             return builder;

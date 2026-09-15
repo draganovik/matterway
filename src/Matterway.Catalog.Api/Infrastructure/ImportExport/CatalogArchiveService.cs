@@ -5,13 +5,14 @@ using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Minio.DataModel.Args;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace Matterway.Catalog.Api.Infrastructure.ImportExport;
 
 public sealed class CatalogArchiveService(
     CatalogDbComposer context,
-    IMinioClientFactory minioClientFactory,
+    IAmazonS3 client,
     IOptions<ImageStorageOptions> options,
     ILogger<CatalogArchiveService> logger)
     : ICatalogArchiveService
@@ -148,7 +149,6 @@ public sealed class CatalogArchiveService(
             "data/article_images.json",
             cancellationToken);
 
-        var client = minioClientFactory.CreateClient();
         var uploadedObjectNames = new List<string>(articleImages.Count);
 
         try
@@ -169,12 +169,15 @@ public sealed class CatalogArchiveService(
                     : image.ContentType;
 
                 var objectName = ImageStoragePaths.BuildObjectName(image.Id);
-                await client.PutObjectAsync(new PutObjectArgs()
-                        .WithBucket(_options.Bucket)
-                        .WithObject(objectName)
-                        .WithStreamData(contentStream)
-                        .WithObjectSize(contentStream.Length)
-                        .WithContentType(contentType),
+                await client.PutObjectAsync(new PutObjectRequest
+                    {
+                        BucketName = _options.Bucket,
+                        Key = objectName,
+                        InputStream = contentStream,
+                        ContentType = contentType,
+                        AutoCloseStream = false,
+                        UseChunkEncoding = false
+                    },
                     cancellationToken);
 
                 uploadedObjectNames.Add(objectName);
@@ -234,31 +237,25 @@ public sealed class CatalogArchiveService(
         string objectName,
         CancellationToken cancellationToken)
     {
-        var client = minioClientFactory.CreateClient();
         try
         {
-            var stat = await client.StatObjectAsync(
-                new StatObjectArgs()
-                    .WithBucket(_options.Bucket)
-                    .WithObject(objectName),
-                cancellationToken);
+            using var response = await client.GetObjectAsync(new GetObjectRequest
+            {
+                BucketName = _options.Bucket,
+                Key = objectName
+            }, cancellationToken);
 
             await using var buffer = new MemoryStream();
-            await client.GetObjectAsync(
-                new GetObjectArgs()
-                    .WithBucket(_options.Bucket)
-                    .WithObject(objectName)
-                    .WithCallbackStream(stream => stream.CopyTo(buffer)),
-                cancellationToken);
+            await response.ResponseStream.CopyToAsync(buffer, cancellationToken);
 
-            return (buffer.ToArray(), string.IsNullOrWhiteSpace(stat.ContentType)
+            return (buffer.ToArray(), string.IsNullOrWhiteSpace(response.Headers.ContentType)
                 ? "application/octet-stream"
-                : stat.ContentType);
+                : response.Headers.ContentType);
         }
         catch (Exception ex)
         {
             logger.LogError(ex,
-                "Could not read image object '{ObjectName}' from MinIO bucket '{Bucket}'.",
+                "Could not read image object '{ObjectName}' from RustFS bucket '{Bucket}'.",
                 objectName,
                 _options.Bucket);
             throw;
@@ -266,17 +263,19 @@ public sealed class CatalogArchiveService(
     }
 
     private async Task RollbackUploadedObjectsAsync(
-        Minio.IMinioClient client,
+        IAmazonS3 client,
         IReadOnlyCollection<string> objectNames,
         CancellationToken cancellationToken)
     {
         foreach (var objectName in objectNames)
             try
             {
-                await client.RemoveObjectAsync(
-                    new RemoveObjectArgs()
-                        .WithBucket(_options.Bucket)
-                        .WithObject(objectName),
+                await client.DeleteObjectAsync(
+                    new DeleteObjectRequest
+                    {
+                        BucketName = _options.Bucket,
+                        Key = objectName
+                    },
                     cancellationToken);
             }
             catch (Exception ex)

@@ -15,8 +15,8 @@ var services = AppHostServicesOptions.Bind(builder.Configuration);
 var jwtSigningKey = builder.AddParameter("JwtSigningKey", true);
 var systemAccessKey = builder.AddParameter("SystemAccessKey", true);
 var postgresPassword = builder.AddParameter("PostgresPassword", true);
-var minioUser = builder.AddParameter("MinioRootUser");
-var minioPassword = builder.AddParameter("MinioRootPassword", true);
+var rustfsAccessKey = builder.AddParameter("RustFSAccessKey");
+var rustfsSecretKey = builder.AddParameter("RustFSSecretKey", true);
 var stripeSecretKey = builder.AddParameter("StripeSecretKey", true);
 
 builder.AddDockerComposeEnvironment(composeEnvironmentName)
@@ -41,13 +41,18 @@ var databases = (
     Identity: postgres.AddDatabase("IdentityDb"),
     Sales: postgres.AddDatabase("SalesDb"));
 
-var minio = builder.AddContainer("minio", "minio/minio:RELEASE.2025-01-20T14-49-07Z")
-    .WithVolume("matterway-minio-data", "/data")
-    .WithEnvironment("MINIO_ROOT_USER", minioUser)
-    .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
-    .WithArgs("server", "/data", "--console-address", ":9001")
-    .WithHttpEndpoint(services.Minio.Port, 9000, "http")
-    .WithHttpEndpoint(services.Minio.ConsolePort, 9001, "console")
+var rustfs = builder.AddContainer("rustfs", "rustfs/rustfs:1.0.0-rc.6")
+    .WithVolume("matterway-rustfs-data", "/data")
+    .WithEnvironment("RUSTFS_ACCESS_KEY", rustfsAccessKey)
+    .WithEnvironment("RUSTFS_SECRET_KEY", rustfsSecretKey)
+    .WithEnvironment("RUSTFS_CONSOLE_ENABLE", "true")
+    .WithEnvironment("RUSTFS_ADDRESS", ":9000")
+    .WithEnvironment("RUSTFS_CONSOLE_ADDRESS", ":9001")
+    .WithArgs("/data")
+    .WithHttpEndpoint(services.RustFS.Port, 9000, "http")
+    .WithHttpEndpoint(services.RustFS.ConsolePort, 9001, "console")
+    .WithUrlForEndpoint("console", url => url.Url = "/rustfs/console/")
+    .WithHttpHealthCheck("/health/ready", endpointName: "http")
     .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
 
 var dbMigrator = builder.AddProject<Matterway_Migrations>("mtw-db-migrator")
@@ -82,15 +87,15 @@ var identityApiHttp = identityApi.GetEndpoint("http");
 var catalogApiHttp = catalogApi.GetEndpoint("http");
 var customersApiHttp = customersApi.GetEndpoint("http");
 var salesApiHttp = salesApi.GetEndpoint("http");
-var minioHttpEndpoint = minio.GetEndpoint("http");
+var rustfsHttpEndpoint = rustfs.GetEndpoint("http");
 
 catalogApi
-    .WaitFor(minio)
-    .WithReference(minioHttpEndpoint)
+    .WaitFor(rustfs)
+    .WithReference(rustfsHttpEndpoint)
     .WithEnvironment("ImageStorage__Bucket", "article-images")
-    .WithEnvironment("ImageStorage__Endpoint", minioHttpEndpoint)
-    .WithEnvironment("ImageStorage__AccessKey", minioUser)
-    .WithEnvironment("ImageStorage__SecretKey", minioPassword);
+    .WithEnvironment("ImageStorage__Endpoint", rustfsHttpEndpoint)
+    .WithEnvironment("ImageStorage__AccessKey", rustfsAccessKey)
+    .WithEnvironment("ImageStorage__SecretKey", rustfsSecretKey);
 
 var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResource> Resource)[]
 {
@@ -169,6 +174,6 @@ IResourceBuilder<T> WithCommonWebEnvironment<T>(IResourceBuilder<T> webApp)
         .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
         .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
         .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
-        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", minioHttpEndpoint)
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", rustfsHttpEndpoint)
         .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BUCKET", "article-images");
 }

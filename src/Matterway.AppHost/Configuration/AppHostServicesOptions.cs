@@ -7,7 +7,7 @@ internal sealed class AppHostServicesOptions
     public required ServicePortOptions AspireDashboard { get; init; }
     public required ServicePortOptions Scalar { get; init; }
     public required ServicePortOptions Postgres { get; init; }
-    public required MinioPortOptions Minio { get; init; }
+    public required RustFSPortOptions RustFS { get; init; }
     public required ServicePortOptions Storefront { get; init; }
     public required ServicePortOptions Dashboard { get; init; }
 
@@ -22,11 +22,11 @@ internal sealed class AppHostServicesOptions
             AspireDashboard = BindPortOptions<ServicePortOptions>(servicesSection, "AspireDashboard"),
             Scalar = BindPortOptions<ServicePortOptions>(servicesSection, "Scalar"),
             Postgres = BindPortOptions<ServicePortOptions>(servicesSection, "Postgres"),
-            Minio = BindPortOptions<MinioPortOptions>(servicesSection, "Minio",
+            RustFS = BindPortOptions<RustFSPortOptions>(servicesSection, "RustFS",
                 options =>
                 {
                     if (options.ConsolePort <= 0)
-                        throw new InvalidOperationException("Services:Minio:ConsolePort must be greater than zero.");
+                        throw new InvalidOperationException("Services:RustFS:ConsolePort must be greater than zero.");
                 }),
             Storefront = BindPortOptions<ServicePortOptions>(servicesSection, "Storefront"),
             Dashboard = BindPortOptions<ServicePortOptions>(servicesSection, "Dashboard")
@@ -66,7 +66,7 @@ internal class ServicePortOptions
     public int Port { get; init; }
 }
 
-internal sealed class MinioPortOptions : ServicePortOptions
+internal sealed class RustFSPortOptions : ServicePortOptions
 {
     public int ConsolePort { get; init; }
 }
