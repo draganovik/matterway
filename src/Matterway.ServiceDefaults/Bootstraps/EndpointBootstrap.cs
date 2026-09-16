@@ -13,8 +13,6 @@ public enum EndpointKind
     System
 }
 
-public readonly record struct EndpointKindMetadata(EndpointKind Kind);
-
 public interface IEndpoint
 {
     void MapEndpoint(EndpointRouter endpoints);
@@ -37,8 +35,6 @@ public sealed class EndpointRouter(IReadOnlyDictionary<EndpointKind, RouteGroupB
     {
         var builder = map(ResolveGroup(endpointKind), pattern, handler);
         var requestArgumentIndexes = EndpointRequestValidation.GetRequestArgumentIndexes(handler.Method);
-
-        builder.WithMetadata(new EndpointKindMetadata(endpointKind));
 
         if (requestArgumentIndexes.Length > 0)
             builder

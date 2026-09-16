@@ -1,14 +1,9 @@
-using System.Text;
 using Asp.Versioning;
 using Matterway.ServiceDefaults.Authorization;
-using Matterway.ServiceDefaults.Bootstraps;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Matterway.ServiceDefaults.Extensions;
 
@@ -18,65 +13,22 @@ public static class BuilderExtensions
     {
         public IHostApplicationBuilder ConfigureApi(
             ApiDefinition apiDefinition,
-            bool customizeBadHttpRequestProblemDetails = true,
-            Action<ProblemDetailsContext>? customizeProblemDetails = null)
+            bool customizeBadHttpRequestProblemDetails = true)
         {
             ArgumentNullException.ThrowIfNull(apiDefinition);
 
             ConfigureRequestIdentity(builder, apiDefinition.ServiceName);
             ConfigureSystemAccessKey(builder);
-            ConfigureProblemDetails(builder, customizeBadHttpRequestProblemDetails, customizeProblemDetails);
-            ConfigureApiVersioning(builder, apiDefinition.SupportedApiVersions);
-            ConfigureOpenApi(builder, apiDefinition.SupportedApiVersions);
+            builder.Services.AddProblemDetails(options =>
+            {
+                if (customizeBadHttpRequestProblemDetails)
+                    options.CustomizeProblemDetails = context => context.ApplyBadRequestProblemDetails();
+            });
 
-            return builder;
-        }
+            var versions = ApiVersioningConventions.NormalizeSupportedVersions(apiDefinition.SupportedApiVersions);
+            ConfigureApiVersioning(builder, versions);
+            ConfigureOpenApi(builder, versions);
 
-        public IHostApplicationBuilder ConfigureAuthentication(ApiAuthenticationOptions? options = null)
-        {
-            options ??= new ApiAuthenticationOptions();
-            ArgumentNullException.ThrowIfNull(options);
-
-            options.ConfigureServices?.Invoke(builder);
-
-            var validIssuer = options.ValidIssuer ?? builder.Configuration["Jwt:Issuer"];
-            var validAudience = options.ValidAudience ?? builder.Configuration["Jwt:Audience"];
-            if (string.IsNullOrWhiteSpace(validIssuer))
-                throw new InvalidOperationException("JWT issuer not configured.");
-            if (string.IsNullOrWhiteSpace(validAudience))
-                throw new InvalidOperationException("JWT audience not configured.");
-
-            builder.Services.AddAuthentication(authenticationOptions =>
-                {
-                    authenticationOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    authenticationOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    authenticationOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(jwtOptions =>
-                {
-                    var signingKey = builder.Configuration[options.SigningKeyConfigurationPath]
-                                     ?? throw new InvalidOperationException("JWT signing key not configured.");
-
-                    var tokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidIssuer = validIssuer,
-                        ValidAudience = validAudience,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
-                    };
-
-                    options.ConfigureTokenValidation?.Invoke(tokenValidationParameters, builder);
-
-                    jwtOptions.RequireHttpsMetadata = false;
-                    jwtOptions.SaveToken = true;
-                    jwtOptions.TokenValidationParameters = tokenValidationParameters;
-                    options.ConfigureJwtBearer?.Invoke(jwtOptions, builder);
-                });
-
-            builder.Services.AddAuthorization();
             return builder;
         }
     }
@@ -118,33 +70,13 @@ public static class BuilderExtensions
 
         return configuredAuthorities
             .Concat(serviceDiscoveryAuthorities)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-    }
-
-    private static void ConfigureProblemDetails(
-        IHostApplicationBuilder builder,
-        bool customizeBadHttpRequestProblemDetails,
-        Action<ProblemDetailsContext>? customizeProblemDetails)
-    {
-        builder.Services.AddProblemDetails(problemDetailsOptions =>
-        {
-            problemDetailsOptions.CustomizeProblemDetails = context =>
-            {
-                if (customizeBadHttpRequestProblemDetails)
-                    context.ApplyBadRequestProblemDetails();
-
-                customizeProblemDetails?.Invoke(context);
-            };
-        });
     }
 
     private static void ConfigureApiVersioning(
         IHostApplicationBuilder builder,
-        IReadOnlyCollection<ApiVersion> supportedApiVersions)
+        ApiVersion[] versions)
     {
-        var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
-
         builder.Services.AddApiVersioning(versioningOptions =>
         {
             versioningOptions.DefaultApiVersion = versions[0];
@@ -156,21 +88,19 @@ public static class BuilderExtensions
 
     private static void ConfigureOpenApi(
         IHostApplicationBuilder builder,
-        IReadOnlyCollection<ApiVersion> supportedApiVersions)
+        ApiVersion[] versions)
     {
-        var versions = ApiVersioningConventions.NormalizeSupportedVersions(supportedApiVersions);
-
         foreach (var version in versions)
         {
             var documentName = ApiVersioningConventions.ToDocumentName(version);
             builder.Services.AddOpenApi(documentName, openApiOptions =>
             {
                 openApiOptions.ShouldInclude =
-                    description => ApiVersioningConventions.ShouldIncludeInDocument(
+                    description => OpenApiConventions.ShouldIncludeInDocument(
                         description.ActionDescriptor.EndpointMetadata,
                         version);
-                ApiVersioningConventions.SubstituteRouteVersion(openApiOptions, version);
-                ApiVersioningConventions.AddBearerSecurity(openApiOptions);
+                OpenApiConventions.SubstituteRouteVersion(openApiOptions, version);
+                OpenApiConventions.AddSecurity(openApiOptions);
             });
         }
     }

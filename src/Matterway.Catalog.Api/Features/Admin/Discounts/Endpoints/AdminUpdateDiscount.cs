@@ -26,12 +26,12 @@ public class AdminUpdateDiscount : IEndpoint
     private static async Task<Results<Ok<AdminUpdateDiscountResponse>, Created<AdminUpdateDiscountResponse>,
             BadRequest<ProblemDetails>>>
         Handle(
-        string code,
-        AdminUpdateDiscountRequest request,
-        HttpContext httpContext,
-        IArticleRepository articleRepository,
-        IDiscountRepository discountRepository,
-        CancellationToken cancellationToken)
+            string code,
+            AdminUpdateDiscountRequest request,
+            HttpContext httpContext,
+            IArticleRepository articleRepository,
+            IDiscountRepository discountRepository,
+            CancellationToken cancellationToken)
     {
         var normalizedCode = code.Trim().ToUpperInvariant();
         if (string.IsNullOrWhiteSpace(normalizedCode))
