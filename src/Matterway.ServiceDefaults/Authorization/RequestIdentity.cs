@@ -6,8 +6,6 @@ namespace Matterway.ServiceDefaults.Authorization;
 public sealed record RequestIdentityOptions
 {
     public required string ServiceName { get; init; }
-    public string CustomerRoleName { get; init; } = "Customer";
-    public Func<string?, bool>? IsCustomerRole { get; init; }
 }
 
 public static class RequestIdentity
@@ -33,12 +31,7 @@ public static class RequestIdentity
     public static bool IsCustomer(ClaimsPrincipal? principal)
     {
         var roleValue = principal?.FindFirstValue(ClaimTypes.Role);
-        var options = GetOptions();
-
-        if (options.IsCustomerRole is not null)
-            return options.IsCustomerRole(roleValue);
-
-        return string.Equals(roleValue, options.CustomerRoleName, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(roleValue, "Customer", StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool IsEmployee(ClaimsPrincipal? principal)
