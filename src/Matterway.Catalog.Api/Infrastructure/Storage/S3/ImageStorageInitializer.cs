@@ -1,11 +1,12 @@
+using System.Net;
+using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.Extensions.Options;
-using Minio;
-using Minio.DataModel.Args;
 
-namespace Matterway.Catalog.Api.Infrastructure.Storage.Minio;
+namespace Matterway.Catalog.Api.Infrastructure.Storage.S3;
 
 public sealed class ImageStorageInitializer(
-    IMinioClientFactory clientFactory,
+    IAmazonS3 client,
     IOptions<ImageStorageOptions> options,
     ILogger<ImageStorageInitializer> logger)
     : IHostedService
@@ -16,7 +17,6 @@ public sealed class ImageStorageInitializer(
     {
         try
         {
-            var client = clientFactory.CreateClient();
             await EnsureBucketAsync(client, cancellationToken).ConfigureAwait(false);
             await EnsureBucketReadPolicyAsync(client, cancellationToken).ConfigureAwait(false);
         }
@@ -32,21 +32,33 @@ public sealed class ImageStorageInitializer(
         return Task.CompletedTask;
     }
 
-    private async Task EnsureBucketAsync(IMinioClient client, CancellationToken cancellationToken)
+    private async Task EnsureBucketAsync(IAmazonS3 client, CancellationToken cancellationToken)
     {
-        var bucketExists = await client.BucketExistsAsync(
-            new BucketExistsArgs().WithBucket(_options.Bucket),
-            cancellationToken).ConfigureAwait(false);
-
-        if (bucketExists) return;
-
-        logger.LogInformation("Creating image storage bucket '{Bucket}'.", _options.Bucket);
-        await client.MakeBucketAsync(
-            new MakeBucketArgs().WithBucket(_options.Bucket),
-            cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await client.HeadBucketAsync(new HeadBucketRequest
+            {
+                BucketName = _options.Bucket
+            }, cancellationToken).ConfigureAwait(false);
+        }
+        catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            logger.LogInformation("Creating image storage bucket '{Bucket}'.", _options.Bucket);
+            try
+            {
+                await client.PutBucketAsync(new PutBucketRequest
+                {
+                    BucketName = _options.Bucket
+                }, cancellationToken).ConfigureAwait(false);
+            }
+            catch (AmazonS3Exception createException) when (createException.ErrorCode == "BucketAlreadyOwnedByYou")
+            {
+                // Another Catalog instance created the bucket concurrently.
+            }
+        }
     }
 
-    private async Task EnsureBucketReadPolicyAsync(IMinioClient client, CancellationToken cancellationToken)
+    private async Task EnsureBucketReadPolicyAsync(IAmazonS3 client, CancellationToken cancellationToken)
     {
         var policyJson = $$"""
                            {
@@ -74,10 +86,12 @@ public sealed class ImageStorageInitializer(
             "Ensuring anonymous read policy for image storage bucket '{Bucket}' on prefix 'images/*'.",
             _options.Bucket);
 
-        await client.SetPolicyAsync(
-            new SetPolicyArgs()
-                .WithBucket(_options.Bucket)
-                .WithPolicy(policyJson),
+        await client.PutBucketPolicyAsync(
+            new PutBucketPolicyRequest
+            {
+                BucketName = _options.Bucket,
+                Policy = policyJson
+            },
             cancellationToken).ConfigureAwait(false);
     }
 }

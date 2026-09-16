@@ -1,123 +1,143 @@
-# Matterway Platform
+# Matterway
 
-> A commerce platform for browsing products, managing customer accounts, and operating catalog, order, and payment workflows.
+Matterway is a commerce platform with a customer storefront, an administration dashboard, and four APIs for catalog, customer, identity, and sales workflows.
 
-Matterway combines a customer storefront, an internal administration dashboard, and service-owned APIs for catalog, customers, identity, and sales. The stack uses .NET 10, PostgreSQL, MinIO, Nuxt 4, and Aspire.
+- **Storefront:** product browsing, customer accounts, carts, checkout, and Stripe payments.
+- **Dashboard:** articles, product details, discounts, catalog archives, customer accounts, and orders.
+- **Backend:** ASP.NET Core APIs, PostgreSQL databases, and RustFS object storage, started together through Aspire.
 
-## Architecture
+The stack uses .NET 10, Nuxt 4, Vue 3, Nuxt UI, PostgreSQL 18, and RustFS. Catalog accesses RustFS through the AWS S3 SDK; an AWS account is not required.
 
-The Storefront and Dashboard are the only browser-facing applications. Their Nuxt server routes proxy requests to the internal APIs and orchestrate flows such as checkout.
+[Get started](#get-started) · [Architecture](#architecture) · [Development](#development) · [Image storage](#image-storage) · [Deployment](#deployment) · [Troubleshooting](#troubleshooting)
 
-```mermaid
-flowchart LR
-  Browser["Browser"] --> Storefront["Storefront Web"]
-  Browser --> Dashboard["Dashboard Web"]
+## Get started
 
-  Storefront --> Catalog["Catalog API"]
-  Storefront --> Customers["Customers API"]
-  Storefront --> Identity["Identity API"]
-  Storefront --> Sales["Sales API"]
+Run the commands below from the repository root.
 
-  Dashboard --> Catalog
-  Dashboard --> Customers
-  Dashboard --> Identity
-  Dashboard --> Sales
+### 1. Install prerequisites
 
-  Customers --> Catalog
-  Customers --> Identity
-  Sales --> Customers
+| Tool | Requirement |
+| --- | --- |
+| .NET SDK | .NET 10; see [`global.json`](global.json) for SDK resolution settings |
+| Node.js and npm | Node 22.12+ within the 22.x line, or Node 24.11+ within the 24.x line, satisfies both web app lockfiles |
+| Docker | A running Docker engine for PostgreSQL and RustFS |
+| Aspire CLI | Starts and deploys the application defined by AppHost |
 
-  Migrations["Migration Runner"] --> Postgres["PostgreSQL"]
-  Catalog --> Minio["MinIO Object Storage"]
-  Catalog --> Postgres
-  Customers --> Postgres
-  Identity --> Postgres
-  Sales --> Postgres
-```
+The `dotnet-ef` tool is needed for manual database maintenance. The Stripe CLI is needed only for local webhook forwarding.
 
-### Routing
-
-Backend API routes use these scopes:
-
-- `/api/public/v1/...`
-- `/api/self/v1/...`
-- `/api/admin/v1/...`
-- `/api/system/v1/...`
-
-Browser requests use same-origin Nuxt routes such as `/api/<service>/<scope>/v1/...`. AppHost injects the internal service addresses through `NUXT_SERVER_*`, so browser code does not need backend ports or CORS configuration.
-
-Storefront-owned routes live under `/api/storefront/...`, including checkout and Stripe webhooks. Image requests use `/api/storefront/cdn/images/<id>` or `/api/dashboard/cdn/images/<id>`.
-
-### Authentication
-
-- Identity.Api issues JWT access and refresh tokens.
-- Role and permission claims control user access.
-- Internal system endpoints can additionally require `X-System-Access-Key`.
-
-## Repository Layout
-
-```text
-src/
-  Matterway.AppHost/          Aspire orchestration and composition root
-  Matterway.ServiceDefaults/  Shared platform defaults
-  Matterway.Catalog.Api/      Catalog domain and MinIO integration
-  Matterway.Customers.Api/    Customer domain
-  Matterway.Identity.Api/     Authentication and JWT service
-  Matterway.Migrations/       EF Core migration runner
-  Matterway.Sales.Api/        Sales domain
-  Matterway.Storefront.Web/   Nuxt customer application
-  Matterway.Dashboard.Web/    Nuxt administration application
-
-scripts/                      Development and deployment helpers
-data/                         Local artifacts such as catalog archives
-docs/                         Diagrams and supporting assets
-```
-
-## Local Development
-
-### Prerequisites
-
-- Docker
-- .NET SDK 10.x
-- Node.js 20+
-- Aspire CLI
-- `dotnet-ef` tool
-- Stripe CLI, only for webhook testing
-
-### Install Dependencies
+### 2. Restore dependencies
 
 ```bash
 dotnet restore Matterway.slnx
-npm install --prefix src/Matterway.Storefront.Web
-npm install --prefix src/Matterway.Dashboard.Web
+npm ci --prefix src/Matterway.Storefront.Web
+npm ci --prefix src/Matterway.Dashboard.Web
 ```
 
-### Configure AppHost
+### 3. Configure local secrets
 
-Versioned topology settings are in `src/Matterway.AppHost/appsettings*.json`. Store secrets outside the repository:
+AppHost passes credentials to the services it starts. Replace the placeholders below and store the values in .NET user secrets:
 
 ```bash
-dotnet user-secrets set "Parameters:JwtSigningKey" "<value>" --project src/Matterway.AppHost
-dotnet user-secrets set "Parameters:SystemAccessKey" "<value>" --project src/Matterway.AppHost
-dotnet user-secrets set "Parameters:PostgresPassword" "<value>" --project src/Matterway.AppHost
-dotnet user-secrets set "Parameters:MinioRootUser" "<value>" --project src/Matterway.AppHost
-dotnet user-secrets set "Parameters:MinioRootPassword" "<value>" --project src/Matterway.AppHost
-dotnet user-secrets set "Parameters:StripeSecretKey" "<value>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:JwtSigningKey" "<random-signing-key>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:SystemAccessKey" "<random-service-key>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:PostgresPassword" "<database-password>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:RustFSAccessKey" "matterway-local" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:RustFSSecretKey" "<storage-secret>" --project src/Matterway.AppHost
+dotnet user-secrets set "Parameters:StripeSecretKey" "<stripe-test-secret-key>" --project src/Matterway.AppHost
 ```
 
-Required topology sections are `Services:AspireDashboard`, `Services:Postgres`, `Services:Minio`, `Services:Storefront`, and `Services:Dashboard`.
+Use at least 32 random ASCII characters for the JWT signing key. The RustFS access key must not contain `/`, and its secret key must contain at least eight characters. Use a Stripe test-mode secret key for local checkout.
 
-API projects keep `appsettings*.json` in their project roots for standalone local runs. These files are excluded from publish output; AppHost supplies deployment settings and secrets as environment variables. Catalog image storage uses `ImageStorage:*`, which AppHost wires to MinIO.
+### 4. Start the application
 
-### Run
-
-`aspire.config.json` selects the AppHost and enables watch mode, so the normal development command is:
+Start Docker, then run:
 
 ```bash
 aspire run
 ```
 
-For a background session:
+[`aspire.config.json`](aspire.config.json) selects AppHost and enables watch mode. AppHost starts the infrastructure, runs migrations for all four databases, and supplies service addresses to the APIs and web apps. Catalog also waits for RustFS readiness before initializing its image bucket.
+
+Open the Aspire dashboard URL printed in the terminal to inspect resource status, logs, and traces.
+
+### Local addresses
+
+| Service | Address | Purpose |
+| --- | --- | --- |
+| Storefront | [localhost:4001](http://localhost:4001) | Customer application |
+| Dashboard | [localhost:4002](http://localhost:4002) | Administration application |
+| Scalar | [localhost:18889](http://localhost:18889) | Combined API reference |
+| Aspire | Port `18888`; use the terminal link | Resource status and telemetry |
+| RustFS console | [localhost:19001/rustfs/console/](http://localhost:19001/rustfs/console/) | Buckets and objects |
+| RustFS S3 API | `http://localhost:19000` | Object storage endpoint |
+| Catalog API | `http://localhost:2001` | Articles, details, discounts, and images |
+| Customers API | `http://localhost:2002` | Customer profiles, addresses, and carts |
+| Identity API | `http://localhost:2003` | Authentication and permissions |
+| Sales API | `http://localhost:2004` | Orders and payments |
+| PostgreSQL | `localhost:15432` | Four service-owned databases |
+
+## Architecture
+
+Browser requests go through the Nuxt server routes in Storefront or Dashboard. These routes forward requests to the APIs and coordinate workflows such as checkout. Each API owns its database; Catalog also stores image objects in RustFS.
+
+```mermaid
+flowchart LR
+  Browser["Browser"]
+
+  subgraph Web["Nuxt applications · server routes"]
+    direction LR
+    Storefront["Storefront"]
+    Dashboard["Dashboard"]
+  end
+
+  Browser --> Web
+  Web --> Catalog["Catalog API"]
+    Catalog --> CatalogDb[(CatalogDb)]
+    Catalog --> RustFS[("RustFS<br/>article-images")]
+  Web --> Customers["Customers API"]
+    Customers --> CustomersDb[(CustomersDb)]
+    Customers -.-> Catalog
+    Customers -.-> Identity
+  Web --> Identity["Identity API"]
+    Identity --> IdentityDb[(IdentityDb)]
+  Web --> Sales["Sales API"]
+    Sales --> SalesDb[(SalesDb)]
+    Sales -.-> Customers
+```
+
+Both Nuxt applications call all four APIs. Dashed arrows show service-to-service calls: Sales calls Customers, and Customers calls Catalog and Identity.
+
+### Routes and authentication
+
+API routes are grouped under `/api/public/v1`, `/api/self/v1`, `/api/admin/v1`, and `/api/system/v1`. Browser clients use same-origin Nuxt routes such as `/api/<service>/<scope>/v1/...`. AppHost supplies internal addresses through `NUXT_SERVER_*` environment variables.
+
+Identity issues access and refresh JWTs. APIs enforce role and permission claims; system endpoints can also require `X-System-Access-Key`.
+
+Storefront-owned workflows use `/api/storefront/...`. Image requests go through `/api/storefront/cdn/images/<id>` or `/api/dashboard/cdn/images/<id>`.
+
+### Repository layout
+
+```text
+src/
+  Matterway.AppHost/          Aspire orchestration and deployment
+  Matterway.ServiceDefaults/  Shared API, telemetry, and hosting defaults
+  Matterway.Catalog.Api/      Catalog, images, and archive import/export
+  Matterway.Customers.Api/    Customers, addresses, and carts
+  Matterway.Identity.Api/     Authentication, users, and permissions
+  Matterway.Sales.Api/        Orders and payments
+  Matterway.Migrations/       Migration runner for all four databases
+  Matterway.Storefront.Web/   Customer-facing Nuxt application
+  Matterway.Dashboard.Web/    Administration Nuxt application
+scripts/                     Database, migration, and image-publishing helpers
+data/                        Local artifacts, including catalog archives
+docs/                        Diagrams, screenshots, and supporting documents
+```
+
+See [`docs/README.md`](docs/README.md) for diagram sources and export instructions.
+
+## Development
+
+### Start and stop a background session
 
 ```bash
 aspire start
@@ -125,39 +145,70 @@ aspire ps
 aspire stop
 ```
 
-### Default Development Endpoints
+### Check changes
 
-| Component        | Port  | Responsibility                              |
-|------------------|-------|---------------------------------------------|
-| Catalog.Api      | 2001  | Articles, pricing, discounts, images        |
-| Customers.Api    | 2002  | Profiles, addresses, carts, order mirror    |
-| Identity.Api     | 2003  | Authentication, tokens, permissions         |
-| Sales.Api        | 2004  | Orders, payments, status tracking           |
-| Storefront.Web   | 4001  | Customer SSR application                    |
-| Dashboard.Web    | 4002  | Administration SSR application              |
-| PostgreSQL       | 15432 | Relational datastore                        |
-| MinIO API        | 19000 | Object storage API                          |
-| MinIO Console    | 19001 | Object storage administration               |
-| Matterway Aspire | 18888 | Local orchestration and telemetry           |
-| Scalar           | 18889 | Unified API reference                       |
+```bash
+dotnet build Matterway.slnx
 
-### Test Stripe Webhooks
+npm run typecheck --prefix src/Matterway.Storefront.Web
+npm run lint --prefix src/Matterway.Storefront.Web
+npm run build --prefix src/Matterway.Storefront.Web
+
+npm run typecheck --prefix src/Matterway.Dashboard.Web
+npm run lint --prefix src/Matterway.Dashboard.Web
+npm run build --prefix src/Matterway.Dashboard.Web
+```
+
+These commands check compilation, types, lint rules, and production web builds. They do not exercise checkout or other complete user flows.
+
+### Configuration
+
+- **Ports:** [`src/Matterway.AppHost/appsettings.json`](src/Matterway.AppHost/appsettings.json) defines `Services:AspireDashboard`, `Services:Scalar`, `Services:Postgres`, `Services:RustFS`, `Services:Storefront`, and `Services:Dashboard`. API development ports are in each API's `Properties/launchSettings.json`.
+- **Local credentials:** use AppHost user secrets from the setup instructions.
+- **Standalone API runs:** each API has its own `appsettings*.json`. Configure its database, authentication, and service dependencies when running it outside AppHost.
+- **Deployment:** API `appsettings*.json` files are excluded from publish output. AppHost supplies the deployment configuration through environment variables.
+
+### Database maintenance
+
+The migration runner applies existing migrations during an Aspire-managed startup. For manual maintenance, install `dotnet-ef` and configure the API projects to reach the intended databases.
+
+| Task | Command |
+| --- | --- |
+| Apply migrations to all API databases | `./scripts/databases update` |
+| Drop all API databases, without confirmation | `./scripts/databases drop` |
+| Add an `Initialize` migration to every API | `./scripts/migrations add` |
+| Remove the latest migration from every API | `./scripts/migrations remove` |
+
+The helpers operate on **all four APIs**. For a named migration in one service, use `dotnet ef migrations add <name> --project src/Matterway.Catalog.Api`, substituting the relevant project. Windows command-prompt equivalents are available as `.cmd` files in `scripts/`.
+
+### Stripe webhooks
+
+With Storefront running and a Stripe test key configured, forward events to the local handler:
 
 ```bash
 stripe listen --forward-to http://localhost:4001/api/storefront/webhooks/stripe
 ```
 
-## Database and Migrations
+The handler processes `charge.succeeded` events to register payments with Sales.
 
-`Matterway.Migrations` applies all four service schemas during an Aspire-managed start or deployment. The repository helpers are for direct local maintenance:
+## Image storage
 
-| Task | Command |
-|------|---------|
-| Apply all migrations | `./scripts/databases update` |
-| Drop all local databases | `./scripts/databases drop` |
-| Add each service's `Initialize` migration | `./scripts/migrations add` |
-| Remove each service's latest migration | `./scripts/migrations remove` |
-| Show helper usage | `./scripts/databases help` or `./scripts/migrations help` |
+AppHost runs the pinned `rustfs/rustfs:1.0.0-rc.6` image. This is a release candidate; test upgrades before changing the tag.
+
+Sign in to the [RustFS console](http://localhost:19001/rustfs/console/) with the configured access and secret keys. Catalog creates the `article-images` bucket automatically and grants anonymous reads for its `images/*` prefix. Objects use keys of the form `images/<image-id-without-hyphens>`.
+
+**Upload product images through Matterway's Dashboard.** This creates the database record and the stored object together. Uploading through the RustFS console creates only the object.
+
+Catalog uses path-style S3 addressing and signing region `us-east-1`, unless `ImageStorage:Region` is set. For a standalone Catalog run, configure `ImageStorage:Endpoint`, `ImageStorage:Bucket`, `ImageStorage:AccessKey`, and `ImageStorage:SecretKey`. AppHost sets these automatically for managed runs.
+
+### Persistent data
+
+| Docker volume | Contents |
+| --- | --- |
+| `matterway-postgres-data` | PostgreSQL databases |
+| `matterway-rustfs-data` | RustFS objects and storage metadata |
+
+These volumes persist across application restarts. Keep database and object-storage backups together so image records remain consistent with their objects.
 
 ## Deployment
 
@@ -165,28 +216,37 @@ stripe listen --forward-to http://localhost:4001/api/storefront/webhooks/stripe
 aspire deploy
 ```
 
-The default deployment environment is `Production`. Use `--environment <name>` only for another named deployment environment.
+Aspire builds the .NET services and Nuxt servers and generates the Docker Compose deployment. The default deployment environment is `Production`; use `--environment <name>` for another named environment.
 
-Aspire generates the Docker Compose deployment and container images. It builds and packages the Nuxt servers from their package scripts, while the .NET SDK builds the APIs and migration runner; no project-level Dockerfiles are required.
+AppHost marks Storefront and Dashboard as the public application endpoints. The APIs and storage services remain internal in publish mode. Provide deployment credentials through the deployment environment.
 
-Only Storefront.Web and Dashboard.Web have public HTTP endpoints in publish mode. The APIs, PostgreSQL, MinIO, and migration runner remain internal to the generated composition.
-
-To retag and push the generated application images:
+To retag and push the generated application images to your Docker Hub namespace:
 
 ```bash
-./scripts/dockerhub push <source-tag> [dest-tag] [namespace]
+./scripts/dockerhub push <source-tag> <destination-tag> <your-namespace>
 ```
 
-Run `./scripts/dockerhub help` for examples and defaults.
+Run `./scripts/dockerhub help` for details. Omitting the namespace uses the script's configured default.
 
-## Observability
+## Troubleshooting
 
-The platform configures OpenTelemetry, resilient `HttpClient` defaults, standardized ProblemDetails responses, and OpenAPI generation. Storefront.Web exports server-side traces; Dashboard.Web currently does not.
+| Symptom | Check |
+| --- | --- |
+| AppHost asks for a missing parameter | Set all six `Parameters:*` user secrets on `src/Matterway.AppHost`, then restart. |
+| A container will not start | Confirm Docker is running and inspect the resource logs in Aspire. |
+| An API is waiting to start | Inspect `mtw-db-migrator`; Catalog also waits for RustFS readiness. |
+| A local port is occupied | Check the configured ports and stop any previous Aspire session with `aspire stop`. |
+| RustFS console returns an error at `/` | Open `/rustfs/console/` on port `19001`. |
+| npm reports an unsupported Node version | Use a Node version listed under prerequisites, then rerun `npm ci`. |
 
-## Documentation
+Check RustFS readiness directly:
 
-See [`docs/README.md`](docs/README.md) for the editable PlantUML sources and rendered diagrams.
+```bash
+curl --fail http://localhost:19000/health/ready
+```
+
+For storage operations, see the [RustFS container guide](https://docs.rustfs.com/en/installation/container) and [health endpoint reference](https://docs.rustfs.com/en/operations/status-check).
 
 ## License
 
-MIT License. See [`LICENSE.txt`](LICENSE.txt).
+[MIT](LICENSE.txt)
