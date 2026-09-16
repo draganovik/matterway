@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Matterway.ServiceDefaults.Routing;
 
-public abstract class ParsableRouteConstraint<TValue> : IRouteConstraint
+public sealed class ParsableRouteConstraint<TValue> : IRouteConstraint
     where TValue : IParsable<TValue>
 {
     public bool Match(

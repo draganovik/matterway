@@ -24,8 +24,8 @@ public static class BuilderBootstrap
 
         builder.Services.Configure<RouteOptions>(routeOptions =>
         {
-            routeOptions.ConstraintMap[nameof(ArticleCode)] = typeof(ArticleCodeRouteConstraint);
-            routeOptions.ConstraintMap[nameof(OrderId)] = typeof(OrderIdRouteConstraint);
+            routeOptions.ConstraintMap[nameof(ArticleCode)] = typeof(ParsableRouteConstraint<ArticleCode>);
+            routeOptions.ConstraintMap[nameof(OrderId)] = typeof(ParsableRouteConstraint<OrderId>);
         });
 
         builder.AddServiceDefaults();

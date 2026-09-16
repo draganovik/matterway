@@ -1,3 +1,4 @@
+using Aspire.Hosting.JavaScript;
 using Matterway.AppHost.ApiDocumentation;
 using Matterway.AppHost.Configuration;
 using Matterway.ServiceDefaults;
@@ -63,39 +64,26 @@ var dbMigrator = builder.AddProject<Matterway_Migrations>("mtw-db-migrator")
     .WaitFor(postgres)
     .PublishAsDockerComposeService((_, service) => { service.Restart = "no"; });
 
-var identityApi = AddApi<Matterway_Identity_Api>(
-    ApiDirectory.Identity,
-    api => api.WithReference(databases.Identity));
+var identityApi = AddApi<Matterway_Identity_Api>(ApiDirectory.Identity)
+    .WithReference(databases.Identity);
 
-var catalogApi = AddApi<Matterway_Catalog_Api>(
-    ApiDirectory.Catalog,
-    api => api.WithReference(databases.Catalog));
-
-var customersApi = AddApi<Matterway_Customers_Api>(
-    ApiDirectory.Customers,
-    api => api
-        .WithReference(databases.Customers)
-        .WithReference(identityApi.GetEndpoint("http"))
-        .WithReference(catalogApi.GetEndpoint("http")));
-
-var salesApi = AddApi<Matterway_Sales_Api>(
-    ApiDirectory.Sales,
-    api => api.WithReference(databases.Sales)
-        .WithReference(customersApi.GetEndpoint("http")));
-
-var identityApiHttp = identityApi.GetEndpoint("http");
-var catalogApiHttp = catalogApi.GetEndpoint("http");
-var customersApiHttp = customersApi.GetEndpoint("http");
-var salesApiHttp = salesApi.GetEndpoint("http");
-var rustfsHttpEndpoint = rustfs.GetEndpoint("http");
-
-catalogApi
+var catalogApi = AddApi<Matterway_Catalog_Api>(ApiDirectory.Catalog)
+    .WithReference(databases.Catalog)
     .WaitFor(rustfs)
-    .WithReference(rustfsHttpEndpoint)
+    .WithReference(rustfs.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__Bucket", "article-images")
-    .WithEnvironment("ImageStorage__Endpoint", rustfsHttpEndpoint)
+    .WithEnvironment("ImageStorage__Endpoint", rustfs.GetEndpoint("http"))
     .WithEnvironment("ImageStorage__AccessKey", rustfsAccessKey)
     .WithEnvironment("ImageStorage__SecretKey", rustfsSecretKey);
+
+var customersApi = AddApi<Matterway_Customers_Api>(ApiDirectory.Customers)
+    .WithReference(databases.Customers)
+    .WithReference(identityApi.GetEndpoint("http"))
+    .WithReference(catalogApi.GetEndpoint("http"));
+
+var salesApi = AddApi<Matterway_Sales_Api>(ApiDirectory.Sales)
+    .WithReference(databases.Sales)
+    .WithReference(customersApi.GetEndpoint("http"));
 
 var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResource> Resource)[]
 {
@@ -105,53 +93,31 @@ var apiResources = new (ApiDefinition Definition, IResourceBuilder<ProjectResour
     (ApiDirectory.Sales, salesApi)
 };
 
-#pragma warning disable ASPIREJAVASCRIPT001
-WithCommonWebEnvironment(
-        builder.AddViteApp("mtw-storefront-web", "../Matterway.Storefront.Web")
-            .PublishAsPackageScript()
-            .WithEndpoint("http", endpoint =>
-            {
-                endpoint.Port = services.Storefront.Port;
-                endpoint.IsProxied = false;
-            })
-            .WithExternalHttpEndpoints())
+foreach (var (_, api) in apiResources)
+    api
+        .WithEnvironment("Jwt__Key", jwtSigningKey)
+        .WithEnvironment("Jwt__Issuer", identityApi.GetEndpoint("http"))
+        .WithEnvironment("Jwt__Audience", identityApi.GetEndpoint("http"))
+        .WithEnvironment("Security__SystemAccessKey", systemAccessKey);
+
+AddWebApp("mtw-storefront-web", "../Matterway.Storefront.Web", services.Storefront.Port)
     .WithEnvironment("NUXT_SYSTEM_ACCESS_KEY", systemAccessKey)
     .WithEnvironment("NUXT_STRIPE_SECRET_KEY", stripeSecretKey)
     .WaitFor(catalogApi)
-    .WaitFor(salesApi)
-    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+    .WaitFor(salesApi);
 
-WithCommonWebEnvironment(
-        builder.AddViteApp("mtw-dashboard-web", "../Matterway.Dashboard.Web")
-            .PublishAsPackageScript()
-            .WithEndpoint("http", endpoint =>
-            {
-                endpoint.Port = services.Dashboard.Port;
-                endpoint.IsProxied = false;
-            })
-            .WithExternalHttpEndpoints())
+AddWebApp("mtw-dashboard-web", "../Matterway.Dashboard.Web", services.Dashboard.Port)
     .WaitFor(identityApi)
     .WaitFor(catalogApi)
     .WaitFor(customersApi)
-    .WaitFor(salesApi)
-    .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
-#pragma warning restore ASPIREJAVASCRIPT001
+    .WaitFor(salesApi);
 
 if (builder.Environment.IsDevelopment())
     ScalarApiRegistration.AddApiReferences(builder, services.Scalar.Port, apiResources);
 
-foreach (var (_, api) in apiResources)
-    api
-        .WithEnvironment("Jwt__Key", jwtSigningKey)
-        .WithEnvironment("Jwt__Issuer", identityApiHttp)
-        .WithEnvironment("Jwt__Audience", identityApiHttp)
-        .WithEnvironment("Security__SystemAccessKey", systemAccessKey);
-
 builder.Build().Run();
 
-IResourceBuilder<ProjectResource> AddApi<TProject>(
-    ApiDefinition apiDefinition,
-    Func<IResourceBuilder<ProjectResource>, IResourceBuilder<ProjectResource>> configure)
+IResourceBuilder<ProjectResource> AddApi<TProject>(ApiDefinition apiDefinition)
     where TProject : IProjectMetadata, new()
 {
     var api = builder.AddProject<TProject>(apiDefinition.AspireServiceName)
@@ -160,20 +126,31 @@ IResourceBuilder<ProjectResource> AddApi<TProject>(
     if (!builder.ExecutionContext.IsPublishMode)
         api = api.WithExternalHttpEndpoints();
 
-    return configure(api).WaitFor(dbMigrator);
+    return api.WaitFor(dbMigrator);
 }
 
-IResourceBuilder<T> WithCommonWebEnvironment<T>(IResourceBuilder<T> webApp)
-    where T : IResource, IResourceWithEnvironment
+#pragma warning disable ASPIREJAVASCRIPT001
+IResourceBuilder<ViteAppResource> AddWebApp(string name, string path, int port)
 {
+    var webApp = builder.AddViteApp(name, path)
+        .PublishAsPackageScript()
+        .WithEndpoint("http", endpoint =>
+        {
+            endpoint.Port = port;
+            endpoint.IsProxied = false;
+        })
+        .WithExternalHttpEndpoints()
+        .PublishAsDockerComposeService((_, service) => { service.Restart = "unless-stopped"; });
+
     if (!builder.ExecutionContext.IsPublishMode)
         webApp = webApp.WithEnvironment("HOST", "localhost");
 
     return webApp
-        .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApiHttp)
-        .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApiHttp)
-        .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApiHttp)
-        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApiHttp)
-        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", rustfsHttpEndpoint)
+        .WithEnvironment("NUXT_SERVER_IDENTITY_API_BASE_URL", identityApi.GetEndpoint("http"))
+        .WithEnvironment("NUXT_SERVER_CATALOG_API_BASE_URL", catalogApi.GetEndpoint("http"))
+        .WithEnvironment("NUXT_SERVER_CUSTOMERS_API_BASE_URL", customersApi.GetEndpoint("http"))
+        .WithEnvironment("NUXT_SERVER_SALES_API_BASE_URL", salesApi.GetEndpoint("http"))
+        .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BASE_URL", rustfs.GetEndpoint("http"))
         .WithEnvironment("NUXT_SERVER_IMAGE_CDN_BUCKET", "article-images");
 }
+#pragma warning restore ASPIREJAVASCRIPT001

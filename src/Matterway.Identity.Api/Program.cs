@@ -16,12 +16,20 @@ var builder = BuilderBootstrap.CreateBuilder(
 
 var jwtConfigurationSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtConfigurationSection.Get<JwtTokenOptions>() ?? new JwtTokenOptions();
+builder.Services.Configure<JwtTokenOptions>(jwtConfigurationSection);
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
 builder
     .ConfigureApi(
         apiContract,
         false)
-    .ConfigureAuthentication(CreateAuthenticationOptions(jwtConfigurationSection, jwtOptions))
+    .ConfigureAuthentication(options =>
+    {
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+        options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
+        options.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(Math.Max(0, jwtOptions.ClockSkewMinutes));
+        options.Events = new JwtBearerEvents { OnTokenValidated = ValidateAccessTokenAsync };
+    })
     .ConfigureIdentity()
     .ConfigurePersistence()
     .ConfigureEndpoints();
@@ -32,35 +40,6 @@ app.UseApiFoundation();
 app.ApplyApiContract(apiContract);
 
 app.Run();
-
-static ApiAuthenticationOptions CreateAuthenticationOptions(
-    IConfigurationSection jwtConfigurationSection,
-    JwtTokenOptions jwtOptions)
-{
-    return new ApiAuthenticationOptions
-    {
-        ValidIssuer = jwtOptions.Issuer,
-        ValidAudience = jwtOptions.Audience,
-        ConfigureServices = hostBuilder =>
-        {
-            hostBuilder.Services.Configure<JwtTokenOptions>(jwtConfigurationSection);
-            hostBuilder.Services.AddScoped<ITokenService, JwtTokenService>();
-        },
-        ConfigureTokenValidation = (tokenValidationParameters, _) =>
-        {
-            tokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-            tokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
-            tokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(Math.Max(0, jwtOptions.ClockSkewMinutes));
-        },
-        ConfigureJwtBearer = (jwtBearerOptions, _) =>
-        {
-            jwtBearerOptions.Events = new JwtBearerEvents
-            {
-                OnTokenValidated = ValidateAccessTokenAsync
-            };
-        }
-    };
-}
 
 static async Task ValidateAccessTokenAsync(TokenValidatedContext context)
 {
