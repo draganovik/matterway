@@ -247,6 +247,11 @@ curl --fail http://localhost:19000/health/ready
 
 For storage operations, see the [RustFS container guide](https://docs.rustfs.com/en/installation/container) and [health endpoint reference](https://docs.rustfs.com/en/operations/status-check).
 
+## Author
+
+Mladen Draganović  
+GitHub: [@draganovik](https://github.com/draganovik)
+
 ## License
 
-[MIT](LICENSE.txt)
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
