@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Matterway.Catalog.Api.Infrastructure.Persistence.ArticleEntity;
 
-public sealed class EfPgArticleRepository(CatalogDbComposer context)
+internal sealed class EfPgArticleRepository(
+    CatalogDbComposer context,
+    IArticleRsqlRuleProvider rsqlRuleProvider)
     : IArticleRepository
 {
     public async Task<Article?> Create(Article requestModel, CancellationToken cancellationToken = default)
@@ -99,7 +101,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
     public async Task<int> Count(string? filter,
         CancellationToken cancellationToken = default)
     {
-        var articleQuery = context.Article.AsQueryable().ApplyArticleRsql(filter);
+        var articleQuery = await BuildQuery(filter, cancellationToken);
         return await articleQuery.CountAsync(cancellationToken);
     }
 
@@ -109,7 +111,7 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
         string? filter,
         CancellationToken cancellationToken = default)
     {
-        var articleQuery = context.Article.AsQueryable().ApplyArticleRsql(filter);
+        var articleQuery = await BuildQuery(filter, cancellationToken);
         var now = DateTime.UtcNow;
         return await articleQuery
             .AsNoTracking()
@@ -120,6 +122,17 @@ public sealed class EfPgArticleRepository(CatalogDbComposer context)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
+
+    private async Task<IQueryable<Article>> BuildQuery(
+        string? filter,
+        CancellationToken cancellationToken)
+    {
+        var query = context.Article.AsQueryable();
+        if (string.IsNullOrWhiteSpace(filter)) return query;
+
+        var ruleSet = await rsqlRuleProvider.GetAsync(cancellationToken);
+        return query.ApplyArticleRsql(filter, ruleSet);
     }
 
     public async Task<Article?> Update(Article request, ArticleCode originalCode,

@@ -1,3 +1,4 @@
+using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Domain.Entities;
 using Matterway.Catalog.Api.Features.Admin.Details.Contracts;
 using Matterway.Catalog.Api.Infrastructure.Persistence.DetailEntity;
@@ -38,6 +39,15 @@ public class AdminPutDetail : IEndpoint
                 Title = "Slug is required",
                 Status = StatusCodes.Status400BadRequest
             });
+
+        if (ArticleRsqlSupport.IsReservedField(normalizedSlug))
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = "Slug is reserved",
+                Detail = $"'{normalizedSlug}' is a built-in article filter field.",
+                Status = StatusCodes.Status400BadRequest
+            });
+
         var existing = await repository.GetBy(normalizedSlug, cancellationToken);
 
         var entity = new Detail
