@@ -12,9 +12,8 @@ namespace Matterway.Catalog.Api.Domain;
 /// </summary>
 /// <remarks>
 /// This extension translates a filter string into LINQ expressions EF can execute server-side.
-/// Base article fields live in <see cref="ArticleFieldRules"/>, text detail slugs in
-/// <see cref="ArticleDetailRules"/>, and numeric detail slugs in <see cref="ArticleNumericDetailRules"/>;
-/// add entries there to expose new filters without touching callers.
+/// Base article fields live in <see cref="ArticleFieldRules"/>. Detail rules come from
+/// the current database definitions supplied by <see cref="ArticleRsqlRuleSet"/>.
 /// Examples:
 /// <list type="bullet">
 /// <item><description><c>title==bulb;price=le=5000</c></description></item>
@@ -72,147 +71,33 @@ public static class ArticleRsqlSupport
             ["available"] = ArticleFieldRule.Bool(p => p.IsAvailable)
         };
 
-    // Article detail slugs that can be filtered via RSQL (string comparisons only).
-    private static readonly IReadOnlyDictionary<string, ArticleDetailRule> ArticleDetailRules =
-        new Dictionary<string, ArticleDetailRule>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["category"] = ArticleDetailRule.Text("category", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["segment"] = ArticleDetailRule.Text("segment", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["audio"] = ArticleDetailRule.Text("audio", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["audio-quality"] = ArticleDetailRule.Text("audio-quality", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["battery"] = ArticleDetailRule.Text("battery", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["brand"] = ArticleDetailRule.Text("brand", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["camera"] = ArticleDetailRule.Text("camera", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["color"] = ArticleDetailRule.Text("color", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["color-temperature"] = ArticleDetailRule.Text("color-temperature", RsqlOperator.Equal,
-                RsqlOperator.In, RsqlOperator.NotIn),
-            ["compatibility"] = ArticleDetailRule.Text("compatibility", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["connectivity"] = ArticleDetailRule.Text("connectivity", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["display"] = ArticleDetailRule.Text("display", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["features"] = ArticleDetailRule.Text("features", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["material"] = ArticleDetailRule.Text("material", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["model"] = ArticleDetailRule.Text("model", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["operating-system"] = ArticleDetailRule.Text("operating-system", RsqlOperator.Equal,
-                RsqlOperator.In, RsqlOperator.NotIn),
-            ["ports"] = ArticleDetailRule.Text("ports", RsqlOperator.Equal, RsqlOperator.In, RsqlOperator.NotIn),
-            ["processor"] = ArticleDetailRule.Text("processor", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["resolution"] = ArticleDetailRule.Text("resolution", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["video-quality"] = ArticleDetailRule.Text("video-quality", RsqlOperator.Equal, RsqlOperator.In,
-                RsqlOperator.NotIn)
-        };
-
-    // Article numeric detail slugs that can be filtered via RSQL (numeric comparisons).
-    private static readonly IReadOnlyDictionary<string, ArticleDetailNumericRule> ArticleNumericDetailRules =
-        new Dictionary<string, ArticleDetailNumericRule>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["battery-size"] = ArticleDetailNumericRule.Number(
-                "battery-size",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["depth"] = ArticleDetailNumericRule.Number(
-                "depth",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["height"] = ArticleDetailNumericRule.Number(
-                "height",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["power"] = ArticleDetailNumericRule.Number(
-                "power",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["ram-size"] = ArticleDetailNumericRule.Number(
-                "ram-size",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["refresh-rate"] = ArticleDetailNumericRule.Number(
-                "refresh-rate",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["screen-size"] = ArticleDetailNumericRule.Number(
-                "screen-size",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["storage"] = ArticleDetailNumericRule.Number(
-                "storage",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["weight"] = ArticleDetailNumericRule.Number(
-                "weight",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn),
-            ["width"] = ArticleDetailNumericRule.Number(
-                "width",
-                RsqlOperator.Equal,
-                RsqlOperator.NotEqual,
-                RsqlOperator.GreaterThanOrEqual,
-                RsqlOperator.LessThanOrEqual,
-                RsqlOperator.In,
-                RsqlOperator.NotIn)
-        };
-
     /// <summary>
     /// Applies an RSQL string to an article query.
     /// </summary>
     /// <param name="query">Queryable of articles to filter.</param>
     /// <param name="rsqlFilter">RSQL filter string (<c>field=op=value</c>), or null to skip filtering.</param>
+    /// <param name="ruleSet">Detail rules loaded for the current request.</param>
     /// <returns>The filtered queryable; original instance if no filter is provided or no predicate is built.</returns>
-    public static IQueryable<Article> ApplyArticleRsql(this IQueryable<Article> query, string? rsqlFilter)
+    internal static IQueryable<Article> ApplyArticleRsql(
+        this IQueryable<Article> query,
+        string? rsqlFilter,
+        ArticleRsqlRuleSet ruleSet)
     {
         if (string.IsNullOrWhiteSpace(rsqlFilter))
             return query;
 
-        var predicate = BuildPredicate(rsqlFilter);
+        var predicate = BuildPredicate(rsqlFilter, ruleSet);
         return query.Where(predicate);
     }
 
-    private static Expression<Func<Article, bool>> BuildPredicate(string rsqlFilter)
+    internal static bool IsReservedField(string slug)
+    {
+        return ArticleFieldRules.ContainsKey(slug);
+    }
+
+    private static Expression<Func<Article, bool>> BuildPredicate(
+        string rsqlFilter,
+        ArticleRsqlRuleSet ruleSet)
     {
         var filterGroups = ParseFilterGroupsOrThrow(rsqlFilter);
         var parameter = Expression.Parameter(typeof(Article), "article");
@@ -223,7 +108,7 @@ public static class ArticleRsqlSupport
             Expression? andExpression = null;
             foreach (var token in andGroup)
             {
-                var expression = BuildExpressionForToken(parameter, token);
+                var expression = BuildExpressionForToken(parameter, token, ruleSet);
                 andExpression = andExpression is null
                     ? expression
                     : Expression.AndAlso(andExpression, expression);
@@ -384,7 +269,10 @@ public static class ArticleRsqlSupport
         return trimmed;
     }
 
-    private static Expression BuildExpressionForToken(ParameterExpression parameter, FilterToken token)
+    private static Expression BuildExpressionForToken(
+        ParameterExpression parameter,
+        FilterToken token,
+        ArticleRsqlRuleSet ruleSet)
     {
         if (ArticleFieldRules.TryGetValue(token.Field, out var fieldRule))
         {
@@ -393,10 +281,10 @@ public static class ArticleRsqlSupport
                    throw BadFilter($"Operator '{token.Operator}' is not supported for field '{token.Field}'.");
         }
 
-        if (ArticleDetailRules.TryGetValue(token.Field, out var detailRule))
+        if (ruleSet.TextRules.TryGetValue(token.Field, out var detailRule))
             return BuildDetailExpression(parameter, token, detailRule);
 
-        if (ArticleNumericDetailRules.TryGetValue(token.Field, out var numericRule))
+        if (ruleSet.NumericRules.TryGetValue(token.Field, out var numericRule))
             return BuildNumericDetailExpression(parameter, token, numericRule);
 
         throw BadFilter($"Unknown filter field or slug '{token.Field}'.");
@@ -619,32 +507,6 @@ public static class ArticleRsqlSupport
     private sealed record FilterToken(string Field, RsqlOperator Operator, IReadOnlyList<string> Values);
 
     /// <summary>
-    /// Describes how an article detail slug should be interpreted (string operators only).
-    /// </summary>
-    private sealed record ArticleDetailRule(
-        string Slug,
-        ISet<RsqlOperator> SupportedOperators)
-    {
-        public static ArticleDetailRule Text(string slug, params RsqlOperator[] operators)
-        {
-            return new ArticleDetailRule(slug, operators.ToHashSet());
-        }
-    }
-
-    /// <summary>
-    /// Describes how a numeric detail slug should be interpreted (numeric operators).
-    /// </summary>
-    private sealed record ArticleDetailNumericRule(
-        string Slug,
-        ISet<RsqlOperator> SupportedOperators)
-    {
-        public static ArticleDetailNumericRule Number(string slug, params RsqlOperator[] operators)
-        {
-            return new ArticleDetailNumericRule(slug, operators.ToHashSet());
-        }
-    }
-
-    /// <summary>
     /// Describes how a top-level article field is converted into an expression tree for a filter token.
     /// </summary>
     private sealed record ArticleFieldRule(Func<ParameterExpression, FilterToken, Expression?> Build)
@@ -679,17 +541,5 @@ public static class ArticleRsqlSupport
         {
             return node == source ? target : base.VisitParameter(node);
         }
-    }
-
-    private enum RsqlOperator
-    {
-        Equal,
-        NotEqual,
-        In,
-        NotIn,
-        GreaterThan,
-        GreaterThanOrEqual,
-        LessThan,
-        LessThanOrEqual
     }
 }

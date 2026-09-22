@@ -27,6 +27,7 @@ public static class PersistenceRegistration
             builder.Services.AddScoped<IArticleDetailNumericRepository, EfPgArticleDetailNumericRepository>();
             builder.Services.AddScoped<IDetailRepository, EfPgDetailRepository>();
             builder.Services.AddScoped<IArticleImageRepository, EfPgArticleImageRepository>();
+            builder.Services.AddScoped<IArticleRsqlRuleProvider, EfPgArticleRsqlRuleProvider>();
             builder.Services.AddScoped<IArticleRepository, EfPgArticleRepository>();
 
             return builder;

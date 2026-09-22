@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text.Json;
+using Matterway.Catalog.Api.Domain;
 using Matterway.Catalog.Api.Infrastructure.ImportExport.Rows;
 using Matterway.Catalog.Api.Infrastructure.Persistence;
 using Matterway.Catalog.Api.Infrastructure.Storage;
@@ -148,6 +149,12 @@ public sealed class CatalogArchiveService(
             archive,
             "data/article_images.json",
             cancellationToken);
+
+        var reservedDetail = details.FirstOrDefault(detail =>
+            !string.IsNullOrWhiteSpace(detail.Slug) && ArticleRsqlSupport.IsReservedField(detail.Slug));
+        if (reservedDetail is not null)
+            throw new InvalidDataException(
+                $"Detail slug '{reservedDetail.Slug}' is reserved for a built-in article filter field.");
 
         var uploadedObjectNames = new List<string>(articleImages.Count);
 
