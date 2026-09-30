@@ -8,7 +8,19 @@ Matterway is a commerce platform with a customer storefront, an administration d
 
 The stack uses .NET 10, Nuxt 4, Vue 3, Nuxt UI, PostgreSQL 18, and RustFS. Catalog accesses RustFS through the AWS S3 SDK; an AWS account is not required.
 
-[Get started](#get-started) · [Architecture](#architecture) · [Development](#development) · [Image storage](#image-storage) · [Deployment](#deployment) · [Troubleshooting](#troubleshooting)
+[Preview](#preview) · [Get started](#get-started) · [Architecture](#architecture) · [Development](#development) · [Image storage](#image-storage) · [Deployment](#deployment) · [Troubleshooting](#troubleshooting)
+
+## Preview
+
+| Storefront | Catalog administration |
+| --- | --- |
+| ![Storefront showing camera products with price and technical-detail filters](docs/screenshots/previews/storefront.png) | ![Dashboard showing article details, pricing, availability, and product images](docs/screenshots/previews/catalog.png) |
+| Browse products and filter by price and technical details. | Manage articles, product images, prices, and availability. |
+
+| Order administration | Aspire dashboard |
+| --- | --- |
+| ![Dashboard showing an order, payment totals, and status history](docs/screenshots/previews/orders.png) | ![Aspire dashboard showing the APIs, web applications, databases, and object storage](docs/screenshots/previews/aspire.png) |
+| Review order items, payments, and status history. | Inspect services, infrastructure, and resource health. |
 
 ## Get started
 
